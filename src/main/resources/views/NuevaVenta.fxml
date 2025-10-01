@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #456789;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.NuevaVentaController">
+   <top>
+      <GridPane prefHeight="120.0" prefWidth="990.0" style="-fx-background-color: #456789;" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.50745212880412" minWidth="10.0" prefWidth="200.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="169.3582233064397" minWidth="10.0" prefWidth="159.044763087058" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="175.65671416767248" minWidth="10.0" prefWidth="155.4626949154793" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="175.65671416767248" minWidth="0.0" prefWidth="35.10446383858033" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="294.940290879768" minWidth="10.0" prefWidth="214.20896403448023" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="144.9402892753685" minWidth="10.0" prefWidth="134.68655482526094" />
+          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="124.04478146286851" minWidth="10.0" prefWidth="124.04478146286851" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Código de barras" textFill="WHITE" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
+            <Button maxWidth="130.0" minWidth="130.0" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="130.0" text="Buscar con filtros" GridPane.rowIndex="2" />
+            <TextField fx:id="tfCodBarra" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" promptText="Código de barras..." GridPane.rowIndex="1" />
+            <Separator orientation="VERTICAL" prefHeight="95.0" prefWidth="14.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.rowSpan="2147483647" GridPane.valignment="CENTER" />
+            <Button mnemonicParsing="false" onAction="#agregarRepuesto" text="Agregar seleccionado" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <Button mnemonicParsing="false" onAction="#limpiarLista" text="Limpiar lista de venta" GridPane.columnIndex="4" />
+            <Button disable="true" maxHeight="0.0" maxWidth="0.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="0.0" prefWidth="0.0" text="Quitar repuesto" GridPane.columnIndex="4" />
+            <Label text="Repuestos a vender:" textFill="WHITE" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <Button maxWidth="130.0" minWidth="130.0" mnemonicParsing="false" onAction="#todosRepuestos" prefWidth="130.0" text="Todos los repuestos" GridPane.rowIndex="3" />
+            <CheckBox fx:id="checkStockBajo" mnemonicParsing="false" selected="true" text="Ver stock bajo." textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <CheckBox fx:id="checkStockNormal" mnemonicParsing="false" selected="true" text="Ver stock normal." textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <TextField fx:id="tfProducto" layoutX="10.0" layoutY="42.0" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" promptText="Producto..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="tfMarca" layoutX="185.0" layoutY="42.0" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" promptText="Marca..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label layoutX="10.0" layoutY="23.0" text="Nombre del producto" textFill="WHITE" GridPane.columnIndex="1" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="213.0" layoutY="16.0" text="Marca del producto" textFill="WHITE" GridPane.columnIndex="2" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+         </children>
+      </GridPane>
+   </top>
+   <bottom>
+      <GridPane prefHeight="51.0" prefWidth="990.0" style="-fx-background-color: #456789;" BorderPane.alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="654.0596815531176" minWidth="160.0" prefWidth="306.3581618089991" />
+            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="654.0596815531176" minWidth="35.82089600506754" prefWidth="292.02988051603376" />
+            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="654.0596815531176" minWidth="35.82089600506754" prefWidth="186.73129943453375" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="492.7164123222435" minWidth="100.31346801363532" prefWidth="198.91047727262367" />
+          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="400.29850460739976" minWidth="10.0" prefWidth="206.194025295884" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Button fx:id="btnEmitirNota" alignment="CENTER" mnemonicParsing="false" onAction="#emitirNotaRetiro" prefHeight="25.0" prefWidth="150.0" text="Emitir nota retiro" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+            <CheckBox fx:id="checkImprimirNota" mnemonicParsing="false" text="Imprimir nota." textFill="WHITE" GridPane.columnIndex="3" />
+            <Label fx:id="labelTotal" text="TOTAL: $ 0" textFill="WHITE" GridPane.columnIndex="4">
+               <font>
+                  <Font size="16.0" />
+               </font></Label>
+            <Button fx:id="btnPagar" disable="true" mnemonicParsing="false" onAction="#pagar" prefWidth="150.0" style="-fx-background-color: #9ae084;" text="Hacer pago" GridPane.columnIndex="4" GridPane.rowIndex="1">
+               <tooltip>
+                  <Tooltip text="Debe haber emitido la nota de retiro para hacer el pago." wrapText="true" />
+               </tooltip>
+            </Button>
+            <Label prefHeight="50.0" prefWidth="250.0" text="*Para continuar con el pago es necesario emitir la nota de retiro." textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowSpan="2" GridPane.valignment="BOTTOM" />
+            <CheckBox fx:id="checkRutaPredeterminada" mnemonicParsing="false" prefHeight="34.0" prefWidth="119.0" selected="true" text="Guardar en ruta predeterminada." textFill="WHITE" wrapText="true" GridPane.columnIndex="2" GridPane.rowSpan="2147483647" />
+         </children>
+      </GridPane>
+   </bottom>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+   <right>
+      <fx:include fx:id="tablaDetallesVenta" maxHeight="420.0" maxWidth="500.0" minHeight="420.0" minWidth="500.0" prefHeight="420.0" prefWidth="500.0" source="../components/TablaDetallesVenta.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="530.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="CENTER_RIGHT" />
+   </right>
+   <left>
+      <AnchorPane BorderPane.alignment="CENTER">
+         <children>
+            <TableView fx:id="tableRepuestos" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <columns>
+                <TableColumn fx:id="colCodBarra" prefWidth="90.26864004135132" text="Cod Barra" />
+                <TableColumn fx:id="colNombre" prefWidth="185.55223083496094" text="Nombre" />
+                  <TableColumn fx:id="colMarca" prefWidth="108.8955078125" text="Marca" />
+                  <TableColumn fx:id="colPrecio" prefWidth="85.97021484375" text="Precio" />
+              </columns>
+            </TableView>
+         </children>
+      </AnchorPane>
+   </left>
+   <center>
+      <Label maxHeight="1.7976931348623157E308" text="&gt;" textAlignment="CENTER" textFill="WHITE" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+   </center>
+</BorderPane>

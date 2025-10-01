@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #20736a;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.VentasController">
+   <top>
+      <GridPane maxHeight="137.0" minHeight="120.0" prefHeight="137.0" prefWidth="990.0" style="-fx-background-color: #20736a;" BorderPane.alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="94.56718318375809" prefWidth="94.56718318375809" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="186.26862971696124" minWidth="108.79105131608617" prefWidth="108.79105131608617" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="65.0" minWidth="65.0" prefWidth="65.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="134.4477213899712" minWidth="100.0" prefWidth="134.4477213899712" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="65.0" minWidth="65.0" prefWidth="65.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="84.53727413864976" prefWidth="84.53727413864976" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Button maxWidth="130.0" minWidth="130.0" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="130.0" text="Buscar con filtros" GridPane.rowIndex="2" />
+            <TextField fx:id="tfBuscar" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" promptText="Código de venta..." GridPane.rowIndex="1" />
+            <ComboBox fx:id="comboOrdenarPor" prefWidth="150.0" promptText="Ordenar por..." GridPane.columnIndex="2" />
+            <ComboBox fx:id="comboTipoOrden" prefWidth="150.0" promptText="Tipo de orden" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label text="Estado ventas" textFill="WHITE" underline="true" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
+            <Label text="Ordenar por:" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Tipo de orden:" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets right="5.0" />
+               </GridPane.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" prefHeight="27.0" prefWidth="198.0" text="Buscar por fecha" textAlignment="CENTER" textFill="WHITE" underline="true" GridPane.columnIndex="6" GridPane.columnSpan="3" GridPane.halignment="CENTER">
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
+            <DatePicker fx:id="dateFechaMin" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+            <DatePicker fx:id="dateFechaMax" GridPane.columnIndex="8" GridPane.rowIndex="1" />
+            <Separator prefWidth="200.0" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+            <Label alignment="CENTER" prefHeight="27.0" prefWidth="194.0" text="Buscar por monto" textFill="WHITE" underline="true" GridPane.columnIndex="6" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+               <font>
+                  <Font size="17.0" />
+               </font>
+            </Label>
+            <TextField fx:id="tfMontoMin" GridPane.columnIndex="6" GridPane.rowIndex="3" />
+            <TextField fx:id="tfMontoMax" GridPane.columnIndex="8" GridPane.rowIndex="3" />
+            <Separator prefWidth="200.0" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+            <Label text="Código de venta:" textFill="WHITE" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <CheckBox fx:id="checkPendiente" mnemonicParsing="false" selected="true" text="Pendiente pago" textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+            <CheckBox fx:id="checkPagado" mnemonicParsing="false" selected="true" text="Pagado" textFill="WHITE" GridPane.columnIndex="4" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </CheckBox>
+            <CheckBox fx:id="checkCancelado" mnemonicParsing="false" selected="true" text="Cancelado" textFill="WHITE" GridPane.columnIndex="4" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </CheckBox>
+            <Button maxWidth="130.0" minWidth="130.0" mnemonicParsing="false" onAction="#todasVentas" prefWidth="130.0" text="Todas las ventas" GridPane.rowIndex="3" />
+            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
+            <Button maxWidth="150.0" mnemonicParsing="false" onAction="#ventasHoy" prefWidth="150.0" text="Ventas de hoy" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="5.0" />
+         </BorderPane.margin>
+      </GridPane>
+   </top>
+   <center>
+      <TableView fx:id="tablaVentas" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="colCodVenta" prefWidth="134.68655371665955" text="Código venta" />
+          <TableColumn fx:id="colEstadoVenta" prefWidth="155.462646484375" text="Estado" />
+            <TableColumn fx:id="colFechaVenta" prefWidth="145.4327392578125" text="Fecha" />
+            <TableColumn fx:id="colMontoVenta" prefWidth="151.88064575195312" text="Monto" />
+        </columns>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </TableView>
+   </center>
+   <right>
+      <VBox alignment="TOP_CENTER" prefHeight="448.0" prefWidth="160.0" style="-fx-background-color: #20736a;" BorderPane.alignment="CENTER">
+         <children>
+            <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#verDetalles" prefHeight="30.0" prefWidth="150.0" text="Ver detalles">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#imprimirFactura" prefHeight="30.0" prefWidth="150.0" text="Imprimir factura">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#cancelarVenta" prefHeight="30.0" prefWidth="150.0" text="Cancelar venta">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Separator prefWidth="200.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Separator>
+            <Label text="Generación de reportes" textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#totalVentasAnual" prefHeight="30.0" prefWidth="150.0" text="Total ventas anual">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#cantidadVentasAnual" prefHeight="30.0" prefWidth="150.0" text="Cantidad ventas anual">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </right>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</BorderPane>

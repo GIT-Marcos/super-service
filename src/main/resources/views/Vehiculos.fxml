@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #b34f0c;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.VehiculosController">
+   <top>
+      <GridPane maxHeight="140.0" minHeight="100.0" prefHeight="140.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <TextField fx:id="tfPatente" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" promptText="Patente del vehículo..." GridPane.rowIndex="1" />
+            <Button maxWidth="140.0" minWidth="140.0" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="140.0" text="Buscar con filtros" GridPane.rowIndex="2" />
+            <Label text="Patente" textFill="WHITE" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
+            <Button maxWidth="140.0" minWidth="140.0" mnemonicParsing="false" onAction="#todosLosVehiculos" prefWidth="140.0" text="Todos los vehículos" GridPane.rowIndex="3" />
+            <TextField fx:id="tfModelo" layoutX="10.0" layoutY="45.0" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" promptText="Modelo del vehículo..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="tfMarca" layoutX="211.0" layoutY="45.0" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" promptText="Marca del vehículo..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label text="Modelo" textFill="WHITE" GridPane.columnIndex="1" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Marca" textFill="WHITE" GridPane.columnIndex="2" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </GridPane>
+   </top>
+   <center>
+      <TableView fx:id="tablaVehiculos" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="colPatente" prefWidth="108.8955409526825" text="Patente" />
+          <TableColumn fx:id="colMarca" prefWidth="192.00001525878906" text="Marca" />
+            <TableColumn fx:id="colModelo" prefWidth="255.04476928710938" text="Modelo" />
+            <TableColumn fx:id="colCil" prefWidth="90.98504638671875" text="Cil. cc." />
+            <TableColumn fx:id="colAnio" prefWidth="76.65667724609375" text="Año" />
+            <TableColumn fx:id="colColor" prefWidth="106.746337890625" text="Color" />
+        </columns>
+      </TableView>
+   </center>
+   <right>
+      <VBox alignment="TOP_CENTER" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#cargarVehiculo" prefHeight="30.0" prefWidth="150.0" text="Cargar vehículo">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button layoutX="15.0" layoutY="90.0" maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#modificarVehiculo" prefHeight="30.0" prefWidth="150.0" text="Modificar vehículo">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#verDetalles" prefHeight="30.0" prefWidth="150.0" text="Ver detalles de vehículo">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#eliminarVehiculo" prefHeight="30.0" prefWidth="150.0" text="Eliminar vehículo">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Separator prefWidth="200.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Separator>
+            <Label text="Generación de reportes" textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Button maxHeight="52.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#generarReporteMasRegistrados" prefHeight="30.0" prefWidth="162.0" text="Modelos más registrados" wrapText="true">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
+            <Separator prefWidth="200.0" />
+            <Label text="Exportar lista actual" textFill="WHITE">
+               <font>
+                  <Font size="13.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Label>
+            <ComboBox fx:id="comboFormato" prefWidth="150.0" promptText="Formato...">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </ComboBox>
+            <Button mnemonicParsing="false" onAction="#exportarTabla" text="Exportar">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </right>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</BorderPane>

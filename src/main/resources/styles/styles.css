@@ -1,0 +1,93 @@
+.background-nav-bar {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, rgba(42,123,155,1) 0%, rgba(29,128,72,1) 100%);
+}
+
+/* --- ESTILOS PARA BOTONES DEL NAV --- */
+
+.nav-btn {
+    -fx-background-color: linear-gradient(to bottom, #ededed 5%, #bab1ba 100%);
+    -fx-background-radius: 5;
+    -fx-border-color: #d6bcd6;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-text-fill: #3a8a9e;
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+    -fx-padding: 5px 5px;
+    -fx-effect: dropshadow(gaussian, #899599, 4, 0.5, 3, 4);
+    -fx-font-smoothing-type: lcd;
+}
+.nav-btn:hover {
+    -fx-background-color: linear-gradient(to bottom, #bab1ba 5%, #ededed 100%);
+}
+.nav-btn:pressed {
+    -fx-translate-y: 1;
+}
+
+/* --- ESTILOS PARA CELDA DE LISTVIEW --- */
+
+/* Estilo general del ListView */
+.list-view {
+    -fx-background-color: #ECEFF1;
+    -fx-padding: 8;
+}
+
+/* Estilo de la celda */
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 4 0 4 0;
+}
+
+/* Estilo de la tarjeta */
+.card-pane {
+    -fx-background-color: white;
+    -fx-border-color: #CFD8DC;
+    -fx-border-width: 1px;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 5, 0.2, 0, 2);
+}
+
+/* Efecto hover */
+.list-cell:filled:hover .card-pane {
+    -fx-border-color: #007bff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.3, 0, 3);
+}
+
+/* --- NUEVO ESTILO --- */
+/* Estilo para el texto del código de barras */
+.barcode-label {
+    /* Fuente monoespaciada para que parezca un código */
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-font-size: 14px;
+    -fx-text-fill: #37474F; /* Un gris oscuro azulado */
+    -fx-font-weight: bold;
+    /* La magia: rotamos el texto */
+    -fx-rotate: -90;
+}
+
+/* Estilos de texto (sin cambios) */
+.nombre-producto {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263238;
+}
+
+.marca-producto {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #546E7A;
+}
+
+.cantidad-label {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0D47A1;
+}
+
+.unidad-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #455A64;
+}
+
+

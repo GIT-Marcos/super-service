@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="600.0" maxWidth="1150.0" minHeight="600.0" minWidth="1150.0" prefHeight="600.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.MainController">
+    <center>
+        <StackPane fx:id="contentPane" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+    </center>
+   <left>
+        <VBox fx:id="vboxNavBar" alignment="TOP_CENTER" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" spacing="10.0" styleClass="background-nav-bar" stylesheets="@../styles/styles.css" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+            <children>
+            <Button layoutX="20.0" layoutY="92.0" maxWidth="1.7976931348623157E308" onAction="#irDeposito" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Depósito">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../imgs/depot.png" />
+                     </image>
+                  </ImageView>
+               </graphic></Button>
+            <Button layoutX="20.0" layoutY="20.0" maxWidth="1.7976931348623157E308" onAction="#irNuevaVenta" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Nueva venta">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../imgs/venta.png" />
+                     </image>
+                  </ImageView>
+               </graphic></Button>
+            <Button layoutX="20.0" layoutY="20.0" maxWidth="1.7976931348623157E308" onAction="#irVentas" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Ver ventas">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../imgs/chart.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button layoutX="20.0" layoutY="123.0" maxWidth="1.7976931348623157E308" onAction="#irNotasRetiro" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Notas retiros">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../imgs/notebook.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button layoutX="20.0" layoutY="175.0" maxWidth="1.7976931348623157E308" onAction="#irVehiculos" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Vehículos">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../imgs/auto.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button layoutX="20.0" layoutY="226.0" maxWidth="1.7976931348623157E308" onAction="#irClientes" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Clientes">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../imgs/identity-card.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button layoutX="20.0" layoutY="278.0" maxWidth="1.7976931348623157E308" onAction="#cerrarSesion" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Cerrar sesión" />
+            </children>
+        </VBox>
+   </left>
+</BorderPane>

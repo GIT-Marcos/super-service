@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #20783f;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DepositoController">
+   <center>
+      <TableView fx:id="tablaRepuestos" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <columns>
+            <TableColumn fx:id="colCodBarra" editable="false" prefWidth="85.25371944904327" text="Cod barras" />
+            <TableColumn fx:id="colDetalle" editable="false" prefWidth="199.16419982910156" text="Nombre" />
+            <TableColumn fx:id="colMarca" editable="false" minWidth="0.0" prefWidth="123.94027709960938" text="Marca" />
+            <TableColumn fx:id="colPrecio" editable="false" prefWidth="111.76116943359375" text="Precio" />
+            <TableColumn fx:id="colCantidad" editable="false" prefWidth="93.8507080078125" text="Existente" />
+            <TableColumn fx:id="colCantidadMinima" editable="false" prefWidth="109.6119384765625" text="Existente mínimo" />
+            <TableColumn fx:id="colUniMedida" prefWidth="112.47760009765625" text="Uni. Medida" />
+         </columns>
+      </TableView>
+   </center>
+   <top>
+      <GridPane alignment="CENTER" prefHeight="150.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Button fx:id="butBuscar" mnemonicParsing="false" onAction="#buscarConFiltros" prefHeight="30.0" prefWidth="150.0" text="Buscar con filtros" GridPane.rowIndex="2" />
+            <CheckBox fx:id="checkMostrarNormal" mnemonicParsing="false" prefHeight="20.0" selected="true" text="Mostrar stock normal" textFill="WHITE" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </CheckBox>
+            <CheckBox fx:id="checkMostrarBajo" mnemonicParsing="false" prefHeight="20.0" selected="true" text="Mostrar stock bajo" textFill="WHITE" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </CheckBox>
+            <Label prefHeight="20.0" text="Ordenar por" textFill="WHITE" GridPane.columnIndex="3" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets left="10.0" />
+               </GridPane.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label prefHeight="20.0" text="Tipo de orden" textFill="WHITE" GridPane.columnIndex="4" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets left="10.0" />
+               </GridPane.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ComboBox fx:id="comboOrdenarPor" prefHeight="20.0" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets left="10.0" />
+               </GridPane.margin>
+            </ComboBox>
+            <ComboBox fx:id="comboTipoOrden" prefHeight="20.0" prefWidth="150.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets left="10.0" />
+               </GridPane.margin>
+            </ComboBox>
+            <Label fx:id="labelAvisoStock" style="-fx-border-color: #700406;" text="*Existen repuestos con stock bajo." textFill="#f09095" visible="false" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="2">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="tfNombre" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" promptText="Nombre epuesto..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="tfCodigo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" promptText="Código de barras..." GridPane.rowIndex="1" />
+            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
+            <Button fx:id="btnTodosRepuestos" mnemonicParsing="false" onAction="#todosRepuestos" prefHeight="30.0" prefWidth="150.0" text="Todos los repuestos" GridPane.rowIndex="3" />
+            <TextField fx:id="tfMarca" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" promptText="Marca repuesto..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label text="Código de barras" textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Label text="Nombre del repuesto" textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.columnIndex="1" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Label text="Marca del repuesto" textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.columnIndex="2" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+         </children>
+      </GridPane>
+   </top>
+   <right>
+      <VBox alignment="TOP_CENTER" prefHeight="410.0" prefWidth="170.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" onAction="#nuevoRepuesto" prefHeight="30.0" prefWidth="150.0" text="Nuevo repuesto">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#modRepuesto" prefHeight="30.0" prefWidth="150.0" text="Modificar repuesto">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#borrarRepuesto" prefHeight="30.0" prefWidth="150.0" text="Borrar repuesto">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#ingresarStock" prefHeight="30.0" prefWidth="150.0" text="Ingresar stock">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Separator prefWidth="200.0">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Separator>
+            <Label text="Generación de reportes" textFill="WHITE">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Button mnemonicParsing="false" onAction="#masRetiradosParaVenta" prefHeight="30.0" prefWidth="150.0" text="Más retirados para venta">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button disable="true" layoutX="20.0" layoutY="214.0" mnemonicParsing="false" onAction="#masRetiradosParaService" prefHeight="30.0" prefWidth="150.0" text="Más retirados para service">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font size="11.0" />
+               </font>
+            </Button>
+            <Separator prefWidth="200.0">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Separator>
+            <Label text="Generar tabla actual" textFill="WHITE">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ComboBox fx:id="comboFormatos" prefWidth="80.0">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </ComboBox>
+            <Button mnemonicParsing="false" onAction="#generar" prefHeight="30.0" prefWidth="150.0" text="Generar">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </right>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</BorderPane>

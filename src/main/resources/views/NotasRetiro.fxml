@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<TabPane maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #686975;" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.NotasRetiroController">
+  <tabs>
+    <Tab text="Notas de retiro">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <BorderPane style="-fx-border-width: 2; -fx-border-color: #000000; -fx-border-radius: 5;" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="50.0">
+                     <right>
+                        <VBox alignment="TOP_CENTER" maxHeight="130.0" maxWidth="130.0" minHeight="130.0" minWidth="130.0" prefHeight="310.0" prefWidth="130.0" style="-fx-background-color: #686975;" BorderPane.alignment="TOP_CENTER">
+                           <children>
+                              <Separator prefWidth="200.0">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </Separator>
+                              <Button maxHeight="30.0" maxWidth="120.0" minHeight="30.0" minWidth="120.0" mnemonicParsing="false" onAction="#verDetalles" prefHeight="30.0" prefWidth="120.0" text="Ver detalles">
+                                 <font>
+                                    <Font size="13.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </Button>
+                              <Button layoutX="15.0" layoutY="24.0" maxHeight="30.0" maxWidth="120.0" minHeight="30.0" minWidth="120.0" mnemonicParsing="false" onAction="#eliminarNota" prefHeight="30.0" prefWidth="120.0" text="Cancelar nota">
+                                 <font>
+                                    <Font size="13.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </VBox>
+                     </right>
+                     <center>
+                        <ListView fx:id="listViewNotas" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                     </center>
+                     <top>
+                        <GridPane prefHeight="80.0" prefWidth="451.0" style="-fx-background-color: #686975;" BorderPane.alignment="CENTER">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="45.999981658181014" minWidth="10.0" prefWidth="23.074627654274764" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Buscar por fecha" textFill="WHITE" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.halignment="CENTER">
+                                 <font>
+                                    <Font size="17.0" />
+                                 </font>
+                              </Label>
+                              <DatePicker fx:id="dateFechaMin" promptText="dd/MM/yyyy" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <DatePicker fx:id="dateFechaMax" promptText="dd/MM/yyyy" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                              <Separator prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Button maxHeight="30.0" maxWidth="120.0" minHeight="30.0" minWidth="120.0" mnemonicParsing="false" onAction="#aplicarFiltros" prefHeight="30.0" prefWidth="120.0" text="Aplicar filtro" GridPane.rowIndex="1" />
+                              <Button maxHeight="30.0" maxWidth="120.0" minHeight="30.0" minWidth="120.0" mnemonicParsing="false" onAction="#actualizar" prefHeight="30.0" prefWidth="120.0" text="Actualizar">
+                                 <font>
+                                    <Font size="13.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </GridPane>
+                     </top>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </BorderPane>
+               </children></AnchorPane>
+      </content>
+    </Tab>
+    <Tab text="Nueva nota">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <top>
+                        <AnchorPane prefHeight="160.0" prefWidth="990.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.999981658181" minWidth="10.0" prefWidth="130.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="231.40297064862997" minWidth="10.0" prefWidth="130.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="231.40297064862997" minWidth="10.0" prefWidth="130.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="155.74625851364976" minWidth="10.0" prefWidth="130.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Button maxWidth="120.0" mnemonicParsing="false" onAction="#buscar" text="Buscar con filtros" GridPane.rowIndex="2" />
+                                    <TextField fx:id="tfCodBarras" promptText="Cód. de barras..." GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets right="2.0" />
+                                       </GridPane.margin>
+                                    </TextField>
+                                    <Button maxWidth="120.0" mnemonicParsing="false" onAction="#verTodos" text="Ver todos" GridPane.rowIndex="3" />
+                                    <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
+                                    <TextField fx:id="tfNombre" promptText="Nombre repuesto..." GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets right="2.0" />
+                                       </GridPane.margin>
+                                    </TextField>
+                                    <TextField fx:id="tfMarca" promptText="Marca repuesto..." GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets right="2.0" />
+                                       </GridPane.margin>
+                                    </TextField>
+                                    <CheckBox fx:id="checkVerBajo" mnemonicParsing="false" selected="true" text="Ver stock bajo." textFill="WHITE" GridPane.columnIndex="3">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </CheckBox>
+                                    <CheckBox fx:id="checkVerNormal" mnemonicParsing="false" selected="true" text="ver stock normal." textFill="WHITE" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </CheckBox>
+                                    <ComboBox fx:id="cbOrdenarPor" prefWidth="150.0" promptText="Ordenar por:" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                    <ComboBox fx:id="cbTipoOrden" prefWidth="150.0" promptText="Tipo de orden:" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                       <GridPane.margin>
+                                          <Insets right="2.0" />
+                                       </GridPane.margin>
+                                    </ComboBox>
+                                    <Label text="Código de barras" textAlignment="CENTER" textFill="WHITE" wrapText="true" GridPane.valignment="BOTTOM">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Nombre del repuesto" textAlignment="CENTER" textFill="WHITE" wrapText="true" GridPane.columnIndex="1" GridPane.valignment="BOTTOM">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Marca del Repuesto" textAlignment="CENTER" textFill="WHITE" wrapText="true" GridPane.columnIndex="2" GridPane.valignment="BOTTOM">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Tipo de orden" textAlignment="CENTER" textFill="WHITE" wrapText="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Ordenar por" textAlignment="CENTER" textFill="WHITE" wrapText="true" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </GridPane>
+                              <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="540.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Button fx:id="btnCrearNota" disable="true" mnemonicParsing="false" onAction="#crearNota" text="Crear nota" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                                    <Button mnemonicParsing="false" onAction="#agregar" text="Agregar detalle" GridPane.rowIndex="3" />
+                                    <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
+                                    <Button mnemonicParsing="false" onAction="#limpiarLista" text="Limpiar lista" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <CheckBox fx:id="checkGuardar" mnemonicParsing="false" selected="true" text="Guardar nota en ruta predeterminada." textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.columnIndex="2" GridPane.rowSpan="2" GridPane.valignment="TOP">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </CheckBox>
+                                    <CheckBox fx:id="checkImprimir" mnemonicParsing="false" text="Imprimir nota." textFill="WHITE" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </CheckBox>
+                                    <Button mnemonicParsing="false" onAction="#emitirNota" text="Emitir nota de retiro" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                    <Label text="*Para crear la nota es necesario emitirla." textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.halignment="LEFT" GridPane.rowSpan="2" GridPane.valignment="TOP">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                     </top>
+                     <left>
+                        <TableView fx:id="tablaRepuestos" maxWidth="490.0" minWidth="490.0" prefWidth="490.0" BorderPane.alignment="CENTER">
+                          <columns>
+                            <TableColumn fx:id="colCodigo" prefWidth="90.26865220069885" text="Código" />
+                            <TableColumn fx:id="colNombre" prefWidth="167.64177703857422" text="Nombre" />
+                              <TableColumn fx:id="colMarca" prefWidth="85.25369262695312" text="Marca" />
+                              <TableColumn fx:id="colExistente" prefWidth="46.567169189453125" text="Existente" />
+                              <TableColumn fx:id="colMin" prefWidth="31.5224609375" text="Mín." />
+                              <TableColumn fx:id="colUniMedida" prefWidth="68.776123046875" text="Uni. Medida" />
+                          </columns>
+                        </TableView>
+                     </left>
+                     <right>
+                        <ListView fx:id="listViewDetalles" maxWidth="450.0" minWidth="450.0" prefWidth="450.0" BorderPane.alignment="CENTER" />
+                     </right>
+                     <center>
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="&gt;" BorderPane.alignment="CENTER">
+                           <font>
+                              <Font size="32.0" />
+                           </font>
+                        </Text>
+                     </center>
+                  </BorderPane>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding></AnchorPane>
+      </content>
+    </Tab>
+  </tabs>
+</TabPane>

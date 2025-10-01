@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarRepuestoController">
+  <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="12.0" valignment="CENTER" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Label text="Código de barras:" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM" />
+      <Label text="Seleccione o escriba marca del repuesto:" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" />
+      <Label text="Lote:" GridPane.halignment="LEFT" GridPane.rowIndex="12" GridPane.valignment="BOTTOM" />
+      <Button fx:id="btnCerrar" mnemonicParsing="false" onAction="#cerrar" prefWidth="150.0" text="Cerrar" GridPane.halignment="CENTER" GridPane.rowIndex="17" GridPane.valignment="CENTER" />
+      <TextField fx:id="tfCodBarra" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+      <TextField fx:id="tfNombre" prefWidth="284.0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.valignment="TOP">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+      </TextField>
+      <Label text="Nombre repuesto:" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+      </Label>
+      <Label text="Precio:" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="BOTTOM" />
+      <Label text="Cantidad de Stock:" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
+      <Label text="Observaciones:" GridPane.halignment="LEFT" GridPane.rowIndex="14" GridPane.valignment="BOTTOM" />
+      <Label text="*Los campos &quot;Lote&quot; y &quot;Observaciones&quot; no son obligatorios." GridPane.columnSpan="3" GridPane.halignment="LEFT" GridPane.rowIndex="16" GridPane.valignment="BOTTOM" />
+      <ComboBox fx:id="comboMarcas" editable="true" prefHeight="27.0" prefWidth="220.0" promptText="Nueva marca..." GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+      <Label text="Cantidad de Stock Mínimo:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
+      <TextField fx:id="tfCantidadStockMin" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="TOP" />
+      <TextField fx:id="tfCantidadStock" GridPane.rowIndex="9" GridPane.valignment="TOP" />
+      <TextField fx:id="tfLote" GridPane.rowIndex="13" GridPane.valignment="TOP" />
+      <TextField fx:id="tfObservaciones" GridPane.columnSpan="3" GridPane.rowIndex="15" GridPane.valignment="TOP" />
+      <ComboBox fx:id="comboUniMedidas" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="TOP" />
+      <Label text="Seleccione o escriba la ubicación del repuesto:" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="10" GridPane.valignment="BOTTOM" />
+      <ComboBox fx:id="comboUbicaciones" editable="true" prefWidth="220.0" promptText="Nueva ubicación..." GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.valignment="TOP" />
+      <Label text="Unidad de medida:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
+      <TextField fx:id="tfPrecio" GridPane.rowIndex="7" GridPane.valignment="TOP" />
+      <Button fx:id="btnCargarRepuesto" maxHeight="40.0" maxWidth="150.0" minHeight="40.0" minWidth="150.0" mnemonicParsing="false" onAction="#cargarRepuesto" prefHeight="40.0" prefWidth="150.0" text="Guardar repuesto" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="17" GridPane.valignment="CENTER" />
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="10.0" right="10.0" />
+   </padding>
+</GridPane>

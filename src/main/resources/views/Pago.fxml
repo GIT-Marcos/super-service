@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.PagoController">
+   <children>
+      <HBox style="-fx-background-color: #456789;">
+         <children>
+            <Label fx:id="labelTotal" text="TOTAL: $ 0" textFill="WHITE">
+               <font>
+                  <Font size="22.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="10.0" top="10.0" />
+         </padding>
+      </HBox>
+      <GridPane>
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Forma de pago:" />
+            <RadioButton fx:id="radTarjCredito" mnemonicParsing="false" selected="true" text="Tarjeta de crédito" GridPane.rowIndex="1">
+               <toggleGroup>
+                  <ToggleGroup fx:id="radiosFormaPago" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="radTransferencia" mnemonicParsing="false" text="Transferencia" toggleGroup="$radiosFormaPago" GridPane.rowIndex="2" />
+            <RadioButton fx:id="radTarjDebito" mnemonicParsing="false" text="Tarjeta de débito" toggleGroup="$radiosFormaPago" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <RadioButton fx:id="radEfectivo" mnemonicParsing="false" text="Efectivo" toggleGroup="$radiosFormaPago" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Cantidad a pagar: $" GridPane.rowIndex="3" />
+            <Label text="Descuento: %" GridPane.rowIndex="4" />
+            <Spinner fx:id="spinDescuento" editable="true" prefHeight="26.0" prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="tfMonto" promptText="\$ 00.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+         </children>
+         <VBox.margin>
+            <Insets left="5.0" right="5.0" />
+         </VBox.margin>
+      </GridPane>
+      <Separator prefWidth="200.0">
+         <VBox.margin>
+            <Insets bottom="5.0" top="5.0" />
+         </VBox.margin>
+      </Separator>
+      <GridPane>
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="N° referencia:" GridPane.rowIndex="3" />
+            <Label text="Últimos 4 dígitos tarjeta:" GridPane.rowIndex="2" />
+            <Label text="Marca de tarjeta:" />
+            <Label text="Banco de tarjeta:" GridPane.rowIndex="1" />
+            <ComboBox fx:id="comboMarcaTarjeta" editable="true" prefWidth="150.0" promptText="Nueva tarjeta..." GridPane.columnIndex="1" />
+            <ComboBox fx:id="comboBancoTarjeta" editable="true" prefWidth="150.0" promptText="Nuevo banco..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="tfUltimos4" maxWidth="80.0" minWidth="80.0" prefWidth="80.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="tfNroReferencia" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Button disable="true" mnemonicParsing="false" text="Adjuntar comprobante" GridPane.rowIndex="4" />
+         </children>
+         <VBox.margin>
+            <Insets left="5.0" right="5.0" />
+         </VBox.margin>
+      </GridPane>
+      <GridPane>
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.97013119744105" minWidth="10.0" prefWidth="133.74625424431605" />
+            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="206.8209045097435" minWidth="10.0" prefWidth="206.8209045097435" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#volver" prefHeight="26.0" prefWidth="90.0" text="Volver" GridPane.rowIndex="1" />
+            <Button fx:id="btnPagar" mnemonicParsing="false" onAction="#pagar" prefHeight="26.0" prefWidth="120.0" text="PAGAR" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+         <VBox.margin>
+            <Insets left="5.0" right="5.0" top="20.0" />
+         </VBox.margin>
+      </GridPane>
+   </children>
+</VBox>
