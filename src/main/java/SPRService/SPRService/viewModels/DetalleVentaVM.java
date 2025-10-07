@@ -24,7 +24,7 @@ public class DetalleVentaVM {
     public DetalleVentaVM(DetalleRetiro d) {
         this.detalleRetiro = d;
         this.nombre = new SimpleStringProperty(d.getRepuesto().getDetalle());
-        this.marca = new SimpleStringProperty(d.getRepuesto().getMarca());
+        this.marca = new SimpleStringProperty(d.getRepuesto().getMarcaRepuesto().getNombreMarca());
         this.precioUnitario = new SimpleStringProperty("$ " + d.getRepuesto().getPrecio());
         this.cantidadVendida = new SimpleDoubleProperty(d.getCantidadRetirada());
         this.subTotal = new SimpleStringProperty("$ "+ d.getSubTotal());
@@ -82,7 +82,7 @@ public class DetalleVentaVM {
         this.detalleRetiro.setSubTotal(d.getSubTotal());
         // - Propiedades del VM
         this.nombre.set(d.getRepuesto().getDetalle());
-        this.marca.set(d.getRepuesto().getMarca());
+        this.marca.set(d.getRepuesto().getMarcaRepuesto().getNombreMarca());
         this.precioUnitario.set(d.getRepuesto().getPrecio().toString());
         this.cantidadVendida.set(d.getCantidadRetirada());
         this.subTotal.set(d.getSubTotal().toString());

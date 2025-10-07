@@ -12,6 +12,24 @@ import java.util.Optional;
 
 public class SimpleDialogs {
 
+    public static String nombreMarcaRepuesto(ActionEvent event) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Crear nueva marca de repuestos");
+        dialog.setHeaderText("Indique el nombre de la nueva marca de repuestos que desea cargar en el sistema.");
+        dialog.setContentText("Nombre: ");
+
+        Optional<String> opt = dialog.showAndWait();
+        if (opt.isEmpty()) {
+            return null;
+        }
+        try {
+            return ManejadorInputs.textoGenerico(opt.get().strip(), true, 2, 100);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            Alertas.aviso("Crear nueva marca de repuestos", e.getMessage());
+            return null;
+        }
+    }
+
     public static File selectorRuta(ActionEvent event, String titulo, String nombreDefecto,
                                     FileChooser.ExtensionFilter extensiones) {
         Node n = ((Node) event.getSource());
@@ -80,7 +98,7 @@ public class SimpleDialogs {
         if (opt.isEmpty()) {
             return null;
         }
-        String input = opt.get().trim();
+        String input = opt.get().strip();
         try {
             if (input.isBlank()) {
                 Alertas.aviso("Genera reporte", "Para continuar debe ingresar una cantidad.");

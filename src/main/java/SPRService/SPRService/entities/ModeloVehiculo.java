@@ -1,6 +1,5 @@
 package SPRService.SPRService.entities;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,7 +35,8 @@ public class ModeloVehiculo implements Serializable{
     @ManyToOne()
     @JoinColumn(nullable = false, name = "fk_marca")
     private MarcaVehiculo marcaVehiculo;
-    
+
+    //todo: convertir en Set
     @OneToMany(mappedBy = "modeloVehiculo")
     private List<Vehiculo> vehiculos = new ArrayList<>();
 

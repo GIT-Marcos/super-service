@@ -81,11 +81,11 @@ public class MarcaVehiculo implements Serializable {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         MarcaVehiculo that = (MarcaVehiculo) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(nombreMarca, that.nombreMarca);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(nombreMarca);
     }
 }

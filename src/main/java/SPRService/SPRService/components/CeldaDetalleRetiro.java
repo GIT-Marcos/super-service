@@ -84,7 +84,7 @@ public class CeldaDetalleRetiro extends ListCell<DetalleRetiro> {
         } else {
             barcodeLabel.setText(String.valueOf(item.getRepuesto().getCodBarra()));
             nombreLabel.setText(item.getRepuesto().getDetalle());
-            marcaLabel.setText(item.getRepuesto().getMarca());
+            marcaLabel.setText(item.getRepuesto().getMarcaRepuesto().getNombreMarca());
             cantidadLabel.setText(String.valueOf(item.getCantidadRetirada()));
             unidadLabel.setText(item.getRepuesto().getStock().getUnidadMedida());
 

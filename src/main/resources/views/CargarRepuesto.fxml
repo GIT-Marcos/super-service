@@ -37,11 +37,11 @@
   </rowConstraints>
    <children>
       <Label text="Código de barras:" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM" />
-      <Label text="Seleccione o escriba marca del repuesto:" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" />
+      <Label text="Seleccione o cargue la marca del repuesto:" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" />
       <Label text="Lote:" GridPane.halignment="LEFT" GridPane.rowIndex="12" GridPane.valignment="BOTTOM" />
       <Button fx:id="btnCerrar" mnemonicParsing="false" onAction="#cerrar" prefWidth="150.0" text="Cerrar" GridPane.halignment="CENTER" GridPane.rowIndex="17" GridPane.valignment="CENTER" />
-      <TextField fx:id="tfCodBarra" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-      <TextField fx:id="tfNombre" prefWidth="284.0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.valignment="TOP">
+      <TextField fx:id="tfCodBarra" maxHeight="28.0" maxWidth="250.0" minHeight="28.0" minWidth="250.0" prefHeight="28.0" prefWidth="250.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+      <TextField fx:id="tfNombre" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" prefWidth="284.0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.valignment="TOP">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
@@ -54,19 +54,20 @@
       <Label text="Precio:" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="BOTTOM" />
       <Label text="Cantidad de Stock:" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
       <Label text="Observaciones:" GridPane.halignment="LEFT" GridPane.rowIndex="14" GridPane.valignment="BOTTOM" />
-      <Label text="*Los campos &quot;Lote&quot; y &quot;Observaciones&quot; no son obligatorios." GridPane.columnSpan="3" GridPane.halignment="LEFT" GridPane.rowIndex="16" GridPane.valignment="BOTTOM" />
-      <ComboBox fx:id="comboMarcas" editable="true" prefHeight="27.0" prefWidth="220.0" promptText="Nueva marca..." GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+      <Label text="*Los campos &quot;Lote&quot; y &quot;Observaciones&quot; no son obligatorios." underline="true" GridPane.columnSpan="3" GridPane.halignment="LEFT" GridPane.rowIndex="16" GridPane.valignment="BOTTOM" />
+      <ComboBox fx:id="comboMarcas" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" prefWidth="250.0" promptText="Marca del repuesto..." GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
       <Label text="Cantidad de Stock Mínimo:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
-      <TextField fx:id="tfCantidadStockMin" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="TOP" />
-      <TextField fx:id="tfCantidadStock" GridPane.rowIndex="9" GridPane.valignment="TOP" />
-      <TextField fx:id="tfLote" GridPane.rowIndex="13" GridPane.valignment="TOP" />
-      <TextField fx:id="tfObservaciones" GridPane.columnSpan="3" GridPane.rowIndex="15" GridPane.valignment="TOP" />
-      <ComboBox fx:id="comboUniMedidas" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="TOP" />
+      <TextField fx:id="tfCantidadStockMin" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="TOP" />
+      <TextField fx:id="tfCantidadStock" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.rowIndex="9" GridPane.valignment="TOP" />
+      <TextField fx:id="tfLote" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.rowIndex="13" GridPane.valignment="TOP" />
+      <TextField fx:id="tfObservaciones" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.columnSpan="3" GridPane.rowIndex="15" GridPane.valignment="TOP" />
+      <ComboBox fx:id="comboUniMedidas" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="TOP" />
       <Label text="Seleccione o escriba la ubicación del repuesto:" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="10" GridPane.valignment="BOTTOM" />
-      <ComboBox fx:id="comboUbicaciones" editable="true" prefWidth="220.0" promptText="Nueva ubicación..." GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.valignment="TOP" />
+      <ComboBox fx:id="comboUbicaciones" editable="true" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" prefWidth="220.0" promptText="Nueva ubicación..." GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.valignment="TOP" />
       <Label text="Unidad de medida:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
-      <TextField fx:id="tfPrecio" GridPane.rowIndex="7" GridPane.valignment="TOP" />
+      <TextField fx:id="tfPrecio" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.rowIndex="7" GridPane.valignment="TOP" />
       <Button fx:id="btnCargarRepuesto" maxHeight="40.0" maxWidth="150.0" minHeight="40.0" minWidth="150.0" mnemonicParsing="false" onAction="#cargarRepuesto" prefHeight="40.0" prefWidth="150.0" text="Guardar repuesto" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="17" GridPane.valignment="CENTER" />
+      <Button maxHeight="28.0" minHeight="28.0" mnemonicParsing="false" onAction="#nuevaMarca" prefHeight="28.0" prefWidth="140.0" text="Nueva marca..." GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
    </children>
    <padding>
       <Insets bottom="5.0" left="10.0" right="10.0" />

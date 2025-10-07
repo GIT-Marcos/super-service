@@ -1,6 +1,7 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.RepuestoDAO;
+import SPRService.SPRService.entities.MarcaRepuesto;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -13,6 +14,7 @@ import SPRService.SPRService.entities.Stock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Singleton
 public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements RepuestoDAO {
@@ -113,6 +115,7 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Repuesto> query = cb.createQuery(Repuesto.class);
         Root<Repuesto> root = query.from(Repuesto.class);
+        Join<Repuesto, MarcaRepuesto> joinMarca = root.join("marcaRepuesto", JoinType.LEFT);
         Join<Repuesto, Stock> joinStock = root.join("stock", JoinType.LEFT);
         List<Predicate> filtros = new ArrayList<>();
         filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
@@ -125,7 +128,8 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
             filtros.add(cb.like(cb.lower(root.get("detalle")), "%" + nombreProd.toLowerCase() + "%"));
         }
         if (!marcaProd.isBlank()) {
-            filtros.add(cb.like(cb.lower(root.get("marca")), "%" + marcaProd.toLowerCase() + "%"));
+            filtros.add(cb.like(cb.lower(joinMarca.get("nombreMarca")),
+                    "%" + marcaProd.toLowerCase(Locale.ROOT) + "%"));
         }
         //SI LOS 2 VIENEN VERDADEROS, O SEA QUIERE VER TODOS, NO ENTRA EN NINGÚN IF
         if (verStockNormal && !verStockBajo) {

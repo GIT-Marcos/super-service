@@ -1,7 +1,10 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.entities.MarcaRepuesto;
 import SPRService.SPRService.exceptions.DuplicateProductException;
+import SPRService.SPRService.services.MarcaRepuestoServ;
 import SPRService.SPRService.services.RepuestoServ;
+import SPRService.SPRService.util.SimpleDialogs;
 import com.google.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import javafx.collections.FXCollections;
@@ -22,40 +25,32 @@ import SPRService.SPRService.util.alertas.Alertas;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class CargarRepuestoController implements Initializable, DataReceiver<Repuesto>, ModalController<Repuesto> {
 
     private Repuesto repuesto;
-    //    private Stock stock = new Stock();
     private final RepuestoServ repuestoServ;
+    private final MarcaRepuestoServ marcaRepuestoServ;
+    private ObservableList<MarcaRepuesto> obsListMarcaRepuesto = FXCollections.observableArrayList();
     private boolean flagModificacion = false;
 
     @FXML
-    private TextField tfCodBarra;
+    private TextField tfCodBarra, tfNombre, tfPrecio, tfCantidadStock, tfCantidadStockMin, tfLote,
+            tfObservaciones;
     @FXML
-    private TextField tfNombre;
-    @FXML
-    private TextField tfPrecio;
-    @FXML
-    private TextField tfCantidadStock;
-    @FXML
-    private TextField tfCantidadStockMin;
-    @FXML
-    private TextField tfLote;
-    @FXML
-    private TextField tfObservaciones;
-    @FXML
-    private ComboBox<String> comboMarcas;
+    private ComboBox<MarcaRepuesto> comboMarcas;
     @FXML
     private ComboBox<String> comboUniMedidas;
     @FXML
     private ComboBox<String> comboUbicaciones;
 
     @Inject
-    public CargarRepuestoController(RepuestoServ repuestoServ) {
+    public CargarRepuestoController(RepuestoServ repuestoServ, MarcaRepuestoServ marcaRepuestoServ) {
         this.repuestoServ = repuestoServ;
+        this.marcaRepuestoServ = marcaRepuestoServ;
     }
 
     @Override
@@ -77,24 +72,42 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
     }
 
     @FXML
+    private void nuevaMarca(ActionEvent event) {
+        String nombreMarca = SimpleDialogs.nombreMarcaRepuesto(event);
+        if (nombreMarca == null) return;
+
+        MarcaRepuesto marcaRepuesto = new MarcaRepuesto(null, nombreMarca, new HashSet<>());
+        try {
+            marcaRepuesto = marcaRepuestoServ.cargarMarca(marcaRepuesto);
+            obsListMarcaRepuesto.addFirst(marcaRepuesto);
+        } catch (RuntimeException e) {
+            Alertas.error("Crear nueva marca de repuestos", e.getMessage());
+//            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
     private void cargarRepuesto(ActionEvent event) {
         Repuesto repuestoParaCargar;
-        String codBarra = tfCodBarra.getText().trim();
-        String marca = comboMarcas.getSelectionModel().getSelectedItem();
-        String nombre = tfNombre.getText().trim();
-        String inputPrecio = tfPrecio.getText().trim();
-        String inputCantidad = tfCantidadStock.getText().trim();
-        String inputCantidadMin = tfCantidadStockMin.getText().trim();
+        String codBarra = tfCodBarra.getText().strip();
+        MarcaRepuesto marca = comboMarcas.getSelectionModel().getSelectedItem();
+        if (marca == null) {
+            Alertas.aviso("Guardar repuesto", "Debe seleccionar una marca para el repuesto.");
+            return;
+        }
+        String nombre = tfNombre.getText().strip();
+        String inputPrecio = tfPrecio.getText().strip();
+        String inputCantidad = tfCantidadStock.getText().strip();
+        String inputCantidadMin = tfCantidadStockMin.getText().strip();
         String uniMedida = comboUniMedidas.getSelectionModel().getSelectedItem();
         String ubicacion = comboUbicaciones.getSelectionModel().getSelectedItem();
-        String lote = tfLote.getText().trim();
-        String observaciones = tfObservaciones.getText().trim();
+        String lote = tfLote.getText().strip();
+        String observaciones = tfObservaciones.getText().strip();
         BigDecimal precio;
         Double cantidad;
         Double cantidadMin;
         try {
             ManejadorInputs.codBarras(codBarra, true);
-            ManejadorInputs.textoGenerico(marca, true, null, 30);
             ManejadorInputs.textoGenerico(nombre, true, null, 40);
             precio = ManejadorInputs.dinero(inputPrecio, true);
             cantidad = ManejadorInputs.cantidadStock(inputCantidad, true);
@@ -103,39 +116,31 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
             ManejadorInputs.textoGenerico(ubicacion, true, null, 20);
             ManejadorInputs.textoGenerico(lote, false, null, 40);
             ManejadorInputs.textoGenerico(observaciones, false, null, 100);
-        } catch (NumberFormatException nfe) {
-            Alertas.aviso("Carga repuesto", nfe.getMessage());
-            return;
         } catch (IllegalArgumentException iae) {
-            Alertas.aviso("Carga repuesto", iae.getMessage());
+            Alertas.aviso("Guardar repuesto", iae.getMessage());
             return;
         }
-
-        //TODO: usar patrón de diseño para crear objetos esto es un asco
-        if (!flagModificacion) {
-            Stock stock = new Stock(null, cantidad, cantidadMin, uniMedida, ubicacion, lote, observaciones);
-            repuestoParaCargar = new Repuesto(null, codBarra, marca, nombre, precio, stock);
-        } else {
-            Stock stock = new Stock(this.repuesto.getStock().getId(), cantidad, cantidadMin, uniMedida, ubicacion, lote, observaciones);
-            repuestoParaCargar = new Repuesto(this.repuesto.getId(), codBarra, marca, nombre, precio,
-                    stock);
-        }
-
         boolean resultado = Alertas.confirmacion("Guardar repuesto",
-                "¿Está seguro que desea guardar el repuesto: " + repuestoParaCargar.getDetalle() + "?");
+                "¿Está seguro que desea guardar el repuesto: " + nombre + "?");
         if (!resultado) return;
 
         try {
+            //TODO: usar patrón de diseño para crear objetos esto es un asco
             if (!flagModificacion) {
+                Stock stock = new Stock(null, cantidad, cantidadMin, uniMedida, ubicacion, lote, observaciones);
+                repuestoParaCargar = new Repuesto(null, codBarra, nombre, precio, marca, stock);
                 repuestoParaCargar = repuestoServ.cargarRepuesto(repuestoParaCargar);
             } else {
                 try {
+                    Stock stock = new Stock(this.repuesto.getStock().getId(), cantidad, cantidadMin, uniMedida, ubicacion,
+                            lote, observaciones);
+                    repuestoParaCargar = new Repuesto(this.repuesto.getId(), codBarra, nombre, precio, marca, stock);
                     repuestoParaCargar = repuestoServ.modificarRepuesto(repuestoParaCargar);
                 } catch (PersistenceException e) {
                     if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
                             e.getCause() instanceof org.postgresql.util.PSQLException) {
                         throw new DuplicateProductException("Ya existe un producto con el código de barras: "
-                                + repuestoParaCargar.getCodBarra() + " en el sistema.");
+                                + codBarra + " en el sistema.");
                     } else {
                         throw e;
                     }
@@ -159,14 +164,8 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
     }
 
     private void llenarCombos() {
-        ObservableList<String> observableListMarcas = FXCollections.observableArrayList();
-        observableListMarcas.add("Corven");
-        observableListMarcas.add("Fate");
-        observableListMarcas.add("Mirgor");
-        observableListMarcas.add("Bosch");
-        observableListMarcas.add("Valeo");
-        observableListMarcas.add("SKF");
-        comboMarcas.setItems(observableListMarcas);
+        obsListMarcaRepuesto.addAll(marcaRepuestoServ.verTodas());
+        comboMarcas.setItems(obsListMarcaRepuesto);
         /*****************/
         ObservableList<String> observableListUniMed = FXCollections.observableArrayList();
         observableListUniMed.add("Unidad");
@@ -193,11 +192,11 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
         this.repuesto = r;
 
         this.tfCodBarra.setText(r.getCodBarra());
-        if (this.comboMarcas.getItems().contains(r.getMarca())) {
-            this.comboMarcas.getSelectionModel().select(r.getMarca());
+        if (this.comboMarcas.getItems().contains(r.getMarcaRepuesto())) {
+            this.comboMarcas.getSelectionModel().select(r.getMarcaRepuesto());
         } else {
-            this.comboMarcas.getItems().add(r.getMarca());
-            this.comboMarcas.getSelectionModel().select(r.getMarca());
+            this.comboMarcas.getItems().add(r.getMarcaRepuesto());
+            this.comboMarcas.getSelectionModel().select(r.getMarcaRepuesto());
         }
         this.tfNombre.setText(r.getDetalle());
         this.tfPrecio.setText(r.getPrecio().toString());
