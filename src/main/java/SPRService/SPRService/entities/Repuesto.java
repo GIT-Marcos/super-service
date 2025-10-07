@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 @Table(name = "repuestos")
@@ -14,11 +15,8 @@ public class Repuesto implements Serializable{
     @Column(name = "pk_repuesto")
     private Long id;
 
-    @Column(name = "codigo_barra",nullable = false, unique = true)
+    @Column(name = "codigo_barras",nullable = false, unique = true)
     private String codBarra;
-
-    @Column(nullable = false)
-    private String marca;
 
     @Column(nullable = false)
     private String detalle;
@@ -28,8 +26,11 @@ public class Repuesto implements Serializable{
     
     @Column(nullable = false)
     private Boolean activo;
+
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "fk_marca_repuesto", nullable = false)
+    private MarcaRepuesto marcaRepuesto;
     
-    //RELACIÓN HACIA STOCK 1-1
     @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     @JoinColumn(name = "fk_stock", nullable = false)
     private Stock stock;
@@ -37,14 +38,16 @@ public class Repuesto implements Serializable{
     public Repuesto() {
     }
 
-    public Repuesto(Long id, String codBarra, String marca, String detalle, BigDecimal precio, Stock stock) {
+    public Repuesto(Long id, String codBarra, String detalle, BigDecimal precio,
+                    MarcaRepuesto marcaRepuesto, Stock stock) {
         this.id = id;
         this.codBarra = codBarra;
-        this.marca = marca;
         this.detalle = detalle;
         this.precio = precio;
-        this.activo = Boolean.TRUE;
+        this.marcaRepuesto = marcaRepuesto;
+        this.marcaRepuesto.getRepuestos().add(this);
         this.stock = stock;
+        this.activo = Boolean.TRUE;
     }
 
     public Long getId() {
@@ -61,14 +64,6 @@ public class Repuesto implements Serializable{
 
     public void setCodBarra(String codBarra) {
         this.codBarra = codBarra;
-    }
-
-    public String getMarca() {
-        return marca;
-    }
-
-    public void setMarca(String marca) {
-        this.marca = marca;
     }
 
     public String getDetalle() {
@@ -94,7 +89,15 @@ public class Repuesto implements Serializable{
     public void setActivo(Boolean activo) {
         this.activo = activo;
     }
-    
+
+    public MarcaRepuesto getMarcaRepuesto() {
+        return marcaRepuesto;
+    }
+
+    public void setMarcaRepuesto(MarcaRepuesto marcaRepuesto) {
+        this.marcaRepuesto = marcaRepuesto;
+    }
+
     public Stock getStock() {
         return stock;
     }
@@ -105,7 +108,23 @@ public class Repuesto implements Serializable{
 
     @Override
     public String toString() {
-        return "Repuesto{" + "id=" + id + ", codBarra=" + codBarra + ", marca=" + marca + ", detalle=" + detalle + ", precio=" + precio + ", activo=" + activo + '}';
+        return "Repuesto{" +
+                "id=" + id +
+                ", codBarra='" + codBarra + '\'' +
+                ", detalle='" + detalle + '\'' +
+                ", precio=" + precio +
+                ", activo=" + activo +
+                '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Repuesto repuesto)) return false;
+        return Objects.equals(codBarra, repuesto.codBarra);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(codBarra);
+    }
 }

@@ -20,7 +20,7 @@ public class RepuestoRowViewModel {
         this.id = new SimpleLongProperty(r.getId());
         this.coBarra = new SimpleStringProperty(r.getCodBarra());
         this.nombre = new SimpleStringProperty(r.getDetalle());
-        this.marca = new SimpleStringProperty(r.getMarca());
+        this.marca = new SimpleStringProperty(r.getMarcaRepuesto().getNombreMarca());
         this.precio = new SimpleStringProperty("$ " + r.getPrecio());
         this.cantidad = new SimpleDoubleProperty(r.getStock().getCantidadExistente());
         this.cantidadMinima = new SimpleDoubleProperty(r.getStock().getCantMinima());
@@ -38,7 +38,7 @@ public class RepuestoRowViewModel {
         // - propiedades de la entidad
         this.repuestoOriginal.setId(repuestoActualizado.getId());
         this.repuestoOriginal.setCodBarra(repuestoActualizado.getCodBarra());
-        this.repuestoOriginal.setMarca(repuestoActualizado.getMarca());
+        this.repuestoOriginal.setMarcaRepuesto(repuestoActualizado.getMarcaRepuesto());
         this.repuestoOriginal.setDetalle(repuestoActualizado.getDetalle());
         this.repuestoOriginal.setPrecio(repuestoActualizado.getPrecio());
         this.repuestoOriginal.setStock(repuestoActualizado.getStock());
@@ -53,7 +53,7 @@ public class RepuestoRowViewModel {
         this.id.set(repuestoActualizado.getId());
         this.coBarra.set(repuestoActualizado.getCodBarra());
         this.nombre.set(repuestoActualizado.getDetalle());
-        this.marca.set(repuestoActualizado.getMarca());
+        this.marca.set(repuestoActualizado.getMarcaRepuesto().getNombreMarca());
         this.precio.set("$ " + repuestoActualizado.getPrecio());
         this.cantidad.set(repuestoActualizado.getStock().getCantidadExistente());
         this.cantidadMinima.set(repuestoActualizado.getStock().getCantMinima());

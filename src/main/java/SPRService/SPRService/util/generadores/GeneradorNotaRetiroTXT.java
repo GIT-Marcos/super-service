@@ -23,7 +23,7 @@ public class GeneradorNotaRetiroTXT {
                     "CÓDIGO: %s\r\nDETALLE: %s\r\nMARCA: %s\r\nCANTIDAD: %s\r\nUBICACIÓN: %s\r\nLOTE: %s\r\n------------------------\r\n",
                     dr.getRepuesto().getCodBarra(),
                     dr.getRepuesto().getDetalle(),
-                    dr.getRepuesto().getMarca(),
+                    dr.getRepuesto().getMarcaRepuesto().getNombreMarca(),
                     dr.getCantidadRetirada(),
                     dr.getRepuesto().getStock().getUbicacion(),
                     dr.getRepuesto().getStock().getLote()

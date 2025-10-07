@@ -39,6 +39,8 @@ public class PersistenceModule extends AbstractModule {
         bind(UsuarioDAO.class).to(UsuarioDAOImpl.class).in(Scopes.SINGLETON);
         bind(ClienteServ.class).to(ClienteServImpl.class).in(Scopes.SINGLETON);
         bind(ClienteDAO.class).to(ClienteDAOImpl.class).in(Scopes.SINGLETON);
+        bind(MarcaRepuestoServ.class).to(MarcaRepuestoServImpl.class).in(Scopes.SINGLETON);
+        bind(MarcaRepuestoDAO.class).to(MarcaRepuestoDAOImpl.class).in(Scopes.SINGLETON);
     }
 
     private Properties loadProperties() {

@@ -183,7 +183,7 @@ public class GeneradorPDF {
                 total = total.add(subtotal);
 
                 table.addCell(new PdfPCell(new Phrase(d.getRepuesto().getCodBarra(), smallFont)));
-                table.addCell(new PdfPCell(new Phrase(d.getRepuesto().getMarca(), smallFont)));
+                table.addCell(new PdfPCell(new Phrase(d.getRepuesto().getMarcaRepuesto().getNombreMarca(), smallFont)));
                 table.addCell(new PdfPCell(new Phrase(d.getRepuesto().getDetalle(), smallFont)));
                 table.addCell(new PdfPCell(new Phrase("$ " + d.getRepuesto().getPrecio(), smallFont)));
                 table.addCell(new PdfPCell(new Phrase(String.valueOf(d.getCantidadRetirada()), smallFont)));

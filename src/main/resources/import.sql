@@ -801,3 +801,5 @@ INSERT INTO modelos_vehiculos (nombre_modelo, anio, cilindrada, fk_marca) VALUES
 INSERT INTO modelos_vehiculos (nombre_modelo, anio, cilindrada, fk_marca) VALUES ('Weekend Adventure 1.8', '2018', 1.8, 1);
 INSERT INTO modelos_vehiculos (nombre_modelo, anio, cilindrada, fk_marca) VALUES ('Weekend Attractive 1.4', '2019', 1.4, 1);
 INSERT INTO modelos_vehiculos (nombre_modelo, anio, cilindrada, fk_marca) VALUES ('Weekend Attractive 1.4', '2020', 1.4, 1);
+
+---------------------------------------------------------------------------------------------------
