@@ -26,7 +26,11 @@ public enum Views {
     MODELO_VEHICULO("/views/StepDatosModelo.fxml", StepDatosModeloController.class),
     DETALLE_VEHICULO("/views/DetallesVehiculo.fxml", DetalleVehiculoController.class),
     CARGAR_VEHICULO("/views/CargarVehiculo.fxml", WizardCargarVehiculoController.class),
-    CARGAR_CLIENTE("/views/CargarCliente.fxml", CargarClienteController.class);
+    CARGAR_CLIENTE("/views/CargarCliente.fxml", CargarClienteController.class),
+
+    // Views charts
+    CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
+    CHART_VENTAS_RESPUESTOS_ANIO("/views/ChartTotalVentasAnio.fxml", ChartTotalVentasAnioController.class);
 
     private final String fxmlPath;
     private final Class<?> controllerClass;

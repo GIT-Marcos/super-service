@@ -72,8 +72,8 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
     }
 
     @FXML
-    private void nuevaMarca(ActionEvent event) {
-        String nombreMarca = SimpleDialogs.nombreMarcaRepuesto(event);
+    private void nuevaMarca() {
+        String nombreMarca = SimpleDialogs.nombreMarcaRepuesto();
         if (nombreMarca == null) return;
 
         MarcaRepuesto marcaRepuesto = new MarcaRepuesto(null, nombreMarca, new HashSet<>());
@@ -82,7 +82,6 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
             obsListMarcaRepuesto.addFirst(marcaRepuesto);
         } catch (RuntimeException e) {
             Alertas.error("Crear nueva marca de repuestos", e.getMessage());
-//            throw new RuntimeException(e);
         }
     }
 

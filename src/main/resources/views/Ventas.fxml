@@ -153,16 +153,12 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#totalVentasAnual" prefHeight="30.0" prefWidth="150.0" text="Total ventas anual">
+            <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#reportesAnuales" prefHeight="30.0" prefWidth="150.0" text="Reportes anuales">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
             </Button>
-            <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#cantidadVentasAnual" prefHeight="30.0" prefWidth="150.0" text="Cantidad ventas anual">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-            </Button>
+            <Button layoutX="15.0" layoutY="214.0" maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#reportesMensuales" prefHeight="30.0" prefWidth="150.0" text="Reportes mensuales" />
          </children>
       </VBox>
    </right>

@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class SimpleDialogs {
 
-    public static String nombreMarcaRepuesto(ActionEvent event) {
+    public static String nombreMarcaRepuesto() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Crear nueva marca de repuestos");
         dialog.setHeaderText("Indique el nombre de la nueva marca de repuestos que desea cargar en el sistema.");
@@ -44,7 +44,6 @@ public class SimpleDialogs {
         return file;
     }
 
-    //esto es auxiliar hasta implementación de JasperReports
     public static Integer selectorFechaReporte(String titulo, String header, String content) {
         Integer fecha;
         TextInputDialog dialog = new TextInputDialog();
@@ -57,7 +56,7 @@ public class SimpleDialogs {
         if (opt.isEmpty()) {
             return null;
         }
-        String input = opt.get().trim();
+        String input = opt.get().strip();
         try {
             fecha = Integer.valueOf(input);
         } catch (NumberFormatException e) {
@@ -78,7 +77,7 @@ public class SimpleDialogs {
         if (opt.isEmpty()) {
             return null;
         }
-        String input = opt.get().trim();
+        String input = opt.get().strip();
         try {
             return ManejadorInputs.cantidadStock(input, true);
         } catch (RuntimeException e) {

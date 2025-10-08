@@ -2,6 +2,9 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.StockDAO;
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
+import SPRService.SPRService.DTOs.VentaRepuestosCantidadEnAnioDTO;
+import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
+import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.services.VentaRepuestoServ;
@@ -13,9 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class VentaRepuestoServImpl implements VentaRepuestoServ {
@@ -37,48 +38,38 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     @Transactional
     @Override
-    public Map<String, BigDecimal> reporteTotalVentasPorMeses(Integer anio) {
-        List<Object[]> objetos;
-        String[] meses = {
-                "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-        };
-        objetos = daoVenta.totalVentasPorMeses(anio);
-        Map<String, BigDecimal> ventasPorMes = new LinkedHashMap<>();
-        // Inicializa con 0 para todos los meses
-        for (int i = 0; i < 12; i++) {
-            ventasPorMes.put(meses[i], BigDecimal.ZERO);
+    public List<VentaRepuestosEnAnioDTO> reporteTotalVentasEnAnio(int anio) {
+        List<VentaRepuestosEnAnioDTO> dtos = new ArrayList<>();
+        List<Object[]> objetosVenta;
+        objetosVenta = daoVenta.totalVentasPorMeses(anio);
+
+        for (Object[] o : objetosVenta) {
+            int nroMes = (int) o[0];
+            BigDecimal ingresos = (BigDecimal) o[1];
+            dtos.add(new VentaRepuestosEnAnioDTO(nroMes, ingresos));
         }
-        // Llena con los datos reales desde la BD
-        for (Object[] fila : objetos) {
-            Integer mes = (Integer) fila[0];  // mes: 1 - 12
-            BigDecimal cantidad = (BigDecimal) fila[1];
-            ventasPorMes.put(meses[mes - 1], cantidad);
-        }
-        return ventasPorMes;
+        return dtos;
     }
 
     @Transactional
     @Override
-    public Map<String, Long> reporteCantidadVentasPorMeses(Integer anio) {
-        List<Object[]> objetos;
-        String[] meses = {
-                "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-        };
-        objetos = daoVenta.cantidadVentasPorMeses(anio);
-        Map<String, Long> ventasPorMes = new LinkedHashMap<>();
-        // Inicializa con 0 para todos los meses
-        for (int i = 0; i < 12; i++) {
-            ventasPorMes.put(meses[i], 0L);
+    public List<VentaRepuestosCantidadEnAnioDTO> reporteCantidadVentasEnAnio(int anio) {
+        List<VentaRepuestosCantidadEnAnioDTO> dtos = new ArrayList<>();
+        List<Object[]> objetosVenta;
+        objetosVenta = daoVenta.cantidadVentasPorMeses(anio);
+
+        for (Object[] o : objetosVenta) {
+            int nroMes = (int) o[0];
+            Long ingresos = (Long) o[1];
+            dtos.add(new VentaRepuestosCantidadEnAnioDTO(nroMes, ingresos));
         }
-        // Llena con los datos reales desde la BD
-        for (Object[] fila : objetos) {
-            Integer mes = (Integer) fila[0];  // mes: 1 - 12
-            Long cantidad = (Long) fila[1];
-            ventasPorMes.put(meses[mes - 1], cantidad);
-        }
-        return ventasPorMes;
+        return dtos;
+    }
+
+    @Transactional
+    @Override
+    public List<VentaRepuestosEnMesDTO> reporteTotalVentasEnMes(int anio, int mes) {
+        return daoVenta.reporteTotalVentasDiariasEnMes(anio, mes);
     }
 
     @Transactional

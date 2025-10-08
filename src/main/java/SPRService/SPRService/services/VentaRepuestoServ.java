@@ -1,5 +1,8 @@
 package SPRService.SPRService.services;
 
+import SPRService.SPRService.DTOs.VentaRepuestosCantidadEnAnioDTO;
+import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
+import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
@@ -7,15 +10,16 @@ import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 public interface VentaRepuestoServ {
 
     List<VentaRepuesto> verTodas();
 
-    Map<String, BigDecimal> reporteTotalVentasPorMeses(Integer anio);
+    List<VentaRepuestosEnAnioDTO> reporteTotalVentasEnAnio(int anio);
 
-    Map<String, Long> reporteCantidadVentasPorMeses(Integer anio);
+    List<VentaRepuestosCantidadEnAnioDTO> reporteCantidadVentasEnAnio(int anio);
+
+    List<VentaRepuestosEnMesDTO> reporteTotalVentasEnMes(int anio, int mes);
 
     List<VentaRepuesto> verVentasHoy();
 

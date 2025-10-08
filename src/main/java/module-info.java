@@ -9,10 +9,10 @@ module navegador2.SPRService {
     requires org.postgresql.jdbc;
     requires org.apache.poi.ooxml;
     requires com.github.librepdf.openpdf;
-    requires java.desktop;
     requires org.jfree.jfreechart;
     requires com.google.guice;
     requires com.google.guice.extensions.persist;
+    requires javafx.swing;
 
     // Abre paquetes a FXML/FX Base para reflexión
     opens SPRService.SPRService to javafx.fxml;
