@@ -23,7 +23,6 @@ import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.generadores.GeneradorPDF;
-import SPRService.SPRService.util.generadores.GeneradorReportes;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -151,30 +150,12 @@ public class VentasController implements Initializable {
     }
 
     @FXML
-    private void totalVentasAnual() {
+    private void reportesAnuales() {
         navigator.openModal(Views.CHART_VENTAS_RESPUESTOS_ANIO, "Reporte", null);
     }
 
     @FXML
-    private void cantidadVentasAnual(ActionEvent event) {
-        Integer fecha = SimpleDialogs.selectorFechaReporte("Generar reporte",
-                "Ingrese el número del año para el reporte. \n" +
-                "Ej: 2025", "Año: ");
-        if (fecha == null) {
-            return;
-        }
-        File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta para la generación del reporte",
-                "reporte cantidad de ventas año " + fecha + ".jpg",
-                new FileChooser.ExtensionFilter("Imágenes JPG (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
-        if (file == null) {
-            return;
-        }
-        Map<String, Long> datos = ventaRepuestoServ.reporteCantidadVentasEnAnio(fecha);
-        GeneradorReportes.cantidadVentasAnual(file, datos);
-    }
-
-    @FXML
-    private void cantidadVentasMes() {
+    private void reportesMensuales() {
         navigator.openModal(Views.CHART_VENTAS_REPUESTOS_MES, "Reporte", null);
     }
 

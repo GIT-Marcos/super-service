@@ -31,7 +31,7 @@
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
    <center>
-      <BarChart fx:id="chart" BorderPane.alignment="CENTER">
+      <BarChart fx:id="chart" animated="false" BorderPane.alignment="CENTER">
         <xAxis>
           <CategoryAxis />
         </xAxis>

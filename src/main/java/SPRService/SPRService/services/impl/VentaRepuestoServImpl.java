@@ -2,6 +2,7 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.StockDAO;
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
+import SPRService.SPRService.DTOs.VentaRepuestosCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
@@ -15,9 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class VentaRepuestoServImpl implements VentaRepuestoServ {
@@ -54,28 +53,17 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     @Transactional
     @Override
-    public Map<String, Long> reporteCantidadVentasEnAnio(int anio) {
-        List<Object[]> objetos;
+    public List<VentaRepuestosCantidadEnAnioDTO> reporteCantidadVentasEnAnio(int anio) {
+        List<VentaRepuestosCantidadEnAnioDTO> dtos = new ArrayList<>();
+        List<Object[]> objetosVenta;
+        objetosVenta = daoVenta.cantidadVentasPorMeses(anio);
 
-
-
-        String[] meses = {
-                "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-        };
-        objetos = daoVenta.cantidadVentasPorMeses(anio);
-        Map<String, Long> ventasPorMes = new LinkedHashMap<>();
-        // Inicializa con 0 para todos los meses
-        for (int i = 0; i < 12; i++) {
-            ventasPorMes.put(meses[i], 0L);
+        for (Object[] o : objetosVenta) {
+            int nroMes = (int) o[0];
+            Long ingresos = (Long) o[1];
+            dtos.add(new VentaRepuestosCantidadEnAnioDTO(nroMes, ingresos));
         }
-        // Llena con los datos reales desde la BD
-        for (Object[] fila : objetos) {
-            Integer mes = (Integer) fila[0];  // mes: 1 - 12
-            Long cantidad = (Long) fila[1];
-            ventasPorMes.put(meses[mes - 1], cantidad);
-        }
-        return ventasPorMes;
+        return dtos;
     }
 
     @Transactional
