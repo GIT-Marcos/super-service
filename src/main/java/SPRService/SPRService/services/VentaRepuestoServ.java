@@ -25,6 +25,8 @@ public interface VentaRepuestoServ {
 
     BigDecimal ingresosDeVentasEnAnio(int anio);
 
+    Double ingresosPromedioPorVentaEnAnio(int anio);
+
     List<VentaRepuesto> verVentasHoy();
 
     List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,

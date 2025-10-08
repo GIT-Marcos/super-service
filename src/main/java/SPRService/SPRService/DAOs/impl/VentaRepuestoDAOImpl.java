@@ -148,6 +148,17 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
     }
 
     @Override
+    public Double ingresosPromedioPorVentaEnAnio(int anio) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("SELECT AVG(v.montoTotal) FROM VentaRepuesto v " +
+                                "WHERE YEAR(v.fechaVenta) = :anio " +
+                                "AND v.activo = true",
+                        Double.class)
+                .setParameter("anio", anio)
+                .getSingleResult();
+    }
+
+    @Override
     public VentaRepuesto borradoLogico(VentaRepuesto ventaRepuesto, AuditoriaVenta auditoriaVenta) {
         EntityManager em = emProvider.get();
         em.persist(auditoriaVenta);

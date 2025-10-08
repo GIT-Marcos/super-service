@@ -55,6 +55,14 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
      */
     BigDecimal ingresosDeVentasEnAnio(int anio);
 
+    /**
+     * Usado para información de reportes.
+     *
+     * @param anio año sobre el que se debe calcular.
+     * @return promedio de ingresos sobre ventas de repuestos activas que se realizaron en el año argumentado.
+     */
+    Double ingresosPromedioPorVentaEnAnio(int anio);
+
     //ESCRITURA
 
     VentaRepuesto borradoLogico(VentaRepuesto ventaRepuesto, AuditoriaVenta auditoriaVenta);

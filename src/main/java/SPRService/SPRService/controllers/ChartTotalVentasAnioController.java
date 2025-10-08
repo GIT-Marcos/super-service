@@ -45,7 +45,7 @@ public class ChartTotalVentasAnioController implements Initializable {
     @FXML
     private AreaChart<String, Number> chart;
     @FXML
-    private Label lblIngresosTotales, lblTitulo, lblCantidadDeVentasAnio, lblPromedio;
+    private Label lblIngresosTotales, lblTitulo, lblCantidadDeVentasAnio, lblPromedioIngresosPorVenta;
 
     @Inject
     public ChartTotalVentasAnioController(VentaRepuestoServ ventaRepuestoServ) {
@@ -104,6 +104,7 @@ public class ChartTotalVentasAnioController implements Initializable {
         lblTitulo.setText("Información del año: " + anio);
         lblCantidadDeVentasAnio.setText(ventaRepuestoServ.cantidadDeVentasEnAnio(anio) + " ventas");
         lblIngresosTotales.setText("$ " + ventaRepuestoServ.ingresosDeVentasEnAnio(anio));
+        lblPromedioIngresosPorVenta.setText("$ " + ventaRepuestoServ.ingresosPromedioPorVentaEnAnio(anio));
     }
 
     private void poblarChartCantidad(List<VentaRepuestosCantidadEnAnioDTO> ventasDTO) {
