@@ -137,6 +137,17 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
     }
 
     @Override
+    public BigDecimal ingresosDeVentasEnAnio(int anio) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("SELECT SUM(v.montoTotal) FROM VentaRepuesto v " +
+                                "WHERE YEAR(v.fechaVenta) = :anio " +
+                                "AND v.activo = true",
+                        BigDecimal.class)
+                .setParameter("anio", anio)
+                .getSingleResult();
+    }
+
+    @Override
     public VentaRepuesto borradoLogico(VentaRepuesto ventaRepuesto, AuditoriaVenta auditoriaVenta) {
         EntityManager em = emProvider.get();
         em.persist(auditoriaVenta);

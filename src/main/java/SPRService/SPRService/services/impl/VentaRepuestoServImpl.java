@@ -80,6 +80,12 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     @Transactional
     @Override
+    public BigDecimal ingresosDeVentasEnAnio(int anio) {
+        return daoVenta.ingresosDeVentasEnAnio(anio);
+    }
+
+    @Transactional
+    @Override
     public List<VentaRepuesto> verVentasHoy() {
         return daoVenta.buscarVentas(null, null, null,
                 null, "id", 0, LocalDate.now(), LocalDate.now());

@@ -59,14 +59,12 @@ public class ChartTotalVentasAnioController implements Initializable {
 
     @FXML
     private void generarReporteIngresos() {
-        llenarInfoDelAnio();
         int nroAnio = spinnerAnio.getValue();
         this.poblarChartIngresos(ventaRepuestoServ.reporteTotalVentasEnAnio(nroAnio));
     }
 
     @FXML
     private void generarReporteCantidad() {
-        llenarInfoDelAnio();
         int nroAnio = spinnerAnio.getValue();
         poblarChartCantidad(ventaRepuestoServ.reporteCantidadVentasEnAnio(nroAnio));
     }
@@ -105,6 +103,7 @@ public class ChartTotalVentasAnioController implements Initializable {
         int anio = spinnerAnio.getValue();
         lblTitulo.setText("Información del año: " + anio);
         lblCantidadDeVentasAnio.setText(ventaRepuestoServ.cantidadDeVentasEnAnio(anio) + " ventas");
+        lblIngresosTotales.setText("$ " + ventaRepuestoServ.ingresosDeVentasEnAnio(anio));
     }
 
     private void poblarChartCantidad(List<VentaRepuestosCantidadEnAnioDTO> ventasDTO) {
@@ -172,6 +171,7 @@ public class ChartTotalVentasAnioController implements Initializable {
             return false;
         } else {
             Alertas.exito("Generación de reporte", "Se ha generado el reporte con éxito.");
+            llenarInfoDelAnio();
             return true;
         }
     }

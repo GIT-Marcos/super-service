@@ -23,6 +23,8 @@ public interface VentaRepuestoServ {
 
     Long cantidadDeVentasEnAnio(int anio);
 
+    BigDecimal ingresosDeVentasEnAnio(int anio);
+
     List<VentaRepuesto> verVentasHoy();
 
     List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,
