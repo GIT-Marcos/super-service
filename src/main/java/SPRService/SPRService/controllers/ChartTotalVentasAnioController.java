@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.image.WritableImage;
@@ -43,6 +44,8 @@ public class ChartTotalVentasAnioController implements Initializable {
     private Spinner<Integer> spinnerAnio;
     @FXML
     private AreaChart<String, Number> chart;
+    @FXML
+    private Label lblIngresosTotales, lblTitulo, lblCantidadDeVentasAnio, lblPromedioIngresosPorVenta;
 
     @Inject
     public ChartTotalVentasAnioController(VentaRepuestoServ ventaRepuestoServ) {
@@ -96,7 +99,13 @@ public class ChartTotalVentasAnioController implements Initializable {
         }
     }
 
-
+    private void llenarInfoDelAnio() {
+        int anio = spinnerAnio.getValue();
+        lblTitulo.setText("Información del año: " + anio);
+        lblCantidadDeVentasAnio.setText(ventaRepuestoServ.cantidadDeVentasEnAnio(anio) + " ventas");
+        lblIngresosTotales.setText("$ " + ventaRepuestoServ.ingresosDeVentasEnAnio(anio));
+        lblPromedioIngresosPorVenta.setText("$ " + ventaRepuestoServ.ingresosPromedioPorVentaEnAnio(anio));
+    }
 
     private void poblarChartCantidad(List<VentaRepuestosCantidadEnAnioDTO> ventasDTO) {
         if (!limpiaChartYVerificaDTO(ventasDTO)) return;
@@ -152,7 +161,7 @@ public class ChartTotalVentasAnioController implements Initializable {
         chart.getData().add(series);
     }
 
-    private <D> boolean limpiaChartYVerificaDTO(List<D> dtoList) {
+    private boolean limpiaChartYVerificaDTO(List<?> dtoList) {
         chart.getData().clear();
         if (dtoList == null) {
             Alertas.aviso("Generación de reporte", "Error al obtener los datos.");
@@ -163,6 +172,7 @@ public class ChartTotalVentasAnioController implements Initializable {
             return false;
         } else {
             Alertas.exito("Generación de reporte", "Se ha generado el reporte con éxito.");
+            llenarInfoDelAnio();
             return true;
         }
     }

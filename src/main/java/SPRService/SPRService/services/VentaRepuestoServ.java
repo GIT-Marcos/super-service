@@ -21,6 +21,12 @@ public interface VentaRepuestoServ {
 
     List<VentaRepuestosEnMesDTO> reporteTotalVentasEnMes(int anio, int mes);
 
+    Long cantidadDeVentasEnAnio(int anio);
+
+    BigDecimal ingresosDeVentasEnAnio(int anio);
+
+    Double ingresosPromedioPorVentaEnAnio(int anio);
+
     List<VentaRepuesto> verVentasHoy();
 
     List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,

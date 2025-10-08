@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long>{
+public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
 
     //LECTURA
 
@@ -38,7 +38,31 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long>{
      * en un mes en particular.
      */
     List<VentaRepuestosEnMesDTO> reporteTotalVentasDiariasEnMes(Integer anio, Integer mes);
-    
+
+    /**
+     * Usado para información de reportes.
+     *
+     * @param anio año sobre el que se debe calcular.
+     * @return número de ventas de repuestos activas que se realizaron en el año argumentado.
+     */
+    Long cantidadDeVentasEnAnio(int anio);
+
+    /**
+     * Usado para información de reportes.
+     *
+     * @param anio año sobre el que se debe calcular.
+     * @return total de ingresos sobre ventas de repuestos activas que se realizaron en el año argumentado.
+     */
+    BigDecimal ingresosDeVentasEnAnio(int anio);
+
+    /**
+     * Usado para información de reportes.
+     *
+     * @param anio año sobre el que se debe calcular.
+     * @return promedio de ingresos sobre ventas de repuestos activas que se realizaron en el año argumentado.
+     */
+    Double ingresosPromedioPorVentaEnAnio(int anio);
+
     //ESCRITURA
 
     VentaRepuesto borradoLogico(VentaRepuesto ventaRepuesto, AuditoriaVenta auditoriaVenta);
