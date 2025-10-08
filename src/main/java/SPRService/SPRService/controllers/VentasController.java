@@ -169,7 +169,8 @@ public class VentasController implements Initializable {
 
     @FXML
     private void cantidadVentasAnual(ActionEvent event) {
-        Integer fecha = SimpleDialogs.selectorFechaReporte("Generar reporte", "Ingrese el número del año para el reporte. \n" +
+        Integer fecha = SimpleDialogs.selectorFechaReporte("Generar reporte",
+                "Ingrese el número del año para el reporte. \n" +
                 "Ej: 2025", "Año: ");
         if (fecha == null) {
             return;
@@ -182,6 +183,12 @@ public class VentasController implements Initializable {
         }
         Map<String, Long> datos = ventaRepuestoServ.reporteCantidadVentasPorMeses(fecha);
         GeneradorReportes.cantidadVentasAnual(file, datos);
+    }
+
+    @FXML
+    private void cantidadVentasMes() {
+//        List<VentaRepuestosEnMesDTO> dtos = ventaRepuestoServ.reporteTotalVentasEnMes(2025, 10);
+        navigator.openModal(Views.CHART_VENTAS_REPUESTOS_MES, "Reporte", null);
     }
 
     @FXML

@@ -163,6 +163,7 @@
                   <Insets bottom="10.0" />
                </VBox.margin>
             </Button>
+            <Button layoutX="15.0" layoutY="214.0" maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#cantidadVentasMes" prefHeight="30.0" prefWidth="150.0" text="Cantidad ventas del mes" />
          </children>
       </VBox>
    </right>

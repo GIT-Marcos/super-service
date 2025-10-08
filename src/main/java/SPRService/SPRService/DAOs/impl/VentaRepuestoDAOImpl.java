@@ -1,11 +1,13 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
+import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 
@@ -101,6 +103,26 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
                         Object[].class)
                 .setParameter("anio", anio)
                 .getResultList();
+    }
+
+    public List<VentaRepuestosEnMesDTO> reporteTotalVentasDiariasEnMes(int anio, int mes) {
+        EntityManager em = emProvider.get();
+        String hql = "SELECT NEW SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO(" +
+                "    DAY(v.fechaVenta), " +
+                "    SUM(v.montoTotal)" +
+                ") " +
+                "FROM VentaRepuesto v " +
+                "WHERE YEAR(v.fechaVenta) = :anio " +
+                "  AND MONTH(v.fechaVenta) = :mes " +
+                "  AND v.activo = true " +
+                "GROUP BY DAY(v.fechaVenta) " +
+                "ORDER BY DAY(v.fechaVenta) ASC";
+
+        TypedQuery<VentaRepuestosEnMesDTO> query = em.createQuery(hql, VentaRepuestosEnMesDTO.class);
+        query.setParameter("anio", anio);
+        query.setParameter("mes", mes);
+
+        return query.getResultList();
     }
 
     @Override

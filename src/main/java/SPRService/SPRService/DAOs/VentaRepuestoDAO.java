@@ -1,9 +1,9 @@
 package SPRService.SPRService.DAOs;
 
+import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
-import org.hibernate.Session;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,6 +20,11 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long>{
     List<Object[]> cantidadVentasPorMeses(Integer anio);
     
     List<Object[]> totalVentasPorMeses(Integer anio);
+
+    /**
+     * Genera reporte por DÍA de total ganancias de ventas de repuestos en un mes en particular.
+     */
+    List<VentaRepuestosEnMesDTO> reporteTotalVentasDiariasEnMes(int anio, int mes);
     
     //ESCRITURA
 

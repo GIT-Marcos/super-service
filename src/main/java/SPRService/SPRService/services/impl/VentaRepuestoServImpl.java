@@ -2,6 +2,7 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.StockDAO;
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
+import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.services.VentaRepuestoServ;
@@ -79,6 +80,12 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
             ventasPorMes.put(meses[mes - 1], cantidad);
         }
         return ventasPorMes;
+    }
+
+    @Transactional
+    @Override
+    public List<VentaRepuestosEnMesDTO> reporteTotalVentasEnMes(int anio, int mes) {
+        return daoVenta.reporteTotalVentasDiariasEnMes(anio, mes);
     }
 
     @Transactional

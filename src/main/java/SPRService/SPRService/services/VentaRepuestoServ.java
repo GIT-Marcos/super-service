@@ -1,5 +1,6 @@
 package SPRService.SPRService.services;
 
+import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
@@ -16,6 +17,11 @@ public interface VentaRepuestoServ {
     Map<String, BigDecimal> reporteTotalVentasPorMeses(Integer anio);
 
     Map<String, Long> reporteCantidadVentasPorMeses(Integer anio);
+
+    /**
+     * Genera reporte por DÍA de total ganancias de ventas de repuestos en un mes en particular.
+     */
+    List<VentaRepuestosEnMesDTO> reporteTotalVentasEnMes(int anio, int mes);
 
     List<VentaRepuesto> verVentasHoy();
 
