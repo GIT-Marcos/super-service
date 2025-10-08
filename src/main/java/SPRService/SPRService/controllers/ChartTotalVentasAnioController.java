@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.image.WritableImage;
@@ -43,6 +44,8 @@ public class ChartTotalVentasAnioController implements Initializable {
     private Spinner<Integer> spinnerAnio;
     @FXML
     private AreaChart<String, Number> chart;
+    @FXML
+    private Label lblIngresosTotales, lblTitulo;
 
     @Inject
     public ChartTotalVentasAnioController(VentaRepuestoServ ventaRepuestoServ) {
@@ -52,6 +55,8 @@ public class ChartTotalVentasAnioController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configCampos();
+
+
     }
 
     @FXML
