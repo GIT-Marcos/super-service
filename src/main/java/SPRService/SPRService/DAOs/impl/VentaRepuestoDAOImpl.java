@@ -84,7 +84,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
                                 + "WHERE YEAR(v.fechaVenta) = :anio "
                                 + "AND v.activo = true "
                                 + "GROUP BY MONTH(v.fechaVenta) "
-                                + "ORDER BY MONTH(v.fechaVenta)",
+                                + "ORDER BY MONTH(v.fechaVenta) ASC",
                         Object[].class)
                 .setParameter("anio", anio)
                 .getResultList();
@@ -99,13 +99,13 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
                                 + "WHERE YEAR(v.fechaVenta) = :anio "
                                 + "AND v.activo = true "
                                 + "GROUP BY MONTH(v.fechaVenta) "
-                                + "ORDER BY MONTH(v.fechaVenta)",
+                                + "ORDER BY MONTH(v.fechaVenta) ASC",
                         Object[].class)
                 .setParameter("anio", anio)
                 .getResultList();
     }
 
-    public List<VentaRepuestosEnMesDTO> reporteTotalVentasDiariasEnMes(int anio, int mes) {
+    public List<VentaRepuestosEnMesDTO> reporteTotalVentasDiariasEnMes(Integer anio, Integer mes) {
         EntityManager em = emProvider.get();
         String hql = "SELECT NEW SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO(" +
                 "    DAY(v.fechaVenta), " +

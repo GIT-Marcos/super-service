@@ -151,20 +151,8 @@ public class VentasController implements Initializable {
     }
 
     @FXML
-    private void totalVentasAnual(ActionEvent event) {
-        Integer fecha = SimpleDialogs.selectorFechaReporte("Generar reporte", "Ingrese el número del año para el reporte. \n" +
-                "Ej: 2025", "Año: ");
-        if (fecha == null) {
-            return;
-        }
-        File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta para la generación del reporte",
-                "reporte total ventas año " + fecha + ".jpg",
-                new FileChooser.ExtensionFilter("Imágenes JPG (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
-        if (file == null) {
-            return;
-        }
-        Map<String, BigDecimal> datos = ventaRepuestoServ.reporteTotalVentasPorMeses(fecha);
-        GeneradorReportes.totalVentasAnual(file, datos);
+    private void totalVentasAnual() {
+        navigator.openModal(Views.CHART_VENTAS_RESPUESTOS_ANIO, "Reporte", null);
     }
 
     @FXML
@@ -181,13 +169,12 @@ public class VentasController implements Initializable {
         if (file == null) {
             return;
         }
-        Map<String, Long> datos = ventaRepuestoServ.reporteCantidadVentasPorMeses(fecha);
+        Map<String, Long> datos = ventaRepuestoServ.reporteCantidadVentasEnAnio(fecha);
         GeneradorReportes.cantidadVentasAnual(file, datos);
     }
 
     @FXML
     private void cantidadVentasMes() {
-//        List<VentaRepuestosEnMesDTO> dtos = ventaRepuestoServ.reporteTotalVentasEnMes(2025, 10);
         navigator.openModal(Views.CHART_VENTAS_REPUESTOS_MES, "Reporte", null);
     }
 

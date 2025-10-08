@@ -29,7 +29,8 @@ public enum Views {
     CARGAR_CLIENTE("/views/CargarCliente.fxml", CargarClienteController.class),
 
     // Views charts
-    CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class);
+    CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
+    CHART_VENTAS_RESPUESTOS_ANIO("/views/ChartTotalVentasAnio.fxml", ChartTotalVentasAnioController.class);
 
     private final String fxmlPath;
     private final Class<?> controllerClass;

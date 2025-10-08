@@ -17,14 +17,27 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long>{
                                      BigDecimal montoMinimo, BigDecimal montomaximo, String nombreColOrdenar,
                                      Integer tipoOrden, LocalDate fechaMinima, LocalDate fechaMaxima);
 
+    /**
+     * Trae datos para crear los DTOs que son necesarios para el reporte sobre la cantidad de ventas de repuestos
+     * por mes en un año.
+     *
+     * @param anio para buscar las ventas.
+     */
     List<Object[]> cantidadVentasPorMeses(Integer anio);
-    
+
+    /**
+     * Trae datos para crear los DTOs que son necesarios para el reporte sobre total de ganancias de ventas
+     * de repuestos.
+     *
+     * @param anio para buscar las ventas.
+     */
     List<Object[]> totalVentasPorMeses(Integer anio);
 
     /**
-     * Genera reporte por DÍA de total ganancias de ventas de repuestos en un mes en particular.
+     * Trae los DTOs necesarios para crear un reporte sobre el total de ingresos de ventas de repuestos por día
+     * en un mes en particular.
      */
-    List<VentaRepuestosEnMesDTO> reporteTotalVentasDiariasEnMes(int anio, int mes);
+    List<VentaRepuestosEnMesDTO> reporteTotalVentasDiariasEnMes(Integer anio, Integer mes);
     
     //ESCRITURA
 
