@@ -126,6 +126,17 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
     }
 
     @Override
+    public Long cantidadDeVentasEnAnio(int anio) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("SELECT COUNT(v) FROM VentaRepuesto v " +
+                                "WHERE YEAR(v.fechaVenta) = :anio " +
+                                "AND v.activo = true",
+                        Long.class)
+                .setParameter("anio", anio)
+                .getSingleResult();
+    }
+
+    @Override
     public VentaRepuesto borradoLogico(VentaRepuesto ventaRepuesto, AuditoriaVenta auditoriaVenta) {
         EntityManager em = emProvider.get();
         em.persist(auditoriaVenta);

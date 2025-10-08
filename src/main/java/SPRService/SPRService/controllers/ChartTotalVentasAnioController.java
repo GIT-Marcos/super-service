@@ -45,7 +45,7 @@ public class ChartTotalVentasAnioController implements Initializable {
     @FXML
     private AreaChart<String, Number> chart;
     @FXML
-    private Label lblIngresosTotales, lblTitulo;
+    private Label lblIngresosTotales, lblTitulo, lblCantidadDeVentasAnio, lblPromedio;
 
     @Inject
     public ChartTotalVentasAnioController(VentaRepuestoServ ventaRepuestoServ) {
@@ -55,18 +55,18 @@ public class ChartTotalVentasAnioController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configCampos();
-
-
     }
 
     @FXML
     private void generarReporteIngresos() {
+        llenarInfoDelAnio();
         int nroAnio = spinnerAnio.getValue();
         this.poblarChartIngresos(ventaRepuestoServ.reporteTotalVentasEnAnio(nroAnio));
     }
 
     @FXML
     private void generarReporteCantidad() {
+        llenarInfoDelAnio();
         int nroAnio = spinnerAnio.getValue();
         poblarChartCantidad(ventaRepuestoServ.reporteCantidadVentasEnAnio(nroAnio));
     }
@@ -101,7 +101,11 @@ public class ChartTotalVentasAnioController implements Initializable {
         }
     }
 
-
+    private void llenarInfoDelAnio() {
+        int anio = spinnerAnio.getValue();
+        lblTitulo.setText("Información del año: " + anio);
+        lblCantidadDeVentasAnio.setText(ventaRepuestoServ.cantidadDeVentasEnAnio(anio) + " ventas");
+    }
 
     private void poblarChartCantidad(List<VentaRepuestosCantidadEnAnioDTO> ventasDTO) {
         if (!limpiaChartYVerificaDTO(ventasDTO)) return;
@@ -157,7 +161,7 @@ public class ChartTotalVentasAnioController implements Initializable {
         chart.getData().add(series);
     }
 
-    private <D> boolean limpiaChartYVerificaDTO(List<D> dtoList) {
+    private boolean limpiaChartYVerificaDTO(List<?> dtoList) {
         chart.getData().clear();
         if (dtoList == null) {
             Alertas.aviso("Generación de reporte", "Error al obtener los datos.");
