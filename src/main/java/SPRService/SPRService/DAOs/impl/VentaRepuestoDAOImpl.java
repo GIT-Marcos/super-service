@@ -1,8 +1,10 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
+import SPRService.SPRService.DTOs.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -24,6 +26,22 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
 
     public VentaRepuestoDAOImpl() {
         super(VentaRepuesto.class);
+    }
+
+    @Override
+    public ResultadoPaginado<VentaRepuesto> verTodosPaginado(int pagina, int tamanioPagina) {
+        EntityManager em = emProvider.get();
+        Long totalResultados = em.createQuery("SELECT COUNT(v) FROM VentaRepuesto v",
+                Long.class).getSingleResult();
+
+        List<VentaRepuesto> ventas = em.createQuery("SELECT v FROM VentaRepuesto v " +
+                                "ORDER BY v.fechaVenta DESC",
+                        VentaRepuesto.class)
+                .setFirstResult(pagina * tamanioPagina)
+                .setMaxResults(tamanioPagina)
+                .getResultList();
+
+        return new ResultadoPaginado<>(ventas, totalResultados);
     }
 
     @Override
@@ -74,6 +92,56 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         }
 
         return em.createQuery(query).getResultList();
+    }
+
+    @Override
+    public ResultadoPaginado<VentaRepuesto> buscarPaginadoConFiltros(FiltroVentaRepuestoDTO filtro,
+                                                                     int pagina, int tamanioPagina) {
+        EntityManager em = emProvider.get();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+
+        // --- 1. CONSULTA PARA OBTENER EL TOTAL DE RESULTADOS (CONTEO) ---
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<VentaRepuesto> countRoot = countQuery.from(VentaRepuesto.class);
+        countQuery.select(cb.count(countRoot));
+        // Aplicamos los filtros a la consulta de conteo
+        aplicarFiltros(filtro, cb, countQuery, countRoot);
+
+        Long totalResultados = em.createQuery(countQuery).getSingleResult();
+
+        // Si no hay resultados, no hace falta ejecutar la segunda consulta
+        if (totalResultados == 0) {
+            return new ResultadoPaginado<>(new ArrayList<>(), 0L);
+        }
+
+        // --- 2. CONSULTA PARA OBTENER LOS DATOS DE LA PÁGINA ACTUAL ---
+        CriteriaQuery<VentaRepuesto> dataQuery = cb.createQuery(VentaRepuesto.class);
+        Root<VentaRepuesto> dataRoot = dataQuery.from(VentaRepuesto.class);
+        dataQuery.select(dataRoot);
+        // Volvemos a aplicar los mismos filtros, pero ahora a la consulta de datos
+        aplicarFiltros(filtro, cb, dataQuery, dataRoot);
+
+        // Aplicar ordenación
+        if (filtro.tipoOrden() != null && filtro.colOrden() != null && !filtro.colOrden().isBlank()) {
+            if (filtro.tipoOrden() == 0) { // Descendente
+                dataQuery.orderBy(cb.desc(dataRoot.get(filtro.colOrden())));
+            } else { // Ascendente
+                dataQuery.orderBy(cb.asc(dataRoot.get(filtro.colOrden())));
+            }
+        } else {
+            dataQuery.orderBy(cb.desc(dataRoot.get("fechaVenta"))); // Un orden por defecto
+        }
+
+        TypedQuery<VentaRepuesto> typedDataQuery = em.createQuery(dataQuery);
+
+        // Aplicar paginación
+        typedDataQuery.setFirstResult(pagina * tamanioPagina);
+        typedDataQuery.setMaxResults(tamanioPagina);
+
+        List<VentaRepuesto> ventas = typedDataQuery.getResultList();
+
+        // --- 3. DEVOLVER EL RESULTADO COMPLETO ---
+        return new ResultadoPaginado<>(ventas, totalResultados);
     }
 
     @Override
@@ -163,5 +231,36 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         EntityManager em = emProvider.get();
         em.persist(auditoriaVenta);
         return em.merge(ventaRepuesto);
+    }
+
+    private void aplicarFiltros(FiltroVentaRepuestoDTO filtro, CriteriaBuilder cb, CriteriaQuery<?> query,
+                                Root<VentaRepuesto> root) {
+        List<Predicate> predicados = new ArrayList<>();
+
+        if (filtro.codVenta() != null && filtro.codVenta() > 0) {
+            predicados.add(cb.equal(root.get("id"), filtro.codVenta()));
+        }
+        if (filtro.estados() != null && !filtro.estados().isEmpty()) {
+            predicados.add(root.get("estadoVenta").in(filtro.estados()));
+        }
+        if (filtro.montoMin() != null && filtro.montoMax() != null) {
+            predicados.add(cb.between(root.get("montoTotal"), filtro.montoMin(), filtro.montoMax()));
+        } else if (filtro.montoMin() != null) {
+            predicados.add(cb.greaterThanOrEqualTo(root.get("montoTotal"), filtro.montoMin()));
+        } else if (filtro.montoMax() != null) {
+            predicados.add(cb.lessThanOrEqualTo(root.get("montoTotal"), filtro.montoMax()));
+        }
+        if (filtro.fechaMin() != null && filtro.fechaMax() != null) {
+            predicados.add(cb.between(root.get("fechaVenta"), filtro.fechaMin(), filtro.fechaMax()));
+        } else if (filtro.fechaMin() != null) {
+            predicados.add(cb.greaterThanOrEqualTo(root.get("fechaVenta"), filtro.fechaMin()));
+        } else if (filtro.fechaMax() != null) {
+            predicados.add(cb.lessThanOrEqualTo(root.get("fechaVenta"), filtro.fechaMax()));
+        }
+
+        // Aplicamos la lista de predicados a la consulta
+        if (!predicados.isEmpty()) {
+            query.where(cb.and(predicados.toArray(new Predicate[0])));
+        }
     }
 }
