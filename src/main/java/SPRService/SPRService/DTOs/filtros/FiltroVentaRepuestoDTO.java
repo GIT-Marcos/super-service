@@ -1,4 +1,4 @@
-package SPRService.SPRService.DTOs;
+package SPRService.SPRService.DTOs.filtros;
 
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 

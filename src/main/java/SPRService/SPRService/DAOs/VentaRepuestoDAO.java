@@ -1,6 +1,6 @@
 package SPRService.SPRService.DAOs;
 
-import SPRService.SPRService.DTOs.FiltroVentaRepuestoDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.VentaRepuesto;

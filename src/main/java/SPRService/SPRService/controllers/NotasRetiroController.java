@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.util.ResultadoPaginado;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
 import SPRService.SPRService.components.CeldaDetalleRetiro;
 import SPRService.SPRService.entities.DetalleRetiro;
@@ -21,12 +22,16 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -37,8 +42,8 @@ public class NotasRetiroController implements Initializable {
     private final Navigator navigator;
     private ObservableList<NotaRetiro> notasObsList = FXCollections.observableArrayList();
     private ObservableList<DetalleRetiro> detallesObsList = FXCollections.observableArrayList();
-    //    private List<Repuesto> repuestos = new ArrayList<>();
     private ObservableList<RepuestoRowViewModel> obsListRepuestoVM = FXCollections.observableArrayList();
+    private static final int ITEMS_POR_PAGINA_NOTAS = 30;
 
     @Inject
     public NotasRetiroController(NotaRetiroServ notaRetiroServ, AppCoordinator appCoordinator, RepuestoServ repuestoServ) {
@@ -48,25 +53,17 @@ public class NotasRetiroController implements Initializable {
     }
 
     @FXML
-    private ListView<NotaRetiro> listViewNotas;
+    private ListView<NotaRetiro> listViewNotasRetiro;
     @FXML
-    private DatePicker dateFechaMin;
+    private Pagination paginacionNotasRetiro;
     @FXML
-    private DatePicker dateFechaMax;
+    private DatePicker dateFechaMin, dateFechaMax;
     @FXML
-    private TextField tfCodBarras;
+    private TextField tfCodBarras, tfMarca, tfNombre;
     @FXML
-    private TextField tfMarca;
+    private ComboBox<String> cbTipoOrden, cbOrdenarPor;
     @FXML
-    private TextField tfNombre;
-    @FXML
-    private ComboBox<String> cbTipoOrden;
-    @FXML
-    private ComboBox<String> cbOrdenarPor;
-    @FXML
-    private CheckBox checkVerBajo;
-    @FXML
-    private CheckBox checkVerNormal;
+    private CheckBox checkVerBajo, checkVerNormal;
     @FXML
     private Button btnCrearNota;
     @FXML
@@ -74,70 +71,92 @@ public class NotasRetiroController implements Initializable {
     @FXML
     private TableView<RepuestoRowViewModel> tablaRepuestos;
     @FXML
-    private TableColumn<RepuestoRowViewModel, String> colCodigo;
+    private TableColumn<RepuestoRowViewModel, String> colCodigo, colNombre, colMarca, colUniMedida;
     @FXML
-    private TableColumn<RepuestoRowViewModel, String> colNombre;
+    private TableColumn<RepuestoRowViewModel, Double> colExistente, colMin;
     @FXML
-    private TableColumn<RepuestoRowViewModel, String> colMarca;
-    @FXML
-    private TableColumn<RepuestoRowViewModel, Double> colExistente;
-    @FXML
-    private TableColumn<RepuestoRowViewModel, Double> colMin;
-    @FXML
-    private TableColumn<RepuestoRowViewModel, String> colUniMedida;
-    @FXML
-    private CheckBox checkGuardar;
-    @FXML
-    private CheckBox checkImprimir;
+    private CheckBox checkGuardar, checkImprimir;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // --- CONFIGURACIÓN TAB 1: NOTAS DE RETIRO ---
         dateFechaMin.setConverter(new SafeLocalDateConverter());
         dateFechaMax.setConverter(new SafeLocalDateConverter());
-        llenarCombos();
-        // ListView detalles
-        this.notasObsList.addAll(notaRetiroServ.verTodasPorFecha());
-        listViewNotas.setItems(this.notasObsList);
-        listViewNotas.setCellFactory(param -> new ListCell<>() {
+
+        // 1. Enlazar la lista observable al ListView (se hace una sola vez)
+        listViewNotasRetiro.setItems(this.notasObsList);
+
+        // 2. Configurar cómo se muestra cada celda (tu código original, perfecto)
+        listViewNotasRetiro.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(NotaRetiro item, boolean empty) {
                 super.updateItem(item, empty);
-
                 if (empty || item == null) {
                     setText(null);
-                    setGraphic(null);
                 } else {
-                    setText("N° de nota: " + item.getId() + " . Fecha de nota: " + item.getFecha());
+                    setText("N° de nota: " + item.getId() + " . Fecha de nota: " +
+                            item.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                 }
             }
         });
-        // ListView nueva nota
+
+        // 3. Conectar el control de paginación a nuestra lógica de carga de datos
+        paginacionNotasRetiro.setPageFactory(this::cargarPagina);
+
+        // --- CONFIGURACIÓN TAB 2: NUEVA NOTA (Sin cambios) ---
+        llenarCombos();
         this.listViewDetalles.setItems(this.detallesObsList);
         listViewDetalles.setCellFactory(param -> new CeldaDetalleRetiro());
-        // seteo de Tabla
         configColumnas();
         tablaRepuestos.setItems(this.obsListRepuestoVM);
         seteaEstiloTabla();
         llenarFilas(repuestoServ.verTodos());
     }
 
+    private Node cargarPagina(int indicePagina) {
+        // 1. Obtener los filtros actuales de la UI
+        LocalDate fechaMin = dateFechaMin.getValue();
+        LocalDate fechaMax = dateFechaMax.getValue();
+
+        // 2. Llamar al servicio paginado
+        ResultadoPaginado<NotaRetiro> resultado = notaRetiroServ.buscarPaginado(
+                fechaMin, fechaMax, indicePagina, ITEMS_POR_PAGINA_NOTAS
+        );
+
+        // 3. Actualizar el número total de páginas en el control
+        long totalItems = resultado.getCantidadResultados();
+        long totalPaginas = (totalItems + ITEMS_POR_PAGINA_NOTAS - 1) / ITEMS_POR_PAGINA_NOTAS;
+        paginacionNotasRetiro.setPageCount(totalPaginas == 0 ? 1 : (int) totalPaginas);
+
+        // 4. Poblar la lista observable con los resultados de la página actual
+        notasObsList.setAll(resultado.getLista());
+
+        return new VBox(); // Devolver un nodo dummy
+    }
+
+    private void limpiarFiltrosNotas() {
+        dateFechaMin.setValue(null);
+        dateFechaMax.setValue(null);
+    }
+
     @FXML
-    private void actualizar() {
-        this.notasObsList.clear();
-        this.notasObsList.addAll(this.notaRetiroServ.verTodasPorFecha());
+    private void verTodas() {
+        limpiarFiltrosNotas();
+        aplicarFiltros();
     }
 
     @FXML
     private void aplicarFiltros() {
-        if (dateFechaMin.getValue() == null && dateFechaMax.getValue() == null) return;
-        this.notasObsList.clear();
-        this.notasObsList.addAll(notaRetiroServ.buscarPorFecha(dateFechaMin.getValue(), dateFechaMax.getValue()));
+        if (paginacionNotasRetiro.getCurrentPageIndex() != 0) {
+            paginacionNotasRetiro.setCurrentPageIndex(0);
+        }
+        cargarPagina(0);
     }
 
     @FXML
     private void verDetalles() {
-        NotaRetiro n = listViewNotas.getSelectionModel().getSelectedItem();
+        NotaRetiro n = listViewNotasRetiro.getSelectionModel().getSelectedItem();
         if (n == null) {
             Alertas.aviso("Detalles de nota re retiro", "Debe seleccionar una nota para " +
                     "ver sus detalles");
@@ -149,7 +168,7 @@ public class NotasRetiroController implements Initializable {
 
     @FXML
     private void eliminarNota() {
-        NotaRetiro n = listViewNotas.getSelectionModel().getSelectedItem();
+        NotaRetiro n = listViewNotasRetiro.getSelectionModel().getSelectedItem();
         if (n == null) {
             Alertas.aviso("Cancelar nota de retiro", "Debe seleccionar una nota para cancelarla.");
             return;
@@ -159,7 +178,11 @@ public class NotasRetiroController implements Initializable {
             return;
         try {
             notaRetiroServ.cancelarNota(n);
-            notasObsList.remove(n);
+
+            // IMPORTANTE: En lugar de quitar el item de la lista, recargamos la página actual.
+            // Esto asegura que la vista esté siempre sincronizada con la base de datos.
+            cargarPagina(paginacionNotasRetiro.getCurrentPageIndex()); // <-- CAMBIO CLAVE
+
             Alertas.exito("Cancelar nota de retiro", "Se ha cancelado la nota de retiro con éxito.");
         } catch (RuntimeException e) {
             Alertas.error("Cancelar nota de retiro", "Ha ocurrido un error inesperado al cancelar la nota.");
@@ -275,7 +298,7 @@ public class NotasRetiroController implements Initializable {
             notaRetiroServ.guardarNota(notaParaCargar);
             Alertas.exito("Nueva nota de retiro", "Se ha creado la nota de retiro con éxito.");
             detallesObsList.clear();
-            actualizar();
+            cargarPagina(paginacionNotasRetiro.getCurrentPageIndex());
             btnCrearNota.setDisable(true);
             verTodos();
         } catch (Exception e) {
