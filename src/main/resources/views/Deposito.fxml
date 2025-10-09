@@ -127,12 +127,12 @@
                   <Insets />
                </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#modRepuesto" prefHeight="30.0" prefWidth="150.0" text="Modificar repuesto">
+            <Button mnemonicParsing="false" onAction="#modRepuesto" prefHeight="30.0" prefWidth="150.0" text="Detalles/Modificar">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#borrarRepuesto" prefHeight="30.0" prefWidth="150.0" text="Borrar repuesto">
+            <Button mnemonicParsing="false" onAction="#borrarRepuesto" prefHeight="30.0" prefWidth="150.0" text="Dar de baja">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
@@ -152,7 +152,7 @@
                   <Insets top="10.0" />
                </VBox.margin>
                <font>
-                  <Font size="14.0" />
+                  <Font size="15.0" />
                </font>
             </Label>
             <Button mnemonicParsing="false" onAction="#masRetiradosParaVenta" prefHeight="30.0" prefWidth="150.0" text="Más retirados para venta">
@@ -173,20 +173,20 @@
                   <Insets top="10.0" />
                </VBox.margin>
             </Separator>
-            <Label text="Generar tabla actual" textFill="WHITE">
+            <Label text="Exportar tabla actual" textFill="WHITE">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
                <font>
-                  <Font size="14.0" />
+                  <Font size="15.0" />
                </font>
             </Label>
-            <ComboBox fx:id="comboFormatos" prefWidth="80.0">
+            <ComboBox fx:id="comboFormatos" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" promptText="Formato...">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </ComboBox>
-            <Button mnemonicParsing="false" onAction="#generar" prefHeight="30.0" prefWidth="150.0" text="Generar">
+            <Button mnemonicParsing="false" onAction="#generar" prefHeight="30.0" prefWidth="150.0" text="Exportar">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>

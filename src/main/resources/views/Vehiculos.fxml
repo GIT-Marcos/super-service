@@ -103,10 +103,10 @@
                   <Insets bottom="10.0" />
                </VBox.margin>
                <font>
-                  <Font size="13.0" />
+                  <Font size="15.0" />
                </font>
             </Label>
-            <Button maxHeight="52.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#generarReporteMasRegistrados" prefHeight="30.0" prefWidth="162.0" text="Modelos más registrados" wrapText="true">
+            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#generarReporteMasRegistrados" prefHeight="30.0" prefWidth="150.0" text="Modelos más registrados" wrapText="true">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
@@ -117,18 +117,18 @@
             <Separator prefWidth="200.0" />
             <Label text="Exportar lista actual" textFill="WHITE">
                <font>
-                  <Font size="13.0" />
+                  <Font size="15.0" />
                </font>
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
             </Label>
-            <ComboBox fx:id="comboFormato" prefWidth="150.0" promptText="Formato...">
+            <ComboBox fx:id="comboFormato" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" promptText="Formato...">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
             </ComboBox>
-            <Button mnemonicParsing="false" onAction="#exportarTabla" text="Exportar">
+            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#exportarTabla" prefHeight="30.0" prefWidth="150.0" text="Exportar">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>

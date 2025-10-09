@@ -44,7 +44,7 @@
             <TextField fx:id="tfBuscar" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" promptText="Código de venta..." GridPane.rowIndex="1" />
             <ComboBox fx:id="comboOrdenarPor" prefWidth="150.0" promptText="Ordenar por..." GridPane.columnIndex="2" />
             <ComboBox fx:id="comboTipoOrden" prefWidth="150.0" promptText="Tipo de orden" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <Label text="Estado ventas" textFill="WHITE" underline="true" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+            <Label text="Estado de ventas" textFill="WHITE" underline="true" GridPane.columnIndex="4" GridPane.halignment="CENTER">
                <GridPane.margin>
                   <Insets right="5.0" />
                </GridPane.margin>
@@ -150,7 +150,7 @@
                   <Insets bottom="10.0" />
                </VBox.margin>
                <font>
-                  <Font size="14.0" />
+                  <Font size="15.0" />
                </font>
             </Label>
             <Button maxHeight="30.0" maxWidth="150.0" mnemonicParsing="false" onAction="#reportesAnuales" prefHeight="30.0" prefWidth="150.0" text="Reportes anuales">
