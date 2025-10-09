@@ -87,7 +87,8 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
     @Transactional
     @Override
     public Double ingresosPromedioPorVentaEnAnio(int anio) {
-        return daoVenta.ingresosPromedioPorVentaEnAnio(anio);
+        Double result = daoVenta.ingresosPromedioPorVentaEnAnio(anio);
+        return Math.round(result * 100.0) / 100.0;
     }
 
     @Transactional

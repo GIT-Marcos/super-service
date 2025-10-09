@@ -22,21 +22,25 @@
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
+               <font>
+                  <Font size="13.0" />
+               </font>
             </Button>
-            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Ver detalles">
+            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#modificar" prefHeight="30.0" prefWidth="150.0" text="Detalles/Modificar">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
-            </Button>
-            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#modificar" prefHeight="30.0" prefWidth="150.0" text="Modificar datos">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
+               <font>
+                  <Font size="13.0" />
+               </font>
             </Button>
             <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#darDeBaja" prefHeight="30.0" prefWidth="150.0" text="Dar de baja">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
+               <font>
+                  <Font size="13.0" />
+               </font>
             </Button>
             <Separator prefWidth="200.0">
                <VBox.margin>
@@ -51,7 +55,7 @@
                   <Font size="15.0" />
                </font>
             </Label>
-            <Button disable="true" maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Reporte más frecuentes">
+            <Button disable="true" maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Clientes más frecuentes">
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>

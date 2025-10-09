@@ -45,7 +45,7 @@
             <Button mnemonicParsing="false" onAction="#agregarRepuesto" text="Agregar seleccionado" GridPane.columnIndex="4" GridPane.rowIndex="1" />
             <Button mnemonicParsing="false" onAction="#limpiarLista" text="Limpiar lista de venta" GridPane.columnIndex="4" />
             <Button disable="true" maxHeight="0.0" maxWidth="0.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="0.0" prefWidth="0.0" text="Quitar repuesto" GridPane.columnIndex="4" />
-            <Label text="Repuestos a vender:" textFill="WHITE" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <Label text="Repuestos a vender:" textFill="WHITE" GridPane.columnIndex="4" GridPane.rowIndex="3" />
             <Button maxWidth="130.0" minWidth="130.0" mnemonicParsing="false" onAction="#todosRepuestos" prefWidth="130.0" text="Todos los repuestos" GridPane.rowIndex="3" />
             <CheckBox fx:id="checkStockBajo" mnemonicParsing="false" selected="true" text="Ver stock bajo." textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <CheckBox fx:id="checkStockNormal" mnemonicParsing="false" selected="true" text="Ver stock normal." textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="2" />
@@ -61,36 +61,43 @@
                   <Font size="13.0" />
                </font>
             </Label>
+            <CheckBox fx:id="checkRutaPredeterminada" mnemonicParsing="false" selected="true" text="Guardar en ruta predeterminada." textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.columnIndex="5" GridPane.columnSpan="2147483647" />
+            <CheckBox fx:id="checkImprimirNota" mnemonicParsing="false" text="Imprimir nota." textFill="WHITE" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+            <Button fx:id="btnEmitirNota" alignment="CENTER" mnemonicParsing="false" onAction="#emitirNotaRetiro" text="Emitir nota retiro" GridPane.columnIndex="6" GridPane.halignment="LEFT" GridPane.rowIndex="1">
+               <font>
+                  <Font size="13.0" />
+               </font></Button>
          </children>
       </GridPane>
    </top>
    <bottom>
       <GridPane prefHeight="51.0" prefWidth="990.0" style="-fx-background-color: #456789;" BorderPane.alignment="CENTER">
         <columnConstraints>
-            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="654.0596815531176" minWidth="160.0" prefWidth="306.3581618089991" />
-            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="654.0596815531176" minWidth="35.82089600506754" prefWidth="292.02988051603376" />
-            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="654.0596815531176" minWidth="35.82089600506754" prefWidth="186.73129943453375" />
-          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="492.7164123222435" minWidth="100.31346801363532" prefWidth="198.91047727262367" />
-          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="400.29850460739976" minWidth="10.0" prefWidth="206.194025295884" />
+            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="654.0596815531176" minWidth="35.82089600506754" prefWidth="224.35811617879529" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="569.3880463564259" minWidth="100.31346801363532" prefWidth="569.3880463564259" />
+          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Button fx:id="btnEmitirNota" alignment="CENTER" mnemonicParsing="false" onAction="#emitirNotaRetiro" prefHeight="25.0" prefWidth="150.0" text="Emitir nota retiro" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-            <CheckBox fx:id="checkImprimirNota" mnemonicParsing="false" text="Imprimir nota." textFill="WHITE" GridPane.columnIndex="3" />
-            <Label fx:id="labelTotal" text="TOTAL: $ 0" textFill="WHITE" GridPane.columnIndex="4">
+            <Label fx:id="labelTotal" text="TOTAL: $ 0" textFill="WHITE" GridPane.columnIndex="2">
                <font>
                   <Font size="16.0" />
                </font></Label>
-            <Button fx:id="btnPagar" disable="true" mnemonicParsing="false" onAction="#pagar" prefWidth="150.0" style="-fx-background-color: #9ae084;" text="Hacer pago" GridPane.columnIndex="4" GridPane.rowIndex="1">
+            <Button fx:id="btnPagar" disable="true" maxHeight="28.0" minHeight="28.0" mnemonicParsing="false" onAction="#pagar" prefHeight="28.0" prefWidth="150.0" style="-fx-background-color: #9ae084;" text="HACER PAGO" GridPane.columnIndex="2" GridPane.rowIndex="1">
                <tooltip>
                   <Tooltip text="Debe haber emitido la nota de retiro para hacer el pago." wrapText="true" />
                </tooltip>
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
             </Button>
-            <Label prefHeight="50.0" prefWidth="250.0" text="*Para continuar con el pago es necesario emitir la nota de retiro." textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowSpan="2" GridPane.valignment="BOTTOM" />
-            <CheckBox fx:id="checkRutaPredeterminada" mnemonicParsing="false" prefHeight="34.0" prefWidth="119.0" selected="true" text="Guardar en ruta predeterminada." textFill="WHITE" wrapText="true" GridPane.columnIndex="2" GridPane.rowSpan="2147483647" />
+            <Label prefHeight="50.0" prefWidth="250.0" text="*Para realizar el pago es necesario haber emitido la nota de retiro." textAlignment="RIGHT" textFill="WHITE" underline="true" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowSpan="2147483647" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
          </children>
       </GridPane>
    </bottom>
