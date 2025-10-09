@@ -1,6 +1,6 @@
 package SPRService.SPRService.services;
 
-import SPRService.SPRService.DTOs.FiltroVentaRepuestoDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;

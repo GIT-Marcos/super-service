@@ -41,6 +41,8 @@ module navegador2.SPRService {
     exports SPRService.SPRService.util.persistence;
     exports SPRService.SPRService.viewModels.tablas;
     opens SPRService.SPRService.viewModels.tablas to javafx.base;
+    exports SPRService.SPRService.DTOs.filtros;
+    opens SPRService.SPRService.DTOs.filtros to javafx.base;
 
     // "opens components to javafx.fxml;" no hace nada (no es un paquete Java), puedes quitarlo.
 

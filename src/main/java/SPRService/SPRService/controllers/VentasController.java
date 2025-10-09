@@ -1,6 +1,6 @@
 package SPRService.SPRService.controllers;
 
-import SPRService.SPRService.DTOs.FiltroVentaRepuestoDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
@@ -25,7 +25,6 @@ import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.generadores.GeneradorPDF;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;

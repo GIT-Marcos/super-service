@@ -6,6 +6,7 @@ import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.NotaRetiro;
 import SPRService.SPRService.entities.Stock;
 import SPRService.SPRService.services.NotaRetiroServ;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
@@ -30,6 +31,13 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
     @Override
     public List<NotaRetiro> verTodasPorFecha() {
         return daoNota.verTodasPorFecha();
+    }
+
+    @Transactional
+    @Override
+    public ResultadoPaginado<NotaRetiro> buscarPaginado(LocalDate fechaMin, LocalDate fechaMax,
+                                                        int pagina, int tamanioPagina) {
+        return daoNota.buscarPaginado(fechaMin, fechaMax, pagina, tamanioPagina);
     }
 
     @Transactional
