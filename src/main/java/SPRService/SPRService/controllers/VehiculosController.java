@@ -40,25 +40,13 @@ public class VehiculosController implements Initializable {
     private final VehiculoServ vehiculoServ;
 
     @FXML
-    private TextField tfPatente;
-    @FXML
-    private TextField tfModelo;
-    @FXML
-    private TextField tfMarca;
+    private TextField tfPatente, tfModelo, tfMarca;
     @FXML
     private TableView<VehiculoRowViewModel> tablaVehiculos;
     @FXML
-    private TableColumn<VehiculoRowViewModel, String> colPatente;
-    @FXML
-    private TableColumn<VehiculoRowViewModel, String> colMarca;
-    @FXML
-    private TableColumn<VehiculoRowViewModel, String> colModelo;
+    private TableColumn<VehiculoRowViewModel, String> colPatente, colMarca, colModelo, colAnio, colColor;
     @FXML
     private TableColumn<VehiculoRowViewModel, Double> colCil;
-    @FXML
-    private TableColumn<VehiculoRowViewModel, String> colAnio;
-    @FXML
-    private TableColumn<VehiculoRowViewModel, String> colColor;
     @FXML
     private ComboBox<String> comboFormato;
 
@@ -152,7 +140,7 @@ public class VehiculosController implements Initializable {
     @FXML
     private void exportarTabla(ActionEvent event) {
         if (obsListViewModel.isEmpty()) {
-            Alertas.aviso("Exportar tabla actual", "No hay repuestos en la tabla catual para exportar.");
+            Alertas.aviso("Exportar tabla actual", "No hay vehículos en la tabla catual para exportar.");
             return;
         }
 
@@ -160,10 +148,10 @@ public class VehiculosController implements Initializable {
         String defaultFileName;
         if (comboFormato.getValue().equals("CSV")) {
             filter = new FileChooser.ExtensionFilter("Archivos CSV (*.csv)", "*.csv");
-            defaultFileName = "tabla_repuestos.csv";
+            defaultFileName = "tabla_vehículos.csv";
         } else {
             filter = new FileChooser.ExtensionFilter("Archivos Excel (*.xlsx)", "*.xlsx");
-            defaultFileName = "tabla_repuestos.xlsx";
+            defaultFileName = "tabla_vehículos.xlsx";
         }
         File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta", defaultFileName, filter);
         if (file == null) return;
