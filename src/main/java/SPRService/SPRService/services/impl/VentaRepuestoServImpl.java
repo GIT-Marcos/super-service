@@ -8,7 +8,6 @@ import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.services.VentaRepuestoServ;
-import SPRService.SPRService.util.ManejadorInputs;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
@@ -88,8 +87,7 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
     @Transactional
     @Override
     public Double ingresosPromedioPorVentaEnAnio(int anio) {
-        Double result = daoVenta.ingresosPromedioPorVentaEnAnio(anio);
-        return Math.round(result * 100.0) / 100.0;
+        return daoVenta.ingresosPromedioPorVentaEnAnio(anio);
     }
 
     @Transactional
