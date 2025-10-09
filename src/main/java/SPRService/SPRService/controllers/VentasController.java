@@ -1,26 +1,26 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.VentaRepuestoServ;
+import SPRService.SPRService.util.*;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import SPRService.SPRService.viewModels.tablas.VentaRepuestoVMtabla;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
-import SPRService.SPRService.util.ManejadorInputs;
-import SPRService.SPRService.util.SafeLocalDateConverter;
-import SPRService.SPRService.util.SessionManager;
-import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.generadores.GeneradorPDF;
 
@@ -29,18 +29,14 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class VentasController implements Initializable {
 
     private ObservableList<VentaRepuestoVMtabla> obsListVentasVM = FXCollections.observableArrayList();
     private final VentaRepuestoServ ventaRepuestoServ;
     private final Navigator navigator;
-
-    @Inject
-    public VentasController(VentaRepuestoServ ventaRepuestoServ, AppCoordinator appCoordinator) {
-        this.ventaRepuestoServ = ventaRepuestoServ;
-        this.navigator = appCoordinator.getMainNavigator();
-    }
+    private static final int ITEMS_POR_PAGINA = 15;
 
     @FXML
     private TextField tfBuscar, tfMontoMin, tfMontoMax;
@@ -54,6 +50,14 @@ public class VentasController implements Initializable {
     private TableColumn<VentaRepuestoVMtabla, Long> colCodVenta, colEstadoVenta, colFechaVenta, colMontoVenta;
     @FXML
     private DatePicker dateFechaMin, dateFechaMax;
+    @FXML
+    private Pagination paginacion;
+
+    @Inject
+    public VentasController(VentaRepuestoServ ventaRepuestoServ, AppCoordinator appCoordinator) {
+        this.ventaRepuestoServ = ventaRepuestoServ;
+        this.navigator = appCoordinator.getMainNavigator();
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -64,46 +68,60 @@ public class VentasController implements Initializable {
         dateFechaMax.setPromptText("dd/MM/yyyy");
 
         configColumnas();
+        configurarControles();
         tablaVentas.setItems(obsListVentasVM);
-        llenarTabla(ventaRepuestoServ.verTodas());
+        paginacion.setPageFactory(this::cargarPagina);
+    }
+
+    private Node cargarPagina(int indicePagina) {
+        // 1. Recolectar todos los filtros de la UI
+        FiltroVentaRepuestoDTO filtros = recolectarFiltrosActuales();
+
+        // 2. Llamar al servicio con los filtros y la paginación
+        ResultadoPaginado<VentaRepuesto> resultado = ventaRepuestoServ.buscarVentasPaginado(
+                filtros, indicePagina, ITEMS_POR_PAGINA);
+
+        // 3. Calcular el número total de páginas y actualizar el control
+        long totalItems = resultado.getCantidadResultados();
+        long totalPaginas = (totalItems + ITEMS_POR_PAGINA - 1) / ITEMS_POR_PAGINA; // Forma segura de redondear hacia arriba
+        paginacion.setPageCount(totalPaginas == 0 ? 1 : (int) totalPaginas);
+
+        // 4. Convertir las entidades a ViewModels
+        List<VentaRepuestoVMtabla> viewModels = resultado.getLista()
+                .stream()
+                .map(VentaRepuestoVMtabla::new)
+                .collect(Collectors.toList());
+
+        // 5. ACTUALIZAR el contenido de la lista observable.
+        // setAll es más eficiente que clear() y addAll().
+        obsListVentasVM.setAll(viewModels);
+
+        return new VBox(); // Devolver un nodo vacío porque la tabla ya está en la escena.
     }
 
     @FXML
     private void buscarConFiltros() {
-        LocalDate fechaMin = dateFechaMin.getValue();
-        LocalDate fechaMax = dateFechaMax.getValue();
-        Long codigo;
-        int tipoOrden;
-        BigDecimal montoMin;
-        BigDecimal montoMax;
-        List<EstadoVentaRepuesto> estados;
-        try {
-            codigo = ManejadorInputs.codigoVenta(tfBuscar.getText().strip(), false);
-            montoMin = ManejadorInputs.dinero(tfMontoMin.getText().strip(), false);
-            montoMax = ManejadorInputs.dinero(tfMontoMax.getText().strip(), false);
-            tipoOrden = comboTipoOrden.getSelectionModel().getSelectedIndex();
-            estados = tomarEstados();
-        } catch (NullPointerException | IllegalArgumentException npe) {
-            Alertas.aviso("Buscar ventas", npe.getMessage());
-            return;
+        // Al cambiar los filtros, siempre volvemos a la primera página.
+        // Establecer el índice de página a 0 NO dispara el pageFactory automáticamente.
+        // Por eso, después de establecerlo, llamamos directamente a nuestra carga.
+        if (paginacion.getCurrentPageIndex() != 0) {
+            paginacion.setCurrentPageIndex(0);
         }
-        if (estados.isEmpty()) {
-            obsListVentasVM.clear();
-            return;
-        }
-
-        llenarTabla(ventaRepuestoServ.buscarVentas(codigo, estados, montoMin, montoMax,
-                tomaOrdenPor(), tipoOrden, fechaMin, fechaMax));
+        cargarPagina(0);
     }
 
     @FXML
     private void todasVentas() {
-        llenarTabla(ventaRepuestoServ.verTodas());
+        limpiarFiltros();
+        buscarConFiltros(); // Reutilizamos la lógica de búsqueda para recargar
     }
 
     @FXML
     private void ventasHoy() {
-        llenarTabla(ventaRepuestoServ.verVentasHoy());
+        limpiarFiltros();
+        dateFechaMin.setValue(LocalDate.now());
+        dateFechaMax.setValue(LocalDate.now());
+        buscarConFiltros();
     }
 
     @FXML
@@ -199,6 +217,50 @@ public class VentasController implements Initializable {
         }
     }
 
+    private FiltroVentaRepuestoDTO recolectarFiltrosActuales() {
+        try {
+            return new FiltroVentaRepuestoDTO(
+                    ManejadorInputs.codigoVenta(tfBuscar.getText().strip(), false),
+                    ManejadorInputs.dinero(tfMontoMin.getText().strip(), false),
+                    ManejadorInputs.dinero(tfMontoMax.getText().strip(), false),
+                    dateFechaMin.getValue(),
+                    dateFechaMax.getValue(),
+                    tomarEstados(),
+                    tomaOrdenPor(),
+                    comboTipoOrden.getSelectionModel().getSelectedIndex()
+            );
+        } catch (Exception e) {
+            // Manejar la excepción, quizás mostrar una alerta
+            // y devolver un DTO vacío para no romper la carga.
+            Alertas.aviso("Filtro inválidos", e.getMessage());
+            return new FiltroVentaRepuestoDTO(); // Devuelve filtros por defecto
+        }
+    }
+
+    private void limpiarFiltros() {
+        tfBuscar.clear();
+        tfMontoMin.clear();
+        tfMontoMax.clear();
+        dateFechaMin.setValue(null);
+        dateFechaMax.setValue(null);
+        checkPagado.setSelected(true);
+        checkPendiente.setSelected(true);
+        checkCancelado.setSelected(true);
+        comboOrdenarPor.getSelectionModel().select(0);
+        comboTipoOrden.getSelectionModel().select(0);
+    }
+
+    private void configurarControles() {
+        llenarCombos();
+        dateFechaMin.setConverter(new SafeLocalDateConverter());
+        dateFechaMin.setPromptText("dd/MM/yyyy");
+        dateFechaMax.setConverter(new SafeLocalDateConverter());
+        dateFechaMax.setPromptText("dd/MM/yyyy");
+
+        // Listener para que al presionar Enter en el campo de búsqueda, se active el filtro
+        tfBuscar.setOnAction(e -> buscarConFiltros());
+    }
+
     private List<EstadoVentaRepuesto> tomarEstados() {
         List<EstadoVentaRepuesto> list = new ArrayList<>();
         if (checkPagado.isSelected()) {
@@ -220,23 +282,16 @@ public class VentasController implements Initializable {
         colMontoVenta.setCellValueFactory(new PropertyValueFactory<>("montoVenta"));
     }
 
-    private void llenarTabla(List<VentaRepuesto> ventas) {
-        obsListVentasVM.clear();
-        for (VentaRepuesto v : ventas) {
-            obsListVentasVM.add(new VentaRepuestoVMtabla(v));
-        }
-    }
-
     private void llenarCombos() {
         ObservableList<String> listaTipoOrden = FXCollections.observableArrayList();
-        listaTipoOrden.add("Ascendente");
         listaTipoOrden.add("Descendente");
+        listaTipoOrden.add("Ascendente");
         comboTipoOrden.setItems(listaTipoOrden);
         comboTipoOrden.getSelectionModel().select(0);
         ObservableList<String> listaOrdenPor = FXCollections.observableArrayList();
-        listaOrdenPor.add("Código");
-        listaOrdenPor.add("Monto");
         listaOrdenPor.add("Fecha");
+        listaOrdenPor.add("Monto");
+        listaOrdenPor.add("Código");
         comboOrdenarPor.setItems(listaOrdenPor);
         comboOrdenarPor.getSelectionModel().select(0);
     }
@@ -245,9 +300,9 @@ public class VentasController implements Initializable {
         int ordenarPor = comboOrdenarPor.getSelectionModel().getSelectedIndex();
         //los valores q toma son el del atributo de Repuesto.class
         return switch (ordenarPor) {
-            case 0 -> "id";
+            case 0 -> "fechaVenta";
             case 1 -> "montoTotal";
-            case 2 -> "fechaVenta";
+            case 2 -> "id";
             default -> "id";
         };
     }

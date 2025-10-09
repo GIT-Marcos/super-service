@@ -2,12 +2,14 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.StockDAO;
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
+import SPRService.SPRService.DTOs.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.services.VentaRepuestoServ;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
@@ -34,6 +36,14 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
     @Override
     public List<VentaRepuesto> verTodas() {
         return daoVenta.getAll();
+    }
+
+    @Transactional
+    @Override
+    public ResultadoPaginado<VentaRepuesto> buscarVentasPaginado(FiltroVentaRepuestoDTO filtro,
+                                                                 int pagina, int tamanioPagina) {
+        if (filtro == null) filtro = new FiltroVentaRepuestoDTO();
+        return daoVenta.buscarPaginadoConFiltros(filtro, pagina, tamanioPagina);
     }
 
     @Transactional

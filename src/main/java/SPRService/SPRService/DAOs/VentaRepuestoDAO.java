@@ -1,9 +1,11 @@
 package SPRService.SPRService.DAOs;
 
+import SPRService.SPRService.DTOs.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
+import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,9 +15,14 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
 
     //LECTURA
 
+    ResultadoPaginado<VentaRepuesto> verTodosPaginado(int pagina, int tamanioPagina);
+
     List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,
                                      BigDecimal montoMinimo, BigDecimal montomaximo, String nombreColOrdenar,
                                      Integer tipoOrden, LocalDate fechaMinima, LocalDate fechaMaxima);
+
+    ResultadoPaginado<VentaRepuesto> buscarPaginadoConFiltros(FiltroVentaRepuestoDTO filtro,
+                                                              int pagina, int tamanioPagina);
 
     /**
      * Trae datos para crear los DTOs que son necesarios para el reporte sobre la cantidad de ventas de repuestos

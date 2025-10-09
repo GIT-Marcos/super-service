@@ -1,11 +1,13 @@
 package SPRService.SPRService.services;
 
+import SPRService.SPRService.DTOs.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
+import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +17,16 @@ public interface VentaRepuestoServ {
 
     List<VentaRepuesto> verTodas();
 
+    List<VentaRepuesto> verVentasHoy();
+
+    ResultadoPaginado<VentaRepuesto> buscarVentasPaginado(FiltroVentaRepuestoDTO filtro, int pagina, int tamanioPagina);
+
+    @Deprecated
+    List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,
+                                     BigDecimal montoMinimo, BigDecimal montomaximo, String nombreColumnaOrnenar,
+                                     Integer tipoOrden, LocalDate fechaMinima, LocalDate fechaMaxima);
+
+    /* -- INICIO REPORTES -- */
     List<VentaRepuestosEnAnioDTO> reporteTotalVentasEnAnio(int anio);
 
     List<VentaRepuestosCantidadEnAnioDTO> reporteCantidadVentasEnAnio(int anio);
@@ -26,12 +38,7 @@ public interface VentaRepuestoServ {
     BigDecimal ingresosDeVentasEnAnio(int anio);
 
     Double ingresosPromedioPorVentaEnAnio(int anio);
-
-    List<VentaRepuesto> verVentasHoy();
-
-    List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,
-                                     BigDecimal montoMinimo, BigDecimal montomaximo, String nombreColumnaOrnenar,
-                                     Integer tipoOrden, LocalDate fechaMinima, LocalDate fechaMaxima);
+    /* -- FIN REPORTES -- */
 
     VentaRepuesto cargarVenta(VentaRepuesto venta);
 
