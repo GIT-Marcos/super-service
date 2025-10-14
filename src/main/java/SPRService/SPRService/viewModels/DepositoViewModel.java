@@ -152,8 +152,8 @@ public class DepositoViewModel {
     }
 
     public void ingresarStock() {
-        RepuestoRowViewModel seleccionado = selectedRepuesto.get();
-        if (seleccionado == null) {
+        RepuestoRowViewModel repuestoSeleccionado = selectedRepuesto.get();
+        if (repuestoSeleccionado == null) {
             Alertas.aviso("Ingresar stock", "Debe seleccionar un repuesto para ingresarle stock.");
             return;
         }
@@ -162,10 +162,10 @@ public class DepositoViewModel {
             Double cantidad = SimpleDialogs.inputStock();
             if (cantidad == null) return;
 
-            Stock stock = seleccionado.getRepuestoOriginal().getStock();
-            stock.entradaStock(cantidad);
-            stockServ.modificarStock(stock);
-            seleccionado.updateFrom(seleccionado.getRepuestoOriginal());
+            Repuesto r = repuestoSeleccionado.getRepuestoOriginal();
+            Stock stock = stockServ.agregarExistente(r.getStock(), cantidad);
+            r.setStock(stock);
+            repuestoSeleccionado.updateFrom(r);
             verificarBajoStock();
             Alertas.exito("Ingreso stock", "Se ha agregado stock con éxito.");
         } catch (IllegalArgumentException e) {

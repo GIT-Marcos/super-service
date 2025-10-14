@@ -38,23 +38,4 @@ public class StockServImpl implements StockServ {
         stock.salidaDeStock(cantidad);
         return daoStock.update(stock);
     }
-
-    @Transactional
-    @Override
-    public void modificarStock(Stock stockActualizado) {
-        if (stockActualizado == null) {
-            throw new NullPointerException("El stock que se quiere actualizar es nulo.");
-        }
-        modificarStock(List.of(stockActualizado));
-    }
-
-    @Transactional
-    @Override
-    public void modificarStock(List<Stock> stockListActualizado) {
-        if (stockListActualizado == null) {
-            throw new NullPointerException("El stock que se quiere actualizar es nulo.");
-        }
-        daoStock.update(stockListActualizado);
-    }
-
 }
