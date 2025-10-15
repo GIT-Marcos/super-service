@@ -6,10 +6,7 @@ import java.util.List;
 
 public interface StockServ {
 
-    /**
-     * Usado cuando se hace un ingreso en la cantidad de stock de un repuesto.
-     */
-    void modificarStock(Stock stockActualizado);
+    Stock agregarExistente(Stock stock, Double cantidad);
 
-    void modificarStock(List<Stock> stockListActualizado);
+    Stock quitarExistente(Stock stock, Double cantidad);
 }

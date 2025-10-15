@@ -116,17 +116,27 @@ public class Stock implements Serializable {
 
     @Override
     public String toString() {
-        return "Stock{" + "id=" + id + ", cantidad=" + cantidadExistente + ", cantMinima=" + cantMinima + ", unidadMedida=" + unidadMedida + ", ubicacion=" + ubicacion + ", lote=" + lote + ", observaciones=" + observaciones + ", activo=" + activo + '}';
+        return "Stock{" +
+                "id=" + id +
+                ", cantidadExistente=" + cantidadExistente +
+                ", cantMinima=" + cantMinima +
+                ", unidadMedida='" + unidadMedida + '\'' +
+                ", ubicacion='" + ubicacion + '\'' +
+                ", lote='" + lote + '\'' +
+                ", observaciones='" + observaciones + '\'' +
+                ", activo=" + activo +
+                '}';
     }
 
     /**
-     * Calcula la nueva cantidad de existente cuando se retira stock.
+     * Usado cuando se debe retirar stock. Calcula la nueva cantidad de existente cuando se retira stock.
      */
     public void salidaDeStock(Double cantidadSalida){
-        // todo: ver si debe ir una excepción acá
-        if (cantidadSalida > cantidadExistente)
+        if (cantidadSalida.isInfinite() || cantidadSalida.isNaN() || cantidadSalida < 0)
+            throw new IllegalArgumentException("Cantidad de stock a agregar en mal formato");
+        if (cantidadSalida > this.getCantidadExistente())
             throw new IllegalArgumentException("La cantidad de salida de stock es mayor al existente.");
-        if (cantidadSalida < 0) cantidadSalida = 0D;
+
         Double nuevaCantidad = this.getCantidadExistente() - cantidadSalida;
         // para redondear
         nuevaCantidad = ManejadorInputs.cantidadStock(String.valueOf(nuevaCantidad), true);
@@ -137,6 +147,9 @@ public class Stock implements Serializable {
      * Usado para agregar cantidad existente al stock.
      */
     public void entradaStock(Double cantidadEntrada) {
+        if (cantidadEntrada.isInfinite() || cantidadEntrada.isNaN() || cantidadEntrada < 0)
+            throw new IllegalArgumentException("Cantidad de stock a agregar en mal formato");
+
         this.setCantidadExistente(this.getCantidadExistente() + cantidadEntrada);
     }
     

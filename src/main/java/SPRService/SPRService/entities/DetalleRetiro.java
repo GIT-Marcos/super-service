@@ -21,7 +21,7 @@ public class DetalleRetiro implements Serializable {
     @Column(name = "sub_total", precision = 16, scale = 2, nullable = false)
     private BigDecimal subTotal;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.MERGE)
     @JoinColumn(name = "fk_repuesto", nullable = false)
     private Repuesto repuesto;
 
@@ -33,7 +33,6 @@ public class DetalleRetiro implements Serializable {
         this.cantidadRetirada = cantidadRetirada;
         this.repuesto = repuesto;
         calcularSubTotal();
-        restarExistenteStock();
     }
 
     public Long getId() {
@@ -78,10 +77,6 @@ public class DetalleRetiro implements Serializable {
                 '}';
     }
 
-    protected void devolverStock() {
-        this.repuesto.getStock().entradaStock(this.cantidadRetirada);
-    }
-
     private void calcularSubTotal() {
         if (this.cantidadRetirada != null && this.repuesto != null) {
             this.subTotal = Operador.multiplicarDineroPorAlgo(this.repuesto.getPrecio(),
@@ -89,9 +84,5 @@ public class DetalleRetiro implements Serializable {
         } else {
             this.subTotal = BigDecimal.ONE;
         }
-    }
-
-    private void restarExistenteStock() {
-        this.getRepuesto().getStock().salidaDeStock(cantidadRetirada);
     }
 }

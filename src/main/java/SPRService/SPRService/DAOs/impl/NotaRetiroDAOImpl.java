@@ -49,7 +49,7 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
         countQuery.select(cb.count(countRoot));
 
         // Aplicamos los mismos predicados de filtro a la consulta de conteo
-        Predicate[] countPredicates = crearPredicadosDeFecha(cb, countRoot, fechaMin, fechaMax);
+        Predicate[] countPredicates = crearPredicados(cb, countRoot, fechaMin, fechaMax);
         if (countPredicates.length > 0) {
             countQuery.where(countPredicates);
         }
@@ -67,7 +67,7 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
         dataQuery.select(dataRoot);
 
         // Aplicamos los predicados de filtro a la consulta de datos
-        Predicate[] dataPredicates = crearPredicadosDeFecha(cb, dataRoot, fechaMin, fechaMax);
+        Predicate[] dataPredicates = crearPredicados(cb, dataRoot, fechaMin, fechaMax);
         if (dataPredicates.length > 0) {
             dataQuery.where(dataPredicates);
         }
@@ -101,9 +101,10 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
      * Auxiliar para crear un array de predicados (filtros) basados en las fechas.
      * Esto evita duplicar código y previene errores al usar la API de Criteria.
      */
-    private Predicate[] crearPredicadosDeFecha(CriteriaBuilder cb, Root<NotaRetiro> root,
-                                               LocalDate fechaMin, LocalDate fechaMax) {
+    private Predicate[] crearPredicados(CriteriaBuilder cb, Root<NotaRetiro> root,
+                                        LocalDate fechaMin, LocalDate fechaMax) {
         List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get("activo"), true));
         if (fechaMin != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("fecha"), fechaMin));
         }

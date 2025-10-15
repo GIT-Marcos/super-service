@@ -173,7 +173,6 @@ public class NuevaVentaController implements Initializable {
                 Views.PAGO, "Pago", ventaRepuesto);
         if (optional.isPresent()) {
             limpiarLista();
-            todosRepuestos();
         }
     }
 

@@ -189,7 +189,7 @@ public class Pago implements Serializable {
                 '}';
     }
 
-    protected void cancelar() {
+    public void cancelarPago() {
         this.activo = Boolean.FALSE;
     }
 }

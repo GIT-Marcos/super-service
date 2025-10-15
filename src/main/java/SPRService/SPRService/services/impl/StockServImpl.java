@@ -7,8 +7,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
-import java.util.List;
-
 @Singleton
 public class StockServImpl implements StockServ {
 
@@ -21,20 +19,15 @@ public class StockServImpl implements StockServ {
 
     @Transactional
     @Override
-    public void modificarStock(Stock stockActualizado) {
-        if (stockActualizado == null) {
-            throw new NullPointerException("El stock que se quiere actualizar es nulo.");
-        }
-        modificarStock(List.of(stockActualizado));
+    public Stock agregarExistente(Stock stock, Double cantidad) {
+        stock.entradaStock(cantidad);
+        return daoStock.update(stock);
     }
 
     @Transactional
     @Override
-    public void modificarStock(List<Stock> stockListActualizado) {
-        if (stockListActualizado == null) {
-            throw new NullPointerException("El stock que se quiere actualizar es nulo.");
-        }
-        daoStock.update(stockListActualizado);
+    public Stock quitarExistente(Stock stock, Double cantidad) {
+        stock.salidaDeStock(cantidad);
+        return daoStock.update(stock);
     }
-
 }
