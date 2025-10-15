@@ -137,13 +137,9 @@ public class VentaRepuesto implements Serializable {
                 '}';
     }
 
-    public void cancelarVenta(boolean restablecerStocks) {
+    public void cancelarVenta() {
         this.activo = Boolean.FALSE;
         this.estadoVenta = EstadoVentaRepuesto.CANCELADO;
-        for (Pago p : this.pagosList){
-            p.cancelar();
-        }
-        if (restablecerStocks) this.notaRetiro.cancelarNota();
     }
 
     public void asociarPago(Pago pago) {

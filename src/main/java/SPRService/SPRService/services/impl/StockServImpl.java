@@ -7,8 +7,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
-import java.util.List;
-
 @Singleton
 public class StockServImpl implements StockServ {
 
@@ -19,22 +17,16 @@ public class StockServImpl implements StockServ {
         this.daoStock = daoStock;
     }
 
+    @Transactional
     @Override
     public Stock agregarExistente(Stock stock, Double cantidad) {
-        if (cantidad.isInfinite() || cantidad.isNaN() || cantidad < 0)
-            throw new IllegalArgumentException("Cantidad de stock a agregar en mal formato");
-
         stock.entradaStock(cantidad);
         return daoStock.update(stock);
     }
 
+    @Transactional
     @Override
     public Stock quitarExistente(Stock stock, Double cantidad) {
-        if (cantidad.isInfinite() || cantidad.isNaN() || cantidad < 0)
-            throw new IllegalArgumentException("Cantidad de stock a agregar en mal formato");
-        if (cantidad > stock.getCantidadExistente())
-            throw new IllegalArgumentException("La cantidad de salida de stock es mayor al existente.");
-
         stock.salidaDeStock(cantidad);
         return daoStock.update(stock);
     }

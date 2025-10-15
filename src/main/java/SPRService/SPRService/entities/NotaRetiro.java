@@ -79,13 +79,9 @@ public class NotaRetiro implements Serializable {
 
     /**
      * Una nota de retiro representa una cantidad de stock que se ha restado para fines comerciales. Si la nota es
-     * cancelada, las cantidades RETIRADAS se deben restablecer.
-     * Usado cuando se debe cancelar una nota de retiro por cualquier motivo. Restablece los existentes de stock.
+     * cancelada, las cantidades RETIRADAS si o si se deben restablecer.
      */
     public void cancelarNota() {
         this.activo = Boolean.FALSE;
-        for (DetalleRetiro d : this.detalleRetiroList) {
-            d.devolverStock();
-        }
     }
 }

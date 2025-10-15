@@ -8,6 +8,7 @@ import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
+import SPRService.SPRService.services.NotaRetiroServ;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
@@ -25,11 +26,13 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     private final VentaRepuestoDAO daoVenta;
     private final StockDAO daoStock;
+    private final NotaRetiroServ notaRetiroServ;
 
     @Inject
-    public VentaRepuestoServImpl(VentaRepuestoDAO daoVenta, StockDAO daoStock) {
+    public VentaRepuestoServImpl(VentaRepuestoDAO daoVenta, StockDAO daoStock, NotaRetiroServ notaRetiroServ) {
         this.daoVenta = daoVenta;
         this.daoStock = daoStock;
+        this.notaRetiroServ = notaRetiroServ;
     }
 
     @Transactional
@@ -146,9 +149,12 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
         if (venta == null) {
             throw new NullPointerException("venta nula recibida en el servicio");
         }
-        // la cantidad del stock se actualiza al crearse el objeto DetalleRetiro.
-        daoVenta.save(venta);
+
+        for (DetalleRetiro d : venta.getNotaRetiro().getDetallesRetiroList()) {
+            d.getRepuesto().getStock().salidaDeStock(d.getCantidadRetirada());
+        }
         daoStock.update(obtenerStocksDeVenta(venta));
+        daoVenta.save(venta);
         return venta;
     }
 
@@ -168,11 +174,16 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
         if (ventaRepuesto == null || usuario == null) {
             throw new NullPointerException("error: venta o usuario nulo en servicio.");
         }
-        ventaRepuesto.cancelarVenta(restablecerStocks);
+
+        ventaRepuesto.cancelarVenta();
+        for (Pago p : ventaRepuesto.getPagosList()) {
+            p.cancelarPago();
+        }
+        if (restablecerStocks) {
+            notaRetiroServ.cancelarNota(ventaRepuesto.getNotaRetiro());
+        }
         AuditoriaVenta auditoriaVenta = new AuditoriaVenta(null, "Cancelación",
                 motivo, LocalDateTime.now(), usuario);
-
-        daoStock.update(obtenerStocksDeVenta(ventaRepuesto));
         return daoVenta.borradoLogico(ventaRepuesto, auditoriaVenta);
     }
 
