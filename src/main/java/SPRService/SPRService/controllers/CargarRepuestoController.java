@@ -100,8 +100,8 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
         String inputCantidadMin = tfCantidadStockMin.getText().strip();
         String uniMedida = comboUniMedidas.getSelectionModel().getSelectedItem();
         String ubicacion = comboUbicaciones.getSelectionModel().getSelectedItem();
-        String lote = tfLote.getText().strip();
-        String observaciones = tfObservaciones.getText().strip();
+        String lote;
+        String observaciones;
         BigDecimal precio;
         Double cantidad;
         Double cantidadMin;
@@ -113,8 +113,8 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
             cantidadMin = ManejadorInputs.cantidadStock(inputCantidadMin, true);
             ManejadorInputs.textoGenerico(uniMedida, true, null, 20);
             ManejadorInputs.textoGenerico(ubicacion, true, null, 20);
-            ManejadorInputs.textoGenerico(lote, false, null, 40);
-            ManejadorInputs.textoGenerico(observaciones, false, null, 100);
+            lote = ManejadorInputs.textoGenerico(tfLote.getText().strip(), false, null, 40);
+            observaciones = ManejadorInputs.textoGenerico(tfObservaciones.getText().strip(), false, null, 100);
         } catch (IllegalArgumentException iae) {
             Alertas.aviso("Guardar repuesto", iae.getMessage());
             return;
