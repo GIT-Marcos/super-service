@@ -76,8 +76,9 @@ public class LoginController implements Initializable {
             s.close();
         } else {
             try {
-                ManejadorInputs.textoGenerico(nombreUsuario, true, 3, 30);
-                ManejadorInputs.contrasenia(inputPass, true);
+                ManejadorInputs.textoGenerico(nombreUsuario, true, "Nombre de usuario",
+                        30);
+                ManejadorInputs.contrasenia(inputPass);
                 Usuario usuario = usuarioServ.loguear(nombreUsuario, inputPass);
                 SessionManager.iniciarSesion(usuario);
                 appCoordinator.onLoginSuccess();

@@ -76,9 +76,6 @@ public class ManejadorInputs {
         }
 
         String parsableInput = trimmedInput.replace(',', '.');
-//        if (!PATRON_NUMERICO.matcher(parsableInput).matches()) {
-//            throw new IllegalArgumentException("La cantidad '" + input + "' no es un número válido.");
-//        }
         try {
             double valor = Double.parseDouble(parsableInput);
             if (valor < 0) {

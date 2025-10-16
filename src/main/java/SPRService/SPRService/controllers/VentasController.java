@@ -219,9 +219,9 @@ public class VentasController implements Initializable {
     private FiltroVentaRepuestoDTO recolectarFiltrosActuales() {
         try {
             return new FiltroVentaRepuestoDTO(
-                    ManejadorInputs.codigoVenta(tfBuscar.getText().strip(), false),
-                    ManejadorInputs.dinero(tfMontoMin.getText().strip(), false, false),
-                    ManejadorInputs.dinero(tfMontoMax.getText().strip(), false, false),
+                    ManejadorInputs.codigoVenta(tfBuscar.getText(), false),
+                    ManejadorInputs.dinero(tfMontoMin.getText(), false, false),
+                    ManejadorInputs.dinero(tfMontoMax.getText(), false, false),
                     dateFechaMin.getValue(),
                     dateFechaMax.getValue(),
                     tomarEstados(),

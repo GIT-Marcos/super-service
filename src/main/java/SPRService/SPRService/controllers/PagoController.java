@@ -86,12 +86,12 @@ public class PagoController implements Initializable, DataReceiver<VentaRepuesto
         Pago pagoParaCargar;
 
         MetodosPago metodosPago = tomaMetodoPago();
-        String inputMonto = tfMonto.getText().strip();
+        String inputMonto = tfMonto.getText();
         Integer inputDescuento = spinDescuento.getValue();
         String marcaTarjeta = comboMarcaTarjeta.getSelectionModel().getSelectedItem();
         String bancoTarjeta = comboBancoTarjeta.getSelectionModel().getSelectedItem();
-        String ultimos4 = tfUltimos4.getText().strip();
-        String nroReferencia = tfNroReferencia.getText().strip();
+        String ultimos4 = tfUltimos4.getText();
+        String nroReferencia = tfNroReferencia.getText();
 
         BigDecimal monto;
         BigDecimal porcentajeDescuento;

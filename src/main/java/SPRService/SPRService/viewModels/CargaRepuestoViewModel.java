@@ -163,8 +163,8 @@ public class CargaRepuestoViewModel {
         // La conversión de String a BigDecimal/Double se haría en el Controller,
         // pero idealmente se usarían TextFormatters para evitar inputs inválidos.
         // Aquí asumimos que los bindings ya han poblado las propiedades correctamente.
-        ManejadorInputs.textoGenerico(uniMedidaSeleccionada.getValue().strip(), true, null, 20);
-        ManejadorInputs.textoGenerico(ubicacionSeleccionada.getValue().strip(), true, null, 20);
+        ManejadorInputs.textoGenerico(uniMedidaSeleccionada.getValue(), true, null, 20);
+        ManejadorInputs.textoGenerico(ubicacionSeleccionada.getValue(), true, null, 20);
         ManejadorInputs.textoGenerico(lote.getValue(), false, null, 40);
         ManejadorInputs.textoGenerico(observaciones.getValue(), false, null, 100);
     }
