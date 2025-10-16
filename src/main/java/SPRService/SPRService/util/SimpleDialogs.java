@@ -23,7 +23,8 @@ public class SimpleDialogs {
             return null;
         }
         try {
-            return ManejadorInputs.textoGenerico(opt.get().strip(), true, 2, 100);
+            return ManejadorInputs.textoGenerico(opt.get().strip(), true, "Nombre de marca",
+                    100);
         } catch (NullPointerException | IllegalArgumentException e) {
             Alertas.aviso("Crear nueva marca de repuestos", e.getMessage());
             return null;
@@ -122,7 +123,8 @@ public class SimpleDialogs {
         }
 
         try {
-            return ManejadorInputs.textoGenerico(opt.get().strip(), true, 3, 50);
+            return ManejadorInputs.textoGenerico(opt.get().strip(), true, "Motivo",
+                    50);
         } catch (NullPointerException | IllegalArgumentException e) {
             Alertas.aviso("Cancelación de venta", e.getMessage());
             return null;

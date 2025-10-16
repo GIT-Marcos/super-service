@@ -125,9 +125,9 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         try {
             dni = ManejadorInputs.dni(tfDNI.getText().strip(), true);
             nombre = ManejadorInputs.textoGenerico(tfNombre.getText().strip(), true,
-                    2, 40);
+                    "Nombre", 40);
             apellido = ManejadorInputs.textoGenerico(tfApellido.getText().strip(), true,
-                    2, 40);
+                    "Apellido", 40);
         } catch (RuntimeException e) {
             Alertas.aviso("Guardar cliente", e.getMessage());
             return;

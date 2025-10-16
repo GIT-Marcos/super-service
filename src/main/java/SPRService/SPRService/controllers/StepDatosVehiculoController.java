@@ -59,9 +59,12 @@ public class StepDatosVehiculoController implements Initializable, WizardStepCon
         try {
             // Reutilizamos la lógica de ManejadorInputs que lanza excepciones
             ManejadorInputs.patente(tfPatente.getText().strip(), true);
-            ManejadorInputs.textoGenerico(tfColor.getText().strip(), true, 3, 40);
-            ManejadorInputs.textoGenerico(tfNroChasis.getText().strip(), false, 17, 17);
-            ManejadorInputs.textoGenerico(tfNroMotor.getText().strip(), false, 3, 20);
+            ManejadorInputs.textoGenerico(tfColor.getText().strip(), true, "Color",
+                    40);
+            ManejadorInputs.textoGenerico(tfNroChasis.getText().strip(), false, "nro chasis",
+                    17);
+            ManejadorInputs.textoGenerico(tfNroMotor.getText().strip(), false, "nro motor",
+                    20);
             lblAviso.setText(""); // Limpiar mensajes de error previos
         } catch (IllegalArgumentException e) {
             // La validación falló, mostramos el error
@@ -75,9 +78,11 @@ public class StepDatosVehiculoController implements Initializable, WizardStepCon
         try {
             // Reutilizamos la lógica de ManejadorInputs que lanza excepciones
             ManejadorInputs.patente(tfPatente.getText().strip(), true);
-            ManejadorInputs.textoGenerico(tfColor.getText().strip(), true, 3, 40);
-            ManejadorInputs.textoGenerico(tfNroChasis.getText().strip(), false, 17, 17);
-            ManejadorInputs.textoGenerico(tfNroMotor.getText().strip(), false, 3, 20);
+            ManejadorInputs.textoGenerico(tfColor.getText().strip(), true, "Color", 40);
+            ManejadorInputs.textoGenerico(tfNroChasis.getText().strip(), false, "nro chasis",
+                    17);
+            ManejadorInputs.textoGenerico(tfNroMotor.getText().strip(), false, "nro motor",
+                    20);
             lblAviso.setText(""); // Limpiar mensajes de error previos
             return true;
         } catch (IllegalArgumentException e) {

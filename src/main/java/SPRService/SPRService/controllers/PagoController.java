@@ -23,7 +23,6 @@ import SPRService.SPRService.util.alertas.Alertas;
 import org.hibernate.HibernateException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -87,22 +86,22 @@ public class PagoController implements Initializable, DataReceiver<VentaRepuesto
         Pago pagoParaCargar;
 
         MetodosPago metodosPago = tomaMetodoPago();
-        String inputMonto = tfMonto.getText().trim();
+        String inputMonto = tfMonto.getText().strip();
         Integer inputDescuento = spinDescuento.getValue();
         String marcaTarjeta = comboMarcaTarjeta.getSelectionModel().getSelectedItem();
         String bancoTarjeta = comboBancoTarjeta.getSelectionModel().getSelectedItem();
-        String ultimos4 = tfUltimos4.getText().trim();
-        String nroReferencia = tfNroReferencia.getText().trim();
+        String ultimos4 = tfUltimos4.getText().strip();
+        String nroReferencia = tfNroReferencia.getText().strip();
 
         BigDecimal monto;
         BigDecimal porcentajeDescuento;
         BigDecimal montoPagar;
         try {
-            monto = ManejadorInputs.dinero(inputMonto, true);
-            porcentajeDescuento = ManejadorInputs.porcentaje(inputDescuento, false);
+            monto = ManejadorInputs.dinero(inputMonto, true, false);
+            porcentajeDescuento = ManejadorInputs.porcentaje(inputDescuento.toString(), false);
             if (metodosPago != MetodosPago.EFECTIVO) {
-                ManejadorInputs.comboBox(marcaTarjeta, true, null, 30);
-                ManejadorInputs.comboBox(bancoTarjeta, true, null, 30);
+                ManejadorInputs.marcaTarjetaYBanco(marcaTarjeta, true, null, 30);
+                ManejadorInputs.marcaTarjetaYBanco(bancoTarjeta, true, null, 30);
                 ManejadorInputs.ultimos4(ultimos4, true);
                 ManejadorInputs.referenciaTarjeta(nroReferencia, true);
             }
