@@ -54,8 +54,8 @@ public class CrearUsuarioController implements Initializable {
         PrivilegioUsuario privilegio = comboRoles.getSelectionModel().getSelectedItem();
 
         try {
-            ManejadorInputs.textoGenerico(nombre, true, 4, 20);
-            ManejadorInputs.contrasenia(contrasenia, true);
+            ManejadorInputs.textoGenerico(nombre, true, "Nombre de usuario", 20);
+            ManejadorInputs.contrasenia(contrasenia);
 
             boolean resultado = Alertas.confirmacion("Confirmación", "¿Está seguro que desea " +
                     "cargar el usuario " + nombre + "?");

@@ -1,5 +1,6 @@
 package SPRService.SPRService.util;
 
+import SPRService.SPRService.viewModels.CargaRepuestoViewModel;
 import SPRService.SPRService.viewModels.DepositoViewModel;
 import SPRService.SPRService.viewModels.VehiculoVM;
 import SPRService.SPRService.navigation.WizardStateProvider;
@@ -13,6 +14,7 @@ public class AppModule extends AbstractModule {
         bind(WizardStateProvider.class).in(Scopes.SINGLETON);
         bind(VehiculoVM.class);
         bind(DepositoViewModel.class);
+        bind(CargaRepuestoViewModel.class);
     }
 
     // Provee un FXMLLoader ya configurado con la fábrica de controladores de Guice.

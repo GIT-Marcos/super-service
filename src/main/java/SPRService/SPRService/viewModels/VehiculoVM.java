@@ -95,6 +95,7 @@ public class VehiculoVM {
      * Se usa al editar un vehículo existente.
      * @param vehiculo La entidad a cargar.
      */
+    //todo: hace lo mismo que el de abajo, quitar este
     public void cargarDesdeEntidad(Vehiculo vehiculo) {
         this.vehiculoModelo = vehiculo;
         this.id.set(vehiculo.getId());
@@ -110,7 +111,7 @@ public class VehiculoVM {
     }
 
     /**
-     * Carga el ViewModel con los datos de una entidad Vehiculo existente.
+     * Carga el ViewModel con los datos de una entidad Vehículo existente.
      * ESTA ES LA VERSIÓN CORREGIDA.
      *
      * @param vehiculo La entidad a cargar.
@@ -199,7 +200,6 @@ public class VehiculoVM {
 
         // NO establezcas el ID a null aquí. Si es una entidad nueva, ya es null.
         // Si es una entidad existente, Hibernate necesita el ID para saber qué fila actualizar.
-        // vehiculoParaGuardar.setId(null); // <-- ELIMINAR ESTA LÍNEA SI LA TENÍAS
 
         return vehiculoParaGuardar;
     }
