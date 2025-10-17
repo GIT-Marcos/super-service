@@ -177,7 +177,9 @@ public class CargaRepuestoViewModel {
             stock = repuesto.getStock();
         } else {
             repuesto = new Repuesto();
+            repuesto.setActivo(Boolean.TRUE);
             stock = new Stock();
+            stock.setActivo(Boolean.TRUE);
             repuesto.setStock(stock);
         }
 
