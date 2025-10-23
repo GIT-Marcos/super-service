@@ -1,5 +1,6 @@
 package SPRService.SPRService.viewModels;
 
+import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.entities.MarcaVehiculo;
 import SPRService.SPRService.entities.ModeloVehiculo;
 import SPRService.SPRService.entities.Vehiculo;
@@ -26,6 +27,7 @@ public class VehiculoVM {
     private final StringProperty nroChasis = new SimpleStringProperty("");
     private final StringProperty nroMotor = new SimpleStringProperty("");
     private final StringProperty color = new SimpleStringProperty("");
+    private final ObjectProperty<Cliente> cliente = new SimpleObjectProperty<>();
 
     // --- Propiedades para manejar las relaciones ---
 
@@ -93,6 +95,7 @@ public class VehiculoVM {
     /**
      * Carga los datos de una entidad Vehículo en el ViewModel.
      * Se usa al editar un vehículo existente.
+     *
      * @param vehiculo La entidad a cargar.
      */
     //todo: hace lo mismo que el de abajo, quitar este
@@ -103,6 +106,7 @@ public class VehiculoVM {
         this.nroChasis.set(vehiculo.getNroChasis());
         this.nroMotor.set(vehiculo.getNroMotor());
         this.color.set(vehiculo.getColor());
+        if (vehiculo.getCliente() != null) this.cliente.set(vehiculo.getCliente());
 
         if (vehiculo.getModeloVehiculo() != null) {
             // Esto activará los listeners para poblar las propiedades derivadas
@@ -125,6 +129,7 @@ public class VehiculoVM {
         this.nroChasis.set(vehiculo.getNroChasis());
         this.nroMotor.set(vehiculo.getNroMotor());
         this.color.set(vehiculo.getColor());
+        if (vehiculo.getCliente() != null) this.cliente.set(vehiculo.getCliente());
 
         // --- ¡AQUÍ ESTÁ LA LÓGICA CORREGIDA! ---
         if (vehiculo.getModeloVehiculo() != null && vehiculo.getModeloVehiculo().getMarcaVehiculo() != null) {
@@ -193,6 +198,7 @@ public class VehiculoVM {
         vehiculoParaGuardar.setFechaRegistro(LocalDate.now());
         vehiculoParaGuardar.setEstado(Boolean.TRUE);
         vehiculoParaGuardar.setModeloVehiculo(modeloSeleccionado.get());
+        if (cliente.get() != null) vehiculoParaGuardar.setCliente(cliente.get());
 
         // Estos campos parecen ser nulos por defecto, mantenemos esa lógica.
         vehiculoParaGuardar.setEstadoIngreso(null);
@@ -227,6 +233,7 @@ public class VehiculoVM {
         nroChasis.set("");
         nroMotor.set("");
         color.set("");
+        cliente.set(null);
 
         // Limpiar selecciones y listas
         // No limpies 'marcasDisponibles' si es una lista global,
@@ -245,6 +252,7 @@ public class VehiculoVM {
     public StringProperty nroChasisProperty() { return nroChasis; }
     public StringProperty nroMotorProperty() { return nroMotor; }
     public StringProperty colorProperty() { return color; }
+    public ObjectProperty<Cliente> clientePropery() { return cliente; }
 
     public ObservableList<MarcaVehiculo> getMarcasDisponibles() { return marcasDisponibles; }
     public ObjectProperty<MarcaVehiculo> marcaSeleccionadaProperty() { return marcaSeleccionada; }
