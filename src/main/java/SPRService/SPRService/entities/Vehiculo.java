@@ -48,11 +48,6 @@ public class Vehiculo implements Serializable {
     @JoinColumn(nullable = false, name = "fk_modelo")
     private ModeloVehiculo modeloVehiculo;
 
-    //todo: quitar, poner en orden trabajo
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(nullable = true, name = "fk_estado_ingreso")
-    private List<DatosIngresoAuto> estadoIngreso = new ArrayList<>();
-
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
@@ -61,7 +56,7 @@ public class Vehiculo implements Serializable {
     }
 
     public Vehiculo(Long id, String patente, String nroChasis, String nroMotor, String color, Boolean estado,
-                    ModeloVehiculo modeloVehiculo, List<DatosIngresoAuto> estadoIngreso, Cliente cliente) {
+                    ModeloVehiculo modeloVehiculo, Cliente cliente) {
         this.id = id;
         this.patente = patente;
         this.nroChasis = nroChasis;
@@ -70,7 +65,6 @@ public class Vehiculo implements Serializable {
         this.fechaRegistro = LocalDate.now();
         this.estado = estado;
         this.modeloVehiculo = modeloVehiculo;
-        this.estadoIngreso = estadoIngreso;
         this.cliente = cliente;
     }
 
@@ -128,14 +122,6 @@ public class Vehiculo implements Serializable {
 
     public void setModeloVehiculo(ModeloVehiculo modeloVehiculo) {
         this.modeloVehiculo = modeloVehiculo;
-    }
-
-    public List<DatosIngresoAuto> getEstadoIngreso() {
-        return estadoIngreso;
-    }
-
-    public void setEstadoIngreso(List<DatosIngresoAuto> estadoIngreso) {
-        this.estadoIngreso = estadoIngreso;
     }
 
     public Cliente getCliente() {

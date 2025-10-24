@@ -1,16 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package SPRService.SPRService.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "datos_ingreso_autos")
@@ -26,18 +20,19 @@ public class DatosIngresoAuto implements Serializable{
     
     @Column(nullable = false)
     private Double combustible;
-    
-    @Column(name = "obs_ingreso_auto")
-    private String observacionesIngreso;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "inventario", joinColumns = @JoinColumn(name = "pk_inventario"))
+    private Set<String> inventario = new HashSet<>();
 
     public DatosIngresoAuto() {
     }
 
-    public DatosIngresoAuto(Long id, Double kilometraje, Double combustible, String observacionesIngreso) {
+    public DatosIngresoAuto(Long id, Double kilometraje, Double combustible, Set<String> inventario) {
         this.id = id;
         this.kilometraje = kilometraje;
         this.combustible = combustible;
-        this.observacionesIngreso = observacionesIngreso;
+        this.inventario = inventario;
     }
 
     public Long getId() {
@@ -64,18 +59,21 @@ public class DatosIngresoAuto implements Serializable{
         this.combustible = combustible;
     }
 
-    public String getObservacionesIngreso() {
-        return observacionesIngreso;
+    public Set<String> getInventario() {
+        return inventario;
     }
 
-    public void setObservacionesIngreso(String observacionesIngreso) {
-        this.observacionesIngreso = observacionesIngreso;
+    public void setInventario(Set<String> inventario) {
+        this.inventario = inventario;
     }
 
     @Override
     public String toString() {
-        return "DatosIngresoAuto{" + "id=" + id + ", kilometraje=" + kilometraje + ", combustible=" + combustible + ", observacionesIngreso=" + observacionesIngreso + '}';
+        return "DatosIngresoAuto{" +
+                "id=" + id +
+                ", kilometraje=" + kilometraje +
+                ", combustible=" + combustible +
+                ", inventario=" + inventario +
+                '}';
     }
-    
-    
 }
