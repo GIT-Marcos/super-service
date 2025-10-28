@@ -206,9 +206,6 @@ public class VehiculoVM {
         vehiculoParaGuardar.setCliente(clienteSeleccionado.get());
         vehiculoParaGuardar.setModeloVehiculo(modeloSeleccionado.get());
 
-        // Estos campos parecen ser nulos por defecto, mantenemos esa lógica.
-        vehiculoParaGuardar.setEstadoIngreso(null);
-
         // NO establezcas el ID a null aquí. Si es una entidad nueva, ya es null.
         // Si es una entidad existente, Hibernate necesita el ID para saber qué fila actualizar.
 

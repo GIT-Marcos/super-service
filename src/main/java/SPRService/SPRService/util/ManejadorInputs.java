@@ -81,6 +81,9 @@ public class ManejadorInputs {
             if (valor < 0) {
                 throw new IllegalArgumentException("La cantidad no puede ser negativa.");
             }
+            if (valor > 9999999) {
+                throw new IllegalArgumentException("La cantidad de stock no puede ser mayor a 9,999,999");
+            }
             return valor;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Formato de cantidad inválido: " + input);

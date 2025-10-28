@@ -6,6 +6,7 @@ import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.viewModels.CargaRepuestoViewModel;
 import com.google.inject.Inject;
 import jakarta.persistence.PersistenceException;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,15 +21,11 @@ import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.util.alertas.Alertas;
 import javafx.util.converter.BigDecimalStringConverter;
 import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.NumberStringConverter;
 
-import java.math.BigDecimal;
 import java.net.URL;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 
 public class CargarRepuestoController implements Initializable, DataReceiver<Repuesto>, ModalController<Repuesto> {
 
@@ -53,6 +50,13 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
         viewModel.inicializar();
         configurarFormattersNumericos();
         bindControls();
+
+        Platform.runLater(() -> {
+            Stage s = (Stage) tfCodBarra.getScene().getWindow();
+            s.setOnCloseRequest(event -> {
+                this.viewModel.limpiar();
+            });
+        });
     }
 
     private void configurarFormattersNumericos() {
@@ -149,6 +153,7 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
 
     @FXML
     private void cerrar(ActionEvent event) {
+        this.viewModel.limpiar();
         Node n = ((Node) event.getSource());
         Stage s = (Stage) n.getScene().getWindow();
         s.close();
