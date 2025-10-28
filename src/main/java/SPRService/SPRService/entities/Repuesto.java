@@ -94,6 +94,9 @@ public class Repuesto implements Serializable{
         return marcaRepuesto;
     }
 
+    /**
+     * Usar vincularRepuestoYMarca(MarcaRepuesto m) en lugar de esta.
+     */
     public void setMarcaRepuesto(MarcaRepuesto marcaRepuesto) {
         this.marcaRepuesto = marcaRepuesto;
     }
@@ -126,5 +129,10 @@ public class Repuesto implements Serializable{
     @Override
     public int hashCode() {
         return Objects.hashCode(codBarra);
+    }
+
+    public void vincularRepuestoYMarca(MarcaRepuesto m) {
+        this.marcaRepuesto = m;
+        m.getRepuestos().add(this);
     }
 }

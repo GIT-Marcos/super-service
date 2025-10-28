@@ -113,7 +113,7 @@ public class RepuestoServImpl implements RepuestoServ {
             throw new NullPointerException("Error: el repuesto o el stock es nulo.");
         try {
             MarcaRepuesto marcaAttached = daoMarca.update(repuesto.getMarcaRepuesto());
-            repuesto.setMarcaRepuesto(marcaAttached);
+            repuesto.vincularRepuestoYMarca(marcaAttached);
             daoRepuesto.save(repuesto);
         } catch (PersistenceException e) {
             if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||

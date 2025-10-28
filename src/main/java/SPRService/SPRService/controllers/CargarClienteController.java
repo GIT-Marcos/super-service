@@ -20,7 +20,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -143,11 +143,11 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
             datosContacto.setId(null);
             datosContacto.getEmailSet().addAll(obsListEmails);
             datosContacto.getNroTelefonoSet().addAll(obsListNrosTelefono);
-            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new ArrayList<>());
+            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new HashSet<>());
         } else {
             DatosContacto datosContacto = this.cliente.getContactosCliente();
             clienteParaCargar = new Cliente(this.cliente.getId(), dni, nombre, apellido,
-                    datosContacto, new ArrayList<>());
+                    datosContacto, new HashSet<>());
         }
 
         try {
