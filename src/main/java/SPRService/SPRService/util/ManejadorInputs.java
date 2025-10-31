@@ -15,6 +15,7 @@ public class ManejadorInputs {
             "^\\d{1,3}(,\\d{3})*(\\.\\d{1,2})?$|^\\d+(\\.\\d{1,2})?$");
     private static final Pattern PATRON_NROS_DNI = Pattern.compile("^\\d+$");
     private static final Pattern PATRON_PATENTE = Pattern.compile("^[a-zA-Z0-9]*$");
+    private static final Pattern PATRON_KILOMETRAJE = Pattern.compile("^\\d{1,7}$\n");
 
     // Para evitar que la clase sea instanciada
     private ManejadorInputs() {
@@ -23,6 +24,23 @@ public class ManejadorInputs {
     // ==============================
     // Métodos Públicos de Validación
     // ==============================
+
+    public static Integer kilometraje(String input, boolean esObligatorio) {
+        String trimmedInput = (input == null) ? "" : input.strip();
+        if (trimmedInput.isBlank()) {
+            if (esObligatorio) {
+                throw new IllegalArgumentException("El kilometraje es obligatorio.");
+            }
+            return 0;
+        }
+        if (trimmedInput.contains(" ")) {
+            throw new IllegalArgumentException("El kilometraje no puede contener espacios.");
+        }
+//        if (!PATRON_KILOMETRAJE.matcher(trimmedInput).matches()){
+//            throw new IllegalArgumentException("Formato inválido en kilometraje.");
+//        }
+        return Integer.parseInt(trimmedInput);
+    }
 
     public static String textoGenerico(String input, boolean esObligatorio, String nombreCampo, Integer largoMax) {
         String trimmedInput = (input == null) ? "" : input.strip();

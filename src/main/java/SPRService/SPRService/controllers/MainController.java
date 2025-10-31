@@ -68,6 +68,9 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void irNuevoService(){navigator.openModal(Views.CARGAR_SERVICE, "Nuevo service", null);}
+
+    @FXML
     private void cerrarSesion(ActionEvent event) {
         if (!SessionManager.cerrarSesion()) {
             return;

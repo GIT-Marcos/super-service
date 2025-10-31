@@ -1,5 +1,4 @@
 module navegador2.SPRService {
-    requires javafx.controls;
     requires javafx.fxml;
     requires jakarta.persistence;
     requires org.hibernate.orm.core;
@@ -13,6 +12,7 @@ module navegador2.SPRService {
     requires com.google.guice;
     requires com.google.guice.extensions.persist;
     requires javafx.swing;
+    requires org.controlsfx.controls;
 
     // Abre paquetes a FXML/FX Base para reflexión
     opens SPRService.SPRService to javafx.fxml;
@@ -43,7 +43,5 @@ module navegador2.SPRService {
     opens SPRService.SPRService.viewModels.tablas to javafx.base;
     exports SPRService.SPRService.DTOs.filtros;
     opens SPRService.SPRService.DTOs.filtros to javafx.base;
-
-    // "opens components to javafx.fxml;" no hace nada (no es un paquete Java), puedes quitarlo.
 
 }
