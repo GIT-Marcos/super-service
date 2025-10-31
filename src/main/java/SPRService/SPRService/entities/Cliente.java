@@ -35,15 +35,14 @@ public class Cliente implements Serializable {
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "cliente")
     private Set<Vehiculo> vehiculos = new HashSet<>();
 
-    //RELACIÓN BI 1 A * CON SERVICE
-//    @OneToMany(mappedBy = "cliente")
-//    private List<Service> services = new ArrayList<>();
+    @OneToMany(mappedBy = "cliente")
+    private Set<Service> services = new HashSet<>();
 
     public Cliente() {
     }
 
     public Cliente(Long id, String dni, String nombre, String apellido, DatosContacto contactosCliente,
-                   Set<Vehiculo> vehiculos/*, List<Service> services*/) {
+                   Set<Vehiculo> vehiculos, Set<Service> services) {
         this.id = id;
         this.dni = dni;
         this.nombre = nombre;
@@ -51,7 +50,7 @@ public class Cliente implements Serializable {
         this.activo = Boolean.TRUE;
         this.contactosCliente = contactosCliente;
         this.vehiculos = vehiculos;
-//        this.services = services;
+        this.services = services;
     }
 
     public Long getId() {
@@ -110,14 +109,13 @@ public class Cliente implements Serializable {
         this.vehiculos = vehiculos;
     }
 
-//    public List<Service> getServices() {
-//        return services;
-//    }
-//
-//    public void setServices(List<Service> services) {
-//        this.services = services;
-//    }
+    public Set<Service> getServices() {
+        return services;
+    }
 
+    public void setServices(Set<Service> services) {
+        this.services = services;
+    }
 
     @Override
     public String toString() {

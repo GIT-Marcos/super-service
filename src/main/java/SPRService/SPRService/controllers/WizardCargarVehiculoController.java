@@ -49,7 +49,7 @@ public class WizardCargarVehiculoController implements Initializable, ModalContr
 
         this.vehiculoServ = vehiculoServ;
         this.asistenteState = new AsistenteState(
-                Arrays.asList(Views.STEP_CLIENTE, Views.DATOS_VEHICULO, Views.MARCA_VEHICULO, Views.MODELO_VEHICULO));
+                Arrays.asList(Views.DATOS_VEHICULO, Views.MARCA_VEHICULO, Views.MODELO_VEHICULO));
         this.wsp = wsp;
     }
 

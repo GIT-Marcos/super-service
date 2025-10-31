@@ -27,6 +27,7 @@ public class NotaRetiro implements Serializable {
     private List<DetalleRetiro> detalleRetiroList = new ArrayList<>();
 
     public NotaRetiro() {
+        this.activo = Boolean.TRUE;
     }
 
     public NotaRetiro(Long id, List<DetalleRetiro> detalleRetiroList) {

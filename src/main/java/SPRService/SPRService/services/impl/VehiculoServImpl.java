@@ -82,8 +82,9 @@ public class VehiculoServImpl implements VehiculoServ {
         vehiculo.setPatente(vehiculo.getPatente().toUpperCase(Locale.ROOT));
         try {
             Cliente clienteDetached = vehiculo.getCliente();
-            vehiculo.setCliente(daoCliente.update(clienteDetached));
-
+            if (clienteDetached != null) {
+                vehiculo.setCliente(daoCliente.update(clienteDetached));
+            }
             ModeloVehiculo modeloDetached = vehiculo.getModeloVehiculo();
             ModeloVehiculo modeloGestionado = daoModelo.update(modeloDetached);
             vehiculo.setModeloVehiculo(modeloGestionado);

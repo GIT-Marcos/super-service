@@ -4,7 +4,7 @@ import SPRService.SPRService.controllers.*;
 
 public enum Views {
 
-    //Views ventanas
+    // Ventanas principales
     LOGIN("/views/Login.fxml", LoginController.class),
     MAIN("/views/MainView.fxml", MainController.class),
     DEPOSITO("/views/Deposito.fxml", DepositoController.class),
@@ -13,8 +13,10 @@ public enum Views {
     NOTAS_RETIRO("/views/NotasRetiro.fxml", NotasRetiroController.class),
     VEHICULOS("/views/Vehiculos.fxml", VehiculosController.class),
     CLIENTES("/views/Clientes.fxml", ClienteController.class),
+    // Ventanas NO modales
+    CARGAR_SERVICE("/views/CargarService.fxml", CargarServiceController.class),
 
-    // Views modales:
+    // Ventanas modales:
     CREAR_USUARIO("/views/CrearUsuario.fxml", CrearUsuarioController.class),
     GUARDAR_REPUESTO("/views/CargarRepuesto.fxml", CargarRepuestoController.class),
     PAGO("/views/Pago.fxml", PagoController.class),
@@ -28,8 +30,11 @@ public enum Views {
     CARGAR_VEHICULO("/views/CargarVehiculo.fxml", WizardCargarVehiculoController.class),
     CARGAR_CLIENTE("/views/CargarCliente.fxml", CargarClienteController.class),
     STEP_CLIENTE("/views/StepCliente.fxml", StepClienteController.class),
+    AGREGAR_REPUESTO_SERVICE("/views/AgregarRepuestoService.fxml", AgregarRepuestoServiceController.class),
+    AGREGAR_CLIENTE_SERVICE("/views/AgregarClienteService.fxml", AgregarClienteServiceController.class),
+    AGREGAR_VEHICULO_SERVICE("/views/AgregarVehiculoService.fxml", AgregarVehiculoServiceController.class),
 
-    // Views charts
+    // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
     CHART_VENTAS_RESPUESTOS_ANIO("/views/ChartTotalVentasAnio.fxml", ChartTotalVentasAnioController.class);
 
