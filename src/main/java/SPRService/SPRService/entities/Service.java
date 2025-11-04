@@ -31,7 +31,7 @@ public class Service implements Serializable {
     @Column(nullable = false)
     private PrioridadService prioridad;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "fk_cliente")
     private Cliente cliente;
 

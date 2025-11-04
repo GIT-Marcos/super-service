@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 
 public class ServiceServImpl implements ServiceServ {
@@ -21,8 +22,8 @@ public class ServiceServImpl implements ServiceServ {
 
     @Transactional
     @Override
-    public List<Service> verTodos() {
-        return List.of();
+    public Set<Service> verTodos() {
+        return daoService.verTodos();
     }
 
     @Transactional

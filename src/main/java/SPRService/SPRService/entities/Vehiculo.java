@@ -48,7 +48,7 @@ public class Vehiculo implements Serializable {
     @JoinColumn(nullable = false, name = "fk_modelo")
     private ModeloVehiculo modeloVehiculo;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne()
     @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
 

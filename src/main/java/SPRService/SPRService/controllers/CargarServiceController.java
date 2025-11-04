@@ -71,25 +71,7 @@ public class CargarServiceController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        lvDetalles.setCellFactory(param -> new CeldaTrabajo(
-                i -> {
-                    restarTotal(i.getSubTotal());
-                }));
-        lvDetalles.setItems(obsListTrabajos);
-
-        valSupp = new ValidationSupport();
-        valSupp.registerValidator(tfTrabajo, true,
-                Validator.createEmptyValidator("El campo del detalle de trabajo no puede quedar vacío."));
-        valSupp.registerValidator(tfPrecioTrabajo, Validator.createRegexValidator(
-                "Formato inválido", "^\\d{1,3}(,\\d{3})*(\\.\\d{1,2})?$|^\\d+(\\.\\d{1,2})?$",
-                Severity.WARNING
-        ));
-        valSupp.registerValidator(tfKilometros, Validator.createRegexValidator(
-                "Formato inválido", "^\\d{1,7}$\n", Severity.WARNING
-        ));
-
-        cbPrioridad.getItems().setAll(PrioridadService.values());
-        cbPrioridad.getSelectionModel().selectFirst();
+        confiCampos();
     }
 
     @FXML
@@ -121,6 +103,13 @@ public class CargarServiceController implements Initializable {
         Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO_SERVICE,
                 "Agregar repuesto", null);
         if (result.isPresent()) {
+            Optional<DetalleRetiro> optionalDuplicado = detalleRetiros.stream().filter(r ->
+                    r.getRepuesto().getId().equals(result.get().getRepuesto().getId())).findAny();
+            if (optionalDuplicado.isPresent()) {
+                Alertas.aviso("Agregar repuesto", "Ya se ha agregado el repuesto: \n" +
+                        result.get().getRepuesto().getDetalle() + "\nal detalle.");
+                return;
+            }
             detalleRetiros.add(result.get());
             obsListTrabajos.add(new DetalleRepuestoServiceViewModel(result.get()));
             agregarTotal(result.get().getSubTotal());
@@ -157,8 +146,25 @@ public class CargarServiceController implements Initializable {
         }
     }
 
+    private boolean validar() {
+        if (this.cliente == null) {
+            Alertas.aviso("Cargar service", "Se debe asociar un cliente para el service.");
+            return false;
+        }
+        if (this.vehiculo == null) {
+            Alertas.aviso("Cargar service", "Se debe asociar un vehículo para el service.");
+            return false;
+        }
+        if (this.trabajos.isEmpty()) {
+            Alertas.aviso("Cargar service", "Deben haber trabajos cargados para poder cargar el service.");
+            return false;
+        }
+        return true;
+    }
+
     @FXML
     private void cargarService(ActionEvent event) {
+        if (!validar()) return;
         try {
             String motivo = ManejadorInputs.textoGenerico(tfMotivoIngreso.getText(), false,
                     "Motivo de ingreso", 500);
@@ -189,14 +195,45 @@ public class CargarServiceController implements Initializable {
             service.asignarCliente(this.cliente);
             service.asignarOrden(orden);
 
+            if (!Alertas.confirmacion("Cargar service", "¿Está seguro que desea cargar?")) return;
             serviceServ.cargarService(service);
             Alertas.exito("Cargar service", "Se ha cargado el service con éxito.");
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
+        } catch (IllegalArgumentException e) {
+            Alertas.aviso("Cargar service", e.getMessage());
         } catch (RuntimeException e) {
             Alertas.error("Cargar service", e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    private void confiCampos() {
+        lvDetalles.setCellFactory(param -> new CeldaTrabajo(
+                i -> {
+                    restarTotal(i.getSubTotal());
+                }));
+        lvDetalles.setItems(obsListTrabajos);
+        cbPrioridad.getItems().setAll(PrioridadService.values());
+        cbPrioridad.getSelectionModel().select(2);
+        sliCombustible.setValue(50);
+
+        configCamposTexto();
+    }
+
+    private void configCamposTexto() {
+        valSupp = new ValidationSupport();
+        valSupp.registerValidator(tfTrabajo, true,
+                Validator.createEmptyValidator("El campo del detalle de trabajo no puede quedar vacío.",
+                        Severity.WARNING));
+        valSupp.registerValidator(tfPrecioTrabajo, Validator.createRegexValidator(
+                "Formato inválido", "^\\d{1,3}(,\\d{3})*(\\.\\d{1,2})?$|^\\d+(\\.\\d{1,2})?$",
+                Severity.WARNING
+        ));
+        valSupp.registerValidator(tfKilometros, Validator.createRegexValidator(
+                "Formato inválido", "^\\d{1,7}$", Severity.WARNING
+        ));
     }
 
     private void agregarTotal(BigDecimal b) {

@@ -29,7 +29,7 @@ public class Orden implements Serializable {
     @Column(name = "total_repuestos")
     private BigDecimal totalRepuestos = BigDecimal.ZERO;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "fk_vehiculo")
     private Vehiculo vehiculo;
 
@@ -42,7 +42,6 @@ public class Orden implements Serializable {
     private NotaRetiro notaRetiro;
 
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false, name = "fk_trabajo")
     private Set<Trabajo> trabajos = new HashSet<>();
 
     @OneToOne(mappedBy = "orden")

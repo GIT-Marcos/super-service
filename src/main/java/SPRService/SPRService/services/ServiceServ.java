@@ -3,10 +3,11 @@ package SPRService.SPRService.services;
 import SPRService.SPRService.entities.Service;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ServiceServ {
 
-    List<Service> verTodos();
+    Set<Service> verTodos();
 
     List<Service> buscarConFiltros();
 
