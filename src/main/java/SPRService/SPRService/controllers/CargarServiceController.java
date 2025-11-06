@@ -1,6 +1,7 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.components.CeldaTrabajo;
+import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.PrioridadService;
@@ -12,6 +13,9 @@ import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.viewModels.DetalleRepuestoServiceViewModel;
 import SPRService.SPRService.viewModels.TrabajoViewModelRepuesto;
+import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
+import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
+import SPRService.SPRService.viewModels.celdas.ItemTrabajoViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,7 +45,10 @@ public class CargarServiceController implements Initializable {
     private final ServiceServ serviceServ;
     private Set<Trabajo> trabajos = new HashSet<>();
     private List<DetalleRetiro> detalleRetiros = new ArrayList<>();
-    private final ObservableList<TrabajoViewModelRepuesto> obsListTrabajos = FXCollections.observableArrayList();
+    private ObservableList<TrabajoViewModelRepuesto> obsListTrabajos = FXCollections.observableArrayList();
+
+    private ObservableList<ItemDetalleViewModel> items = FXCollections.observableArrayList();
+
     private ValidationSupport valSupp;
     private Cliente cliente;
     private Vehiculo vehiculo;
@@ -52,8 +59,10 @@ public class CargarServiceController implements Initializable {
     private CustomTextField tfTrabajo, tfPrecioTrabajo, tfKilometros;
     @FXML
     private TextArea tfMotivoIngreso, tfInventario, tfObservaciones;
+//    @FXML
+//    private ListView<TrabajoViewModelRepuesto> lvDetalles;
     @FXML
-    private ListView<TrabajoViewModelRepuesto> lvDetalles;
+    private ListView<ItemDetalleViewModel> lvDetalles;
     @FXML
     private Label lblCliente, lblVehiculo, lblTotal;
     @FXML
@@ -93,6 +102,9 @@ public class CargarServiceController implements Initializable {
             trabajos.add(new Trabajo(null, detalle, precio));
             tfTrabajo.setText("");
             tfPrecioTrabajo.setText("");
+
+
+            items.addFirst(new ItemTrabajoViewModel(new Trabajo(null, detalle, precio)));
         } catch (RuntimeException e) {
             Alertas.aviso("Agregar trabajo", e.getMessage());
         }
@@ -105,6 +117,7 @@ public class CargarServiceController implements Initializable {
         if (result.isPresent()) {
             Optional<DetalleRetiro> optionalDuplicado = detalleRetiros.stream().filter(r ->
                     r.getRepuesto().getId().equals(result.get().getRepuesto().getId())).findAny();
+            // todo: pasarle la lista que verifique dentro del dialog
             if (optionalDuplicado.isPresent()) {
                 Alertas.aviso("Agregar repuesto", "Ya se ha agregado el repuesto: \n" +
                         result.get().getRepuesto().getDetalle() + "\nal detalle.");
@@ -113,6 +126,8 @@ public class CargarServiceController implements Initializable {
             detalleRetiros.add(result.get());
             obsListTrabajos.add(new DetalleRepuestoServiceViewModel(result.get()));
             agregarTotal(result.get().getSubTotal());
+
+            items.addFirst(new ItemDetalleRetiroViewModel(result.get()));
         }
     }
 
@@ -210,11 +225,17 @@ public class CargarServiceController implements Initializable {
     }
 
     private void confiCampos() {
-        lvDetalles.setCellFactory(param -> new CeldaTrabajo(
-                i -> {
-                    restarTotal(i.getSubTotal());
-                }));
-        lvDetalles.setItems(obsListTrabajos);
+//        lvDetalles.setCellFactory(param -> new CeldaTrabajo(
+//                i -> {
+//                    restarTotal(i.getSubTotal());
+//                }));
+//        lvDetalles.setItems(obsListTrabajos);
+        lvDetalles.setItems(items);
+        lvDetalles.setCellFactory(new ItemCellFactory());
+
+
+
+
         cbPrioridad.getItems().setAll(PrioridadService.values());
         cbPrioridad.getSelectionModel().select(2);
         sliCombustible.setValue(50);

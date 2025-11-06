@@ -16,8 +16,6 @@ public enum PrioridadService {
 
     @Override
     public String toString() {
-        return "PrioridadService{" +
-                "prioridad='" + prioridad + '\'' +
-                '}';
+        return prioridad;
     }
 }

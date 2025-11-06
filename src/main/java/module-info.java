@@ -43,5 +43,7 @@ module navegador2.SPRService {
     opens SPRService.SPRService.viewModels.tablas to javafx.base;
     exports SPRService.SPRService.DTOs.filtros;
     opens SPRService.SPRService.DTOs.filtros to javafx.base;
+    exports SPRService.SPRService.viewModels.celdas;
+    opens SPRService.SPRService.viewModels.celdas to javafx.base;
 
 }
