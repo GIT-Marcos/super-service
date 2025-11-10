@@ -28,7 +28,7 @@
       </ToolBar>
    </top>
    <left>
-      <VBox prefHeight="550.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="600.0" prefWidth="570.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="Cliente del service:">
                <font>

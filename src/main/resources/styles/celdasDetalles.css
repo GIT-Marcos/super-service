@@ -1,0 +1,103 @@
+
+/* ==========================================
+   ESTILOS PARA CELDAS PERSONALIZADAS
+   ========================================== */
+
+/* Contenedor base */
+.celda-item-container {
+    -fx-padding: 5;
+    -fx-background-color: #f4f4f4;
+    -fx-background-radius: 5;
+    -fx-spacing: 10;
+}
+
+/* Labels base */
+.celda-label-tipo {
+    -fx-font-size: 12px;
+    -fx-text-fill: #666;
+    -fx-font-weight: bold;
+}
+
+.celda-label-subtotal {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: white;
+    -fx-background-radius: 3;
+    -fx-padding: 2 8;
+}
+
+/* Botón eliminar */
+.btn-eliminar-item {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 10;
+    -fx-background-radius: 3;
+    -fx-cursor: hand;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+}
+
+.btn-eliminar-item:pressed {
+    -fx-background-color: #a93226;
+}
+
+/* ==========================================
+   CELDA RETIRO
+   ========================================== */
+
+.celda-retiro-container {
+    -fx-border-color: #2196F3;
+    -fx-border-width: 0 0 0 4;
+}
+
+.celda-retiro-header {
+    -fx-spacing: 10;
+}
+
+.celda-retiro-center {
+    -fx-spacing: 10;
+    -fx-font-size: 13px;
+}
+
+.celda-retiro-sub-total {
+    -fx-background-color: #2196F3;
+}
+
+/* ==========================================
+   CELDA TRABAJO
+   ========================================== */
+
+.celda-trabajo-container {
+    -fx-border-color: #FF9800;
+    -fx-border-width: 0 0 0 4;
+}
+
+.celda-trabajo-descripcion {
+    -fx-font-size: 13px;
+    -fx-text-fill: #444;
+}
+
+.celda-trabajo-sub-total {
+    -fx-background-color: #FF9800;
+}
+
+.celda-trabajo-header {
+    -fx-spacing: 10;
+}
+
+/* ==========================================
+   EFECTOS HOVER
+   ========================================== */
+
+.celda-item-container:hover {
+    -fx-background-color: #e8e8e8;
+    -fx-cursor: hand;
+}
+
+.btn-eliminar-item:hover {
+    -fx-background-color: #c0392b;
+}
+
+

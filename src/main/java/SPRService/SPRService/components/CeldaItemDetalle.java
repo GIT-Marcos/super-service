@@ -1,31 +1,72 @@
 package SPRService.SPRService.components;
 
 import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+
+import java.util.function.Consumer;
 
 public abstract class CeldaItemDetalle<T extends ItemDetalleViewModel> extends ListCell<T> {
 
+    protected HBox mainContainer;
     protected VBox container;
     protected Label lblTipo;
     protected Label lblSubTotal;
+    protected Button btnEliminar;
+
+    private Consumer<? super T> onEliminarItem;
 
     public CeldaItemDetalle() {
         inicializarUI();
     }
 
+    public CeldaItemDetalle(Consumer<? super T> onEliminarItem) {  // ← Cambio aquí
+        this.onEliminarItem = onEliminarItem;
+        inicializarUI();
+    }
+
     private void inicializarUI() {
-        container = new VBox(5);
-        container.setStyle("-fx-padding: 10; -fx-background-color: #f4f4f4; -fx-background-radius: 5;");
+        // Contenedor principal horizontal
+        mainContainer = new HBox();
+        mainContainer.getStyleClass().add("celda-item-container");
+        mainContainer.setAlignment(Pos.CENTER_LEFT);
+        mainContainer.setSpacing(10);
+
+        // Contenedor de información (izquierda)
+        container = new VBox();
+        container.setSpacing(5);
+        container.setPadding(new Insets(0, 0, 0, 5));
 
         lblSubTotal = new Label();
-        lblSubTotal.setStyle("-fx-font-weight: bold; -fx-font-size: 10px;");
+        lblSubTotal.getStyleClass().add("celda-label-subtotal");
 
         lblTipo = new Label();
-        lblTipo.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+        lblTipo.getStyleClass().add("celda-label-tipo");
 
         container.getChildren().addAll(lblTipo, lblSubTotal);
+
+        // Espaciador para empujar el botón a la derecha
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Botón eliminar
+        btnEliminar = new Button("✕");
+        btnEliminar.getStyleClass().add("btn-eliminar-item");
+        btnEliminar.setOnAction(e -> {
+            T item = getItem();
+            if (item != null && onEliminarItem != null) {
+                onEliminarItem.accept(item);
+            }
+        });
+
+        mainContainer.getChildren().addAll(container, spacer, btnEliminar);
     }
 
     @Override
@@ -36,17 +77,18 @@ public abstract class CeldaItemDetalle<T extends ItemDetalleViewModel> extends L
             setGraphic(null);
         } else {
             actualizarContenido(item);
-            setGraphic(container);
+            setGraphic(mainContainer);
         }
     }
 
-    // abstracto para personalización específica
     protected abstract void actualizarContenido(T item);
 
-    // común para actualizar datos básicos
     protected void actualizarDatosBasicos(T item) {
         lblTipo.setText(item.getTipo());
-        lblSubTotal.setText(item.getTipo());
+        lblSubTotal.setText("Sub-total: $" + item.getSubTotal().toString());
     }
 
+    public void setOnEliminarItem(Consumer<T> onEliminarItem) {
+        this.onEliminarItem = onEliminarItem;
+    }
 }

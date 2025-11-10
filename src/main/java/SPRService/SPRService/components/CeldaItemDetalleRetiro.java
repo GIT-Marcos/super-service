@@ -4,53 +4,78 @@ import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
+import java.util.function.Consumer;
+
 public class CeldaItemDetalleRetiro extends CeldaItemDetalle<ItemDetalleRetiroViewModel> {
 
     private Label lblCodBarras;
     private Label lblNombreRepuesto;
     private Label lblPrecioUni;
     private Label lblCantidad;
+    private HBox header;
+    private HBox center;
 
     public CeldaItemDetalleRetiro() {
         super();
+        inicializarComponentes();
+    }
+
+    public CeldaItemDetalleRetiro(Consumer<? super ItemDetalleRetiroViewModel> onEliminarItem) {
+        super(onEliminarItem);
+        inicializarComponentes();
+    }
+
+    private void inicializarComponentes() {
+        // Agregar clase específica al container
+        container.getStyleClass().add("celda-retiro-container");
+
+        // Crear labels con estilos CSS
         lblCodBarras = new Label();
-        lblCodBarras.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; " +
-                "-fx-padding: 2 8; -fx-background-radius: 3;");
+        lblCodBarras.getStyleClass().add("celda-retiro-badge");
+
         lblNombreRepuesto = new Label();
-        lblNombreRepuesto.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; " +
-                "-fx-padding: 2 8; -fx-background-radius: 3;");
+        lblNombreRepuesto.getStyleClass().add("celda-retiro-badge");
+
         lblPrecioUni = new Label();
-        lblPrecioUni.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; " +
-                "-fx-padding: 2 8; -fx-background-radius: 3;");
+        lblPrecioUni.getStyleClass().add("celda-retiro-badge");
+
         lblCantidad = new Label();
-        lblCantidad.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; " +
-                "-fx-padding: 2 8; -fx-background-radius: 3;");
+        lblCantidad.getStyleClass().add("celda-retiro-badge");
 
-        HBox header = new HBox(10);
-        header.getChildren().addAll(lblCodBarras, lblNombreRepuesto, lblPrecioUni, lblCantidad);
+        lblSubTotal.getStyleClass().add("celda-retiro-sub-total");
 
+        // Crear header
+        header = new HBox();
+        header.getStyleClass().add("celda-retiro-header");
+        header.getChildren().addAll(lblCodBarras, lblNombreRepuesto);
+
+        center = new HBox();
+        center.getStyleClass().add("celda-retiro-center");
+        center.getChildren().addAll(lblPrecioUni, lblCantidad);
+
+        // Reorganizar container
         container.getChildren().clear();
-        container.getChildren().addAll(header, lblCodBarras, lblNombreRepuesto, lblPrecioUni, lblCantidad);
+        container.getChildren().addAll(lblTipo, header, center, lblSubTotal);
     }
 
     @Override
     protected void actualizarContenido(ItemDetalleRetiroViewModel item) {
         actualizarDatosBasicos(item);
 
-        lblCodBarras.setText("Cod barras: " + item.getCodBarras());
-        lblNombreRepuesto.setText("Cantidad: " + item.cantidadProperty());
-        lblPrecioUni.setText("Precio uni: " + item.getPrecioUnitario());
-        lblCantidad.setText("Cantidad: " + item.cantidadProperty());
+        lblCodBarras.setText("Cod. barras: " + item.getCodBarras());
+        lblNombreRepuesto.setText("Repuesto: " + item.getNombreRepuesto());
+        lblPrecioUni.setText("Precio: $" + item.getPrecioUnitario());
+        lblCantidad.setText("Cantidad: " + item.cantidadProperty().get());
 
-        // Cambiar color según stock
-//        if (item.getStock() < 5) {
-//            lblStock.setStyle(lblStock.getStyle() + "-fx-background-color: #f44336;");
-//        } else {
-//            lblStock.setStyle(lblStock.getStyle() + "-fx-background-color: #4CAF50;");
-//        }
-
-        // Agregar icono de producto
-//        container.setStyle(container.getStyle() + "-fx-border-color: #2196F3; -fx-border-width: 0 0 0 4;");
+        // Aplicar estilo condicional basado en stock
+        aplicarEstiloStock(item);
     }
 
+    private void aplicarEstiloStock(ItemDetalleRetiroViewModel item) {
+        // Ejemplo: cambiar estilo si hay poco stock
+        // if (item.getStock() < 5) {
+        //     lblCantidad.getStyleClass().removeAll("celda-retiro-badge");
+        //     lblCantidad.getStyleClass().add("celda-retiro-badge-warning");
+        // }
+    }
 }

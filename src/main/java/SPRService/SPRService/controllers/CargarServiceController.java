@@ -1,6 +1,5 @@
 package SPRService.SPRService.controllers;
 
-import SPRService.SPRService.components.CeldaTrabajo;
 import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.EstadoService;
@@ -59,8 +58,6 @@ public class CargarServiceController implements Initializable {
     private CustomTextField tfTrabajo, tfPrecioTrabajo, tfKilometros;
     @FXML
     private TextArea tfMotivoIngreso, tfInventario, tfObservaciones;
-//    @FXML
-//    private ListView<TrabajoViewModelRepuesto> lvDetalles;
     @FXML
     private ListView<ItemDetalleViewModel> lvDetalles;
     @FXML
@@ -80,7 +77,7 @@ public class CargarServiceController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        confiCampos();
+        configControles();
     }
 
     @FXML
@@ -224,23 +221,22 @@ public class CargarServiceController implements Initializable {
         }
     }
 
-    private void confiCampos() {
-//        lvDetalles.setCellFactory(param -> new CeldaTrabajo(
-//                i -> {
-//                    restarTotal(i.getSubTotal());
-//                }));
-//        lvDetalles.setItems(obsListTrabajos);
+    private void configControles() {
         lvDetalles.setItems(items);
-        lvDetalles.setCellFactory(new ItemCellFactory());
-
-
-
+        lvDetalles.setCellFactory(new ItemCellFactory(this::eliminarItem));
 
         cbPrioridad.getItems().setAll(PrioridadService.values());
         cbPrioridad.getSelectionModel().select(2);
         sliCombustible.setValue(50);
-
         configCamposTexto();
+
+        String css = getClass().getResource("/styles/celdasDetalles.css").toExternalForm();
+        lvDetalles.getStylesheets().add(css);
+    }
+
+    private void eliminarItem(ItemDetalleViewModel item) {
+        lvDetalles.getItems().remove(item);
+        restarTotal(item.getSubTotal());
     }
 
     private void configCamposTexto() {
