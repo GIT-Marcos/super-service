@@ -2,6 +2,7 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.Repuesto;
+import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.util.ManejadorInputs;
@@ -16,12 +17,15 @@ import javafx.stage.Stage;
 import org.controlsfx.control.textfield.CustomTextField;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class AgregarRepuestoServiceController implements Initializable, ModalController<DetalleRetiro> {
+public class AgregarRepuestoServiceController implements Initializable, ModalController<DetalleRetiro>,
+        DataReceiver<List<DetalleRetiro>> {
 
     private DetalleRetiro detalleRetiro;
+    private List<DetalleRetiro> detallesExistentes;
     private final RepuestoServ repuestoServ;
     private ObservableList<Repuesto> obsListRepuestos = FXCollections.observableArrayList();
 
@@ -47,6 +51,11 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
         return Optional.ofNullable(this.detalleRetiro);
     }
 
+    @Override
+    public void receiveData(List<DetalleRetiro> data) {
+        this.detallesExistentes = data;
+    }
+
     @FXML
     private void agregarRepuesto() {
         Double cantidad;
@@ -56,6 +65,12 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
                     "al service");
             return;
         }
+        if (verificarDuplicado(r)) {
+            Alertas.aviso("Agregar repuesto", "Ya se ha agregado el repuesto: \n" +
+                    r.getDetalle() + "\nal service.");
+            return;
+        }
+
         try {
             cantidad = ManejadorInputs.cantidadStock(ctfCantidad.getText(), true);
         } catch (RuntimeException e) {
@@ -66,9 +81,14 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
         cerrarVentana();
     }
 
+    private boolean verificarDuplicado(Repuesto r) {
+        Optional<DetalleRetiro> optionalDuplicado = this.detallesExistentes.stream().filter(d ->
+                d.getRepuesto().getId().equals(r.getId())).findAny();
+        return optionalDuplicado.isPresent();
+    }
+
     private void cerrarVentana() {
         Stage s = (Stage) ctfBuscar.getScene().getWindow();
         s.close();
     }
-
 }

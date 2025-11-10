@@ -110,16 +110,8 @@ public class CargarServiceController implements Initializable {
     @FXML
     private void irAgregarRepuesto() {
         Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO_SERVICE,
-                "Agregar repuesto", null);
+                "Agregar repuesto", this.detalleRetiros);
         if (result.isPresent()) {
-            Optional<DetalleRetiro> optionalDuplicado = detalleRetiros.stream().filter(r ->
-                    r.getRepuesto().getId().equals(result.get().getRepuesto().getId())).findAny();
-            // todo: pasarle la lista que verifique dentro del dialog
-            if (optionalDuplicado.isPresent()) {
-                Alertas.aviso("Agregar repuesto", "Ya se ha agregado el repuesto: \n" +
-                        result.get().getRepuesto().getDetalle() + "\nal detalle.");
-                return;
-            }
             detalleRetiros.add(result.get());
             obsListTrabajos.add(new DetalleRepuestoServiceViewModel(result.get()));
             agregarTotal(result.get().getSubTotal());
