@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.components.CeldaVehiculo;
 import SPRService.SPRService.entities.Vehiculo;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.ModalController;
@@ -45,10 +46,13 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         textFieldListener();
-//        lvVehiculos.setCellFactory(cell -> new );
         filteredList = new FilteredList<>(obsListVehiculo, p -> true);
         lvVehiculos.setItems(obsListVehiculo);
+        lvVehiculos.setCellFactory(cell -> new CeldaVehiculo());
         obsListVehiculo.addAll(vehiculoServ.verTodosActivos());
+
+        String css = getClass().getResource("/styles/celdaVehiculo.css").toExternalForm();
+        lvVehiculos.getStylesheets().add(css);
     }
 
     @Override
