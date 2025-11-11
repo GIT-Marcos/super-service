@@ -4,6 +4,8 @@ import SPRService.SPRService.entities.Trabajo;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.Objects;
+
 public class ItemTrabajoViewModel extends ItemDetalleViewModel {
 
     private Trabajo trabajo;
@@ -26,5 +28,16 @@ public class ItemTrabajoViewModel extends ItemDetalleViewModel {
 
     public StringProperty descripcionTrabajoProperty() {
         return descripcionTrabajo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ItemTrabajoViewModel that)) return false;
+        return Objects.equals(descripcionTrabajo, that.descripcionTrabajo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(descripcionTrabajo);
     }
 }

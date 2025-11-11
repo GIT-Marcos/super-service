@@ -10,8 +10,6 @@ import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.viewModels.DetalleRepuestoServiceViewModel;
-import SPRService.SPRService.viewModels.TrabajoViewModelRepuesto;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemTrabajoViewModel;
@@ -37,15 +35,12 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CargarServiceController implements Initializable {
 
     private final Navigator navigator;
     private final ServiceServ serviceServ;
-    private Set<Trabajo> trabajos = new HashSet<>();
-    private List<DetalleRetiro> detalleRetiros = new ArrayList<>();
-    private ObservableList<TrabajoViewModelRepuesto> obsListTrabajos = FXCollections.observableArrayList();
-
     private ObservableList<ItemDetalleViewModel> items = FXCollections.observableArrayList();
 
     private ValidationSupport valSupp;
@@ -88,20 +83,18 @@ public class CargarServiceController implements Initializable {
             detalle = ManejadorInputs.textoGenerico(tfTrabajo.getText(), true,
                     "Agregar trabajo", 100);
             precio = ManejadorInputs.dinero(tfPrecioTrabajo.getText(), true, false);
-            boolean seRepite = obsListTrabajos.stream().anyMatch(
-                    d -> d.getDescripcion().equals(detalle));
-            if (seRepite) {
-                Alertas.aviso("Agregar trabajo", "Ya has cargado el trabajo: " + detalle);
-                return;
-            }
-            obsListTrabajos.add(new TrabajoViewModelRepuesto(detalle, precio));
+            ItemTrabajoViewModel itvm = new ItemTrabajoViewModel(new Trabajo(null, detalle, precio));
+            //todo: decidir si conviene o no validad repetido en este caso
+//            for (ItemDetalleViewModel i : this.items) {
+//                if (i.equals(itvm)) {
+//                    Alertas.aviso("Agregar trabajo", "Ya has cargado el trabajo: " + detalle);
+//                    return;
+//                }
+//            }
+            items.addFirst(itvm);
             agregarTotal(precio);
-            trabajos.add(new Trabajo(null, detalle, precio));
             tfTrabajo.setText("");
             tfPrecioTrabajo.setText("");
-
-
-            items.addFirst(new ItemTrabajoViewModel(new Trabajo(null, detalle, precio)));
         } catch (RuntimeException e) {
             Alertas.aviso("Agregar trabajo", e.getMessage());
         }
@@ -110,13 +103,10 @@ public class CargarServiceController implements Initializable {
     @FXML
     private void irAgregarRepuesto() {
         Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO_SERVICE,
-                "Agregar repuesto", this.detalleRetiros);
+                "Agregar repuesto", obtenerDetalles());
         if (result.isPresent()) {
-            detalleRetiros.add(result.get());
-            obsListTrabajos.add(new DetalleRepuestoServiceViewModel(result.get()));
-            agregarTotal(result.get().getSubTotal());
-
             items.addFirst(new ItemDetalleRetiroViewModel(result.get()));
+            agregarTotal(result.get().getSubTotal());
         }
     }
 
@@ -159,8 +149,9 @@ public class CargarServiceController implements Initializable {
             Alertas.aviso("Cargar service", "Se debe asociar un vehículo para el service.");
             return false;
         }
-        if (this.trabajos.isEmpty()) {
-            Alertas.aviso("Cargar service", "Deben haber trabajos cargados para poder cargar el service.");
+        if (this.items.isEmpty()) {
+            Alertas.aviso("Cargar service", "Deben haber repuestos o trabajos" +
+                    " asignados para poder cargar el service.");
             return false;
         }
         return true;
@@ -187,8 +178,8 @@ public class CargarServiceController implements Initializable {
             orden.setInformeTecnico(null);
             orden.setEstadoIngreso(estadoIngreso);
             orden.setVehiculo(vehiculo);
-            orden.setNotaRetiro(new NotaRetiro(null, detalleRetiros));
-            orden.agregarTrabajos(trabajos);
+            orden.setNotaRetiro(new NotaRetiro(null, obtenerDetalles()));
+            orden.agregarTrabajos(obtenerTrabajos());
 
             Service service = new Service();
             service.setId(null);
@@ -227,7 +218,7 @@ public class CargarServiceController implements Initializable {
     }
 
     private void eliminarItem(ItemDetalleViewModel item) {
-        lvDetalles.getItems().remove(item);
+        this.items.remove(item);
         restarTotal(item.getSubTotal());
     }
 
@@ -253,5 +244,33 @@ public class CargarServiceController implements Initializable {
     private void restarTotal(BigDecimal b) {
         totalService = totalService.subtract(b);
         lblTotal.setText("$ " + totalService);
+    }
+
+    private List<DetalleRetiro> obtenerDetalles() {
+        List<ItemDetalleRetiroViewModel> items = this.items.stream().filter(i -> i instanceof ItemDetalleRetiroViewModel)
+                .map(i -> (ItemDetalleRetiroViewModel) i)
+                .toList();
+        if (!items.isEmpty()) {
+            List<DetalleRetiro> detalles = new ArrayList<>();
+            for (ItemDetalleRetiroViewModel i : items) {
+                detalles.add(i.getDetalleRetiro());
+            }
+            return detalles;
+        }
+        return new ArrayList<>();
+    }
+
+    private Set<Trabajo> obtenerTrabajos() {
+        Set<ItemTrabajoViewModel> items = this.items.stream().filter(i -> i instanceof ItemTrabajoViewModel)
+                .map(i -> (ItemTrabajoViewModel) i)
+                .collect(Collectors.toSet());
+        if (!items.isEmpty()) {
+            Set<Trabajo> trabajos = new HashSet<>();
+            for (ItemTrabajoViewModel i : items) {
+                trabajos.add(i.getTrabajo());
+            }
+            return trabajos;
+        }
+        return new HashSet<>();
     }
 }

@@ -82,9 +82,12 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
     }
 
     private boolean verificarDuplicado(Repuesto r) {
-        Optional<DetalleRetiro> optionalDuplicado = this.detallesExistentes.stream().filter(d ->
-                d.getRepuesto().getId().equals(r.getId())).findAny();
-        return optionalDuplicado.isPresent();
+        if (this.detallesExistentes != null) {
+            Optional<DetalleRetiro> optionalDuplicado = this.detallesExistentes.stream().filter(d ->
+                    d.getRepuesto().getId().equals(r.getId())).findAny();
+            return optionalDuplicado.isPresent();
+        }
+        return false;
     }
 
     private void cerrarVentana() {
