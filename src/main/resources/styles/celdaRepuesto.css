@@ -1,0 +1,165 @@
+/* ==========================================
+   CELDA REPUESTO - COMPACTA
+   ========================================== */
+
+/* Container principal - Ultra compacto */
+.celda-repuesto-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 4px;
+    -fx-padding: 3px 6px;
+    -fx-spacing: 3px;
+    -fx-alignment: center-left;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 2, 0, 0, 1);
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+/*
+.celda-repuesto-container:hover {
+    -fx-background-color: #f5f5f5;
+    -fx-cursor: hand;
+    -fx-border-color: #2196F3;
+}
+*/
+/* Estados de alerta del container */
+.celda-repuesto-container.container-critico {
+    -fx-border-color: #f44336;
+    -fx-border-width: 1.5px;
+    -fx-background-color: #ffebee;
+}
+
+.celda-repuesto-container.container-bajo {
+    -fx-border-color: #ff9800;
+    -fx-border-width: 1.5px;
+    -fx-background-color: #fff8e1;
+}
+
+/* VBox contenedor de las 2 filas */
+.celda-repuesto-info-box {
+    -fx-spacing: 3px;
+}
+
+/* ==========================================
+   FILA SUPERIOR (Código, Nombre, Marca, Precio)
+   ========================================== */
+
+.celda-repuesto-fila-superior {
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+}
+
+/* Código de barras - Compacto */
+.celda-repuesto-codigo {
+    -fx-background-color: #424242;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Consolas", "Monaco", monospace;
+    -fx-padding: 2px 6px;
+    -fx-background-radius: 2px;
+    -fx-min-width: 90px;
+    -fx-pref-width: 90px;
+    -fx-alignment: center;
+}
+
+/* Nombre del repuesto - EXPANDIBLE SIN CORTAR */
+.celda-repuesto-nombre {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+    -fx-min-width: 150px;
+    -fx-wrap-text: false;
+    -fx-text-overrun: ellipsis;
+}
+
+/* Marca - A LA DERECHA, Compacta */
+.celda-repuesto-marca {
+    -fx-font-size: 10px;
+    -fx-text-fill: #616161;
+    -fx-padding: 2px 6px;
+    -fx-background-color: #e3f2fd;
+    -fx-background-radius: 2px;
+    -fx-min-width: 60px;
+    -fx-pref-width: 80px;
+}
+
+/* Precio - AL FINAL */
+.celda-repuesto-precio {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2e7d32;
+    -fx-padding: 2px 6px;
+    -fx-background-color: #e8f5e9;
+    -fx-background-radius: 2px;
+    -fx-min-width: 70px;
+    -fx-pref-width: 90px;
+    -fx-alignment: center-right;
+}
+
+/* ==========================================
+   FILA INFERIOR (Stock, Estado)
+   ========================================== */
+
+.celda-repuesto-fila-inferior {
+    -fx-spacing: 6px;
+    -fx-alignment: center-left;
+}
+
+/* Stock - Compacto */
+.celda-repuesto-stock {
+    -fx-font-size: 10px;
+    -fx-text-fill: #757575;
+    -fx-padding: 2px 6px;
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 2px;
+    -fx-min-width: 80px;
+    -fx-pref-width: 100px;
+}
+
+/* Stock normal */
+.celda-repuesto-stock.stock-normal {
+    -fx-background-color: #e8f5e9;
+    -fx-text-fill: #2e7d32;
+}
+
+/* Stock bajo */
+.celda-repuesto-stock.stock-bajo {
+    -fx-background-color: #fff3e0;
+    -fx-text-fill: #e65100;
+    -fx-font-weight: bold;
+}
+
+/* Stock crítico */
+.celda-repuesto-stock.stock-critico {
+    -fx-background-color: #ffebee;
+    -fx-text-fill: #c62828;
+    -fx-font-weight: bold;
+}
+
+/* Estado del stock - Mini */
+.celda-repuesto-estado {
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-padding: 2px 6px;
+    -fx-background-radius: 2px;
+    -fx-min-width: 50px;
+    -fx-pref-width: 60px;
+    -fx-alignment: center;
+}
+
+.celda-repuesto-estado.estado-normal {
+    -fx-background-color: #4caf50;
+    -fx-text-fill: white;
+}
+
+.celda-repuesto-estado.estado-bajo {
+    -fx-background-color: #ff9800;
+    -fx-text-fill: white;
+}
+
+.celda-repuesto-estado.estado-critico {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}

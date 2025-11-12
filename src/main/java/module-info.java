@@ -13,6 +13,7 @@ module navegador2.SPRService {
     requires com.google.guice.extensions.persist;
     requires javafx.swing;
     requires org.controlsfx.controls;
+    requires javafx.base;
 
     // Abre paquetes a FXML/FX Base para reflexión
     opens SPRService.SPRService to javafx.fxml;

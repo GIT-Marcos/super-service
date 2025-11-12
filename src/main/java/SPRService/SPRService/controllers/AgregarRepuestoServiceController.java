@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.components.CeldaRepuesto;
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.navigation.DataReceiver;
@@ -7,6 +8,7 @@ import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.viewModels.celdas.ItemRepuestoViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,10 +29,10 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
     private DetalleRetiro detalleRetiro;
     private List<DetalleRetiro> detallesExistentes;
     private final RepuestoServ repuestoServ;
-    private ObservableList<Repuesto> obsListRepuestos = FXCollections.observableArrayList();
+    private ObservableList<ItemRepuestoViewModel> items = FXCollections.observableArrayList();
 
     @FXML
-    private ListView<Repuesto> lvRepuestos;
+    private ListView<ItemRepuestoViewModel> lvRepuestos;
     @FXML
     private CustomTextField ctfBuscar, ctfCantidad;
 
@@ -41,9 +43,19 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        lvRepuestos.setItems(obsListRepuestos);
+        lvRepuestos.setCellFactory(cell -> new CeldaRepuesto());
+        String css = getClass().getResource("/styles/celdaRepuesto.css").toExternalForm();
+        lvRepuestos.getStylesheets().add(css);
+        lvRepuestos.setItems(items);
+        cargarItems();
+    }
 
-        obsListRepuestos.addAll(repuestoServ.verTodos());
+    private void cargarItems() {
+        items.clear();
+        List<Repuesto> list = repuestoServ.verTodos();
+        for (Repuesto r : list) {
+            items.add(new ItemRepuestoViewModel(r));
+        }
     }
 
     @Override
@@ -59,7 +71,7 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
     @FXML
     private void agregarRepuesto() {
         Double cantidad;
-        Repuesto r = lvRepuestos.getSelectionModel().getSelectedItem();
+        Repuesto r = lvRepuestos.getSelectionModel().getSelectedItem().getRepuesto();
         if (r == null) {
             Alertas.aviso("Agregar repuesto", "Debe seleccionar un repuesto para agregarlo " +
                     "al service");
