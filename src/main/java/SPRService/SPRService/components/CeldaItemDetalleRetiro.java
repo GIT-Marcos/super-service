@@ -10,6 +10,7 @@ public class CeldaItemDetalleRetiro extends CeldaItemDetalle<ItemDetalleRetiroVi
 
     private Label lblCodBarras;
     private Label lblNombreRepuesto;
+    private Label lblmarcaRepuesto;
     private Label lblPrecioUni;
     private Label lblCantidad;
     private HBox header;
@@ -36,6 +37,9 @@ public class CeldaItemDetalleRetiro extends CeldaItemDetalle<ItemDetalleRetiroVi
         lblNombreRepuesto = new Label();
         lblNombreRepuesto.getStyleClass().add("celda-retiro-badge");
 
+        lblmarcaRepuesto = new Label();
+        lblmarcaRepuesto.getStyleClass().add("celda-retiro-badge");
+
         lblPrecioUni = new Label();
         lblPrecioUni.getStyleClass().add("celda-retiro-badge");
 
@@ -51,7 +55,7 @@ public class CeldaItemDetalleRetiro extends CeldaItemDetalle<ItemDetalleRetiroVi
 
         center = new HBox();
         center.getStyleClass().add("celda-retiro-center");
-        center.getChildren().addAll(lblPrecioUni, lblCantidad);
+        center.getChildren().addAll(lblmarcaRepuesto, lblPrecioUni, lblCantidad);
 
         // Reorganizar container
         container.getChildren().clear();
@@ -64,8 +68,9 @@ public class CeldaItemDetalleRetiro extends CeldaItemDetalle<ItemDetalleRetiroVi
 
         lblCodBarras.setText("Cod. barras: " + item.getCodBarras());
         lblNombreRepuesto.setText("Repuesto: " + item.getNombreRepuesto());
+        lblmarcaRepuesto.setText("Marca: " + item.getMarcaRepuesto());
         lblPrecioUni.setText("Precio: $" + item.getPrecioUnitario());
-        lblCantidad.setText("Cantidad: " + item.cantidadProperty().get());
+        lblCantidad.setText("Retirado: " + item.cantidadProperty().get());
 
         // Aplicar estilo condicional basado en stock
         aplicarEstiloStock(item);

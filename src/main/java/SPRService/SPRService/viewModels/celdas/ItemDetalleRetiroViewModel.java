@@ -11,6 +11,7 @@ public class ItemDetalleRetiroViewModel extends ItemDetalleViewModel {
 
     private final StringProperty codBarras = new SimpleStringProperty();
     private final StringProperty nombreRepuesto = new SimpleStringProperty();
+    private final StringProperty marcaRepuesto = new SimpleStringProperty();
     private final ObjectProperty<BigDecimal> precioUnitario = new SimpleObjectProperty<>();
     private final DoubleProperty cantidad = new SimpleDoubleProperty();
 
@@ -18,6 +19,7 @@ public class ItemDetalleRetiroViewModel extends ItemDetalleViewModel {
         super("Repuesto", d.getSubTotal());
         this.codBarras.set(d.getRepuesto().getCodBarra());
         this.nombreRepuesto.set(d.getRepuesto().getDetalle());
+        this.marcaRepuesto.set(d.getRepuesto().getMarcaRepuesto().getNombreMarca());
         this.precioUnitario.set(d.getRepuesto().getPrecio());
         this.cantidad.set(d.getCantidadRetirada());
         this.detalleRetiro = d;
@@ -57,5 +59,13 @@ public class ItemDetalleRetiroViewModel extends ItemDetalleViewModel {
 
     public DoubleProperty cantidadProperty() {
         return cantidad;
+    }
+
+    public String getMarcaRepuesto() {
+        return marcaRepuesto.get();
+    }
+
+    public StringProperty marcaRepuestoProperty() {
+        return marcaRepuesto;
     }
 }
