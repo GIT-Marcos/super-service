@@ -2,13 +2,13 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.entities.*;
-import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.PrioridadService;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
+import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
@@ -57,6 +57,8 @@ public class CargarServiceController implements Initializable {
     private ListView<ItemDetalleViewModel> lvDetalles;
     @FXML
     private Label lblCliente, lblVehiculo, lblTotal;
+    @FXML
+    private DatePicker dpFechaEntrega;
     @FXML
     private ImageView imgLogo;
     @FXML
@@ -190,7 +192,8 @@ public class CargarServiceController implements Initializable {
             }
             orden.agregarTrabajos(obtenerTrabajos());
 
-            Service service = new Service(LocalDateTime.now().plusDays(2), cbPrioridad.getValue(), this.cliente,
+            //todo: hacer que tome la fecha del control datepicker
+            Service service = new Service(LocalDateTime.now().plusDays(1), cbPrioridad.getValue(), this.cliente,
                     orden);
 
             if (!Alertas.confirmacion("Cargar service", "¿Está seguro que desea cargar?")) return;
@@ -208,6 +211,9 @@ public class CargarServiceController implements Initializable {
     }
 
     private void configControles() {
+        dpFechaEntrega.setConverter(new SafeLocalDateConverter());
+        dpFechaEntrega.setPromptText("dd/MM/yyyy");
+
         lvDetalles.setItems(items);
         lvDetalles.setCellFactory(new ItemCellFactory(this::eliminarItem));
 
