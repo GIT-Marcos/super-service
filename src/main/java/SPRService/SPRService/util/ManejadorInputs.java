@@ -92,6 +92,9 @@ public class ManejadorInputs {
             }
             return 0.0;
         }
+        if (trimmedInput.contains(" ")) {
+            throw new IllegalArgumentException("La cantidad de stock no puede contener espacios en blanco");
+        }
 
         String parsableInput = trimmedInput.replace(',', '.');
         try {

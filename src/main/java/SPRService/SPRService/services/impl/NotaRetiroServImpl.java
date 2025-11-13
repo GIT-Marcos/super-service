@@ -22,6 +22,7 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
         this.daoNota = daoNota;
     }
 
+    @Deprecated
     @Transactional
     @Override
     public List<NotaRetiro> verTodasPorFecha() {
@@ -35,6 +36,7 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
         return daoNota.buscarPaginado(fechaMin, fechaMax, pagina, tamanioPagina);
     }
 
+    @Deprecated
     @Transactional
     @Override
     public List<NotaRetiro> buscarPorFecha(LocalDate fechaMin, LocalDate fechaMax) {

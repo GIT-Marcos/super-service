@@ -1,8 +1,10 @@
 package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.ServiceDAO;
+import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.services.ServiceServ;
+import SPRService.SPRService.services.StockServ;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
@@ -13,10 +15,12 @@ import java.util.Set;
 public class ServiceServImpl implements ServiceServ {
 
     private final ServiceDAO daoService;
+    private final StockServ stockServ;
 
     @Inject
-    public ServiceServImpl(ServiceDAO daoService) {
+    public ServiceServImpl(ServiceDAO daoService, StockServ stockServ) {
         this.daoService = daoService;
+        this.stockServ = stockServ;
     }
 
 
@@ -35,6 +39,12 @@ public class ServiceServImpl implements ServiceServ {
     @Transactional
     @Override
     public Service cargarService(Service s) {
+        if (s.getOrden().getNotaRetiro() != null) {
+            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiroList()) {
+                stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
+            }
+        }
+
         daoService.save(s);
         return s;
     }

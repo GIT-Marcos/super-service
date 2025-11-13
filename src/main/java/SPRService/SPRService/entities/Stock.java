@@ -129,12 +129,23 @@ public class Stock implements Serializable {
     }
 
     /**
+     * Público para usar en controladores.
+     */
+    public boolean haySuficiente(Double cantidadSalida) {
+        if (cantidadSalida > this.cantidadExistente) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Usar en servicio
      * Usado cuando se debe retirar stock. Calcula la nueva cantidad de existente cuando se retira stock.
      */
-    public void salidaDeStock(Double cantidadSalida){
+    public void salidaDeStock(Double cantidadSalida) {
         if (cantidadSalida.isInfinite() || cantidadSalida.isNaN() || cantidadSalida < 0)
             throw new IllegalArgumentException("Cantidad de stock a agregar en mal formato");
-        if (cantidadSalida > this.getCantidadExistente())
+        if (!haySuficiente(cantidadSalida))
             throw new IllegalArgumentException("La cantidad de salida de stock es mayor al existente.");
 
         Double nuevaCantidad = this.getCantidadExistente() - cantidadSalida;
@@ -144,6 +155,7 @@ public class Stock implements Serializable {
     }
 
     /**
+     * Usar en servicio
      * Usado para agregar cantidad existente al stock.
      */
     public void entradaStock(Double cantidadEntrada) {
@@ -152,5 +164,4 @@ public class Stock implements Serializable {
 
         this.setCantidadExistente(this.getCantidadExistente() + cantidadEntrada);
     }
-    
 }

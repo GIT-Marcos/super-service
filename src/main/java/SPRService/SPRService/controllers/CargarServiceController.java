@@ -178,17 +178,20 @@ public class CargarServiceController implements Initializable {
             orden.setInformeTecnico(null);
             orden.setEstadoIngreso(estadoIngreso);
             orden.setVehiculo(vehiculo);
-            orden.setNotaRetiro(new NotaRetiro(null, obtenerDetalles()));
+            if (obtenerDetalles().isEmpty()) {
+                orden.setNotaRetiro(null);
+            } else {
+                orden.setNotaRetiro(new NotaRetiro(null, obtenerDetalles()));
+            }
+            if (obtenerTrabajos().isEmpty()) {
+                Alertas.aviso("Cargar service", "Debe agregar al menos 1 trabajo para " +
+                        "cargar el service.");
+                return;
+            }
             orden.agregarTrabajos(obtenerTrabajos());
 
-            Service service = new Service();
-            service.setId(null);
-            service.setFechaEntrega(LocalDateTime.now());
-            service.setFechaCarga(LocalDateTime.now());
-            service.setEstadoService(EstadoService.PENDIENTE);
-            service.setPrioridad(cbPrioridad.getValue());
-            service.asignarCliente(this.cliente);
-            service.asignarOrden(orden);
+            Service service = new Service(LocalDateTime.now().plusDays(2), cbPrioridad.getValue(), this.cliente,
+                    orden);
 
             if (!Alertas.confirmacion("Cargar service", "¿Está seguro que desea cargar?")) return;
             serviceServ.cargarService(service);
