@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.components.CeldaVehiculo;
 import SPRService.SPRService.entities.Vehiculo;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.ModalController;
@@ -11,7 +12,6 @@ import SPRService.SPRService.viewModels.VehiculoVM;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
@@ -19,7 +19,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -29,12 +28,11 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
     private final Navigator navigator;
     private Vehiculo vehiculoSeleccionado;
     private ObservableList<Vehiculo> obsListVehiculo = FXCollections.observableArrayList();
-    private FilteredList<Vehiculo> filteredList;
 
     @FXML
     private ListView<Vehiculo> lvVehiculos;
     @FXML
-    private TextField tfPatente;
+    private TextField tfPatente, tfModelo, tfMarca;
 
     @Inject
     public AgregarVehiculoServiceController(VehiculoServ vehiculoServ, AppCoordinator coordinator) {
@@ -44,11 +42,12 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        textFieldListener();
-//        lvVehiculos.setCellFactory(cell -> new );
-        filteredList = new FilteredList<>(obsListVehiculo, p -> true);
         lvVehiculos.setItems(obsListVehiculo);
+        lvVehiculos.setCellFactory(cell -> new CeldaVehiculo());
         obsListVehiculo.addAll(vehiculoServ.verTodosActivos());
+
+        String css = getClass().getResource("/styles/celdaVehiculo.css").toExternalForm();
+        lvVehiculos.getStylesheets().add(css);
     }
 
     @Override
@@ -62,7 +61,6 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
                 "Cargar nuevo vehículo", null);
         if (result.isPresent()) {
             obsListVehiculo.addFirst(result.get().obtenerEntidadActualizada());
-            tfPatente.setText(result.get().obtenerEntidadActualizada().getPatente());
             lvVehiculos.getSelectionModel().selectFirst();
         }
     }
@@ -79,18 +77,10 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
         s.close();
     }
 
-    private void textFieldListener() {
-        tfPatente.textProperty().addListener((obs, oldVal, newVal) -> {
-            String q = newVal == null ? "" : newVal.toLowerCase(Locale.ROOT);
-            filteredList.setPredicate(u -> {
-                if (q.isEmpty()) {
-                    return true;
-                }
-                String patente = u.getPatente().toLowerCase(Locale.ROOT);
-                String modelo = u.getModeloVehiculo().getNombreModelo();
-                String marca = u.getModeloVehiculo().getMarcaVehiculo().getNombreMarca();
-                return patente.contains(q) || modelo.contains(q) || marca.contains(q);
-            });
-        });
+    @FXML
+    private void buscar() {
+        this.obsListVehiculo.setAll(vehiculoServ.buscarPor(tfPatente.getText().strip(),
+                tfModelo.getText().strip(), tfMarca.getText().strip()));
     }
+
 }

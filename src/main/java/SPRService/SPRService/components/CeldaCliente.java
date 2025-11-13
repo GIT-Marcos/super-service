@@ -22,11 +22,6 @@ public class CeldaCliente extends ListCell<Cliente> {
     public CeldaCliente() {
         super();
 
-        // Cargar el CSS directamente en la celda
-        this.getStylesheets().add(
-                getClass().getResource("/styles/celdaCliente.css").toExternalForm()
-        );
-
         // --- LADO IZQUIERDO: DNI ---
         dniLabel = new Label();
         dniLabel.getStyleClass().add("dni-label");

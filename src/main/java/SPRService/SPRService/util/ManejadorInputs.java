@@ -15,7 +15,7 @@ public class ManejadorInputs {
             "^\\d{1,3}(,\\d{3})*(\\.\\d{1,2})?$|^\\d+(\\.\\d{1,2})?$");
     private static final Pattern PATRON_NROS_DNI = Pattern.compile("^\\d+$");
     private static final Pattern PATRON_PATENTE = Pattern.compile("^[a-zA-Z0-9]*$");
-    private static final Pattern PATRON_KILOMETRAJE = Pattern.compile("^\\d{1,7}$\n");
+    private static final Pattern PATRON_KILOMETRAJE = Pattern.compile("^\\d{1,7}$");
 
     // Para evitar que la clase sea instanciada
     private ManejadorInputs() {
@@ -29,16 +29,16 @@ public class ManejadorInputs {
         String trimmedInput = (input == null) ? "" : input.strip();
         if (trimmedInput.isBlank()) {
             if (esObligatorio) {
-                throw new IllegalArgumentException("El kilometraje es obligatorio.");
+                throw new IllegalArgumentException("Ingresar el kilometraje es obligatorio.");
             }
             return 0;
         }
         if (trimmedInput.contains(" ")) {
             throw new IllegalArgumentException("El kilometraje no puede contener espacios.");
         }
-//        if (!PATRON_KILOMETRAJE.matcher(trimmedInput).matches()){
-//            throw new IllegalArgumentException("Formato inválido en kilometraje.");
-//        }
+        if (!PATRON_KILOMETRAJE.matcher(trimmedInput).matches()){
+            throw new IllegalArgumentException("Formato inválido en kilometraje.");
+        }
         return Integer.parseInt(trimmedInput);
     }
 
@@ -91,6 +91,9 @@ public class ManejadorInputs {
                 throw new IllegalArgumentException("La cantidad de stock es obligatoria.");
             }
             return 0.0;
+        }
+        if (trimmedInput.contains(" ")) {
+            throw new IllegalArgumentException("La cantidad de stock no puede contener espacios en blanco");
         }
 
         String parsableInput = trimmedInput.replace(',', '.');

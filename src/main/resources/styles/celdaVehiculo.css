@@ -1,0 +1,134 @@
+/* ==========================================
+   CELDA VEHÍCULO - LOGO + 2 FILAS
+   ========================================== */
+
+/* Container principal */
+.celda-vehiculo-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6px;
+    -fx-padding: 5px;
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 4, 0, 0, 1);
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+.celda-vehiculo-container:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 6, 0, 0, 2);
+    -fx-border-color: #2196F3;
+}
+
+/* Logo - Izquierda */
+.celda-vehiculo-logo {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0, 0, 1);
+}
+
+/* VBox contenedor de las 2 filas */
+.celda-vehiculo-info-box {
+    -fx-spacing: 6px;
+    -fx-alignment: center-left;
+}
+
+/* ==========================================
+   FILA SUPERIOR (Marca, Modelo, Año, Cilindrada)
+   ========================================== */
+
+.celda-vehiculo-fila-superior {
+    -fx-spacing: 5px;
+    -fx-alignment: center-left;
+}
+
+.celda-vehiculo-marca {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+    -fx-min-width: 50px;
+}
+
+.celda-vehiculo-modelo {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #424242;
+    -fx-min-width: 120px;
+}
+
+.celda-vehiculo-anio {
+    -fx-font-size: 13px;
+    -fx-text-fill: #616161;
+    -fx-min-width: 50px;
+    -fx-padding: 3 8;
+}
+
+.celda-vehiculo-cilindrada {
+    -fx-font-size: 13px;
+    -fx-text-fill: #616161;
+    -fx-min-width: 70px;
+    -fx-padding: 3 8;
+}
+
+/* ==========================================
+   FILA INFERIOR (Patente, Color)
+   ========================================== */
+
+.celda-vehiculo-fila-inferior {
+    -fx-spacing: 15px;
+    -fx-alignment: center-left;
+}
+
+.celda-vehiculo-patente {
+    -fx-background-color: #d68a9c;
+    -fx-text-fill: #000000;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-padding: 6 12;
+    -fx-background-radius: 4px;
+    -fx-min-width: 110px;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(33, 150, 243, 0.3), 4, 0, 0, 1);
+    -fx-letter-spacing: 1.5px;
+}
+
+.celda-vehiculo-color {
+    -fx-font-size: 13px;
+    -fx-text-fill: #757575;
+    -fx-min-width: 80px;
+    -fx-padding: 5 10;
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 3px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+/* ==========================================
+   ESTADOS
+   ========================================== */
+
+.celda-vehiculo-container:selected {
+    -fx-border-color: #2196F3;
+    -fx-border-width: 2px;
+    -fx-background-color: #e3f2fd;
+}
+
+.celda-vehiculo-container:focused {
+    -fx-border-color: #2196F3;
+    -fx-border-width: 2px;
+}
+
+/* Agregar separadores verticales */
+.celda-vehiculo-marca,
+.celda-vehiculo-modelo,
+.celda-vehiculo-anio {
+    -fx-border-width: 0 1 0 0;
+    -fx-border-color: #e0e0e0;
+    -fx-padding: 0 15 0 0;
+}
+
+.celda-vehiculo-cilindrada {
+    -fx-border-width: 0;
+}

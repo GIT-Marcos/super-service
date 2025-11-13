@@ -29,7 +29,7 @@ public class Orden implements Serializable {
     @Column(name = "total_repuestos")
     private BigDecimal totalRepuestos = BigDecimal.ZERO;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "fk_vehiculo")
     private Vehiculo vehiculo;
 
@@ -37,12 +37,11 @@ public class Orden implements Serializable {
     @JoinColumn(nullable = false, name = "fk_estado_ingreso")
     private EstadoIngreso estadoIngreso;
 
-    @OneToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false, name = "fk_nota_retiro")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "fk_nota_retiro")
     private NotaRetiro notaRetiro;
 
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false, name = "fk_trabajo")
     private Set<Trabajo> trabajos = new HashSet<>();
 
     @OneToOne(mappedBy = "orden")
@@ -78,8 +77,10 @@ public class Orden implements Serializable {
     }
 
     private void calcularTotalRepuestos(NotaRetiro n) {
-        for (DetalleRetiro d : notaRetiro.getDetallesRetiroList()) {
-            totalRepuestos = totalTrabajos.add(d.getSubTotal());
+        if (n != null) {
+            for (DetalleRetiro d : notaRetiro.getDetallesRetiroList()) {
+                totalRepuestos = totalTrabajos.add(d.getSubTotal());
+            }
         }
     }
 

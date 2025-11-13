@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.function.BooleanSupplier;
 
+@Deprecated
 public class StepClienteController implements Initializable, WizardStepController {
 
     private final VehiculoVM vehiculoVM;

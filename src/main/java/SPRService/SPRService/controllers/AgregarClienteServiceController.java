@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-//todo: este controller se repite
 public class AgregarClienteServiceController implements Initializable, ModalController<Cliente> {
 
     private final ClienteServ clienteServ;
@@ -46,10 +45,17 @@ public class AgregarClienteServiceController implements Initializable, ModalCont
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         textFieldListener();
+        configControles();
+    }
+
+    private void configControles() {
         filteredList = new FilteredList<>(obsListCliente, p -> true);
         lvClientes.setItems(filteredList);
         lvClientes.setCellFactory(cell -> new CeldaCliente());
         obsListCliente.setAll(clienteServ.getAllActive());
+
+        String css = getClass().getResource("/styles/celdaCliente.css").toExternalForm();
+        lvClientes.getStylesheets().add(css);
     }
 
     @Override

@@ -31,7 +31,7 @@ public class Service implements Serializable {
     @Column(nullable = false)
     private PrioridadService prioridad;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "fk_cliente")
     private Cliente cliente;
 
@@ -43,12 +43,11 @@ public class Service implements Serializable {
         this.fechaCarga = LocalDateTime.now();
     }
 
-    public Service(Long id, LocalDateTime fechaEntrega, EstadoService estadoService,
-                   PrioridadService prioridad, Cliente cliente, Orden orden) {
-        this.id = id;
+    public Service(LocalDateTime fechaEntrega, PrioridadService prioridad,
+                   Cliente cliente, Orden orden) {
         this.fechaCarga = LocalDateTime.now();
         this.fechaEntrega = fechaEntrega;
-        this.estadoService = estadoService;
+        this.estadoService = EstadoService.PENDIENTE;
         this.prioridad = prioridad;
         this.cliente = cliente;
         this.orden = orden;
