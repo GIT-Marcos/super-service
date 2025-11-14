@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.PrioridadService;
@@ -7,6 +8,7 @@ import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ServiceServ;
+import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.viewModels.tablas.ServiceRowViewModel;
 import com.google.inject.Inject;
@@ -66,7 +68,15 @@ public class ServicesController implements Initializable {
 
     @FXML
     private void buscarConFiltros() {
+        if (ccbPrioridades.getCheckModel().getItemCount() == 0 &&
+                ccbPrioridades.getCheckModel().getItemCount() == 0)
+            return;
 
+        FiltroServiceDTO filtros = new FiltroServiceDTO(
+                ManejadorInputs.codigoVenta(tfCodigo.getText().strip(), false),
+                dpMinima.getValue(), dpMaxima.getValue(),
+                ccbEstados.getCheckModel().getCheckedItems(), ccbPrioridades.getCheckModel().getCheckedItems());
+        cargarTabla(serviceServ.buscarConFiltros(filtros));
     }
 
     @FXML
@@ -85,8 +95,8 @@ public class ServicesController implements Initializable {
         configColumnas();
         tablaServices.setItems(obsListServiceVM);
 
-        dpMinima.setConverter(new SafeLocalDateConverter());
         dpMaxima.setConverter(new SafeLocalDateConverter());
+        dpMinima.setConverter(new SafeLocalDateConverter());
 
         ccbEstados.getItems().setAll(EstadoService.values());
         ccbEstados.getCheckModel().checkAll();

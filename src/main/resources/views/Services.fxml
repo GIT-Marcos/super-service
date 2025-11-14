@@ -21,8 +21,8 @@
       <TableView fx:id="tablaServices" BorderPane.alignment="CENTER">
         <columns>
           <TableColumn fx:id="colCodigo" prefWidth="111.0447690486908" text="Código" />
-          <TableColumn fx:id="colFechaCarga" prefWidth="162.6268310546875" text="Fecha de carga" />
-            <TableColumn fx:id="colFechaEntrega" prefWidth="212.0596923828125" text="Fecha de entrega" />
+          <TableColumn fx:id="colFechaCarga" prefWidth="183.40300750732422" text="Fecha de carga" />
+            <TableColumn fx:id="colFechaEntrega" prefWidth="191.2835693359375" text="Fecha de entrega" />
             <TableColumn fx:id="colEstado" prefWidth="164.05972290039062" text="Estado" />
             <TableColumn fx:id="colPrioridad" prefWidth="171.223876953125" text="Prioridad" />
         </columns>
@@ -50,7 +50,7 @@
             <Button minWidth="150.0" mnemonicParsing="false" onAction="#verTodos" text="Ver todos" GridPane.rowIndex="3" />
             <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
             <Button minWidth="150.0" mnemonicParsing="false" onAction="#buscarConFiltros" text="Buscar con filtros" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <CheckComboBox fx:id="ccbPrioridades" minWidth="150.0" showCheckedCount="true" title="Prioridad..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <CheckComboBox fx:id="ccbPrioridades" minWidth="150.0" showCheckedCount="true" title="Prioridad..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <DatePicker fx:id="dpMinima" promptText="dd/MM/yyyy" GridPane.columnIndex="4" GridPane.rowIndex="2" />
             <DatePicker fx:id="dpMaxima" promptText="dd/MM/yyyy" GridPane.columnIndex="6" GridPane.rowIndex="2" />
             <TextField fx:id="tfCodigo" maxWidth="150.0" prefWidth="50.0" promptText="Código de service..." GridPane.rowIndex="1" />
@@ -75,7 +75,7 @@
                   <Font size="12.0" />
                </font>
             </Label>
-            <CheckComboBox fx:id="ccbEstados" layoutX="211.0" layoutY="42.0" minWidth="150.0" showCheckedCount="true" title="Estados..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <CheckComboBox fx:id="ccbEstados" layoutX="211.0" layoutY="42.0" minWidth="150.0" showCheckedCount="true" title="Estados..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
       </GridPane>
    </top>

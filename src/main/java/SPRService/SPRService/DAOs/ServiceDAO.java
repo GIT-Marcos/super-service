@@ -1,5 +1,6 @@
 package SPRService.SPRService.DAOs;
 
+import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
 
 import java.util.List;
@@ -9,4 +10,5 @@ public interface ServiceDAO extends GenericDAO<Service, Long> {
 
     List<Service> verTodos();
 
+    List<Service> buscarConFiltros(FiltroServiceDTO filtros);
 }
