@@ -25,6 +25,7 @@ import org.controlsfx.control.CheckComboBox;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ServicesController implements Initializable {
@@ -81,7 +82,8 @@ public class ServicesController implements Initializable {
 
     @FXML
     private void nuevoService() {
-        navigator.openModal(Views.CARGAR_SERVICE, "Nuevo service", null);
+        Optional<Service> result = navigator.openModal(Views.CARGAR_SERVICE, "Nuevo service", null);
+        result.ifPresent(service -> obsListServiceVM.addFirst(new ServiceRowViewModel(service)));
     }
 
     private void cargarTabla(List<Service> services) {

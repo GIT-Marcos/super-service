@@ -4,6 +4,7 @@ import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.PrioridadService;
 import SPRService.SPRService.navigation.AppCoordinator;
+import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ServiceServ;
@@ -37,7 +38,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CargarServiceController implements Initializable {
+public class CargarServiceController implements Initializable, ModalController<Service> {
 
     private final Navigator navigator;
     private final ServiceServ serviceServ;
@@ -47,6 +48,7 @@ public class CargarServiceController implements Initializable {
     private Cliente cliente;
     private Vehiculo vehiculo;
     private Orden orden;
+    private Service service;
     private BigDecimal totalService = BigDecimal.ZERO;
 
     @FXML
@@ -75,6 +77,11 @@ public class CargarServiceController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configControles();
+    }
+
+    @Override
+    public Optional<Service> getResult() {
+        return Optional.ofNullable(this.service);
     }
 
     @FXML
@@ -142,23 +149,6 @@ public class CargarServiceController implements Initializable {
         }
     }
 
-    private boolean validar() {
-        if (this.cliente == null) {
-            Alertas.aviso("Cargar service", "Se debe asociar un cliente para el service.");
-            return false;
-        }
-        if (this.vehiculo == null) {
-            Alertas.aviso("Cargar service", "Se debe asociar un vehículo para el service.");
-            return false;
-        }
-        if (this.items.isEmpty()) {
-            Alertas.aviso("Cargar service", "Deben haber repuestos o trabajos" +
-                    " asignados para poder cargar el service.");
-            return false;
-        }
-        return true;
-    }
-
     @FXML
     private void cargarService(ActionEvent event) {
         if (!validar()) return;
@@ -197,7 +187,7 @@ public class CargarServiceController implements Initializable {
                     orden);
 
             if (!Alertas.confirmacion("Cargar service", "¿Está seguro que desea cargar?")) return;
-            serviceServ.cargarService(service);
+            this.service = serviceServ.cargarService(service);
             Alertas.exito("Cargar service", "Se ha cargado el service con éxito.");
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
@@ -208,6 +198,23 @@ public class CargarServiceController implements Initializable {
             Alertas.error("Cargar service", e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private boolean validar() {
+        if (this.cliente == null) {
+            Alertas.aviso("Cargar service", "Se debe asociar un cliente para el service.");
+            return false;
+        }
+        if (this.vehiculo == null) {
+            Alertas.aviso("Cargar service", "Se debe asociar un vehículo para el service.");
+            return false;
+        }
+        if (this.items.isEmpty()) {
+            Alertas.aviso("Cargar service", "Deben haber repuestos o trabajos" +
+                    " asignados para poder cargar el service.");
+            return false;
+        }
+        return true;
     }
 
     private void configControles() {
