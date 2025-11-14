@@ -21,14 +21,13 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
 
 
     @Override
-    public Set<Service> verTodos() {
+    public List<Service> verTodos() {
         EntityManager em = emProvider.get();
-        List<Service> services = em.createQuery("SELECT DISTINCT s FROM Service s " +
+        return em.createQuery("SELECT DISTINCT s FROM Service s " +
                                 "JOIN FETCH s.orden o " +
                                 "JOIN FETCH o.trabajos " +
                                 "ORDER BY s.fechaCarga ASC",
                         Service.class)
                 .getResultList();
-        return new HashSet<>(services);
     }
 }

@@ -1,0 +1,104 @@
+package SPRService.SPRService.viewModels.tablas;
+
+import SPRService.SPRService.entities.Service;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class ServiceRowViewModel {
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    private final Service service;
+
+    private final LongProperty codigo;
+    private final StringProperty fechaCarga;
+    private final StringProperty fechaEntrega;
+    private final StringProperty estado;
+    private final StringProperty prioridad;
+
+    public ServiceRowViewModel(Service s) {
+        this.service = s;
+        this.codigo = new SimpleLongProperty(s.getId());
+        this.fechaCarga = new SimpleStringProperty(formatearFecha(s.getFechaCarga()));
+        this.fechaEntrega = new SimpleStringProperty(formatearFecha(s.getFechaEntrega()));
+        this.estado = new SimpleStringProperty(s.getEstadoService().toString());
+        this.prioridad = new SimpleStringProperty(s.getPrioridad().toString());
+    }
+
+    public void updateEntity(Service s) {
+        this.service.setId(s.getId());
+        this.service.setFechaCarga(s.getFechaCarga());
+        this.service.setFechaEntrega(s.getFechaEntrega());
+        this.service.setEstadoService(s.getEstadoService());
+        this.service.setPrioridad(s.getPrioridad());
+        this.service.setCliente(s.getCliente());
+        this.service.setOrden(s.getOrden());
+        // Propiedades VM
+        this.codigo.set(s.getId());
+        this.fechaCarga.set(s.getFechaCarga().toString());
+        this.fechaEntrega.set(s.getFechaEntrega().toString());
+        this.estado.set(s.getEstadoService().toString());
+        this.prioridad.set(s.getPrioridad().toString());
+    }
+
+    /**
+     * Para formatear la fecha o devolver un texto por defecto si es nula.
+     * @param dateTime La fecha y hora a formatear.
+     * @return El string formateado o "-" si la fecha es nula.
+     */
+    private String formatearFecha(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "-";
+        }
+        return dateTime.format(FORMATTER);
+    }
+
+    public Service getService() {
+        return service;
+    }
+
+    public long getCodigo() {
+        return codigo.get();
+    }
+
+    public LongProperty codigoProperty() {
+        return codigo;
+    }
+
+    public String getFechaCarga() {
+        return fechaCarga.get();
+    }
+
+    public StringProperty fechaCargaProperty() {
+        return fechaCarga;
+    }
+
+    public String getFechaEntrega() {
+        return fechaEntrega.get();
+    }
+
+    public StringProperty fechaEntregaProperty() {
+        return fechaEntrega;
+    }
+
+    public String getEstado() {
+        return estado.get();
+    }
+
+    public StringProperty estadoProperty() {
+        return estado;
+    }
+
+    public String getPrioridad() {
+        return prioridad.get();
+    }
+
+    public StringProperty prioridadProperty() {
+        return prioridad;
+    }
+}

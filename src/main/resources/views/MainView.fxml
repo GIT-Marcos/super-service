@@ -61,6 +61,14 @@
                   </ImageView>
                </graphic>
             </Button>
+            <Button layoutX="20.0" layoutY="175.0" maxWidth="1.7976931348623157E308" onAction="#irVerOrdenes" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Ver services">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../imgs/service.png" />
+                     </image></ImageView>
+               </graphic>
+            </Button>
             <Button layoutX="20.0" layoutY="226.0" maxWidth="1.7976931348623157E308" onAction="#irClientes" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Clientes">
                <graphic>
                   <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
@@ -70,14 +78,6 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Button layoutX="20.0" layoutY="123.0" maxWidth="1.7976931348623157E308" onAction="#irNuevoService" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Crear service">
-               <graphic>
-                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../imgs/service.png" />
-                     </image>
-                  </ImageView>
-               </graphic></Button>
             <Button layoutX="20.0" layoutY="278.0" maxWidth="1.7976931348623157E308" onAction="#cerrarSesion" styleClass="nav-btn" stylesheets="@../styles/styles.css" text="Cerrar sesión" />
             </children>
         </VBox>

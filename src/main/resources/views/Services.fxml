@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.CheckComboBox?>
+
+<BorderPane maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #313b4f;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ServicesController">
+   <center>
+      <TableView fx:id="tablaServices" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="colCodigo" prefWidth="111.0447690486908" text="Código" />
+          <TableColumn fx:id="colFechaCarga" prefWidth="162.6268310546875" text="Fecha de carga" />
+            <TableColumn fx:id="colFechaEntrega" prefWidth="212.0596923828125" text="Fecha de entrega" />
+            <TableColumn fx:id="colEstado" prefWidth="164.05972290039062" text="Estado" />
+            <TableColumn fx:id="colPrioridad" prefWidth="171.223876953125" text="Prioridad" />
+        </columns>
+      </TableView>
+   </center>
+   <top>
+      <GridPane prefHeight="130.0" prefWidth="990.0" BorderPane.alignment="CENTER">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Button minWidth="150.0" mnemonicParsing="false" onAction="#verTodos" text="Ver todos" GridPane.rowIndex="3" />
+            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
+            <Button minWidth="150.0" mnemonicParsing="false" onAction="#buscarConFiltros" text="Buscar con filtros" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <CheckComboBox fx:id="ccbPrioridades" minWidth="150.0" showCheckedCount="true" title="Prioridad..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <DatePicker fx:id="dpMinima" promptText="dd/MM/yyyy" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <DatePicker fx:id="dpMaxima" promptText="dd/MM/yyyy" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+            <TextField fx:id="tfCodigo" maxWidth="150.0" prefWidth="50.0" promptText="Código de service..." GridPane.rowIndex="1" />
+            <Label text="Filtros para buscar:" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Separator prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+            <Label text="Fecha de carga" textFill="WHITE" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.halignment="CENTER">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label text="Mínima" textFill="WHITE" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <Label layoutX="445.0" layoutY="47.0" text="Máxima" textFill="WHITE" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <CheckComboBox fx:id="ccbEstados" layoutX="211.0" layoutY="42.0" minWidth="150.0" showCheckedCount="true" title="Estados..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
+   </top>
+   <right>
+      <VBox alignment="TOP_CENTER" maxWidth="170.0" minWidth="170.0" prefHeight="490.0" prefWidth="170.0" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#nuevoService" prefWidth="160.0" text="Nuevo service..." />
+            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Ver detalles" />
+            <Button layoutX="15.0" layoutY="82.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Agregar pago" />
+            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Dar de baja" />
+            <Separator prefWidth="200.0" />
+            <Label text="Generación de reportes" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Total ingresos" />
+         </children></VBox>
+   </right>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</BorderPane>

@@ -13,6 +13,8 @@ public enum Views {
     NOTAS_RETIRO("/views/NotasRetiro.fxml", NotasRetiroController.class),
     VEHICULOS("/views/Vehiculos.fxml", VehiculosController.class),
     CLIENTES("/views/Clientes.fxml", ClienteController.class),
+    SERVICES("/views/Services.fxml", ServicesController.class),
+
     // Ventanas NO modales
     CARGAR_SERVICE("/views/CargarService.fxml", CargarServiceController.class),
 

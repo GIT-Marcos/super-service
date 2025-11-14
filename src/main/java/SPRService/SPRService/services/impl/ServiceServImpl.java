@@ -26,7 +26,7 @@ public class ServiceServImpl implements ServiceServ {
 
     @Transactional
     @Override
-    public Set<Service> verTodos() {
+    public List<Service> verTodos() {
         return daoService.verTodos();
     }
 
