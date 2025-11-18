@@ -52,16 +52,20 @@ public class Pago implements Serializable {
     //ENUM ESTADO PAGO
     //RELACIÓN CON VENTAsERVICE
     //RELACIÓN BI CON VENTA REPUESTO
-    //todo: no valida optional
+    //todo: INVERTIR RELACIÓN
     @ManyToOne(optional = false)
     private VentaRepuesto ventaRepuesto;
+
+    @ManyToOne()
+    @JoinColumn(name = "fk_service")
+    private Service service;
 
     public Pago() {
     }
 
     public Pago(Long id, String dni, BigDecimal montoPagado, String marcaTarjeta,
                 String banco, String referencia, BigDecimal descuento, String ultimos4, MetodosPago MetodoPago,
-                VentaRepuesto ventaRepuesto) {
+                VentaRepuesto ventaRepuesto, Service service) {
         this.id = id;
         this.dni = dni;
         this.fechaPago = LocalDate.now();
@@ -74,6 +78,7 @@ public class Pago implements Serializable {
         this.activo = Boolean.TRUE;
         this.MetodoPago = MetodoPago;
         this.ventaRepuesto = ventaRepuesto;
+        this.service = service;
     }
 
     public Long getId() {
@@ -170,6 +175,14 @@ public class Pago implements Serializable {
 
     public void setVentaRepuesto(VentaRepuesto ventaRepuesto) {
         this.ventaRepuesto = ventaRepuesto;
+    }
+
+    public Service getService() {
+        return service;
+    }
+
+    public void setService(Service service) {
+        this.service = service;
     }
 
     @Override

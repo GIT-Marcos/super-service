@@ -128,7 +128,7 @@ public class PagoController implements Initializable, DataReceiver<VentaRepuesto
 
         //todo: hacer bien esto con patrón diseño y herencia de pago y los métodos de pago
         pagoParaCargar = new Pago(null, null, montoPagar, marcaTarjeta, bancoTarjeta, nroReferencia,
-                porcentajeDescuento, ultimos4, metodosPago, this.venta);
+                porcentajeDescuento, ultimos4, metodosPago, this.venta, null);
         this.venta.asociarPago(pagoParaCargar);
 
         try {
