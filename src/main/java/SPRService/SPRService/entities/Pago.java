@@ -53,7 +53,7 @@ public class Pago implements Serializable {
     //RELACIÓN CON VENTAsERVICE
     //RELACIÓN BI CON VENTA REPUESTO
     //todo: INVERTIR RELACIÓN
-    @ManyToOne(optional = false)
+    @ManyToOne()
     private VentaRepuesto ventaRepuesto;
 
     @ManyToOne()

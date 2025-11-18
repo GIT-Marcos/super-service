@@ -13,7 +13,7 @@ import java.util.List;
 //TODO: separar el código de la venta (id) y agregar código de factura con letras y números.
 @Entity
 @Table(name = "ventas_repuestos")
-public class VentaRepuesto implements Serializable {
+public class VentaRepuesto implements Serializable, Transaccion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -142,15 +142,15 @@ public class VentaRepuesto implements Serializable {
         this.estadoVenta = EstadoVentaRepuesto.CANCELADO;
     }
 
+    @Override
     public void asociarPago(Pago pago) {
         this.getPagosList().add(pago);
         pago.setVentaRepuesto(this);
-
         this.montoFaltante = this.montoFaltante.subtract(pago.getMontoPagado());
-        calcularEstadoVenta();
         if (this.montoFaltante.compareTo(BigDecimal.ZERO) < 0) {
             this.montoFaltante = BigDecimal.ZERO;
         }
+        calcularEstadoVenta();
     }
 
     private void calculaMontoTotal() {

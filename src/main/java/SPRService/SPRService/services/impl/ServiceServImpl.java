@@ -51,7 +51,7 @@ public class ServiceServImpl implements ServiceServ {
     @Transactional
     @Override
     public Service modificarService(Service s) {
-        return null;
+        return daoService.update(s);
     }
 
     @Transactional

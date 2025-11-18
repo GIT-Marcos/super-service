@@ -13,7 +13,7 @@ import java.util.Set;
 //todo: agregarle usuario que la registra
 @Entity
 @Table(name = "services")
-public class Service implements Serializable {
+public class Service implements Serializable, Transaccion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,6 +76,7 @@ public class Service implements Serializable {
         o.setService(this);
     }
 
+    @Override
     public void asociarPago(Pago p) {
         this.pagos.add(p);
         p.setService(this);
@@ -84,14 +85,12 @@ public class Service implements Serializable {
             if (this.montoFaltante.compareTo(BigDecimal.ZERO) < 0) {
                 this.montoFaltante = BigDecimal.ZERO;
             }
-            calcularEstadoSaldo();
         }
+        calcularEstadoSaldo();
     }
 
     private void calcularEstadoSaldo() {
         if (pagos != null && !pagos.isEmpty()) {
-            estadoService = EstadoService.PAGO_PENDIENTE;
-        } else {
             if (this.montoFaltante.compareTo(BigDecimal.ZERO) <= 0) {
                 estadoService = EstadoService.PAGADO;
             } else {
