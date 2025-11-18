@@ -1,6 +1,7 @@
 package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.ServiceDAO;
+import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.services.ServiceServ;
@@ -9,8 +10,6 @@ import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
 import java.util.List;
-import java.util.Set;
-
 
 public class ServiceServImpl implements ServiceServ {
 
@@ -26,14 +25,14 @@ public class ServiceServImpl implements ServiceServ {
 
     @Transactional
     @Override
-    public Set<Service> verTodos() {
+    public List<Service> verTodos() {
         return daoService.verTodos();
     }
 
     @Transactional
     @Override
-    public List<Service> buscarConFiltros() {
-        return List.of();
+    public List<Service> buscarConFiltros(FiltroServiceDTO filtros) {
+        return daoService.buscarConFiltros(filtros);
     }
 
     @Transactional

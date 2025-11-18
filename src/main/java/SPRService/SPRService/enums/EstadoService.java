@@ -18,8 +18,6 @@ public enum EstadoService {
 
     @Override
     public String toString() {
-        return "EstadoService{" +
-                "nombreEstado='" + nombreEstado + '\'' +
-                '}';
+        return nombreEstado;
     }
 }

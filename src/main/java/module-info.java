@@ -14,6 +14,7 @@ module navegador2.SPRService {
     requires javafx.swing;
     requires org.controlsfx.controls;
     requires javafx.base;
+    requires javafx.controls;
 
     // Abre paquetes a FXML/FX Base para reflexión
     opens SPRService.SPRService to javafx.fxml;
