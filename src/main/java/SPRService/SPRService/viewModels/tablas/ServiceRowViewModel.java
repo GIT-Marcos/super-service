@@ -20,6 +20,8 @@ public class ServiceRowViewModel {
     private final StringProperty fechaEntrega;
     private final StringProperty estado;
     private final StringProperty prioridad;
+    private final StringProperty montoFaltante;
+    private final StringProperty montoTotal;
 
     public ServiceRowViewModel(Service s) {
         this.service = s;
@@ -28,6 +30,8 @@ public class ServiceRowViewModel {
         this.fechaEntrega = new SimpleStringProperty(formatearFecha(s.getFechaEntrega()));
         this.estado = new SimpleStringProperty(s.getEstadoService().toString());
         this.prioridad = new SimpleStringProperty(s.getPrioridad().toString());
+        this.montoFaltante = new SimpleStringProperty("$ " + s.getMontoFaltante());
+        this.montoTotal = new SimpleStringProperty("$ " + s.getMontoTotal());
     }
 
     public void updateEntity(Service s) {
@@ -38,12 +42,16 @@ public class ServiceRowViewModel {
         this.service.setPrioridad(s.getPrioridad());
         this.service.setCliente(s.getCliente());
         this.service.setOrden(s.getOrden());
+        this.service.setMontoTotal(s.getMontoTotal());
+        this.service.setMontoFaltante(s.getMontoFaltante());
         // Propiedades VM
         this.codigo.set(s.getId());
         this.fechaCarga.set(s.getFechaCarga().toString());
         this.fechaEntrega.set(s.getFechaEntrega().toString());
         this.estado.set(s.getEstadoService().toString());
         this.prioridad.set(s.getPrioridad().toString());
+        this.montoFaltante.set("$ " + s.getMontoFaltante());
+        this.montoTotal.set("$ " + s.getMontoTotal());
     }
 
     /**
@@ -100,5 +108,21 @@ public class ServiceRowViewModel {
 
     public StringProperty prioridadProperty() {
         return prioridad;
+    }
+
+    public String getMontoFaltante() {
+        return montoFaltante.get();
+    }
+
+    public StringProperty montoFaltanteProperty() {
+        return montoFaltante;
+    }
+
+    public String getMontoTotal() {
+        return montoTotal.get();
+    }
+
+    public StringProperty montoTotalProperty() {
+        return montoTotal;
     }
 }

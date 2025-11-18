@@ -2,6 +2,7 @@ package SPRService.SPRService.enums;
 
 public enum EstadoService {
 
+    CANCELADO("Cancelado"),
     PENDIENTE("Pendiente"),
     EN_ESPERA("En espera"),
     TRABAJANDO("Trabajando"),

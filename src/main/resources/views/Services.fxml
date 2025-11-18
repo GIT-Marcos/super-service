@@ -20,11 +20,13 @@
    <center>
       <TableView fx:id="tablaServices" BorderPane.alignment="CENTER">
         <columns>
-          <TableColumn fx:id="colCodigo" prefWidth="111.0447690486908" text="Código" />
-          <TableColumn fx:id="colFechaCarga" prefWidth="183.40300750732422" text="Fecha de carga" />
-            <TableColumn fx:id="colFechaEntrega" prefWidth="191.2835693359375" text="Fecha de entrega" />
-            <TableColumn fx:id="colEstado" prefWidth="164.05972290039062" text="Estado" />
-            <TableColumn fx:id="colPrioridad" prefWidth="171.223876953125" text="Prioridad" />
+          <TableColumn fx:id="colCodigo" prefWidth="76.65670704841614" text="Código" />
+          <TableColumn fx:id="colFechaCarga" prefWidth="134.68653106689453" text="Fecha de carga" />
+            <TableColumn fx:id="colFechaEntrega" prefWidth="148.29844665527344" text="Fecha de entrega" />
+            <TableColumn fx:id="colEstado" prefWidth="113.19403076171875" text="Estado" />
+            <TableColumn fx:id="colPrioridad" prefWidth="117.4925537109375" text="Prioridad" />
+            <TableColumn fx:id="colMontoFaltante" prefWidth="116.05975341796875" text="Monto faltante" />
+            <TableColumn fx:id="colMontoTotal" prefWidth="111.7611083984375" text="Monto total" />
         </columns>
       </TableView>
    </center>
@@ -84,7 +86,7 @@
          <children>
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#nuevoService" prefWidth="160.0" text="Nuevo service..." />
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Ver detalles" />
-            <Button layoutX="15.0" layoutY="82.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Agregar pago" />
+            <Button layoutX="15.0" layoutY="82.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#agregarPago" prefWidth="160.0" text="Agregar pago" />
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Dar de baja" />
             <Separator prefWidth="200.0" />
             <Label text="Generación de reportes" textFill="WHITE">

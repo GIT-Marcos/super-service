@@ -47,6 +47,8 @@ public class Vehiculo implements Serializable {
     @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
 
+    //todo: hacer bidireccional con service
+
     public Vehiculo() {
     }
 

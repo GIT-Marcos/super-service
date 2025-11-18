@@ -2,8 +2,6 @@ package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.ServiceDAO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
-import SPRService.SPRService.entities.Cliente;
-import SPRService.SPRService.entities.Orden;
 import SPRService.SPRService.entities.Service;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -29,6 +27,7 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
         return em.createQuery("SELECT DISTINCT s FROM Service s " +
                                 "JOIN FETCH s.orden o " +
                                 "JOIN FETCH o.trabajos " +
+                                "LEFT JOIN FETCH s.pagos " +
                                 "ORDER BY s.fechaCarga ASC",
                         Service.class)
                 .getResultList();
@@ -41,8 +40,11 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
 
         CriteriaQuery<Service> query = cb.createQuery(Service.class);
         Root<Service> root = query.from(Service.class);
-        Join<Service, Cliente> joinCliente = root.join("cliente", JoinType.LEFT);
-        Join<Service, Orden> joinOrden = root.join("orden", JoinType.LEFT);
+        query.distinct(true);
+        //todo: usar este formato en los otros
+        root.fetch("cliente", JoinType.LEFT);
+        root.fetch("orden", JoinType.LEFT).fetch("trabajos", JoinType.LEFT);
+        root.fetch("pagos", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
         //todo: agregar estado a los services

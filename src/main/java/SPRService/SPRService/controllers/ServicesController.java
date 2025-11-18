@@ -10,6 +10,7 @@ import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
+import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.viewModels.tablas.ServiceRowViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -47,7 +48,8 @@ public class ServicesController implements Initializable {
     @FXML
     private TableColumn<Long, Long> colCodigo;
     @FXML
-    private TableColumn<String, String> colFechaCarga, colFechaEntrega, colEstado, colPrioridad;
+    private TableColumn<String, String> colFechaCarga, colFechaEntrega, colEstado, colPrioridad, colMontoFaltante,
+            colMontoTotal;
 
     @Inject
     public ServicesController(AppCoordinator coordinator, ServiceServ serviceServ) {
@@ -86,6 +88,19 @@ public class ServicesController implements Initializable {
         result.ifPresent(service -> obsListServiceVM.addFirst(new ServiceRowViewModel(service)));
     }
 
+    @FXML
+    private void agregarPago() {
+        SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            Alertas.aviso("Agregar pago", "Debe seleccionar un service para agregarle el pago.");
+            return;
+        }
+        Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", vm.getService());
+        if (result.isPresent()) {
+            obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(result.get()));
+        }
+    }
+
     private void cargarTabla(List<Service> services) {
         obsListServiceVM.clear();
         for (Service s : services) {
@@ -112,5 +127,7 @@ public class ServicesController implements Initializable {
         colFechaEntrega.setCellValueFactory(new PropertyValueFactory<>("fechaEntrega"));
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
         colPrioridad.setCellValueFactory(new PropertyValueFactory<>("prioridad"));
+        colMontoFaltante.setCellValueFactory(new PropertyValueFactory<>("montoFaltante"));
+        colMontoTotal.setCellValueFactory(new PropertyValueFactory<>("montoTotal"));
     }
 }
