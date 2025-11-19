@@ -167,7 +167,8 @@ public class NuevaVentaController implements Initializable {
 
     @FXML
     private void pagar() {
-        NotaRetiro notaRetiro = new NotaRetiro(null, tablaDetallesVentaController.getDetalles());
+        NotaRetiro notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA,
+                tablaDetallesVentaController.getDetalles());
         VentaRepuesto ventaRepuesto = new VentaRepuesto(null, notaRetiro, new ArrayList<>());
         Optional<VentaRepuesto> optional = navigator.openModal(
                 Views.PAGO, "Pago", ventaRepuesto);

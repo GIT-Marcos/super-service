@@ -173,7 +173,7 @@ public class CargarServiceController implements Initializable, ModalController<S
             if (obtenerDetalles().isEmpty()) {
                 orden.setNotaRetiro(null);
             } else {
-                orden.setNotaRetiro(new NotaRetiro(null, obtenerDetalles()));
+                orden.setNotaRetiro(new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, obtenerDetalles()));
             }
             if (obtenerTrabajos().isEmpty()) {
                 Alertas.aviso("Cargar service", "Debe agregar al menos 1 trabajo para " +
