@@ -7,9 +7,12 @@ import java.util.List;
 
 public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
 
-    /////////////////////LECTURA
+    // __     ____   ___ ______ __ __ ____   ___
+    // ||    ||     //   | || | || || || \\ // \\
+    // ||    ||==  ((      ||   || || ||_// ||=||
+    // ||__| ||___  \\__   ||   \\_// || \\ || ||
 
-    List<Repuesto> allActiveProducts();
+    List<Repuesto> todosProductosActivos();
 
     /**
      * Cuenta los repuestos que tienen menor stock existente que stock mínimo
@@ -19,37 +22,19 @@ public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
      */
     Long cuentaRespBajoStock();
 
-    /**
-     * Para saber como proceder en la carga o modificación de un producto.
-     *
-     * @param codBarra a consultar.
-     * @return null: si el producto que se quiere cargar no existe ya; true: si
-     * el producto ya existe y está activo; false: si el producto ya existe pero
-     * con borrado lógico.
-     */
-    List<Boolean> consultaEstado(String codBarra);
-
-    Long consultarId(String codBarra);
-
-    /**
-     * @param stockNormal si el stock existente es MAYOR q el mínimo
-     * @param stockBajo   si el stock existente es MENOR q el mínimo
-     */
-    @Deprecated
-    List<Repuesto> buscarConFiltros(String inputParaBuscar, Integer opcionBusqueda,
-                                    Boolean stockNormal, Boolean stockBajo, String nombreColumnaOrnenar, Integer tipoOrden);
-
+    //todo: usar dto filtro y paginar
     List<Repuesto> buscarConCriteria(String codBarras, String nombreProd, String marcaProd,
                                      Boolean verStockNormal, Boolean verStockBajo, String colParaOrdenar,
                                      Integer tipoOrden);
+
+    // ____   ____ ____    ___   ____  ______  ____  __
+    // || \\ ||    || \\  // \\  || \\ | || | ||    (( \
+    // ||_// ||==  ||_// ((   )) ||_//   ||   ||==   \\
+    // || \\ ||___ ||     \\_//  || \\   ||   ||___ \_))
 
     /**
      * Para generar un reporte.
      * Qué productos son los que más veces se retiran entre fechas.
      */
     List<Object[]> masRetiradosParaVenta(Integer cantidad, LocalDate fechaInicio, LocalDate fechaFin);
-
-    //////////////////////ESCRITURA
-
-    void borradoLogico(Repuesto repuesto);
 }

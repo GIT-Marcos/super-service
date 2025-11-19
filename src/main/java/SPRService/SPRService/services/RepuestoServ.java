@@ -16,17 +16,18 @@ public interface RepuestoServ {
                                      Boolean verStockNormal, Boolean verStockBajo,
                                      String colParaOrdenar, Integer tipoOrden);
 
-    List<RepuestoRetiradoReporteDTO> repuestosMasRetiradosParaVenta(Integer cantidad, LocalDate fechaMin,
-                                                                    LocalDate fechaMax);
-
     Repuesto cargarRepuesto(Repuesto repuesto);
 
     Repuesto modificarRepuesto(Repuesto repuesto);
 
     void borrarRepuesto(Repuesto repuesto);
 
-    @Deprecated
-    List<Repuesto> buscarConFiltros(String inputParaBuscar, Integer opcionBusqueda,
-                                    Boolean stockNormal, Boolean stockBajo, String nombreColumnaOrnenar,
-                                    Integer tipoOrden);
+    // ____   ____ ____    ___   ____  ______  ____  __
+    // || \\ ||    || \\  // \\  || \\ | || | ||    (( \
+    // ||_// ||==  ||_// ((   )) ||_//   ||   ||==   \\
+    // || \\ ||___ ||     \\_//  || \\   ||   ||___ \_))
+
+    List<RepuestoRetiradoReporteDTO> repuestosMasRetiradosParaVenta(Integer cantidad, LocalDate fechaMin,
+                                                                    LocalDate fechaMax);
+
 }
