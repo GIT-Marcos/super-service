@@ -94,7 +94,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Total ingresos" />
+            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#reportesAnuales" prefWidth="160.0" text="Reportes anuales" />
          </children></VBox>
    </right>
    <padding>

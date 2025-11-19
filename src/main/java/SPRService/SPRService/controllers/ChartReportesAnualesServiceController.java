@@ -1,8 +1,9 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
-import SPRService.SPRService.services.VentaRepuestoServ;
+import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
 import com.google.inject.Inject;
@@ -32,24 +33,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class ChartTotalVentasAnioController implements Initializable {
+//TODO: CONTROLADOR IDÉNTICO AL DE VENTA
+public class ChartReportesAnualesServiceController implements Initializable {
 
-    private final VentaRepuestoServ ventaRepuestoServ;
+    private final ServiceServ serviceServ;
     private final String[] nombresMesesAbreviados = {
             "Ene", "Feb", "Mar", "Abr", "May", "Jun",
             "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
     };
 
     @FXML
+    private Label lblIngresosTotales, lblPromedioIngresosPorService, lblCantidadDeServicesAnio, lblIngresosPorTrabajos,
+            lblIngresosPorRepuestos;
+    @FXML
     private Spinner<Integer> spinnerAnio;
     @FXML
     private AreaChart<String, Number> chart;
-    @FXML
-    private Label lblIngresosTotales, lblTitulo, lblCantidadDeVentasAnio, lblPromedioIngresosPorVenta;
 
     @Inject
-    public ChartTotalVentasAnioController(VentaRepuestoServ ventaRepuestoServ) {
-        this.ventaRepuestoServ = ventaRepuestoServ;
+    public ChartReportesAnualesServiceController(ServiceServ serviceServ) {
+        this.serviceServ = serviceServ;
     }
 
     @Override
@@ -60,19 +63,21 @@ public class ChartTotalVentasAnioController implements Initializable {
     @FXML
     private void generarReporteIngresos() {
         int nroAnio = spinnerAnio.getValue();
-        this.poblarChartIngresos(ventaRepuestoServ.reporteTotalVentasEnAnio(nroAnio));
+        poblarChartIngresos(serviceServ.totalIngresosAnual(nroAnio));
+        poblarLabels();
     }
 
     @FXML
     private void generarReporteCantidad() {
         int nroAnio = spinnerAnio.getValue();
-        poblarChartCantidad(ventaRepuestoServ.reporteCantidadVentasEnAnio(nroAnio));
+        poblarChartCantidad(serviceServ.cantidadDeServicesAnual(nroAnio));
+        poblarLabels();
     }
 
     @FXML
     private void exportarJPG(ActionEvent event) {
         File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta para exportar el reporte",
-                "Reporte total ventas año " + spinnerAnio.getValue(),
+                "Reporte total service año " + spinnerAnio.getValue(),
                 new FileChooser.ExtensionFilter("Imágenes JPG (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
         if (file == null) return;
 
@@ -99,12 +104,41 @@ public class ChartTotalVentasAnioController implements Initializable {
         }
     }
 
-    private void llenarInfoDelAnio() {
-        int anio = spinnerAnio.getValue();
-        lblTitulo.setText("Información del año: " + anio);
-        lblCantidadDeVentasAnio.setText(ventaRepuestoServ.cantidadDeVentasEnAnio(anio) + " ventas");
-        lblIngresosTotales.setText("$ " + ventaRepuestoServ.ingresosDeVentasEnAnio(anio));
-        lblPromedioIngresosPorVenta.setText("$ " + ventaRepuestoServ.ingresosPromedioPorVentaEnAnio(anio));
+    private void poblarLabels() {
+        int ano = spinnerAnio.getValue();
+        DatosReporteServiceDTO dto = serviceServ.generarDatosAnuales(ano);
+        lblIngresosTotales.setText("$ " + dto.ingTotales());
+        lblPromedioIngresosPorService.setText("$ " + dto.ingPromedioPorService());
+        lblCantidadDeServicesAnio.setText(dto.cantidadDeService().toString());
+        lblIngresosPorTrabajos.setText("$ " + dto.ingPorTrabajos());
+        lblIngresosPorRepuestos.setText("$ " + dto.ingPorRepuestos());
+    }
+
+    private void poblarChartIngresos(List<ReporteIngresosEnAnioPorMesDTO> dtos) {
+        if (!limpiaChartYVerificaDTO(dtos)) return;
+
+        // 1. Crear un mapa para acceder fácilmente a las ventas de cada mes.
+        //    La clave es el número del mes (Integer), el valor es el monto (BigDecimal).
+        Map<Integer, BigDecimal> ventasPorMes = new HashMap<>();
+        for (ReporteIngresosEnAnioPorMesDTO dto : dtos) {
+            ventasPorMes.put(dto.nroMes(), dto.totalVendido());
+        }
+
+        // 3. Crear la serie de datos, iterando por los 12 meses del año.
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Total INGRESOS de ventas por mes en " + spinnerAnio.getValue());
+
+        for (int mes = 1; mes <= 12; mes++) {
+            // Obtenemos el monto del mapa. Si no existe, usamos cero.
+            BigDecimal monto = ventasPorMes.getOrDefault(mes, BigDecimal.ZERO);
+            // Usamos el array de abreviaturas para la etiqueta del eje X.
+            String etiquetaMes = nombresMesesAbreviados[mes - 1]; // mes 1 -> índice 0
+            // Añadimos el dato al gráfico.
+            series.getData().add(new XYChart.Data<>(etiquetaMes, monto));
+        }
+
+        // 4. Añadir la serie completa al gráfico.
+        chart.getData().add(series);
     }
 
     private void poblarChartCantidad(List<ReporteCantidadEnAnioDTO> ventasDTO) {
@@ -134,33 +168,6 @@ public class ChartTotalVentasAnioController implements Initializable {
         chart.getData().add(series);
     }
 
-    private void poblarChartIngresos(List<ReporteIngresosEnAnioPorMesDTO> ventasDTO) {
-        if (!limpiaChartYVerificaDTO(ventasDTO)) return;
-
-        // 1. Crear un mapa para acceder fácilmente a las ventas de cada mes.
-        //    La clave es el número del mes (Integer), el valor es el monto (BigDecimal).
-        Map<Integer, BigDecimal> ventasPorMes = new HashMap<>();
-        for (ReporteIngresosEnAnioPorMesDTO dto : ventasDTO) {
-            ventasPorMes.put(dto.nroMes(), dto.totalVendido());
-        }
-
-        // 3. Crear la serie de datos, iterando por los 12 meses del año.
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Total INGRESOS de ventas por mes en " + spinnerAnio.getValue());
-
-        for (int mes = 1; mes <= 12; mes++) {
-            // Obtenemos el monto del mapa. Si no existe, usamos cero.
-            BigDecimal monto = ventasPorMes.getOrDefault(mes, BigDecimal.ZERO);
-            // Usamos el array de abreviaturas para la etiqueta del eje X.
-            String etiquetaMes = nombresMesesAbreviados[mes - 1]; // mes 1 -> índice 0
-            // Añadimos el dato al gráfico.
-            series.getData().add(new XYChart.Data<>(etiquetaMes, monto));
-        }
-
-        // 4. Añadir la serie completa al gráfico.
-        chart.getData().add(series);
-    }
-
     private boolean limpiaChartYVerificaDTO(List<?> dtoList) {
         chart.getData().clear();
         if (dtoList == null) {
@@ -172,7 +179,7 @@ public class ChartTotalVentasAnioController implements Initializable {
             return false;
         } else {
             Alertas.exito("Generación de reporte", "Se ha generado el reporte con éxito.");
-            llenarInfoDelAnio();
+            //llenarInfoDelAnio();
             return true;
         }
     }

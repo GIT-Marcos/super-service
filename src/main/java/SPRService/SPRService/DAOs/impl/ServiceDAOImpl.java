@@ -1,8 +1,10 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.ServiceDAO;
+import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
+import SPRService.SPRService.enums.EstadoService;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import jakarta.persistence.EntityManager;
@@ -15,6 +17,7 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
 
     @Inject
     Provider<EntityManager> emProvider;
+    private final String DTO = "SPRService.SPRService.DTOs.DatosReporteServiceDTO";
 
     public ServiceDAOImpl() {
         super(Service.class);
@@ -71,5 +74,56 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
 
         query.where(cb.and(predicates.toArray(predicates.toArray(new Predicate[0]))));
         return em.createQuery(query).getResultList();
+    }
+
+    @Override
+    public List<Object[]> totalIngresosAnual(Integer anio) {
+        EntityManager em = emProvider.get();
+
+        return em.createQuery(
+                        "SELECT MONTH(s.fechaCarga), SUM(s.montoTotal) " +
+                                "FROM Service s " +
+                                "WHERE YEAR(s.fechaCarga) = :anio " +
+                                "AND s.estadoService = :estado " +
+                                "GROUP BY MONTH(s.fechaCarga) " +
+                                "ORDER BY MONTH(s.fechaCarga) ASC",
+                        Object[].class)
+                .setParameter("anio", anio)
+                .setParameter("estado", EstadoService.PAGADO)
+                .getResultList();
+    }
+
+    @Override
+    public List<Object[]> cantidadDeServicesAnual(Integer anio) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("SELECT MONTH(s.fechaCarga), COUNT(s.montoTotal) " +
+                                "FROM Service s " +
+                                "WHERE YEAR(s.fechaCarga) = :anio " +
+                                "AND s.estadoService = :estado " +
+                                "GROUP BY MONTH(s.fechaCarga) " +
+                                "ORDER BY MONTH(s.fechaCarga) ASC",
+                        Object[].class)
+                .setParameter("anio", anio)
+                .setParameter("estado", EstadoService.PAGADO)
+                .getResultList();
+    }
+
+    @Override
+    public DatosReporteServiceDTO generarDatosAnuales(Integer anio) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("SELECT new " + DTO + "(" +
+                                "  SUM(s.montoTotal), " +
+                                "  AVG(s.montoTotal), " +
+                                "  COUNT(s), " +
+                                "  SUM(s.orden.totalTrabajos), " +
+                                "  SUM(s.orden.totalRepuestos)" +
+                                ") " +
+                                "FROM Service s " +
+                                "WHERE YEAR(s.fechaCarga) = :anio " +
+                                "AND s.estadoService = :estado",
+                        DatosReporteServiceDTO.class)
+                .setParameter("anio", anio)
+                .setParameter("estado", EstadoService.PAGADO)
+                .getSingleResult();
     }
 }
