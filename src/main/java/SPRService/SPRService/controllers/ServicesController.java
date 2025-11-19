@@ -95,6 +95,12 @@ public class ServicesController implements Initializable {
             Alertas.aviso("Agregar pago", "Debe seleccionar un service para agregarle el pago.");
             return;
         }
+        if (vm.getService().getEstadoService() == EstadoService.CANCELADO ||
+                vm.getService().getEstadoService() == EstadoService.PAGADO) {
+            Alertas.aviso("Agregar pago", "No se pueden agregar pagos a las ventas que están canceladas" +
+                    " o pagadas");
+            return;
+        }
         Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", vm.getService());
         if (result.isPresent()) {
             obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(result.get()));
