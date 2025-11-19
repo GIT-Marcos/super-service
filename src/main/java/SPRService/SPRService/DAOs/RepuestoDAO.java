@@ -1,5 +1,6 @@
 package SPRService.SPRService.DAOs;
 
+import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.entities.Repuesto;
 
 import java.time.LocalDate;
@@ -37,4 +38,9 @@ public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
      * Qué productos son los que más veces se retiran entre fechas.
      */
     List<Object[]> masRetiradosParaVenta(Integer cantidad, LocalDate fechaInicio, LocalDate fechaFin);
+
+    /**
+     * Genera reporte del uso de repuestos, si para venta o service.
+     */
+    ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDate fechaMin, LocalDate fechaMax);
 }

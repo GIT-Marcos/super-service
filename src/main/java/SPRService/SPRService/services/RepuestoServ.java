@@ -1,5 +1,6 @@
 package SPRService.SPRService.services;
 
+import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
 import SPRService.SPRService.entities.Repuesto;
 
@@ -30,4 +31,8 @@ public interface RepuestoServ {
     List<RepuestoRetiradoReporteDTO> repuestosMasRetiradosParaVenta(Integer cantidad, LocalDate fechaMin,
                                                                     LocalDate fechaMax);
 
+    /**
+     * Genera reporte del uso de repuestos, si para venta o service.
+     */
+    ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDate fechaMin, LocalDate fechaMax);
 }

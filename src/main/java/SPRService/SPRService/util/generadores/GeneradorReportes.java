@@ -167,6 +167,7 @@ public class GeneradorReportes {
         }
     }
 
+    @Deprecated
     public static void totalVentasAnual(File file, Map<String, BigDecimal> valores) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -214,6 +215,7 @@ public class GeneradorReportes {
         }
     }
 
+    @Deprecated
     public static void cantidadVentasAnual(File file, Map<String, Long> valores) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 

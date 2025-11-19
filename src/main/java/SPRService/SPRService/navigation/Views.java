@@ -4,6 +4,7 @@ import SPRService.SPRService.controllers.*;
 import SPRService.SPRService.controllers.charts.ChartReportesAnualesServiceController;
 import SPRService.SPRService.controllers.charts.ChartTotalVentasAnioController;
 import SPRService.SPRService.controllers.charts.ChartTotalVentasMesController;
+import SPRService.SPRService.controllers.charts.ChartUsoDeRepuestosController;
 
 public enum Views {
 
@@ -42,7 +43,8 @@ public enum Views {
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
     CHART_VENTAS_RESPUESTOS_ANIO("/views/ChartTotalVentasAnio.fxml", ChartTotalVentasAnioController.class),
-    CHART_ANUAL_SERVICE("/views/ChartReportesAnulesService.fxml", ChartReportesAnualesServiceController.class);
+    CHART_ANUAL_SERVICE("/views/ChartReportesAnulesService.fxml", ChartReportesAnualesServiceController.class),
+    CHART_USO_REPUESTOS("/views/ChartUsoDeRepuestos.fxml", ChartUsoDeRepuestosController.class);
 
     private final String fxmlPath;
     private final Class<?> controllerClass;

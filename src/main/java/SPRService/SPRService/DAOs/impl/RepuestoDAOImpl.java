@@ -1,6 +1,7 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.RepuestoDAO;
+import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -21,6 +22,7 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
 
     @Inject
     private Provider<EntityManager> emProvider;
+    private final String DTO = "SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO";
 
     public RepuestoDAOImpl() {
         super(Repuesto.class);
@@ -101,6 +103,22 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
                 .setParameter("fechaFin", fechaFin)
                 .setMaxResults(cantidadRepuestos);
         return query.getResultList();
+    }
+
+    @Override
+    public ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDate fechaMin, LocalDate fechaMax) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("SELECT new " + DTO + "(" +
+                                "SUM(CASE WHEN n.tipoUso = SPRService.SPRService.entities.NotaRetiro.TipoUsoRetiro.VENTA THEN dr.cantidadRetirada ELSE 0.0 END), " +
+                                "SUM(CASE WHEN n.tipoUso = SPRService.SPRService.entities.NotaRetiro.TipoUsoRetiro.SERVICE THEN dr.cantidadRetirada ELSE 0.0 END) " +
+                                ") " +
+                                "FROM NotaRetiro n " +
+                                "JOIN n.detalleRetiroList dr " +
+                                "WHERE n.fecha BETWEEN :fMin AND :fMax",
+                ReporteUsoDeRepuestosDTO.class)
+                .setParameter("fMin", fechaMin)
+                .setParameter("fMax", fechaMax)
+                .getSingleResult();
     }
 
 }

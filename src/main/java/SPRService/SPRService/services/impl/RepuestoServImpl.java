@@ -2,6 +2,7 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.MarcaRepuestoDAO;
 import SPRService.SPRService.DAOs.RepuestoDAO;
+import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import SPRService.SPRService.entities.Repuesto;
@@ -83,6 +84,18 @@ public class RepuestoServImpl implements RepuestoServ {
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    @Transactional
+    @Override
+    public ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDate fechaMin, LocalDate fechaMax) {
+        if (fechaMin == null) fechaMin = LocalDate.of(1900, 1, 1);
+        if (fechaMax == null) fechaMax = LocalDate.now();
+        ReporteUsoDeRepuestosDTO dto = daoRepuesto.usoDeRepuestos(fechaMin, fechaMax);
+        if (dto.paraService() == null || dto.paraVenta() == null) {
+            return null;
+        }
+        return dto;
     }
 
     @Transactional
