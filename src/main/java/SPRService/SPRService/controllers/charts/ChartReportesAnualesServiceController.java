@@ -4,30 +4,23 @@ import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.services.ServiceServ;
-import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.generadores.GeneradorReportes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.image.WritableImage;
-import javafx.stage.FileChooser;
+import javafx.scene.layout.AnchorPane;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -47,6 +40,8 @@ public class ChartReportesAnualesServiceController implements Initializable {
             "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
     };
 
+    @FXML
+    private AnchorPane rootPane;
     @FXML
     private Label lblIngresosTotales, lblPromedioIngresosPorService, lblCantidadDeServicesAnio, lblIngresosPorTrabajos,
             lblIngresosPorRepuestos, lblPorcTrabajos, lblPorcRepuestos;
@@ -83,31 +78,10 @@ public class ChartReportesAnualesServiceController implements Initializable {
 
     @FXML
     private void exportarJPG(ActionEvent event) {
-        File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta para exportar el reporte",
-                "Reporte total service año " + spinnerAnio.getValue(),
-                new FileChooser.ExtensionFilter("Imágenes JPG (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
-        if (file == null) return;
-
-        try {
-            WritableImage writableImage = chart.snapshot(new SnapshotParameters(), null);
-            BufferedImage imageConTransparencia = SwingFXUtils.fromFXImage(writableImage, null);
-            BufferedImage imageSinTransparencia = new BufferedImage(
-                    imageConTransparencia.getWidth(),
-                    imageConTransparencia.getHeight(),
-                    BufferedImage.TYPE_INT_RGB); // Clave: RGB significa sin alfa
-
-            Graphics2D graphics = imageSinTransparencia.createGraphics();
-            graphics.setColor(Color.WHITE); // Establecer el color de fondo
-            graphics.fillRect(0, 0, imageSinTransparencia.getWidth(), imageSinTransparencia.getHeight()); // Rellenar
-            graphics.drawImage(imageConTransparencia, 0, 0, null);
-            graphics.dispose(); // Liberar recursos gráficos
-            boolean exito = ImageIO.write(imageSinTransparencia, "jpg", file);
-
-            Alertas.exito("Exportar reporte", "Reporte exportado con éxito.");
-        } catch (IOException ex) {
-            System.err.println("Error al guardar la imagen del gráfico.");
-            ex.printStackTrace();
-            Alertas.error("Exportar reporte", "Ha ocurrido un error al exportar el reporte.");
+        if (!obsPie.isEmpty()) {
+            GeneradorReportes.exportarJPEG(event, rootPane, "Reporte anual service");
+        } else {
+            Alertas.aviso("Exportar reporte", "No hay datos para exportar.");
         }
     }
 

@@ -3,26 +3,19 @@ package SPRService.SPRService.controllers.charts;
 import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.util.SafeLocalDateConverter;
-import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.generadores.GeneradorReportes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.DatePicker;
-import javafx.scene.image.WritableImage;
-import javafx.stage.FileChooser;
+import javafx.scene.layout.BorderPane;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
@@ -32,6 +25,8 @@ public class ChartUsoDeRepuestosController implements Initializable {
     private final RepuestoServ repuestoServ;
     private ObservableList<PieChart.Data> obsPie = FXCollections.observableArrayList();
 
+    @FXML
+    private BorderPane rootPane;
     @FXML
     private PieChart pieChart;
     @FXML
@@ -69,31 +64,10 @@ public class ChartUsoDeRepuestosController implements Initializable {
 
     @FXML
     private void exportar(ActionEvent event) {
-        File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta para exportar el reporte",
-                "Reporte de uso de repuestos",
-                new FileChooser.ExtensionFilter("Imágenes JPG (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
-        if (file == null) return;
-
-        try {
-            WritableImage writableImage = pieChart.snapshot(new SnapshotParameters(), null);
-            BufferedImage imageConTransparencia = SwingFXUtils.fromFXImage(writableImage, null);
-            BufferedImage imageSinTransparencia = new BufferedImage(
-                    imageConTransparencia.getWidth(),
-                    imageConTransparencia.getHeight(),
-                    BufferedImage.TYPE_INT_RGB); // Clave: RGB significa sin alfa
-
-            Graphics2D graphics = imageSinTransparencia.createGraphics();
-            graphics.setColor(Color.WHITE); // Establecer el color de fondo
-            graphics.fillRect(0, 0, imageSinTransparencia.getWidth(), imageSinTransparencia.getHeight()); // Rellenar
-            graphics.drawImage(imageConTransparencia, 0, 0, null);
-            graphics.dispose(); // Liberar recursos gráficos
-            boolean exito = ImageIO.write(imageSinTransparencia, "jpg", file);
-
-            Alertas.exito("Exportar reporte", "Reporte exportado con éxito.");
-        } catch (IOException ex) {
-            System.err.println("Error al guardar la imagen del gráfico.");
-            ex.printStackTrace();
-            Alertas.error("Exportar reporte", "Ha ocurrido un error al exportar el reporte.");
+        if (!obsPie.isEmpty()) {
+            GeneradorReportes.exportarJPEG(event, rootPane, "Reporte de usos de repuestos");
+        } else {
+            Alertas.aviso("Exportar reporte", "No hay datos para exportar.");
         }
     }
 

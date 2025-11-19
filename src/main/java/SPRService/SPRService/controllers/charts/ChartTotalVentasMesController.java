@@ -2,29 +2,22 @@ package SPRService.SPRService.controllers.charts;
 
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.services.VentaRepuestoServ;
-import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.generadores.GeneradorReportes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.image.WritableImage;
-import javafx.stage.FileChooser;
+import javafx.scene.layout.BorderPane;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Year;
@@ -36,6 +29,8 @@ public class ChartTotalVentasMesController implements Initializable {
 
     private final VentaRepuestoServ ventaRepuestoServ;
 
+    @FXML
+    private BorderPane rootPane;
     @FXML
     private BarChart<String, Number> chart;
     @FXML
@@ -62,42 +57,7 @@ public class ChartTotalVentasMesController implements Initializable {
 
     @FXML
     private void exportarJPG(ActionEvent event) {
-        File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta para exportar el reporte",
-                "Reporte total ventas mes " + comboMeses.getSelectionModel().getSelectedItem() +
-                        " año " + spinnerAnio.getValue(),
-                new FileChooser.ExtensionFilter("Imágenes JPG (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
-        if (file == null) return;
-
-        try {
-            // 1. Tomar el snapshot del gráfico
-            WritableImage writableImage = chart.snapshot(new SnapshotParameters(), null);
-
-            // 2. Convertir a una imagen de AWT (puede tener transparencia)
-            BufferedImage imageConTransparencia = SwingFXUtils.fromFXImage(writableImage, null);
-
-            // --- LA SOLUCIÓN ESTÁ AQUÍ ---
-            // 3. Crear una nueva imagen sin canal alfa (tipo RGB) y con fondo blanco
-            BufferedImage imageSinTransparencia = new BufferedImage(
-                    imageConTransparencia.getWidth(),
-                    imageConTransparencia.getHeight(),
-                    BufferedImage.TYPE_INT_RGB); // Clave: RGB significa sin alfa
-
-            // 4. Dibujar la imagen original sobre el fondo blanco
-            Graphics2D graphics = imageSinTransparencia.createGraphics();
-            graphics.setColor(Color.WHITE); // Establecer el color de fondo
-            graphics.fillRect(0, 0, imageSinTransparencia.getWidth(), imageSinTransparencia.getHeight()); // Rellenar
-            graphics.drawImage(imageConTransparencia, 0, 0, null);
-            graphics.dispose(); // Liberar recursos gráficos
-
-            // 5. Guardar la nueva imagen (sin transparencia) y verificar el resultado
-            boolean exito = ImageIO.write(imageSinTransparencia, "jpg", file);
-
-            Alertas.exito("Exportar reporte", "Reporte exportado con éxito.");
-        } catch (IOException ex) {
-            System.err.println("Error al guardar la imagen del gráfico.");
-            ex.printStackTrace();
-            Alertas.error("Exportar reporte", "Ha ocurrido un error al exportar el reporte.");
-        }
+        GeneradorReportes.exportarJPEG(event, rootPane, "Reporte ingresos ventas en mes");
     }
 
     private void poblarChart(List<VentaRepuestosEnMesDTO> ventasDTO) {
