@@ -1,4 +1,4 @@
-package SPRService.SPRService.controllers;
+package SPRService.SPRService.controllers.charts;
 
 import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;

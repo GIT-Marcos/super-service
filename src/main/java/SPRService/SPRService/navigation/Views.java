@@ -1,6 +1,9 @@
 package SPRService.SPRService.navigation;
 
 import SPRService.SPRService.controllers.*;
+import SPRService.SPRService.controllers.charts.ChartReportesAnualesServiceController;
+import SPRService.SPRService.controllers.charts.ChartTotalVentasAnioController;
+import SPRService.SPRService.controllers.charts.ChartTotalVentasMesController;
 
 public enum Views {
 
