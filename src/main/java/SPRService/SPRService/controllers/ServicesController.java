@@ -101,6 +101,11 @@ public class ServicesController implements Initializable {
         }
     }
 
+    @FXML
+    private void reportesAnuales() {
+        navigator.openModal(Views.CHART_ANUAL_SERVICE, "Generar reportes anuales", null);
+    }
+
     private void cargarTabla(List<Service> services) {
         obsListServiceVM.clear();
         for (Service s : services) {

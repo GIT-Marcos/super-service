@@ -3,8 +3,8 @@ package SPRService.SPRService.services.impl;
 import SPRService.SPRService.DAOs.StockDAO;
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
 import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
-import SPRService.SPRService.DTOs.VentaRepuestosCantidadEnAnioDTO;
-import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
+import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
+import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
@@ -51,30 +51,30 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     @Transactional
     @Override
-    public List<VentaRepuestosEnAnioDTO> reporteTotalVentasEnAnio(int anio) {
-        List<VentaRepuestosEnAnioDTO> dtos = new ArrayList<>();
+    public List<ReporteIngresosEnAnioPorMesDTO> reporteTotalVentasEnAnio(int anio) {
+        List<ReporteIngresosEnAnioPorMesDTO> dtos = new ArrayList<>();
         List<Object[]> objetosVenta;
         objetosVenta = daoVenta.totalVentasPorMeses(anio);
 
         for (Object[] o : objetosVenta) {
             int nroMes = (int) o[0];
             BigDecimal ingresos = (BigDecimal) o[1];
-            dtos.add(new VentaRepuestosEnAnioDTO(nroMes, ingresos));
+            dtos.add(new ReporteIngresosEnAnioPorMesDTO(nroMes, ingresos));
         }
         return dtos;
     }
 
     @Transactional
     @Override
-    public List<VentaRepuestosCantidadEnAnioDTO> reporteCantidadVentasEnAnio(int anio) {
-        List<VentaRepuestosCantidadEnAnioDTO> dtos = new ArrayList<>();
+    public List<ReporteCantidadEnAnioDTO> reporteCantidadVentasEnAnio(int anio) {
+        List<ReporteCantidadEnAnioDTO> dtos = new ArrayList<>();
         List<Object[]> objetosVenta;
         objetosVenta = daoVenta.cantidadVentasPorMeses(anio);
 
         for (Object[] o : objetosVenta) {
             int nroMes = (int) o[0];
             Long ingresos = (Long) o[1];
-            dtos.add(new VentaRepuestosCantidadEnAnioDTO(nroMes, ingresos));
+            dtos.add(new ReporteCantidadEnAnioDTO(nroMes, ingresos));
         }
         return dtos;
     }

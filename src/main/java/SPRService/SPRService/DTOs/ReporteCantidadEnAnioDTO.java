@@ -1,15 +1,14 @@
 package SPRService.SPRService.DTOs;
 
-import java.math.BigDecimal;
+public record ReporteCantidadEnAnioDTO(int nroMes, String mes, Long cantidadVentas) {
 
-public record VentaRepuestosEnAnioDTO(int nroMes, String mes, BigDecimal totalVendido) {
+    public ReporteCantidadEnAnioDTO {}
 
-    public VentaRepuestosEnAnioDTO {}
-
-    public VentaRepuestosEnAnioDTO(int nroMes, BigDecimal totalVendido) {
-        this(nroMes, buscaMes(nroMes), totalVendido);
+    public ReporteCantidadEnAnioDTO(int nroMes, Long cantidadVentas) {
+        this(nroMes, buscaMes(nroMes), cantidadVentas);
     }
 
+    // TODO: esto se repite hacer enum de utilidad
     private static String buscaMes(int nroMes) {
         return switch (nroMes) {
             case 1 -> "Enero";
@@ -28,4 +27,3 @@ public record VentaRepuestosEnAnioDTO(int nroMes, String mes, BigDecimal totalVe
         };
     }
 }
-
