@@ -3,6 +3,7 @@ package SPRService.SPRService.services.impl;
 import SPRService.SPRService.DAOs.ServiceDAO;
 import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
+import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.DetalleRetiro;
@@ -13,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,5 +103,13 @@ public class ServiceServImpl implements ServiceServ {
     @Override
     public DatosReporteServiceDTO generarDatosAnuales(Integer anio) {
         return daoService.generarDatosAnuales(anio);
+    }
+
+    @Transactional
+    @Override
+    public ReporteComparacionDTO generarComparacion(LocalDate fechaMin, LocalDate fechaMax) {
+        if (fechaMin == null) fechaMin = LocalDate.of(1900, 1, 1);
+        if (fechaMax == null) fechaMax = LocalDate.now();
+        return daoService.generarComparacion(fechaMin, fechaMax);
     }
 }

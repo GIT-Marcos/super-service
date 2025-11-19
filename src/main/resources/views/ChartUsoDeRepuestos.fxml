@@ -21,22 +21,22 @@
    <top>
       <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox prefHeight="100.0" prefWidth="240.0">
+            <VBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <Label text="Fecha mínima" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <DatePicker fx:id="fechaMin">
+                  <DatePicker fx:id="fechaMin" promptText="dd/MM/yyyy">
                      <VBox.margin>
                         <Insets bottom="20.0" />
                      </VBox.margin>
                   </DatePicker>
                   <HBox spacing="5.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#exportar" text="Exportar JPEG" />
                         <Button mnemonicParsing="false" onAction="#generar" text="Generar" />
+                        <Button mnemonicParsing="false" onAction="#exportar" text="Exportar JPEG" />
                      </children>
                   </HBox>
                </children>
@@ -48,7 +48,7 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <DatePicker fx:id="fechaMax" />
+                  <DatePicker fx:id="fechaMax" promptText="dd/MM/yyyy" />
                </children>
             </VBox>
          </children>
