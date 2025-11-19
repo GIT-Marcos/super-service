@@ -229,6 +229,10 @@ public class DepositoViewModel {
         }
     }
 
+    public void reporteDeUso() {
+        navigator.openModal(Views.CHART_USO_REPUESTOS, "Reporte de uso", null);
+    }
+
     // --- Lógica Privada ---
     private void actualizarTabla(List<Repuesto> listaRepuestos) {
         repuestosViewModels.setAll(

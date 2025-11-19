@@ -2,14 +2,18 @@ package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.ServiceDAO;
 import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
+import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.enums.EstadoService;
+import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +22,7 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
     @Inject
     Provider<EntityManager> emProvider;
     private final String DTO = "SPRService.SPRService.DTOs.DatosReporteServiceDTO";
+    private final String DTO_COMPARACION = "SPRService.SPRService.DTOs.ReporteComparacionDTO";
 
     public ServiceDAOImpl() {
         super(Service.class);
@@ -126,4 +131,50 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
                 .setParameter("estado", EstadoService.PAGADO)
                 .getSingleResult();
     }
+
+    @Override
+    public ReporteComparacionDTO generarComparacion(LocalDate fechaMin, LocalDate fechaMax) {
+        EntityManager em = emProvider.get();
+
+        // ===== QUERY SERVICE PAGADOS =====
+        Object[] serviceData = em.createQuery(
+                        "SELECT COALESCE(SUM(s.montoTotal), 0), " +
+                                "       COUNT(s) " +
+                                "FROM Service s " +
+                                "WHERE s.estadoService = :estado " +
+                                "AND s.fechaCarga BETWEEN :fMin AND :fMax",
+                        Object[].class)
+                .setParameter("estado", EstadoService.PAGADO)
+                .setParameter("fMin", fechaMin.atStartOfDay())
+                .setParameter("fMax", fechaMax.atTime(23, 59, 59))
+                .getSingleResult();
+
+        BigDecimal ingService = (BigDecimal) serviceData[0];
+        Long cantService = (Long) serviceData[1];
+
+        // ===== QUERY VENTAS PAGADAS =====
+        Object[] ventaData = em.createQuery(
+                        "SELECT COALESCE(SUM(v.montoTotal), 0), " +
+                                "       COUNT(v) " +
+                                "FROM VentaRepuesto v " +
+                                "WHERE v.estadoVenta = :estado " +
+                                "AND v.fechaVenta BETWEEN :fMin AND :fMax",
+                        Object[].class)
+                .setParameter("estado", EstadoVentaRepuesto.PAGADO)
+                .setParameter("fMin", fechaMin)
+                .setParameter("fMax", fechaMax)
+                .getSingleResult();
+
+        BigDecimal ingVenta = (BigDecimal) ventaData[0];
+        Long cantVenta = (Long) ventaData[1];
+
+        // ===== CONSTRUCCIÓN DEL DTO =====
+        return new ReporteComparacionDTO(
+                ingService,
+                ingVenta,
+                cantService,
+                cantVenta
+        );
+    }
+
 }

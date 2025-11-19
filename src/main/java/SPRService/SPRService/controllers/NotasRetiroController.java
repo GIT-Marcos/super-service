@@ -294,7 +294,7 @@ public class NotasRetiroController implements Initializable {
             return;
 
         try {
-            NotaRetiro notaParaCargar = new NotaRetiro(null, detallesObsList);
+            NotaRetiro notaParaCargar = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, detallesObsList);
             notaRetiroServ.guardarNota(notaParaCargar);
             Alertas.exito("Nueva nota de retiro", "Se ha creado la nota de retiro con éxito.");
             detallesObsList.clear();

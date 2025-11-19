@@ -95,6 +95,12 @@ public class ServicesController implements Initializable {
             Alertas.aviso("Agregar pago", "Debe seleccionar un service para agregarle el pago.");
             return;
         }
+        if (vm.getService().getEstadoService() == EstadoService.CANCELADO ||
+                vm.getService().getEstadoService() == EstadoService.PAGADO) {
+            Alertas.aviso("Agregar pago", "No se pueden agregar pagos a las ventas que están canceladas" +
+                    " o pagadas");
+            return;
+        }
         Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", vm.getService());
         if (result.isPresent()) {
             obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(result.get()));
@@ -104,6 +110,11 @@ public class ServicesController implements Initializable {
     @FXML
     private void reportesAnuales() {
         navigator.openModal(Views.CHART_ANUAL_SERVICE, "Generar reportes anuales", null);
+    }
+
+    @FXML
+    private void comparacionIngresos() {
+        navigator.openModal(Views.CHART_COMPARACION_INGRESOS, "Comparación de ingresos", null);
     }
 
     private void cargarTabla(List<Service> services) {

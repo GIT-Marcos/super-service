@@ -95,6 +95,7 @@
                </font>
             </Label>
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#reportesAnuales" prefWidth="160.0" text="Reportes anuales" />
+            <Button layoutX="15.0" layoutY="197.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#comparacionIngresos" prefWidth="160.0" text="Comparación de ingresos" />
          </children></VBox>
    </right>
    <padding>

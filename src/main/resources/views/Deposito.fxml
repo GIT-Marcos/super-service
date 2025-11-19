@@ -160,7 +160,7 @@
                   <Insets top="10.0" />
                </VBox.margin>
             </Button>
-            <Button disable="true" layoutX="20.0" layoutY="214.0" mnemonicParsing="false" onAction="#masRetiradosParaService" prefHeight="30.0" prefWidth="150.0" text="Más retirados para service">
+            <Button layoutX="20.0" layoutY="214.0" mnemonicParsing="false" onAction="#usoDeRepuestos" prefHeight="30.0" prefWidth="150.0" text="Uso de repuestos">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>

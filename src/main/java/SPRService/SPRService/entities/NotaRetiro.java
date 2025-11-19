@@ -19,6 +19,10 @@ public class NotaRetiro implements Serializable {
     @Column(nullable = false)
     private LocalDate fecha;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_uso", nullable = false)
+    private TipoUsoRetiro tipoUso;
+
     @Column(nullable = false)
     private Boolean activo;
 
@@ -30,11 +34,20 @@ public class NotaRetiro implements Serializable {
         this.activo = Boolean.TRUE;
     }
 
-    public NotaRetiro(Long id, List<DetalleRetiro> detalleRetiroList) {
+    public NotaRetiro(Long id, TipoUsoRetiro tipoUso, List<DetalleRetiro> detalleRetiroList) {
         this.id = id;
         this.fecha = LocalDate.now();
+        this.tipoUso = tipoUso;
         this.activo = Boolean.TRUE;
         this.detalleRetiroList = detalleRetiroList;
+    }
+
+    /**
+     * Una nota de retiro representa una cantidad de stock que se ha restado para fines comerciales. Si la nota es
+     * cancelada, las cantidades RETIRADAS si o si se deben restablecer.
+     */
+    public void cancelarNota() {
+        this.activo = Boolean.FALSE;
     }
 
     public Long getId() {
@@ -51,6 +64,14 @@ public class NotaRetiro implements Serializable {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
+    }
+
+    public TipoUsoRetiro getTipoUso() {
+        return tipoUso;
+    }
+
+    public void setTipoUso(TipoUsoRetiro tipoUso) {
+        this.tipoUso = tipoUso;
     }
 
     public Boolean getActivo() {
@@ -79,10 +100,10 @@ public class NotaRetiro implements Serializable {
     }
 
     /**
-     * Una nota de retiro representa una cantidad de stock que se ha restado para fines comerciales. Si la nota es
-     * cancelada, las cantidades RETIRADAS si o si se deben restablecer.
+     * Indica si el retiro de repuestos se realizó para una Venta directa o para un Service.
      */
-    public void cancelarNota() {
-        this.activo = Boolean.FALSE;
+    public enum TipoUsoRetiro {
+        VENTA,
+        SERVICE
     }
 }
