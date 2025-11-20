@@ -89,6 +89,22 @@ public class ServicesController implements Initializable {
     }
 
     @FXML
+    private void modificarService() {
+        SPRService.SPRService.viewModels.tablas.ServiceRowViewModel dto =
+                tablaServices.getSelectionModel().getSelectedItem();
+        if (dto == null) {
+            Alertas.aviso("Detalles de service", "Debes seleccionar un service se la tabla para " +
+                    "ver sus detalles.");
+            return;
+        }
+        Optional<Service> result = navigator.openModal(Views.MODIFICAR_SERVICE,
+                "Detalles del service", dto.getService());
+        if (result.isPresent()) {
+            obsListServiceVM.set(obsListServiceVM.indexOf(dto), new ServiceRowViewModel(result.get()));
+        }
+    }
+
+    @FXML
     private void agregarPago() {
         SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {

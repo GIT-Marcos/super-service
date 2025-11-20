@@ -85,7 +85,7 @@
       <VBox alignment="TOP_CENTER" maxWidth="170.0" minWidth="170.0" prefHeight="490.0" prefWidth="170.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#nuevoService" prefWidth="160.0" text="Nuevo service..." />
-            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Ver detalles" />
+            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#modificarService" prefWidth="160.0" text="Modificar/ver detalles" />
             <Button layoutX="15.0" layoutY="82.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#agregarPago" prefWidth="160.0" text="Agregar pago" />
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Dar de baja" />
             <Separator prefWidth="200.0" />

@@ -170,11 +170,7 @@ public class CargarServiceController implements Initializable, ModalController<S
             orden.setInformeTecnico(null);
             orden.setEstadoIngreso(estadoIngreso);
             orden.setVehiculo(vehiculo);
-            if (obtenerDetalles().isEmpty()) {
-                orden.setNotaRetiro(null);
-            } else {
-                orden.setNotaRetiro(new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, obtenerDetalles()));
-            }
+            orden.setNotaRetiro(new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, obtenerDetalles()));
             if (obtenerTrabajos().isEmpty()) {
                 Alertas.aviso("Cargar service", "Debe agregar al menos 1 trabajo para " +
                         "cargar el service.");
@@ -254,12 +250,12 @@ public class CargarServiceController implements Initializable, ModalController<S
 
     private void agregarTotal(BigDecimal b) {
         totalService = totalService.add(b);
-        lblTotal.setText("$ " + totalService);
+        lblTotal.setText("TOTAL: $ " + totalService);
     }
 
     private void restarTotal(BigDecimal b) {
         totalService = totalService.subtract(b);
-        lblTotal.setText("$ " + totalService);
+        lblTotal.setText("TOTAL: $ " + totalService);
     }
 
     private List<DetalleRetiro> obtenerDetalles() {

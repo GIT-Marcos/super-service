@@ -42,6 +42,17 @@ public class NotaRetiro implements Serializable {
         this.detalleRetiroList = detalleRetiroList;
     }
 
+    public void agregarDetalle(List<DetalleRetiro> detalleRetiros) {
+        if (detalleRetiros != null) {
+            for (DetalleRetiro d : detalleRetiros) {
+                // Evitar duplicados al cargar
+                if (!this.detalleRetiroList.contains(d)) {
+                    this.detalleRetiroList.add(d);
+                }
+            }
+        }
+    }
+
     /**
      * Una nota de retiro representa una cantidad de stock que se ha restado para fines comerciales. Si la nota es
      * cancelada, las cantidades RETIRADAS si o si se deben restablecer.

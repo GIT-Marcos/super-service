@@ -63,7 +63,7 @@ public class Service implements Serializable, Transaccion {
         this.prioridad = prioridad;
         asignarCliente(cliente);
         asignarOrden(orden);
-        calcularMontos();
+        actualizarMontos();
     }
 
     public void asignarCliente(Cliente c) {
@@ -99,12 +99,25 @@ public class Service implements Serializable, Transaccion {
         }
     }
 
-    private void calcularMontos() {
-        this.montoTotal = BigDecimal.ZERO;
+    public void actualizarMontos() {
         if (this.orden != null) {
-            this.montoTotal = this.orden.getTotalRepuestos().add(this.orden.getTotalTrabajos());
+            // 1. Actualizar el Monto Total sumando trabajos y repuestos de la orden
+            this.montoTotal = this.orden.getTotalTrabajos().add(this.orden.getTotalRepuestos());
         }
-        this.montoFaltante = this.montoTotal;
+
+        BigDecimal totalPagado = BigDecimal.ZERO;
+        if (this.pagos != null) {
+            for (Pago p : this.pagos) {
+                totalPagado = totalPagado.add(p.getMontoPagado());
+            }
+        }
+        this.montoFaltante = this.montoTotal.subtract(totalPagado);
+
+        if (this.montoFaltante.compareTo(BigDecimal.ZERO) < 0) {
+            this.montoFaltante = BigDecimal.ZERO;
+        }
+
+        calcularEstadoSaldo();
     }
 
     public Long getId() {
