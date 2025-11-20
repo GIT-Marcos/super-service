@@ -33,11 +33,11 @@ public record ReporteComparacionDTO(
                 safe(cantVenta),
                 safe(cantService) + safe(cantVenta),                // total operaciones
 
-                calcularPorcentaje(safe(cantService),
-                        safe(cantService) + safe(cantVenta)),       // pct services
+                calcularPorcentajeIngresos(safe(ingService),
+                        safe(ingService).add(safe(ingVenta))),      // pct servicios según ingresos
 
-                calcularPorcentaje(safe(cantVenta),
-                        safe(cantService) + safe(cantVenta))        // pct ventas
+                calcularPorcentajeIngresos(safe(ingVenta),
+                        safe(ingService).add(safe(ingVenta)))       // pct ventas según ingresos
         );
     }
 
@@ -52,9 +52,16 @@ public record ReporteComparacionDTO(
         return value == null ? 0L : value;
     }
 
-    private static Double calcularPorcentaje(Long valor, Long total) {
-        if (total == null || total == 0) return 0.0;
-        return round(valor * 100.0 / total);
+    // Porcentajes basados en ingresos
+    private static Double calcularPorcentajeIngresos(BigDecimal valor, BigDecimal total) {
+        if (total == null || total.compareTo(BigDecimal.ZERO) == 0)
+            return 0.0;
+
+        return round(
+                valor.multiply(BigDecimal.valueOf(100))
+                        .divide(total, 4, RoundingMode.HALF_UP)
+                        .doubleValue()
+        );
     }
 
     private static Double round(Double value) {

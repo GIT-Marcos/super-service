@@ -51,7 +51,7 @@ public class ChartUsoDeRepuestosController implements Initializable {
         pieChart.setTitle("Uso de repuestos");
         if (dto.paraService() != 0 && dto.paraVenta() != 0) {
             String titulo = "Uso de repuestos entre: " + fechaMin.getValue() + " y " + fechaMax.getValue() +
-                    " - Total usados: " + dto.total();
+                    " - Total de usos: " + dto.total();
             pieChart.setTitle(titulo);
             obsPie.add(new PieChart.Data("Ventas: " + dto.paraVenta() + " - " + dto.pctParaVenta() + " %",
                     dto.paraVenta()));
