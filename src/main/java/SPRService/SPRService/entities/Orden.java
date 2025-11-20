@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 //todo: agregar tiempo estimado
@@ -65,22 +66,76 @@ public class Orden implements Serializable {
         this.service = service;
     }
 
-    public void agregarTrabajo(Trabajo t) {
-        this.trabajos.add(t);
-        this.totalTrabajos = this.totalTrabajos.add(t.getPrecio());
-    }
-
     public void agregarTrabajos(Set<Trabajo> trabajos) {
-        for (Trabajo t : trabajos) {
-            agregarTrabajo(t);
+        if (trabajos != null) {
+            boolean huboCambios = false;
+            for (Trabajo t : trabajos) {
+                // Evitar duplicados al modificar
+                if (!this.trabajos.contains(t)) {
+                    this.trabajos.add(t);
+                    this.totalTrabajos = this.totalTrabajos.add(t.getPrecio());
+                    huboCambios = true;
+                }
+            }
+            if (huboCambios && this.service != null) {
+                this.service.actualizarMontos();
+            }
         }
     }
 
-    private void calcularTotalRepuestos(NotaRetiro n) {
-        if (n != null) {
-            for (DetalleRetiro d : notaRetiro.getDetallesRetiroList()) {
-                totalRepuestos = totalTrabajos.add(d.getSubTotal());
+    public void agregarTrabajos(Trabajo t) {
+        if (t != null) {
+            agregarTrabajos(Set.of(t));
+        }
+    }
+
+    public void quitarTrabajo(Trabajo t) {
+        if (t != null && this.trabajos.contains(t)) {
+            this.trabajos.remove(t);
+
+            this.totalTrabajos = this.totalTrabajos.subtract(t.getPrecio());
+            if (this.totalTrabajos.compareTo(BigDecimal.ZERO) < 0) {
+                this.totalTrabajos = BigDecimal.ZERO;
             }
+
+            if (this.service != null) {
+                this.service.actualizarMontos();
+            }
+        }
+    }
+
+    public void agregarRepuestos(List<DetalleRetiro> detalles) {
+        if (detalles != null) {
+            this.notaRetiro.agregarDetalle(detalles);
+            actualizarTotalRepuestos();
+            if (this.service != null) {
+                this.service.actualizarMontos();
+            }
+        }
+    }
+
+    public void quitarRepuesto(DetalleRetiro detalle) {
+        if (detalle != null && this.notaRetiro != null) {
+            boolean eliminado = this.notaRetiro.getDetallesRetiroList().remove(detalle);
+
+            if (eliminado) {
+                actualizarTotalRepuestos();
+
+                if (this.service != null) {
+                    this.service.actualizarMontos();
+                }
+            }
+        }
+    }
+
+    private void actualizarTotalRepuestos() {
+        if (this.notaRetiro != null) {
+            totalRepuestos = BigDecimal.ZERO;
+            for (DetalleRetiro d : notaRetiro.getDetallesRetiroList()) {
+                totalRepuestos = totalRepuestos.add(d.getSubTotal());
+            }
+        } else {
+            totalRepuestos = BigDecimal.ZERO;
         }
     }
 
@@ -146,7 +201,10 @@ public class Orden implements Serializable {
 
     public void setNotaRetiro(NotaRetiro notaRetiro) {
         this.notaRetiro = notaRetiro;
-        calcularTotalRepuestos(notaRetiro);
+        actualizarTotalRepuestos();
+        if (this.service != null) {
+            this.service.actualizarMontos();
+        }
     }
 
     public Set<Trabajo> getTrabajos() {
@@ -154,7 +212,7 @@ public class Orden implements Serializable {
     }
 
     /**
-     * Usar operación específica: agregarTrabajo(Trabajo t)
+     * No usar. Usar operaciónes específicas.
      */
     public void setTrabajos(Set<Trabajo> trabajos) {
         this.trabajos = trabajos;

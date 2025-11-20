@@ -44,6 +44,10 @@ public class ServiceServImpl implements ServiceServ {
     @Transactional
     @Override
     public Service cargarService(Service s) {
+        if (s.getOrden().getNotaRetiro().getDetallesRetiroList().isEmpty()) {
+            //todo: ver si cancelar nota
+            s.getOrden().setNotaRetiro(null);
+        }
         if (s.getOrden().getNotaRetiro() != null) {
             for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiroList()) {
                 stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
@@ -57,6 +61,16 @@ public class ServiceServImpl implements ServiceServ {
     @Transactional
     @Override
     public Service modificarService(Service s) {
+        if (s.getOrden().getNotaRetiro().getDetallesRetiroList().isEmpty()) {
+            //todo: ver si cancelar nota
+            s.getOrden().setNotaRetiro(null);
+        }
+        if (s.getOrden().getNotaRetiro() != null) {
+            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiroList()) {
+                stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
+            }
+        }
+
         return daoService.update(s);
     }
 

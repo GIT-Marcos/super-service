@@ -36,6 +36,7 @@ public enum Views {
     AGREGAR_REPUESTO_SERVICE("/views/AgregarRepuestoService.fxml", AgregarRepuestoServiceController.class),
     AGREGAR_CLIENTE_SERVICE("/views/AgregarClienteService.fxml", AgregarClienteServiceController.class),
     AGREGAR_VEHICULO_SERVICE("/views/AgregarVehiculoService.fxml", AgregarVehiculoServiceController.class),
+    MODIFICAR_SERVICE("/views/ModificarService.fxml", ModificarServiceController.class),
 
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),

@@ -65,12 +65,16 @@ public class Trabajo implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Trabajo trabajo)) return false;
-        return Objects.equals(descripcion, trabajo.descripcion);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Trabajo trabajo = (Trabajo) o;
+        return descripcion != null && descripcion.equalsIgnoreCase(trabajo.descripcion);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(descripcion);
+        return descripcion == null ? 0 : descripcion.toLowerCase().hashCode();
     }
+
 }
