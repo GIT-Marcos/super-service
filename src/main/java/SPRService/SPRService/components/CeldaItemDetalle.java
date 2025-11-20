@@ -27,7 +27,7 @@ public abstract class CeldaItemDetalle<T extends ItemDetalleViewModel> extends L
         inicializarUI();
     }
 
-    public CeldaItemDetalle(Consumer<? super T> onEliminarItem) {  // ← Cambio aquí
+    public CeldaItemDetalle(Consumer<? super T> onEliminarItem) {
         this.onEliminarItem = onEliminarItem;
         inicializarUI();
     }
@@ -90,5 +90,14 @@ public abstract class CeldaItemDetalle<T extends ItemDetalleViewModel> extends L
 
     public void setOnEliminarItem(Consumer<T> onEliminarItem) {
         this.onEliminarItem = onEliminarItem;
+    }
+
+    /**
+     * Establece la visibilidad del botón de eliminar.
+     * @param visible true para mostrar, false para ocultar.
+     */
+    public void setBotonEliminarVisible(boolean visible) {
+        btnEliminar.setVisible(visible);
+        btnEliminar.setManaged(visible); // setManaged(false) saca el botón del layout
     }
 }

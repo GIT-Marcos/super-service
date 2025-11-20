@@ -34,7 +34,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ModificarServiceController implements Initializable, DataReceiver<Service>, ModalController<Service> {
 
@@ -137,7 +136,10 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
 
     @FXML
     private void verOrden() {
-
+        Optional<Service> result = navigator.openModal(Views.DETALLE_ORDEN, "Detalle de orden", this.service);
+        if (result.isPresent()) {
+            this.receiveData(result.get());
+        }
     }
 
     @FXML
@@ -158,8 +160,6 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
             LocalDateTime fe = dpFechaEntrega.getValue() == null ? LocalDateTime.now().plusDays(1) :
                     dpFechaEntrega.getValue().atStartOfDay();
             service.setFechaEntrega(fe);
-            service.setPrioridad(cbPrioridad.getValue());
-            service.setEstadoService(cbEstado.getValue());
 
             if (!Alertas.confirmacion("Modificar service", "¿Está seguro que desea guardar el service?"))
                 return;
@@ -278,15 +278,15 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
 
     private boolean estaPagado() {
         if (service.getEstadoService() == EstadoService.PAGADO) {
-            Alertas.error("Guardar service", "No es posible modificar services que ya han sido pagados.");
+            Alertas.error("Modificar service", "No es posible modificar services que ya han sido pagados.");
             return true;
         }
         if (cbEstado.getValue() == EstadoService.PAGADO) {
-            Alertas.error("Guardar service", "No es posible guardar un service con estado: 'Pagado'.");
+            Alertas.error("Modificar service", "No es posible Modificar un service con estado: 'Pagado'.");
             return true;
         }
         if (cbEstado.getValue() == EstadoService.CANCELADO) {
-            Alertas.error("Guardar service", "No es posible guardar un service con estado: 'Cancelado'.");
+            Alertas.error("Modificar service", "No es posible Modificar un service con estado: 'Cancelado'.");
             return true;
         }
         return false;
@@ -294,16 +294,16 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
 
     private boolean validar() {
         if (this.cliente == null) {
-            Alertas.aviso("Cargar service", "Se debe asociar un cliente para el service.");
+            Alertas.aviso("Modificar service", "Se debe asociar un cliente para el service.");
             return false;
         }
         if (this.vehiculo == null) {
-            Alertas.aviso("Cargar service", "Se debe asociar un vehículo para el service.");
+            Alertas.aviso("Modificar service", "Se debe asociar un vehículo para el service.");
             return false;
         }
         if (this.items.isEmpty()) {
-            Alertas.aviso("Cargar service", "Deben haber repuestos o trabajos" +
-                    " asignados para poder cargar el service.");
+            Alertas.aviso("Modificar service", "Deben haber repuestos o trabajos" +
+                    " asignados para poder Modificar el service.");
             return false;
         }
         return true;
@@ -313,10 +313,22 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
         dpFechaEntrega.setConverter(new SafeLocalDateConverter());
         lista.setItems(items);
         lista.setCellFactory(new ItemCellFactory(this::eliminarItem));
-        cbPrioridad.getItems().setAll(PrioridadService.values());
-        cbEstado.getItems().setAll(EstadoService.values());
 
         String css = getClass().getResource("/styles/celdasDetalles.css").toExternalForm();
         lista.getStylesheets().add(css);
+
+        cbPrioridad.getItems().setAll(PrioridadService.values());
+        cbEstado.getItems().setAll(EstadoService.values());
+        cbPrioridad.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.equals(oldValue)) {
+                this.service.setPrioridad(newValue);
+            }
+        });
+
+        cbEstado.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.equals(oldValue)) {
+                this.service.setEstadoService(newValue);
+            }
+        });
     }
 }
