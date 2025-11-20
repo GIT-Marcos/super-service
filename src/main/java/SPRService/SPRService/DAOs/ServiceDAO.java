@@ -3,6 +3,7 @@ package SPRService.SPRService.DAOs;
 import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
+import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.Service;
 
 import java.time.LocalDate;
@@ -13,6 +14,10 @@ public interface ServiceDAO extends GenericDAO<Service, Long> {
     List<Service> verTodos();
 
     List<Service> buscarConFiltros(FiltroServiceDTO filtros);
+
+    //--- ESCRITURA ---
+
+    Service cancelarService(Service s, AuditoriaVenta a);
 
     //--- REPORTES ---
 

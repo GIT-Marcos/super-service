@@ -4,6 +4,7 @@ import SPRService.SPRService.DAOs.ServiceDAO;
 import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
+import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
@@ -22,7 +23,6 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
     @Inject
     Provider<EntityManager> emProvider;
     private final String DTO = "SPRService.SPRService.DTOs.DatosReporteServiceDTO";
-    private final String DTO_COMPARACION = "SPRService.SPRService.DTOs.ReporteComparacionDTO";
 
     public ServiceDAOImpl() {
         super(Service.class);
@@ -79,6 +79,13 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
 
         query.where(cb.and(predicates.toArray(predicates.toArray(new Predicate[0]))));
         return em.createQuery(query).getResultList();
+    }
+
+    @Override
+    public Service cancelarService(Service s, AuditoriaVenta a) {
+        EntityManager em = emProvider.get();
+        em.persist(a);
+        return em.merge(s);
     }
 
     @Override

@@ -2,6 +2,7 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
+import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.PrioridadService;
 import SPRService.SPRService.navigation.AppCoordinator;
@@ -10,6 +11,8 @@ import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
+import SPRService.SPRService.util.SessionManager;
+import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.viewModels.tablas.ServiceRowViewModel;
 import com.google.inject.Inject;
@@ -120,6 +123,50 @@ public class ServicesController implements Initializable {
         Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", vm.getService());
         if (result.isPresent()) {
             obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(result.get()));
+        }
+    }
+
+    @FXML
+    private void darDeBaja() {
+        SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            Alertas.aviso("Cancelar service", "Debe seleccionar un service para cancelarlo.");
+            return;
+        }
+
+        if (vm.getService().getEstadoService() == EstadoService.PAGADO ||
+                vm.getService().getEstadoService() == EstadoService.CANCELADO) {
+            Alertas.aviso("Cancelar service", "No es posible cancelar services en estado 'Pagado' o " +
+                    "'Cancelado'.");
+            return;
+        }
+
+        Usuario usuarioCancelador = SessionManager.getUsuarioSesion();
+        if (usuarioCancelador == null) {
+            Alertas.error("Cancelación de venta", "No hay usuario en la sesión activa.");
+            return;
+        }
+
+        if (!Alertas.confirmacion("Cancelar service", "¿Está seguro de que desea cancelar el service?"))
+            return;
+
+        String motivo = SimpleDialogs.motivoBorrado();
+        if (motivo == null) return;
+
+        boolean confirmacion2 = Alertas.confirmacion("Cancelar service", "Esta acción es " +
+                "irreversible.\n ¿Confirmar el borrado de service?");
+        if (!confirmacion2) return;
+
+        Boolean restablecerStock = Alertas.confirmacionRestablecerStocks();
+        if (restablecerStock == null) return;
+
+        try {
+            Service cancelado = serviceServ.cancelarService(vm.getService(), restablecerStock, motivo, usuarioCancelador);
+            obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(cancelado));
+            Alertas.exito("Cancelar service", "Se ha cancelado el service con éxito.");
+        } catch (RuntimeException e) {
+            Alertas.aviso("Cancelar service", e.getMessage());
+            throw e;
         }
     }
 

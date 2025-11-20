@@ -66,6 +66,8 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
     private ImageView imgMarca;
     @FXML
     private TextArea tfMotivos;
+    @FXML
+    private Button btnGuardar;
 
     @Inject
     public ModificarServiceController(ServiceServ serviceServ, AppCoordinator coordinator) {
@@ -126,6 +128,12 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
         if (stream != null) {
             Image img = new Image(stream);
             imgMarca.setImage(img);
+        }
+
+        if (service.getEstadoService().equals(EstadoService.PAGADO) ||
+                service.getEstadoService().equals(EstadoService.CANCELADO)) {
+            btnGuardar.setDisable(true);
+            cbEstado.setDisable(true);
         }
     }
 
@@ -319,6 +327,9 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
 
         cbPrioridad.getItems().setAll(PrioridadService.values());
         cbEstado.getItems().setAll(EstadoService.values());
+        cbEstado.getItems().remove(EstadoService.CANCELADO);
+        cbEstado.getItems().remove(EstadoService.PAGADO);
+
         cbPrioridad.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && !newValue.equals(oldValue)) {
                 this.service.setPrioridad(newValue);

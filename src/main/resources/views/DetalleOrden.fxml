@@ -15,7 +15,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DetalleOrdenController">
    <top>
       <HBox prefHeight="61.0" prefWidth="691.0" spacing="5.0" BorderPane.alignment="CENTER">
@@ -46,7 +45,7 @@
             </VBox>
             <VBox alignment="CENTER_RIGHT" prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#guardar" text="GUARDAR" />
+                  <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardar" text="GUARDAR" />
                </children>
             </VBox>
          </children>

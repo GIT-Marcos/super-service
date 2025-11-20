@@ -6,8 +6,9 @@ import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
-import SPRService.SPRService.entities.DetalleRetiro;
-import SPRService.SPRService.entities.Service;
+import SPRService.SPRService.entities.*;
+import SPRService.SPRService.enums.EstadoService;
+import SPRService.SPRService.services.NotaRetiroServ;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.services.StockServ;
 import com.google.inject.Inject;
@@ -15,6 +16,7 @@ import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +24,13 @@ public class ServiceServImpl implements ServiceServ {
 
     private final ServiceDAO daoService;
     private final StockServ stockServ;
+    private final NotaRetiroServ notaRetiroServ;
 
     @Inject
-    public ServiceServImpl(ServiceDAO daoService, StockServ stockServ) {
+    public ServiceServImpl(ServiceDAO daoService, StockServ stockServ, NotaRetiroServ notaRetiroServ) {
         this.daoService = daoService;
         this.stockServ = stockServ;
+        this.notaRetiroServ = notaRetiroServ;
     }
 
     @Transactional
@@ -76,8 +80,20 @@ public class ServiceServImpl implements ServiceServ {
 
     @Transactional
     @Override
-    public void borrarService(Service s) {
+    public Service cancelarService(Service s, boolean restablecerStocks, String motivo, Usuario u) {
+        s.setEstadoService(EstadoService.CANCELADO);
+        if (s.getPagos() != null) {
+            for (Pago p : s.getPagos()) {
+                p.cancelarPago();
+            }
+        }
+        if (s.getOrden().getNotaRetiro() != null) {
+            notaRetiroServ.cancelarNota(s.getOrden().getNotaRetiro());
+        }
 
+        AuditoriaVenta auditoria = new AuditoriaVenta(null, "Cancelación de service",
+                motivo, LocalDateTime.now(), u);
+        return daoService.cancelarService(s, auditoria);
     }
 
     //===================================================================
