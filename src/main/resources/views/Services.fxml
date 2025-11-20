@@ -87,7 +87,7 @@
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#nuevoService" prefWidth="160.0" text="Nuevo service..." />
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#modificarService" prefWidth="160.0" text="Modificar/ver detalles" />
             <Button layoutX="15.0" layoutY="82.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#agregarPago" prefWidth="160.0" text="Agregar pago" />
-            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" prefWidth="160.0" text="Dar de baja" />
+            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#darDeBaja" prefWidth="160.0" text="Cancelar service" />
             <Separator prefWidth="200.0" />
             <Label text="Generación de reportes" textFill="WHITE">
                <font>

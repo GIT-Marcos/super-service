@@ -6,6 +6,7 @@ import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
+import SPRService.SPRService.entities.Usuario;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -45,5 +46,5 @@ public interface ServiceServ {
 
     Service modificarService(Service s);
 
-    void borrarService(Service s);
+    Service cancelarService(Service s, boolean restablecerStocks, String motivo, Usuario u);
 }

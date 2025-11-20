@@ -164,6 +164,14 @@ public class Service implements Serializable, Transaccion {
         return estadoService;
     }
 
+    public Set<Pago> getPagos() {
+        return pagos;
+    }
+
+    public void setPagos(Set<Pago> pagos) {
+        this.pagos = pagos;
+    }
+
     public void setEstadoService(EstadoService estadoService) {
         this.estadoService = estadoService;
     }
