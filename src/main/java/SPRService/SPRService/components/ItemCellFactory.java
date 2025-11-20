@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 public class ItemCellFactory implements Callback<ListView<ItemDetalleViewModel>, ListCell<ItemDetalleViewModel>> {
 
     private Consumer<ItemDetalleViewModel> onEliminarItem;
+    private boolean mostrarBotonEliminar = true;
 
     public ItemCellFactory() {
     }
@@ -24,6 +25,8 @@ public class ItemCellFactory implements Callback<ListView<ItemDetalleViewModel>,
     public ListCell<ItemDetalleViewModel> call(ListView<ItemDetalleViewModel> param) {
         return new ListCell<ItemDetalleViewModel>() {
 
+            // Las celdas concretas ahora deben ser instancias de CeldaItemDetalle
+            // para poder acceder a setBotonEliminarVisible.
             private final CeldaItemDetalleRetiro celdaDetalleRetiro = new CeldaItemDetalleRetiro(onEliminarItem);
             private final CeldaItemTrabajo celdaTrabajo = new CeldaItemTrabajo(onEliminarItem);
 
@@ -34,7 +37,11 @@ public class ItemCellFactory implements Callback<ListView<ItemDetalleViewModel>,
                 if (empty || item == null) {
                     setGraphic(null);
                 } else {
-                    // Polimorfismo: seleccionar celda según tipo
+                    // *** APLICAR LA VISIBILIDAD A AMBAS CELDAS ANTES DE USARLAS ***
+                    celdaDetalleRetiro.setBotonEliminarVisible(mostrarBotonEliminar);
+                    celdaTrabajo.setBotonEliminarVisible(mostrarBotonEliminar);
+                    // *************************************************************
+
                     if (item instanceof ItemDetalleRetiroViewModel) {
                         celdaDetalleRetiro.updateItem((ItemDetalleRetiroViewModel) item, false);
                         setGraphic(celdaDetalleRetiro.getGraphic());
@@ -49,5 +56,10 @@ public class ItemCellFactory implements Callback<ListView<ItemDetalleViewModel>,
 
     public void setOnEliminarItem(Consumer<ItemDetalleViewModel> onEliminarItem) {
         this.onEliminarItem = onEliminarItem;
+    }
+
+    public ItemCellFactory setMostrarBotonEliminar(boolean mostrarBotonEliminar) {
+        this.mostrarBotonEliminar = mostrarBotonEliminar;
+        return this; // Permite el encadenamiento de métodos
     }
 }

@@ -16,8 +16,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="730.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ModificarServiceController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ModificarServiceController">
    <top>
       <HBox prefHeight="60.0" prefWidth="691.0" spacing="5.0" BorderPane.alignment="CENTER">
          <children>
@@ -63,7 +62,7 @@
       </HBox>
    </top>
    <left>
-      <VBox prefHeight="440.0" prefWidth="440.0" spacing="5.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="430.0" prefWidth="520.0" spacing="5.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="Cliente del service">
                <font>
