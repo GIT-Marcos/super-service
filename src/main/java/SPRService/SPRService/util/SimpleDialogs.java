@@ -2,7 +2,7 @@ package SPRService.SPRService.util;
 
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import SPRService.SPRService.util.alertas.Alertas;
@@ -43,28 +43,6 @@ public class SimpleDialogs {
         fileChooser.getExtensionFilters().add(extensiones);
         file = fileChooser.showSaveDialog(s);
         return file;
-    }
-
-    public static Integer selectorFechaReporte(String titulo, String header, String content) {
-        Integer fecha;
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle(titulo);
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
-
-        Optional<String> opt = dialog.showAndWait();
-        //si se cierra la ventana
-        if (opt.isEmpty()) {
-            return null;
-        }
-        String input = opt.get().strip();
-        try {
-            fecha = Integer.valueOf(input);
-        } catch (NumberFormatException e) {
-            Alertas.aviso("Generar reporte", "Formato no válido");
-            return null;
-        }
-        return fecha;
     }
 
     public static Double inputStock() {

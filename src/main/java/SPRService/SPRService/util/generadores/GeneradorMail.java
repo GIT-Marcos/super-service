@@ -27,6 +27,42 @@ public class GeneradorMail {
         return prop;
     }
 
+    public static void enviarReview(String review, double puntaje)
+            throws EmailException {
+
+        // 1. Cargar configuración del archivo
+        Properties config = cargarConfiguracion();
+        if (config == null) throw new EmailException("No se pudo cargar la configuración del correo.");
+
+        // LEER PROPIEDADES (Usamos .trim() para evitar errores de espacios)
+        String host = config.getProperty("mail.smtp.host").trim();
+        int port = Integer.parseInt(config.getProperty("mail.smtp.port").trim());
+
+        // --- CAMBIO CLAVE AQUÍ ---
+        String authUser = config.getProperty("mail.auth.user").trim();   // Usuario para Login (El código raro de Mailtrap)
+        String authPass = config.getProperty("mail.auth.pass").trim();   // Contraseña
+        String fromEmail = config.getProperty("mail.from.email").trim(); // Email que se muestra (ej: sistema@tienda.com)
+        String destinatario = config.getProperty("mail.review.addressee.email").trim();
+        // -------------------------
+
+        // 2. Configuración del Servidor
+        MultiPartEmail email = new MultiPartEmail();
+        email.setHostName(host);
+        email.setSmtpPort(port);
+
+        // AQUÍ USAMOS EL USUARIO DE LOGIN (authUser)
+        email.setAuthenticator(new DefaultAuthenticator(authUser, authPass));
+        email.setStartTLSEnabled(true);
+
+        // 3. Datos del correo
+        // AQUÍ USAMOS EL CORREO VISUAL (fromEmail)
+        email.setFrom(fromEmail);
+        email.addTo(destinatario);
+        email.setSubject("Review SuperService");
+        email.setMsg("Puntaje: " + puntaje + "\nComentario: " + review);
+        email.send();
+    }
+
     public static void enviarEmailApache(String destinatario, String asunto, String mensaje, File archivoAdjunto)
             throws EmailException {
 

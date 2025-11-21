@@ -2,6 +2,7 @@ package SPRService.SPRService.navigation;
 
 import SPRService.SPRService.controllers.*;
 import SPRService.SPRService.controllers.charts.*;
+import SPRService.SPRService.controllers.otros.RateController;
 
 public enum Views {
 
@@ -38,6 +39,7 @@ public enum Views {
     AGREGAR_VEHICULO_SERVICE("/views/AgregarVehiculoService.fxml", AgregarVehiculoServiceController.class),
     MODIFICAR_SERVICE("/views/ModificarService.fxml", ModificarServiceController.class),
     DETALLE_ORDEN("/views/DetalleOrden.fxml", DetalleOrdenController.class),
+    RATE("/views/Rate.fxml", RateController.class),
 
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
