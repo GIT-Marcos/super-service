@@ -1,11 +1,9 @@
 package SPRService.SPRService.viewModels.tablas;
 
 import SPRService.SPRService.entities.Service;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -20,8 +18,8 @@ public class ServiceRowViewModel {
     private final StringProperty fechaEntrega;
     private final StringProperty estado;
     private final StringProperty prioridad;
-    private final StringProperty montoFaltante;
-    private final StringProperty montoTotal;
+    private final ObjectProperty<BigDecimal> montoFaltante;
+    private final ObjectProperty<BigDecimal> montoTotal;
 
     public ServiceRowViewModel(Service s) {
         this.service = s;
@@ -30,8 +28,8 @@ public class ServiceRowViewModel {
         this.fechaEntrega = new SimpleStringProperty(formatearFecha(s.getFechaEntrega()));
         this.estado = new SimpleStringProperty(s.getEstadoService().toString());
         this.prioridad = new SimpleStringProperty(s.getPrioridad().toString());
-        this.montoFaltante = new SimpleStringProperty("$ " + s.getMontoFaltante());
-        this.montoTotal = new SimpleStringProperty("$ " + s.getMontoTotal());
+        this.montoFaltante = new SimpleObjectProperty<>(s.getMontoFaltante());
+        this.montoTotal = new SimpleObjectProperty<>(s.getMontoTotal());
     }
 
 //    public void updateEntity(Service s) {
@@ -56,6 +54,7 @@ public class ServiceRowViewModel {
 
     /**
      * Para formatear la fecha o devolver un texto por defecto si es nula.
+     *
      * @param dateTime La fecha y hora a formatear.
      * @return El string formateado o "-" si la fecha es nula.
      */
@@ -110,19 +109,19 @@ public class ServiceRowViewModel {
         return prioridad;
     }
 
-    public String getMontoFaltante() {
+    public BigDecimal getMontoFaltante() {
         return montoFaltante.get();
     }
 
-    public StringProperty montoFaltanteProperty() {
+    public ObjectProperty<BigDecimal> montoFaltanteProperty() {
         return montoFaltante;
     }
 
-    public String getMontoTotal() {
+    public BigDecimal getMontoTotal() {
         return montoTotal.get();
     }
 
-    public StringProperty montoTotalProperty() {
+    public ObjectProperty<BigDecimal> montoTotalProperty() {
         return montoTotal;
     }
 }

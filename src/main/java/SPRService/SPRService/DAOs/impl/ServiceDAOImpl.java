@@ -55,18 +55,24 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
         root.fetch("pagos", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
-        //todo: agregar estado a los services
-        //predicates.add(cb.equal(root.get("activo"), Boolean.TRUE));
 
         if (filtros.codigo() != null && filtros.codigo() != 0)
             predicates.add(cb.equal(root.get("id"), filtros.codigo()));
 
-        if (filtros.fechaMinima() != null && filtros.fechaMaxima() != null) {
-            predicates.add(cb.between(root.get("fechaCarga"), filtros.fechaMinima(), filtros.fechaMaxima()));
-        } else if (filtros.fechaMinima() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("fechaCarga"), filtros.fechaMinima()));
-        } else if (filtros.fechaMaxima() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("fechaCarga"), filtros.fechaMaxima()));
+        if (filtros.fchMinCarga() != null && filtros.fchMaxCarga() != null) {
+            predicates.add(cb.between(root.get("fechaCarga"), filtros.fchMinCarga(), filtros.fchMaxCarga()));
+        } else if (filtros.fchMinCarga() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("fechaCarga"), filtros.fchMinCarga()));
+        } else if (filtros.fchMaxCarga() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("fechaCarga"), filtros.fchMaxCarga()));
+        }
+
+        if (filtros.fchMinRetiro() != null && filtros.fchMaxRetiro() != null) {
+            predicates.add(cb.between(root.get("fechaEntrega"), filtros.fchMinRetiro(), filtros.fchMaxRetiro()));
+        } else if (filtros.fchMinRetiro() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("fechaEntrega"), filtros.fchMinRetiro()));
+        } else if (filtros.fchMaxRetiro() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("fechaEntrega"), filtros.fchMaxRetiro()));
         }
 
         if (filtros.prioridadServices() != null && !filtros.prioridadServices().isEmpty()) {

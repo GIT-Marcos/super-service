@@ -14,8 +14,10 @@ import java.util.List;
  */
 public record FiltroServiceDTO(
         Long codigo,
-        LocalDateTime fechaMinima,
-        LocalDateTime fechaMaxima,
+        LocalDateTime fchMinCarga,
+        LocalDateTime fchMaxCarga,
+        LocalDateTime fchMinRetiro,
+        LocalDateTime fchMaxRetiro,
         List<EstadoService> estados,
         List<PrioridadService> prioridadServices
 ) {
@@ -24,12 +26,15 @@ public record FiltroServiceDTO(
      * Constructor principal que recibe los valores de los controles de la UI.
      * Se encarga de la conversión segura de LocalDate a LocalDateTime y maneja los valores nulos.
      */
-    public FiltroServiceDTO(Long codigo, LocalDate fechaMinima, LocalDate fechaMaxima,
-                            List<EstadoService> estados, List<PrioridadService> prioridadServices) {
+    public FiltroServiceDTO(Long codigo, LocalDate fchMinCarga, LocalDate fchMaxCarga, LocalDate fchMinRetiro,
+                            LocalDate fchMaxRetiro, List<EstadoService> estados,
+                            List<PrioridadService> prioridadServices) {
         this(
                 codigo,
-                (fechaMinima != null) ? fechaMinima.atStartOfDay() : null,
-                (fechaMaxima != null) ? fechaMaxima.atTime(LocalTime.MAX) : null,
+                (fchMinCarga != null) ? fchMinCarga.atStartOfDay() : null,
+                (fchMaxCarga != null) ? fchMaxCarga.atTime(LocalTime.MAX) : null,
+                (fchMinRetiro != null) ? fchMinRetiro.atStartOfDay() : null,
+                (fchMaxRetiro != null) ? fchMaxRetiro.atTime(LocalTime.MAX) : null,
                 estados,
                 prioridadServices
         );
@@ -41,6 +46,6 @@ public record FiltroServiceDTO(
      * un filtro sin restricciones de fecha.
      */
     public FiltroServiceDTO() {
-        this(null, LocalDateTime.MIN, LocalDateTime.MAX, null, null);
+        this(null, LocalDateTime.MIN, LocalDateTime.MAX, LocalDateTime.MIN, LocalDateTime.MAX, null, null);
     }
 }

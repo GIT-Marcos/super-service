@@ -14,7 +14,7 @@ import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorNotaRetiroTXT;
+import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -278,7 +278,7 @@ public class NotasRetiroController implements Initializable {
         }
 
         try {
-            GeneradorNotaRetiroTXT.generaNotaRetiro(this.detallesObsList, file);
+            GeneradorTXT.generaNotaRetiro(this.detallesObsList, file);
             if (checkImprimir.isSelected()) {
                 Impresor.imprimirConSistema(file);
             }

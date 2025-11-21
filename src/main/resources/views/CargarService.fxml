@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -19,13 +20,32 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="650.0" minWidth="1000.0" prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarServiceController">
    <top>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <ToolBar prefHeight="55.0" prefWidth="990.0" BorderPane.alignment="CENTER">
         <items>
           <Button mnemonicParsing="false" onAction="#asignarCliente" text="Asignar cliente" />
             <Button mnemonicParsing="false" onAction="#asignarVehiculo" text="Asignar vehículo" />
-            <ComboBox fx:id="cbPrioridad" prefWidth="150.0" />
-            <Label text="Seleccionar fecha de entrega aproximada:" />
-            <DatePicker fx:id="dpFechaEntrega" />
+            <Separator orientation="VERTICAL" />
+            <VBox alignment="TOP_CENTER">
+               <children>
+                  <Label text="Prioridad" />
+                  <ComboBox fx:id="cbPrioridad" prefWidth="150.0" />
+               </children>
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <VBox alignment="TOP_CENTER">
+               <children>
+                  <Label text="Seleccionar fecha de entrega" />
+                  <DatePicker fx:id="dpFechaEntrega" prefHeight="27.0" prefWidth="120.0" promptText="dd/MM/yyyy" />
+               </children>
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <CheckBox fx:id="cbImprimir" mnemonicParsing="false" text="Imprimir ticket" />
+            <CheckBox fx:id="cbRutaPredeterminada" mnemonicParsing="false" prefHeight="35.0" prefWidth="140.0" selected="true" text="Guardar ticket en ruta predeterminada" wrapText="true">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </CheckBox>
+            <Separator orientation="VERTICAL" />
             <Button mnemonicParsing="false" onAction="#cargarService" text="CARGAR SERVICE" />
         </items>
       </ToolBar>

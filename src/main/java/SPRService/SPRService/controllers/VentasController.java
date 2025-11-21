@@ -22,7 +22,7 @@ import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorPDF;
+import SPRService.SPRService.util.generadores.GeneradorFacturasPDF;
 
 import java.io.File;
 import java.net.URL;
@@ -158,7 +158,7 @@ public class VentasController implements Initializable {
             return;
         }
         try {
-            GeneradorPDF.generaPDFVenta(ventaParaImpresion, file);
+            GeneradorFacturasPDF.generaPDFVenta(ventaParaImpresion, file);
         } catch (RuntimeException e) {
             e.printStackTrace();
             Alertas.error("Impresión de factura", "Ha ocurrido un error inesperado el imprimir la " +

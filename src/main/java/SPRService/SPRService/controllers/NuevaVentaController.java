@@ -21,13 +21,12 @@ import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
 import SPRService.SPRService.components.TablaDetallesVentaController;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorNotaRetiroTXT;
+import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -155,7 +154,7 @@ public class NuevaVentaController implements Initializable {
         }
 
         try {
-            GeneradorNotaRetiroTXT.generaNotaRetiro(tablaDetallesVentaController.getDetalles(), file);
+            GeneradorTXT.generaNotaRetiro(tablaDetallesVentaController.getDetalles(), file);
             if (checkImprimirNota.isSelected()) {
                 Impresor.imprimirConSistema(file);
             }

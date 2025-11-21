@@ -1,5 +1,7 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.FacturaServiceDTO;
+import SPRService.SPRService.DTOs.TicketRetiroServiceDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.entities.Usuario;
@@ -14,19 +16,28 @@ import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.generadores.GeneradorFacturasPDF;
+import SPRService.SPRService.util.generadores.GeneradorTXT;
+import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.tablas.ServiceRowViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.Notifications;
 
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +56,7 @@ public class ServicesController implements Initializable {
     @FXML
     private CheckComboBox<EstadoService> ccbEstados;
     @FXML
-    private DatePicker dpMinima, dpMaxima;
+    private DatePicker dpMinimaCarga, dpMaximaCarga, dpMinimaRetiro, dpMaximaRetiro;
     @FXML
     private TableView<ServiceRowViewModel> tablaServices;
     @FXML
@@ -80,7 +91,8 @@ public class ServicesController implements Initializable {
 
         FiltroServiceDTO filtros = new FiltroServiceDTO(
                 ManejadorInputs.codigoVenta(tfCodigo.getText().strip(), false),
-                dpMinima.getValue(), dpMaxima.getValue(),
+                dpMinimaCarga.getValue(), dpMaximaCarga.getValue(),
+                dpMinimaRetiro.getValue(), dpMaximaRetiro.getValue(),
                 ccbEstados.getCheckModel().getCheckedItems(), ccbPrioridades.getCheckModel().getCheckedItems());
         cargarTabla(serviceServ.buscarConFiltros(filtros));
     }
@@ -124,6 +136,61 @@ public class ServicesController implements Initializable {
         if (result.isPresent()) {
             obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(result.get()));
         }
+    }
+
+    @FXML
+    private void generarFactura(ActionEvent event) {
+        ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            Alertas.aviso("Factura service", "Debe seleccionar un service para imprimir su factura.");
+            return;
+        }
+        if (vm.getService().getEstadoService() == EstadoService.CANCELADO) {
+            Alertas.aviso("Factura service", "No es posible generar facturas de services cancelados.");
+            return;
+        }
+
+        Service seleccion = vm.getService();
+        File file = SimpleDialogs.selectorRuta(event, "Seleccione donde guardar la factura",
+                "Factura service nro. " + seleccion.getId(),
+                new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
+        if (file == null) return;
+
+        FacturaServiceDTO dtoDatosFactura = new FacturaServiceDTO(seleccion);
+        GeneradorFacturasPDF.generaPDFService(dtoDatosFactura, file);
+    }
+
+    @FXML
+    private void generarTicket(ActionEvent event) {
+        ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            Notifications.create()
+                    .title("Generar ticket")
+                    .text("Debe seleccionar un service para poder generar su ticket.")
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.BOTTOM_RIGHT)
+                    .showWarning();
+            return;
+        }
+        if (vm.getService().getEstadoService() == EstadoService.CANCELADO ||
+                vm.getService().getEstadoService() == EstadoService.PAGADO) {
+            Notifications.create()
+                    .title("Generar ticket")
+                    .text("No es posible generar el ticket de una factura en estado 'Pagado' o 'Cancelado'.")
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.BOTTOM_RIGHT)
+                    .showWarning();
+            return;
+        }
+
+        File file = SimpleDialogs.selectorRuta(event, "Seleccione donde quiere guardar el ticket",
+                "ticket-service.txt",
+                new FileChooser.ExtensionFilter("Archivos de texto (*.txt)", "*.txt"));
+        if (file == null) return;
+        GeneradorTXT.generarTicketRetiroService(new TicketRetiroServiceDTO(vm.getService()), file);
+
+        if (Alertas.confirmacion("Generar ticket", "¿Desea imprimir el ticket?"))
+            Impresor.imprimirConSistema(file);
     }
 
     @FXML
@@ -191,8 +258,10 @@ public class ServicesController implements Initializable {
         configColumnas();
         tablaServices.setItems(obsListServiceVM);
 
-        dpMaxima.setConverter(new SafeLocalDateConverter());
-        dpMinima.setConverter(new SafeLocalDateConverter());
+        dpMinimaCarga.setConverter(new SafeLocalDateConverter());
+        dpMaximaCarga.setConverter(new SafeLocalDateConverter());
+        dpMinimaRetiro.setConverter(new SafeLocalDateConverter());
+        dpMaximaRetiro.setConverter(new SafeLocalDateConverter());
 
         ccbEstados.getItems().setAll(EstadoService.values());
         ccbEstados.getCheckModel().checkAll();

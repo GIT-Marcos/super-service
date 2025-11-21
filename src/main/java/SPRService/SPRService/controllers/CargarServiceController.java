@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.TicketRetiroServiceDTO;
 import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.PrioridadService;
@@ -10,7 +11,10 @@ import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
+import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.generadores.GeneradorTXT;
+import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemTrabajoViewModel;
@@ -20,17 +24,22 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 
+import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -67,6 +76,8 @@ public class CargarServiceController implements Initializable, ModalController<S
     private Slider sliCombustible;
     @FXML
     private ComboBox<PrioridadService> cbPrioridad;
+    @FXML
+    private CheckBox cbRutaPredeterminada, cbImprimir;
 
     @Inject
     public CargarServiceController(AppCoordinator coordinator, ServiceServ serviceServ) {
@@ -184,7 +195,17 @@ public class CargarServiceController implements Initializable, ModalController<S
 
             if (!Alertas.confirmacion("Cargar service", "¿Está seguro que desea cargar?")) return;
             this.service = serviceServ.cargarService(service);
-            Alertas.exito("Cargar service", "Se ha cargado el service con éxito.");
+            Notifications.create()
+                    .title("Cargar service")
+                    .text("Se ha cargado el service al sistema con éxito.")
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.BOTTOM_RIGHT)
+                    .showInformation();
+
+            if (Alertas.confirmacion("Generar ticket de service", "¿Quiere generar un ticket?")) {
+                gestionarTicket(event, this.service);
+            }
+
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
@@ -194,6 +215,22 @@ public class CargarServiceController implements Initializable, ModalController<S
             Alertas.error("Cargar service", e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void gestionarTicket(ActionEvent event, Service s) {
+        File file;
+        if (cbRutaPredeterminada.isSelected()) {
+            file = new File("C:\\Users\\Usuario\\Desktop\\ticket-service.txt");
+        } else {
+            file = SimpleDialogs.selectorRuta(event, "Seleccione donde quiere guardar el ticket",
+                    "ticket-service.txt",
+                    new FileChooser.ExtensionFilter("Archivos de texto (*.txt)", "*.txt"));
+        }
+        if (file == null) return;
+        GeneradorTXT.generarTicketRetiroService(new TicketRetiroServiceDTO(s), file);
+
+        if (cbImprimir.isSelected())
+            Impresor.imprimirConSistema(file);
     }
 
     private boolean validar() {
