@@ -29,9 +29,9 @@
             </AreaChart>
          </center>
          <top>
-            <HBox spacing="10.0" BorderPane.alignment="CENTER">
+            <HBox prefHeight="160.0" prefWidth="991.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
-                  <AnchorPane maxHeight="135.0" minHeight="135.0" prefHeight="135.0">
+                  <AnchorPane maxHeight="160.0" minHeight="135.0" prefHeight="160.0" prefWidth="360.0">
                      <children>
                         <Spinner fx:id="spinnerAnio" layoutX="14.0" layoutY="27.0" />
                         <Label layoutX="14.0" layoutY="4.0" text="Seleccione el año sobre el que quiere generar el reporte">
@@ -39,9 +39,10 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <Button layoutX="187.0" layoutY="27.0" mnemonicParsing="false" onAction="#exportarJPG" text="Exportar como JPG" AnchorPane.leftAnchor="187.0" />
-                        <Button layoutX="14.0" layoutY="63.0" minWidth="300.0" mnemonicParsing="false" onAction="#generarReporteIngresos" prefWidth="300.0" text="Generar reporte de INGRESOS de services por mes" />
-                        <Button layoutX="14.0" layoutY="91.0" minWidth="300.0" mnemonicParsing="false" onAction="#generarReporteCantidad" prefWidth="300.0" text="Generar reporte de CANTIDAD de services por mes" />
+                        <Button layoutX="145.0" layoutY="65.0" mnemonicParsing="false" onAction="#exportarJPG" text="Exportar como JPG" AnchorPane.leftAnchor="145.0" />
+                        <Button layoutX="15.0" layoutY="100.0" minWidth="300.0" mnemonicParsing="false" onAction="#generarReporteIngresos" prefWidth="300.0" text="Generar reporte de INGRESOS de services por mes" />
+                        <Button layoutX="15.0" layoutY="128.0" minWidth="300.0" mnemonicParsing="false" onAction="#generarReporteCantidad" prefWidth="300.0" text="Generar reporte de CANTIDAD de services por mes" />
+                        <Button layoutX="15.0" layoutY="65.0" mnemonicParsing="false" onAction="#enviarMail" prefHeight="26.0" prefWidth="117.0" text="Enviar por mail" />
                      </children>
                   </AnchorPane>
                   <Separator orientation="VERTICAL" />

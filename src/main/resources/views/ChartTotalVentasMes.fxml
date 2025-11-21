@@ -24,6 +24,7 @@
             <Button layoutX="14.0" layoutY="63.0" mnemonicParsing="false" onAction="#generar" text="Generar" />
             <ComboBox fx:id="comboMeses" layoutX="14.0" layoutY="28.0" prefWidth="150.0" />
             <Spinner fx:id="spinnerAnio" layoutX="165.0" layoutY="28.0" />
+            <Button layoutX="758.0" layoutY="32.0" mnemonicParsing="false" onAction="#enviarMail" prefHeight="26.0" prefWidth="117.0" text="Enviar por mail" AnchorPane.rightAnchor="14.328357801057152" />
          </children>
       </AnchorPane>
    </top>
