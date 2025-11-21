@@ -45,7 +45,7 @@ public class ServicesController implements Initializable {
     @FXML
     private CheckComboBox<EstadoService> ccbEstados;
     @FXML
-    private DatePicker dpMinima, dpMaxima;
+    private DatePicker dpMinimaCarga, dpMaximaCarga, dpMinimaRetiro, dpMaximaRetiro;
     @FXML
     private TableView<ServiceRowViewModel> tablaServices;
     @FXML
@@ -80,7 +80,8 @@ public class ServicesController implements Initializable {
 
         FiltroServiceDTO filtros = new FiltroServiceDTO(
                 ManejadorInputs.codigoVenta(tfCodigo.getText().strip(), false),
-                dpMinima.getValue(), dpMaxima.getValue(),
+                dpMinimaCarga.getValue(), dpMaximaCarga.getValue(),
+                dpMinimaRetiro.getValue(), dpMaximaRetiro.getValue(),
                 ccbEstados.getCheckModel().getCheckedItems(), ccbPrioridades.getCheckModel().getCheckedItems());
         cargarTabla(serviceServ.buscarConFiltros(filtros));
     }
@@ -191,8 +192,10 @@ public class ServicesController implements Initializable {
         configColumnas();
         tablaServices.setItems(obsListServiceVM);
 
-        dpMaxima.setConverter(new SafeLocalDateConverter());
-        dpMinima.setConverter(new SafeLocalDateConverter());
+        dpMinimaCarga.setConverter(new SafeLocalDateConverter());
+        dpMaximaCarga.setConverter(new SafeLocalDateConverter());
+        dpMinimaRetiro.setConverter(new SafeLocalDateConverter());
+        dpMaximaRetiro.setConverter(new SafeLocalDateConverter());
 
         ccbEstados.getItems().setAll(EstadoService.values());
         ccbEstados.getCheckModel().checkAll();

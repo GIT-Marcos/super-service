@@ -9,9 +9,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.CheckComboBox?>
@@ -30,60 +28,10 @@
         </columns>
       </TableView>
    </center>
-   <top>
-      <GridPane prefHeight="130.0" prefWidth="990.0" BorderPane.alignment="CENTER">
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="100.0" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-         <children>
-            <Button minWidth="150.0" mnemonicParsing="false" onAction="#verTodos" text="Ver todos" GridPane.rowIndex="3" />
-            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
-            <Button minWidth="150.0" mnemonicParsing="false" onAction="#buscarConFiltros" text="Buscar con filtros" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <CheckComboBox fx:id="ccbPrioridades" minWidth="150.0" showCheckedCount="true" title="Prioridad..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <DatePicker fx:id="dpMinima" promptText="dd/MM/yyyy" GridPane.columnIndex="4" GridPane.rowIndex="2" />
-            <DatePicker fx:id="dpMaxima" promptText="dd/MM/yyyy" GridPane.columnIndex="6" GridPane.rowIndex="2" />
-            <TextField fx:id="tfCodigo" maxWidth="150.0" prefWidth="50.0" promptText="Código de service..." GridPane.rowIndex="1" />
-            <Label text="Filtros para buscar:" textFill="WHITE">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Separator prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="2" />
-            <Label text="Fecha de carga" textFill="WHITE" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.halignment="CENTER">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <Label text="Mínima" textFill="WHITE" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Label>
-            <Label layoutX="445.0" layoutY="47.0" text="Máxima" textFill="WHITE" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Label>
-            <CheckComboBox fx:id="ccbEstados" layoutX="211.0" layoutY="42.0" minWidth="150.0" showCheckedCount="true" title="Estados..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
-         </children>
-      </GridPane>
-   </top>
    <right>
       <VBox alignment="TOP_CENTER" maxWidth="170.0" minWidth="170.0" prefHeight="490.0" prefWidth="170.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
+            <Separator prefWidth="200.0" />
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#nuevoService" prefWidth="160.0" text="Nuevo service..." />
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#modificarService" prefWidth="160.0" text="Modificar/ver detalles" />
             <Button layoutX="15.0" layoutY="82.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#agregarPago" prefWidth="160.0" text="Agregar pago" />
@@ -101,4 +49,79 @@
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
+   <top>
+      <HBox prefHeight="150.0" prefWidth="990.0" spacing="5.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox prefHeight="100.0" prefWidth="150.0" spacing="5.0">
+               <children>
+                  <Label text="Filtros para buscar:" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="tfCodigo" maxWidth="150.0" prefWidth="50.0" promptText="Código de service..." />
+                  <Button minWidth="150.0" mnemonicParsing="false" onAction="#buscarConFiltros" text="Buscar con filtros" />
+                  <Button minWidth="150.0" mnemonicParsing="false" onAction="#verTodos" text="Ver todos" />
+               </children>
+            </VBox>
+            <VBox prefHeight="130.0" prefWidth="150.0" spacing="5.0">
+               <children>
+                  <CheckComboBox fx:id="ccbPrioridades" minWidth="150.0" showCheckedCount="true" title="Prioridad..." />
+                  <CheckComboBox fx:id="ccbEstados" minWidth="150.0" showCheckedCount="true" title="Estados..." />
+               </children>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+               <padding>
+                  <Insets top="56.0" />
+               </padding>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefHeight="130.0" prefWidth="150.0" spacing="4.0">
+               <children>
+                  <Label text="Fecha de carga" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Label text="Mínima" textFill="WHITE">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="dpMinimaCarga" promptText="dd/MM/yyyy" />
+                  <Label text="Máxima" textFill="WHITE">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="dpMaximaCarga" promptText="dd/MM/yyyy" />
+               </children>
+            </VBox>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <VBox alignment="TOP_CENTER" prefHeight="150.0" prefWidth="150.0" spacing="4.0">
+               <children>
+                  <Label text="Fecha de entrega" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <Label text="Mínima" textFill="WHITE">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="dpMinimaRetiro" promptText="dd/MM/yyyy" />
+                  <Label text="Máxima" textFill="WHITE">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="dpMaximaRetiro" promptText="dd/MM/yyyy" />
+               </children>
+            </VBox>
+            <VBox prefHeight="150.0" prefWidth="150.0" />
+            <VBox prefHeight="150.0" prefWidth="150.0" />
+         </children>
+      </HBox>
+   </top>
 </BorderPane>
