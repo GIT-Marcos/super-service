@@ -23,8 +23,8 @@
             <TableColumn fx:id="colFechaEntrega" prefWidth="148.29844665527344" text="Fecha de entrega" />
             <TableColumn fx:id="colEstado" prefWidth="113.19403076171875" text="Estado" />
             <TableColumn fx:id="colPrioridad" prefWidth="117.4925537109375" text="Prioridad" />
-            <TableColumn fx:id="colMontoFaltante" prefWidth="116.05975341796875" text="Monto faltante" />
-            <TableColumn fx:id="colMontoTotal" prefWidth="111.7611083984375" text="Monto total" />
+            <TableColumn fx:id="colMontoFaltante" prefWidth="116.05975341796875" text="Monto faltante $" />
+            <TableColumn fx:id="colMontoTotal" prefWidth="111.7611083984375" text="Monto total $" />
         </columns>
       </TableView>
    </center>
