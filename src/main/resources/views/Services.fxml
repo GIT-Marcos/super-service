@@ -36,6 +36,7 @@
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#modificarService" prefWidth="160.0" text="Modificar/ver detalles" />
             <Button layoutX="15.0" layoutY="82.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#agregarPago" prefWidth="160.0" text="Agregar pago" />
             <Button layoutX="15.0" layoutY="131.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#generarFactura" prefWidth="160.0" text="Generar factura" />
+            <Button layoutX="15.0" layoutY="246.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#generarTicket" prefWidth="160.0" text="Generar ticket" />
             <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#darDeBaja" prefWidth="160.0" text="Cancelar service" />
             <Separator prefWidth="200.0" />
             <Label text="Generación de reportes" textFill="WHITE">
