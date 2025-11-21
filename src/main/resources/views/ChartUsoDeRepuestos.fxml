@@ -35,7 +35,6 @@
                   <HBox spacing="5.0">
                      <children>
                         <Button mnemonicParsing="false" onAction="#generar" text="Generar" />
-                        <Button mnemonicParsing="false" onAction="#exportar" text="Exportar JPEG" />
                      </children>
                   </HBox>
                </children>
@@ -48,6 +47,12 @@
                      </font>
                   </Label>
                   <DatePicker fx:id="fechaMax" promptText="dd/MM/yyyy" />
+               </children>
+            </VBox>
+            <VBox prefHeight="100.0" prefWidth="100.0" spacing="5.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#exportar" prefHeight="26.0" prefWidth="95.0" text="Exportar JPEG" />
+                  <Button mnemonicParsing="false" onAction="#enviarMail" text="Enviar por mail" />
                </children>
             </VBox>
          </children>

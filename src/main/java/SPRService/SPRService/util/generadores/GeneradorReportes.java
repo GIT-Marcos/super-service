@@ -67,7 +67,7 @@ public class GeneradorReportes {
 
             // 4) Guardar como JPG
             ImageIO.write(imageSinTransparencia, "jpg", file);
-            Alertas.exito("Exportar reporte", "Reporte exportado con éxito.");
+            Alertas.exito("Exportar reporte", "Reporte guardado y exportado con éxito.");
         } catch (IOException ex) {
             ex.printStackTrace();
             Alertas.error("Exportar reporte", "Ocurrió un error al exportar el reporte.");
