@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.FacturaServiceDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.entities.Usuario;
@@ -14,10 +15,12 @@ import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.generadores.GeneradorFacturasPDF;
 import SPRService.SPRService.viewModels.tablas.ServiceRowViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
@@ -25,8 +28,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
 import org.controlsfx.control.CheckComboBox;
 
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -125,6 +130,28 @@ public class ServicesController implements Initializable {
         if (result.isPresent()) {
             obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(result.get()));
         }
+    }
+
+    @FXML
+    private void generarFactura(ActionEvent event) {
+        ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            Alertas.aviso("Factura service", "Debe seleccionar un service para imprimir su factura.");
+            return;
+        }
+        if (vm.getService().getEstadoService() == EstadoService.CANCELADO) {
+            Alertas.aviso("Factura service", "No es posible generar facturas de services cancelados.");
+            return;
+        }
+
+        Service seleccion = vm.getService();
+        File file = SimpleDialogs.selectorRuta(event, "Seleccione donde guardar la factura",
+                "Factura service nro. " + seleccion.getId(),
+                new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
+        if (file == null) return;
+
+        FacturaServiceDTO dtoDatosFactura = new FacturaServiceDTO(seleccion);
+        GeneradorFacturasPDF.generaPDFService(dtoDatosFactura, file);
     }
 
     @FXML

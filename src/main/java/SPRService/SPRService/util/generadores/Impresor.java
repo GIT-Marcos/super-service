@@ -6,7 +6,7 @@ import java.io.File;
 public class Impresor {
 
     public static void imprimirNotaRetiro(String rutaArchivo) {
-        //TO-DO: ORDENAR TIPOS IMPRESORAS
+        //TODO: ORDENAR TIPOS IMPRESORAS
     }
 
     /*PARA IMPRESORAS GENÉRICAS
@@ -63,7 +63,7 @@ public class Impresor {
                 System.out.println("El archivo no existe.");
                 return;
             }
-            Desktop.getDesktop().print(file); // Envia a imprimir con el programa predeterminado
+            Desktop.getDesktop().print(file); // Envía a imprimir con el programa predeterminado
             System.out.println("Impresión enviada desde el sistema.");
         } catch (Exception e) {
             e.printStackTrace();
