@@ -10,8 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.Rating?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="260.0" prefWidth="390.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.otros.RateController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="451.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.otros.RateController">
    <children>
       <VBox alignment="TOP_CENTER" layoutX="113.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -25,10 +24,43 @@
                   <Insets bottom="5.0" />
                </VBox.margin>
             </Rating>
-            <Separator prefWidth="200.0" />
-            <Label text="Puede dejar un comentario">
+            <Separator prefWidth="200.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin></Separator>
+            <Label text="¿Recomendaría Super Service a otra persona?">
                <font>
-                  <Font size="13.0" />
+                  <Font name="Cambria" size="18.0" />
+               </font>
+            </Label>
+            <Rating fx:id="rate2" max="10" partialRating="true" rating="3.0">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </Rating>
+            <Separator prefWidth="200.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Separator>
+            <Label text="¿Qué tan fácil le fue aplicar Super Service en su empresa?">
+               <font>
+                  <Font name="Cambria" size="18.0" />
+               </font>
+            </Label>
+            <Rating fx:id="rate3" max="10" partialRating="true" rating="3.0">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </Rating>
+            <Separator prefWidth="200.0">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </Separator>
+            <Label text="Puede dejarnos un comentario">
+               <font>
+                  <Font name="Cambria" size="18.0" />
                </font>
             </Label>
             <TextArea fx:id="tfComentario" prefHeight="200.0" prefWidth="200.0" promptText="¿Qué debemos mejorar?">
