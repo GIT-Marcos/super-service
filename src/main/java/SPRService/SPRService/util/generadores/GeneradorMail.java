@@ -27,7 +27,7 @@ public class GeneradorMail {
         return prop;
     }
 
-    public static void enviarReview(String review, double puntaje)
+    public static void enviarReview(String review, double csat, double nsp, double ces)
             throws EmailException {
 
         // 1. Cargar configuración del archivo
@@ -59,7 +59,10 @@ public class GeneradorMail {
         email.setFrom(fromEmail);
         email.addTo(destinatario);
         email.setSubject("Review SuperService");
-        email.setMsg("Puntaje: " + puntaje + "\nComentario: " + review);
+        email.setMsg("CSAT: " + csat + "\n" +
+                "NPS: " + nsp + "\n" +
+                "CES: " + ces + "\n" +
+                "Comentario: " + review);
         email.send();
     }
 

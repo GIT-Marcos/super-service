@@ -105,10 +105,4 @@ public class ModeloVehiculo implements Serializable{
     public String toString() {
         return "ModeloVehiculo{" + "id=" + id + ", nombreModelo=" + nombreModelo + ", anio=" + anio + ", cilindrada=" + cilindrada + '}';
     }
-
-    
-
-   
-    
-    
 }

@@ -21,7 +21,7 @@ public class RateController implements Initializable, ModalController<Boolean> {
     private Boolean result;
 
     @FXML
-    private Rating rate;
+    private Rating rate, rate2, rate3;
     @FXML
     private TextArea tfComentario;
 
@@ -37,11 +37,13 @@ public class RateController implements Initializable, ModalController<Boolean> {
 
     @FXML
     void enviar(ActionEvent event) {
-        double puntaje = rate.getRating();
+        double csat = Math.round(rate.getRating());
+        double nsp = Math.round(rate2.getRating());
+        double ces = Math.round(rate3.getRating());
         String comentario = tfComentario.getText().strip();
 
         try {
-            GeneradorMail.enviarReview(comentario, puntaje);
+            GeneradorMail.enviarReview(comentario, csat, nsp, ces);
             this.result = true;
             closeWindow(event);
         } catch (EmailException e) {
