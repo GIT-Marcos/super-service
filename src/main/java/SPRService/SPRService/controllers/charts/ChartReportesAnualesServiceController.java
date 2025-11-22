@@ -171,7 +171,9 @@ public class ChartReportesAnualesServiceController implements Initializable {
         int ano = spinnerAnio.getValue();
         DatosReporteServiceDTO dto = serviceServ.generarDatosAnuales(ano);
         lblIngresosTotales.setText("$ " + dto.ingTotales());
-        lblPromedioIngresosPorService.setText("$ " + dto.ingPromedioPorService());
+        lblPromedioIngresosPorService.setText(
+                "$ " + String.format("%.2f", dto.ingPromedioPorService())
+        );
         lblCantidadDeServicesAnio.setText(dto.cantidadDeService().toString());
         lblIngresosPorTrabajos.setText("$ " + dto.ingPorTrabajos());
         lblIngresosPorRepuestos.setText("$ " + dto.ingPorRepuestos());

@@ -118,7 +118,7 @@ public class ServiceTest {
                 for (int j = 0; j < cantTrabajos; j++) {
                     trabajos.add(new Trabajo(null,
                             trabajosLista[random.nextInt(trabajosLista.length)],
-                            BigDecimal.valueOf(random.nextInt(15000) + 2000)));
+                            BigDecimal.valueOf(random.nextInt(45000) + 4000)));
                 }
                 orden.agregarTrabajos(trabajos);
 
