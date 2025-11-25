@@ -17,10 +17,6 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
 
     ResultadoPaginado<VentaRepuesto> verTodosPaginado(int pagina, int tamanioPagina);
 
-    List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,
-                                     BigDecimal montoMinimo, BigDecimal montomaximo, String nombreColOrdenar,
-                                     Integer tipoOrden, LocalDate fechaMinima, LocalDate fechaMaxima);
-
     ResultadoPaginado<VentaRepuesto> buscarPaginadoConFiltros(FiltroVentaRepuestoDTO filtro,
                                                               int pagina, int tamanioPagina);
 
