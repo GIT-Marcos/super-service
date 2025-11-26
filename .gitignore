@@ -6,6 +6,9 @@
 .idea/**/shelf
 .idea/**/contentModel.xml
 .idea/modules.xml
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/dataSources/
 
 # Archivos de módulo de IntelliJ (se pueden ignorar si usas Maven/Gradle para importar)
 *.iml
@@ -17,13 +20,15 @@ out/
 *.class
 *.log
 *.ctxt
-*.jar
 *.war
 *.nar
 *.ear
 *.zip
 *.tar.gz
 *.rar
+*.jar
+!maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.jar
 
 ### Maven ###
 target/
