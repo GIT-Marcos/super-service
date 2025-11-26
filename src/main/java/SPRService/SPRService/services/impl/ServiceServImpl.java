@@ -33,6 +33,20 @@ public class ServiceServImpl implements ServiceServ {
         this.notaRetiroServ = notaRetiroServ;
     }
 
+    /**
+     * Para que no se guarden notas de retiro vacías
+     */
+    private void validarNota(Service s) {
+        if (s.getOrden().getNotaRetiro() == null || s.getOrden().getNotaRetiro().getDetallesRetiroList().isEmpty()) {
+            //todo: ver si cancelar nota
+            s.getOrden().setNotaRetiro(null);
+        } else {
+            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiroList()) {
+                stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
+            }
+        }
+    }
+
     @Transactional
     @Override
     public List<Service> verTodos() {
@@ -48,15 +62,7 @@ public class ServiceServImpl implements ServiceServ {
     @Transactional
     @Override
     public Service cargarService(Service s) {
-        if (s.getOrden().getNotaRetiro().getDetallesRetiroList().isEmpty()) {
-            //todo: ver si cancelar nota
-            s.getOrden().setNotaRetiro(null);
-        }
-        if (s.getOrden().getNotaRetiro() != null) {
-            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiroList()) {
-                stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
-            }
-        }
+        validarNota(s);
 
         daoService.save(s);
         return s;
@@ -65,15 +71,7 @@ public class ServiceServImpl implements ServiceServ {
     @Transactional
     @Override
     public Service modificarService(Service s) {
-        if (s.getOrden().getNotaRetiro().getDetallesRetiroList().isEmpty()) {
-            //todo: ver si cancelar nota
-            s.getOrden().setNotaRetiro(null);
-        }
-        if (s.getOrden().getNotaRetiro() != null) {
-            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiroList()) {
-                stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
-            }
-        }
+        validarNota(s);
 
         return daoService.update(s);
     }
