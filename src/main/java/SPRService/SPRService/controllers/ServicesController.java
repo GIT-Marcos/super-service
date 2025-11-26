@@ -139,6 +139,21 @@ public class ServicesController implements Initializable {
     }
 
     @FXML
+    private void verPagos() {
+        SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm =
+                tablaServices.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            Alertas.aviso("Agregar pago", "Debe seleccionar un service para ver sus pagos.");
+            return;
+        }
+        Optional<ServiceRowViewModel> result = navigator.openModal(Views.VER_PAGOS, "Ver pagos", vm);
+        if (result.isPresent()) {
+            obsListServiceVM.set(obsListServiceVM.indexOf(vm), result.get());
+            tablaServices.getSelectionModel().select(result.get());
+        }
+    }
+
+    @FXML
     private void generarFactura(ActionEvent event) {
         ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {

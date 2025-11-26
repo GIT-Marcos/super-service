@@ -94,7 +94,7 @@ class RepuestosVentasTest {
                 DetalleRetiro detalle = new DetalleRetiro(null, cantidad, repuestoAleatorio);
                 NotaRetiro notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA,
                         new ArrayList<>(List.of(detalle)));
-                VentaRepuesto venta = new VentaRepuesto(null, notaRetiro, new ArrayList<>());
+                VentaRepuesto venta = new VentaRepuesto(null, notaRetiro, new HashSet<>());
                 venta.setFechaVenta(fechaVenta);
 
                 // Ticket único usando UUID para evitar colisiones

@@ -40,6 +40,7 @@ public enum Views {
     MODIFICAR_SERVICE("/views/ModificarService.fxml", ModificarServiceController.class),
     DETALLE_ORDEN("/views/DetalleOrden.fxml", DetalleOrdenController.class),
     RATE("/views/Rate.fxml", RateController.class),
+    VER_PAGOS("/views/VerPagos.fxml", VerPagosController.class),
 
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),

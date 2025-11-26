@@ -27,10 +27,7 @@ import SPRService.SPRService.util.generadores.Impresor;
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class NuevaVentaController implements Initializable {
 
@@ -168,7 +165,7 @@ public class NuevaVentaController implements Initializable {
     private void pagar() {
         NotaRetiro notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA,
                 tablaDetallesVentaController.getDetalles());
-        VentaRepuesto ventaRepuesto = new VentaRepuesto(null, notaRetiro, new ArrayList<>());
+        VentaRepuesto ventaRepuesto = new VentaRepuesto(null, notaRetiro, new HashSet<>());
         Optional<VentaRepuesto> optional = navigator.openModal(
                 Views.PAGO, "Pago", ventaRepuesto);
         if (optional.isPresent()) {

@@ -11,10 +11,8 @@ import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import SPRService.SPRService.enums.EstadoVentaRepuesto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +33,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
                 Long.class).getSingleResult();
 
         List<VentaRepuesto> ventas = em.createQuery("SELECT v FROM VentaRepuesto v " +
+                                "LEFT JOIN FETCH v.pagos " +
                                 "ORDER BY v.fechaVenta DESC",
                         VentaRepuesto.class)
                 .setFirstResult(pagina * tamanioPagina)
@@ -42,56 +41,6 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
                 .getResultList();
 
         return new ResultadoPaginado<>(ventas, totalResultados);
-    }
-
-    @Override
-    public List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,
-                                            BigDecimal montoMinimo, BigDecimal montomaximo, String nombreColOrdenar,
-                                            Integer tipoOrden, LocalDate fechaMinima, LocalDate fechaMaxima) {
-        EntityManager em = emProvider.get();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<VentaRepuesto> query = cb.createQuery(VentaRepuesto.class);
-        Root<VentaRepuesto> root = query.from(VentaRepuesto.class);
-        Join<VentaRepuesto, NotaRetiro> joinNota = root.join("notaRetiro");
-        Join<NotaRetiro, DetalleRetiro> joinDetalles = joinNota.join("detalleRetiroList");
-        Join<DetalleRetiro, Repuesto> joinRepuesto = joinDetalles.join("repuesto");
-        Join<Repuesto, Stock> joinStock = joinRepuesto.join("stock");
-        List<Predicate> filtros = new ArrayList<>();
-
-        //SI SE QUIERE BUSCAR ALGO POR CÓDIGO...
-        if (codVenta != null) {
-            filtros.add(cb.equal(root.get("id"), String.valueOf(codVenta)));
-        }
-        //SI SE BUSCA UN ESTADO != DE CUALQUIERA...
-        if (estadosVenta != null && !estadosVenta.isEmpty()) {
-            filtros.add(root.get("estadoVenta").in(estadosVenta));
-        }
-
-        //FILTROS DEL MONTO
-        if (montoMinimo != null && montomaximo != null) {
-            filtros.add(cb.between(root.get("montoTotal"), montoMinimo, montomaximo));
-        } else if (montoMinimo != null) {
-            filtros.add(cb.greaterThanOrEqualTo(root.get("montoTotal"), montoMinimo));
-        } else if (montomaximo != null) {
-            filtros.add(cb.lessThanOrEqualTo(root.get("montoTotal"), montomaximo));
-        }
-
-        if (fechaMinima != null && fechaMaxima != null) {
-            filtros.add(cb.between(root.get("fechaVenta"), fechaMinima, fechaMaxima));
-        } else if (fechaMinima != null) {
-            filtros.add(cb.greaterThanOrEqualTo(root.get("fechaVenta"), fechaMinima));
-        } else if (fechaMaxima != null) {
-            filtros.add(cb.lessThanOrEqualTo(root.get("fechaVenta"), fechaMaxima));
-        }
-
-        query.where(cb.and(filtros.toArray(new Predicate[0])));
-        if (tipoOrden == 0) {
-            query.orderBy(cb.asc(root.get(nombreColOrdenar)));
-        } else if (tipoOrden == 1) {
-            query.orderBy(cb.desc(root.get(nombreColOrdenar)));
-        }
-
-        return em.createQuery(query).getResultList();
     }
 
     @Override
@@ -117,6 +66,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         // --- 2. CONSULTA PARA OBTENER LOS DATOS DE LA PÁGINA ACTUAL ---
         CriteriaQuery<VentaRepuesto> dataQuery = cb.createQuery(VentaRepuesto.class);
         Root<VentaRepuesto> dataRoot = dataQuery.from(VentaRepuesto.class);
+        dataRoot.fetch("pagos", JoinType.LEFT);
         dataQuery.select(dataRoot);
         // Volvemos a aplicar los mismos filtros, pero ahora a la consulta de datos
         aplicarFiltros(filtro, cb, dataQuery, dataRoot);
@@ -144,6 +94,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         return new ResultadoPaginado<>(ventas, totalResultados);
     }
 
+    //todo: eliminar estado venta y que los reportes trabajen sobre las que están pagadas
     @Override
     public List<Object[]> cantidadVentasPorMeses(Integer anio) {
         EntityManager em = emProvider.get();

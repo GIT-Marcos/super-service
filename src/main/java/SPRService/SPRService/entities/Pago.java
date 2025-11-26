@@ -6,15 +6,16 @@ import SPRService.SPRService.enums.MetodosPago;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "pagos")
 public class Pago implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pk_pago")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "pk_pago", nullable = false, updatable = false)
+    private UUID id;
 
     @Column()
     private String dni;
@@ -43,17 +44,12 @@ public class Pago implements Serializable {
     @Column(nullable = false)
     private Boolean activo;
 
-    //ENUM MÉTO DO DE PAGO
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false, name = "metodo_pago")
     private MetodosPago MetodoPago;
 
-    //ENUM BANCO
-    //ENUM ESTADO PAGO
-    //RELACIÓN CON VENTAsERVICE
-    //RELACIÓN BI CON VENTA REPUESTO
-    //todo: INVERTIR RELACIÓN
     @ManyToOne()
+    @JoinColumn(name = "fk_venta")
     private VentaRepuesto ventaRepuesto;
 
     @ManyToOne()
@@ -63,7 +59,7 @@ public class Pago implements Serializable {
     public Pago() {
     }
 
-    public Pago(Long id, String dni, BigDecimal montoPagado, String marcaTarjeta,
+    public Pago(UUID id, String dni, BigDecimal montoPagado, String marcaTarjeta,
                 String banco, String referencia, BigDecimal descuento, String ultimos4, MetodosPago MetodoPago,
                 VentaRepuesto ventaRepuesto, Service service) {
         this.id = id;
@@ -81,11 +77,29 @@ public class Pago implements Serializable {
         this.service = service;
     }
 
-    public Long getId() {
+    public void asociarVenta(VentaRepuesto v) {
+        if (this.service == null) {
+            this.ventaRepuesto = v;
+            this.ventaRepuesto.getPagos().add(this);
+        }
+    }
+
+    public void asociarService(Service s) {
+        if (this.ventaRepuesto == null) {
+            this.service = s;
+            this.service.getPagos().add(this);
+        }
+    }
+
+    public void cancelarPago() {
+        this.activo = Boolean.FALSE;
+    }
+
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -186,23 +200,31 @@ public class Pago implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pago)) return false;
+
+        Pago other = (Pago) o;
+
+        // Importante: id puede ser null si la entidad aún no se ha guardado
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        // Hash code constante para evitar problemas en Sets cuando el ID se genera después de insertar
+        return getClass().hashCode();
+    }
+
+    @Override
     public String toString() {
         return "Pago{" +
                 "id=" + id +
                 ", dni='" + dni + '\'' +
                 ", fechaPago=" + fechaPago +
                 ", montoPagado=" + montoPagado +
-                ", marcaTarjeta='" + marcaTarjeta + '\'' +
-                ", banco='" + banco + '\'' +
-                ", referencia='" + referencia + '\'' +
-                ", descuento=" + descuento +
-                ", ultimos4='" + ultimos4 + '\'' +
                 ", activo=" + activo +
                 ", MetodoPago=" + MetodoPago +
                 '}';
-    }
-
-    public void cancelarPago() {
-        this.activo = Boolean.FALSE;
     }
 }
