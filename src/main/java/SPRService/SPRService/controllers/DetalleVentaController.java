@@ -27,8 +27,6 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     private VentaRepuesto ventaParaDevolver;
     private ObservableList<ItemDetalleViewModel> itemsDetalles = FXCollections.observableArrayList();
     private ObservableList<ItemPagoViewModel> itemsPagos = FXCollections.observableArrayList();
-//    private ObservableList<DetalleVentaVM> obsListDetalleVM = FXCollections.observableArrayList();
-//    private ObservableList<PagosVMtabla> obsListPagoVM = FXCollections.observableArrayList();
     private final Navigator navigator;
 
     @Inject
