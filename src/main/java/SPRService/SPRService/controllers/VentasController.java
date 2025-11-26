@@ -135,7 +135,8 @@ public class VentasController implements Initializable {
 
         Optional<VentaRepuesto> result = navigator.openModal(Views.DETALLE_VENTA, "Detalles de venta",
                         ventaParaDetalles);
-        if (result.isPresent()) vrvm.actualizarDesdeEntidad(result.get());
+        result.ifPresent(venta ->
+                obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(venta)));
     }
 
     @FXML
@@ -208,7 +209,7 @@ public class VentasController implements Initializable {
         try {
             ventaParaCancelar = ventaRepuestoServ.cancelarVenta(ventaParaCancelar, restablecerStock, motivo,
                     usuarioCancelador);
-            vrvm.actualizarDesdeEntidad(ventaParaCancelar);
+            obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(ventaParaCancelar));
             Alertas.exito("Cancelación de venta", "Se ha cancelado la venta con éxito.");
         } catch (RuntimeException e) {
             Alertas.aviso("Cancelación de venta", e.getMessage());

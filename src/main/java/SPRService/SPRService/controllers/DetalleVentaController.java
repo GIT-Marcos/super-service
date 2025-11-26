@@ -24,7 +24,6 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
         ModalController<VentaRepuesto> {
 
     private VentaRepuesto ventaRepuesto;
-    // lo mismo que en el controlador de pago con esto
     private VentaRepuesto ventaParaDevolver;
     private ObservableList<DetalleVentaVM> obsListDetalleVM = FXCollections.observableArrayList();
     private ObservableList<PagosVMtabla> obsListPagoVM = FXCollections.observableArrayList();
@@ -62,14 +61,10 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
             }
             tablaDetallesVentaController.setDetalles(data.getNotaRetiro().getDetallesRetiroList());
             this.obsListPagoVM.clear();
-            for (Pago p : data.getPagosList()) {
+            for (Pago p : data.getPagos()) {
                 this.obsListPagoVM.add(new PagosVMtabla(p));
             }
-            if (data.getEstadoVenta().equals(EstadoVentaRepuesto.PENDIENTE_PAGO)) {
-                butAgregarPago.setDisable(false);
-            } else {
-                butAgregarPago.setDisable(true);
-            }
+            butAgregarPago.setDisable(!data.getEstadoVenta().equals(EstadoVentaRepuesto.PENDIENTE_PAGO));
             cargarLabels();
         }
     }
@@ -83,10 +78,10 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     private void irPago() {
         Optional<VentaRepuesto> result = navigator.openModal(Views.PAGO,
                 "Agregar pago", this.ventaRepuesto);
-        if (result.isPresent()) {
-            this.receiveData(result.get());
-            this.ventaParaDevolver = result.get();
-        }
+        result.ifPresent(repuesto -> {
+            receiveData(repuesto);
+            this.ventaParaDevolver = this.ventaRepuesto;
+        });
     }
 
     private void configColumnas() {

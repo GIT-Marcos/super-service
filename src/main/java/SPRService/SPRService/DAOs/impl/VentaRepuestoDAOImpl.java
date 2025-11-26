@@ -11,10 +11,8 @@ import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import SPRService.SPRService.enums.EstadoVentaRepuesto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +33,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
                 Long.class).getSingleResult();
 
         List<VentaRepuesto> ventas = em.createQuery("SELECT v FROM VentaRepuesto v " +
+                                "LEFT JOIN FETCH v.pagos " +
                                 "ORDER BY v.fechaVenta DESC",
                         VentaRepuesto.class)
                 .setFirstResult(pagina * tamanioPagina)
@@ -67,6 +66,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         // --- 2. CONSULTA PARA OBTENER LOS DATOS DE LA PÁGINA ACTUAL ---
         CriteriaQuery<VentaRepuesto> dataQuery = cb.createQuery(VentaRepuesto.class);
         Root<VentaRepuesto> dataRoot = dataQuery.from(VentaRepuesto.class);
+        dataRoot.fetch("pagos", JoinType.LEFT);
         dataQuery.select(dataRoot);
         // Volvemos a aplicar los mismos filtros, pero ahora a la consulta de datos
         aplicarFiltros(filtro, cb, dataQuery, dataRoot);
@@ -94,6 +94,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         return new ResultadoPaginado<>(ventas, totalResultados);
     }
 
+    //todo: eliminar estado venta y que los reportes trabajen sobre las que están pagadas
     @Override
     public List<Object[]> cantidadVentasPorMeses(Integer anio) {
         EntityManager em = emProvider.get();

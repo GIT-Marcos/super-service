@@ -4,11 +4,9 @@ import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.VentaRepuesto;
-import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {

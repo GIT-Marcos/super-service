@@ -129,7 +129,7 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
         }
 
         ventaRepuesto.cancelarVenta();
-        for (Pago p : ventaRepuesto.getPagosList()) {
+        for (Pago p : ventaRepuesto.getPagos()) {
             p.cancelarPago();
         }
         if (restablecerStocks) {
