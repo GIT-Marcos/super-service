@@ -67,7 +67,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void irNuevaVenta() {
-        navigator.navigateTo(Views.NUEVA_VENTA);
+        navigator.openModal(Views.CARGAR_VENTA, "Cargar nueva venta", null);
     }
 
     @FXML
