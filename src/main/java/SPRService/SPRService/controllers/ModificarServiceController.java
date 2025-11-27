@@ -238,13 +238,13 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
 
     @FXML
     private void agregarRepuesto() {
-        Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO_SERVICE,
+        Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO,
                 "Agregar repuesto", this.notaRetiro.getDetallesRetiroList());
-        if (result.isPresent()) {
-            orden.agregarRepuestos(List.of(result.get()));
-            items.addFirst(new ItemDetalleRetiroViewModel(result.get()));
-            agregarTotal(result.get().getSubTotal());
-        }
+        result.ifPresent(detalle -> {
+            orden.agregarRepuestos(List.of(detalle));
+            items.addFirst(new ItemDetalleRetiroViewModel(detalle));
+            agregarTotal(detalle.getSubTotal());
+        });
     }
 
     private void eliminarItem(ItemDetalleViewModel item) {
