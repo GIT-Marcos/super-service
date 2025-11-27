@@ -7,17 +7,19 @@ import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.util.ManejadorInputs;
-import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.viewModels.celdas.ItemRepuestoViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -27,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class AgregarRepuestoServiceController implements Initializable, ModalController<DetalleRetiro>,
+public class AgregarRepuestoController implements Initializable, ModalController<DetalleRetiro>,
         DataReceiver<List<DetalleRetiro>> {
 
     private DetalleRetiro detalleRetiro;
@@ -46,7 +48,7 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
     private CheckBox cbStockBajo, cbStockNormal;
 
     @Inject
-    public AgregarRepuestoServiceController(RepuestoServ repuestoServ) {
+    public AgregarRepuestoController(RepuestoServ repuestoServ) {
         this.repuestoServ = repuestoServ;
     }
 
@@ -86,15 +88,26 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
     @FXML
     private void agregarRepuesto() {
         Double cantidad;
-        Repuesto r = lvRepuestos.getSelectionModel().getSelectedItem().getRepuesto();
-        if (r == null) {
-            Alertas.aviso("Agregar repuesto", "Debe seleccionar un repuesto para agregarlo " +
-                    "al service");
+        SPRService.SPRService.viewModels.celdas.ItemRepuestoViewModel vm =
+                lvRepuestos.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            Notifications.create()
+                    .title("Agregar repuesto")
+                    .text("Debe seleccionar un repuesto para agregarlo.")
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .showWarning();
             return;
         }
+
+        Repuesto r = vm.getRepuesto();
         if (verificarDuplicado(r)) {
-            Alertas.aviso("Agregar repuesto", "Ya se ha agregado el repuesto: \n" +
-                    r.getDetalle() + "\nal service.");
+            Notifications.create()
+                    .title("Agregar repuesto")
+                    .text("El repuesto seleccionado ya ha sido agregado al detalle.")
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .showWarning();
             return;
         }
 
@@ -104,7 +117,12 @@ public class AgregarRepuestoServiceController implements Initializable, ModalCon
             detalleRetiro = new DetalleRetiro(null, cantidad, r);
             cerrarVentana();
         } catch (RuntimeException e) {
-            Alertas.aviso("Agregar cantidad", e.getMessage());
+            Notifications.create()
+                    .title("Agregar repuesto")
+                    .text(e.getMessage())
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .showWarning();
         }
     }
 
