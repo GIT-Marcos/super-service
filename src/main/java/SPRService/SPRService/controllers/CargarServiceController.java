@@ -122,7 +122,7 @@ public class CargarServiceController implements Initializable, ModalController<S
 
     @FXML
     private void irAgregarRepuesto() {
-        Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO_SERVICE,
+        Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO,
                 "Agregar repuesto", obtenerDetalles());
         if (result.isPresent()) {
             items.addFirst(new ItemDetalleRetiroViewModel(result.get()));

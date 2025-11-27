@@ -34,13 +34,14 @@ public enum Views {
     CARGAR_VEHICULO("/views/CargarVehiculo.fxml", WizardCargarVehiculoController.class),
     CARGAR_CLIENTE("/views/CargarCliente.fxml", CargarClienteController.class),
     STEP_CLIENTE("/views/StepCliente.fxml", StepClienteController.class),
-    AGREGAR_REPUESTO_SERVICE("/views/AgregarRepuestoService.fxml", AgregarRepuestoServiceController.class),
+    AGREGAR_REPUESTO("/views/AgregarRepuesto.fxml", AgregarRepuestoController.class),
     AGREGAR_CLIENTE_SERVICE("/views/AgregarClienteService.fxml", AgregarClienteServiceController.class),
     AGREGAR_VEHICULO_SERVICE("/views/AgregarVehiculoService.fxml", AgregarVehiculoServiceController.class),
     MODIFICAR_SERVICE("/views/ModificarService.fxml", ModificarServiceController.class),
     DETALLE_ORDEN("/views/DetalleOrden.fxml", DetalleOrdenController.class),
     RATE("/views/Rate.fxml", RateController.class),
     VER_PAGOS("/views/VerPagos.fxml", VerPagosController.class),
+    CARGAR_VENTA("/views/CargarVenta.fxml", CargarVentaController.class),
 
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
