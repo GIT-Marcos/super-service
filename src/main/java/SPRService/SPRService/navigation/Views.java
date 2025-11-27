@@ -32,7 +32,6 @@ public enum Views {
     DETALLE_VEHICULO("/views/DetallesVehiculo.fxml", DetalleVehiculoController.class),
     CARGAR_VEHICULO("/views/CargarVehiculo.fxml", WizardCargarVehiculoController.class),
     CARGAR_CLIENTE("/views/CargarCliente.fxml", CargarClienteController.class),
-    STEP_CLIENTE("/views/StepCliente.fxml", StepClienteController.class),
     AGREGAR_REPUESTO("/views/AgregarRepuesto.fxml", AgregarRepuestoController.class),
     AGREGAR_CLIENTE_SERVICE("/views/AgregarClienteService.fxml", AgregarClienteServiceController.class),
     AGREGAR_VEHICULO_SERVICE("/views/AgregarVehiculoService.fxml", AgregarVehiculoServiceController.class),
