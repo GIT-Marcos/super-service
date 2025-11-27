@@ -1,6 +1,5 @@
 package SPRService.SPRService.controllers;
 
-import SPRService.SPRService.DTOs.TicketRetiroServiceDTO;
 import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.NotaRetiro;
