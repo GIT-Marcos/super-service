@@ -10,7 +10,6 @@ public enum Views {
     LOGIN("/views/Login.fxml", LoginController.class),
     MAIN("/views/MainView.fxml", MainController.class),
     DEPOSITO("/views/Deposito.fxml", DepositoController.class),
-    NUEVA_VENTA("/views/NuevaVenta.fxml", NuevaVentaController.class),
     VENTAS("/views/Ventas.fxml", VentasController.class),
     NOTAS_RETIRO("/views/NotasRetiro.fxml", NotasRetiroController.class),
     VEHICULOS("/views/Vehiculos.fxml", VehiculosController.class),
