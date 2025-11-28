@@ -98,7 +98,7 @@
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#nuevoRepuesto" styleClass="btn-success" text="➕ Nuevo">
                     <tooltip><Tooltip text="Agregar nuevo repuesto" /></tooltip>
                 </Button>
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modRepuesto" text="📝 Detalles" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modRepuesto" text="📝 Detalles/Modificar" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#borrarRepuesto" styleClass="btn-danger" text="🗑 Baja" />
 
                 <Separator />
