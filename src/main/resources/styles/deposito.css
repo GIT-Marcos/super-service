@@ -44,6 +44,7 @@
     -fx-cursor: hand;
     -fx-background-radius: 3;
     -fx-font-size: 12px;
+    -fx-border-radius: 3;
 }
 
 .btn-primary {
@@ -89,6 +90,13 @@
     -fx-text-fill: #636e72;
     -fx-font-size: 10px; /* Etiquetas muy pequeñas tipo 'caps' */
 }
+
+.btn-report {
+    -fx-background-color: #cbfdcb;
+    -fx-text-fill: #000000;
+    -fx-border-color: #00800b;
+}
+.btn-report:hover { -fx-background-color: #115700; -fx-text-fill: white; }
 
 /* --- TABLA --- */
 .table-view {

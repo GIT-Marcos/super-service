@@ -36,8 +36,8 @@
                         <TextField fx:id="tfNombre" promptText="Nombre del repuesto" HBox.hgrow="ALWAYS" />
                         <TextField fx:id="tfMarca" prefWidth="130.0" promptText="Marca" />
 
-                        <Button fx:id="butBuscar" defaultButton="true" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="100.0" styleClass="btn-primary" text="Buscar" />
-                        <Button fx:id="btnTodosRepuestos" mnemonicParsing="false" onAction="#todosRepuestos" prefWidth="100.0" text="Ver Todos" />
+                        <Button fx:id="butBuscar" defaultButton="true" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="100.0" styleClass="btn-primary" text="🔍 Buscar" />
+                        <Button fx:id="btnTodosRepuestos" mnemonicParsing="false" onAction="#todosRepuestos" prefWidth="100.0" styleClass="btn-primary" text="Ver Todos" />
                     </children>
                 </HBox>
 
@@ -49,7 +49,7 @@
                         <CheckBox fx:id="checkMostrarBajo" selected="true" text="Ver stock bajo" />
 
                         <!-- Aviso de Stock (Se muestra aquí para ahorrar espacio vertical) -->
-                        <Label fx:id="labelAvisoStock" styleClass="alert-label-compact" text="⚠ Stock Crítico" visible="false">
+                        <Label fx:id="labelAvisoStock" styleClass="alert-label-compact" text="⚠ Repuestos con Stock Crítico" visible="false">
                             <HBox.margin>
                                 <Insets left="10.0" />
                             </HBox.margin>
@@ -58,8 +58,8 @@
                         <Region HBox.hgrow="ALWAYS" />
 
                         <Label text="Ordenar:" textFill="#b2bec3" />
-                        <ComboBox fx:id="comboOrdenarPor" prefHeight="27.0" prefWidth="140.0" promptText="Campo" styleClass="combo-compact" />
-                        <ComboBox fx:id="comboTipoOrden" prefHeight="27.0" prefWidth="140.0" promptText="Orden" styleClass="combo-compact" />
+                        <ComboBox fx:id="comboOrdenarPor" prefWidth="140.0" promptText="Campo" />
+                        <ComboBox fx:id="comboTipoOrden" prefWidth="140.0" promptText="Orden" />
                     </children>
                 </HBox>
             </children>
@@ -89,33 +89,33 @@
 
     <!-- DERECHA: MENÚ LATERAL -->
     <right>
-        <VBox prefWidth="170.0" spacing="8.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+        <VBox prefWidth="160.0" spacing="8.0" styleClass="sidebar" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
             <children>
                 <Label styleClass="section-label" text="ACCIONES" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#nuevoRepuesto" prefHeight="30.0" styleClass="btn-success" text="➕ Nuevo">
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#nuevoRepuesto" styleClass="btn-success" text="➕ Nuevo">
                     <tooltip><Tooltip text="Agregar nuevo repuesto" /></tooltip>
                 </Button>
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modRepuesto" prefHeight="30.0" text="📝 Detalles" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#borrarRepuesto" prefHeight="30.0" styleClass="btn-danger" text="🗑 Baja" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modRepuesto" text="📝 Detalles" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#borrarRepuesto" styleClass="btn-danger" text="🗑 Baja" />
 
                 <Separator />
 
                 <Label styleClass="section-label" text="STOCK" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#ingresarStock" prefHeight="30.0" styleClass="btn-action" text="📦 Ingresar" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#ingresarStock" styleClass="btn-action" text="📦 Ingresar" />
 
                 <Separator />
 
                 <Label styleClass="section-label" text="REPORTES" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#masRetiradosParaVenta" prefHeight="25.0" styleClass="btn-small" text="Más Vendidos" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#usoDeRepuestos" prefHeight="25.0" styleClass="btn-small" text="Uso Repuestos" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#masRetiradosParaVenta" styleClass="btn-report" text="📊 Más Vendidos" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#usoDeRepuestos" styleClass="btn-report" text="Uso Repuestos" />
 
                 <Separator />
                 <Label styleClass="section-label" text="EXPORTAR" />
                 <ComboBox fx:id="comboFormatos" maxWidth="Infinity" styleClass="combo-compact" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generar" prefHeight="30.0" text="⬇ Descargar" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generar" text="⬇ Descargar" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="5.0" right="5.0" top="5.0" />
