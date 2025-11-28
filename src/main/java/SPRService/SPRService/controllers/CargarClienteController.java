@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+//todo: bug no carga datos al modificar
 public class CargarClienteController implements Initializable, DataReceiver<Cliente>, ModalController<Cliente> {
 
     private Cliente cliente;
