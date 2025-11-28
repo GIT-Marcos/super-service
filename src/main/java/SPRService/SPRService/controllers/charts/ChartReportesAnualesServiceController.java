@@ -14,6 +14,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.PieChart;
@@ -24,7 +25,9 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.Duration;
 import org.apache.commons.mail.EmailException;
+import org.controlsfx.control.Notifications;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -89,7 +92,12 @@ public class ChartReportesAnualesServiceController implements Initializable {
         if (!obsPie.isEmpty()) {
             GeneradorReportes.exportarJPEG(event, rootPane, "Reporte anual service");
         } else {
-            Alertas.aviso("Exportar reporte", "No hay datos para exportar.");
+            Notifications.create()
+                    .title("Exportar reporte")
+                    .text("No hay datos para exportar.")
+                    .position(Pos.CENTER)
+                    .hideAfter(Duration.seconds(5))
+                    .showWarning();
         }
     }
 
@@ -110,7 +118,7 @@ public class ChartReportesAnualesServiceController implements Initializable {
                 Alertas.error("Error", "El correo no puede estar vacío.");
                 return;
             }
-            if (emailDestino.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\n")){
+            if (emailDestino.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\n")) {
                 Alertas.error("Error", "El correo está en mal formato.");
                 return;
             }
@@ -274,15 +282,30 @@ public class ChartReportesAnualesServiceController implements Initializable {
     private boolean limpiaChartYVerificaDTO(List<?> dtoList) {
         chart.getData().clear();
         if (dtoList == null) {
-            Alertas.aviso("Generación de reporte", "Error al obtener los datos.");
+            Notifications.create()
+                    .position(Pos.CENTER)
+                    .title("Generación de reporte")
+                    .text("Error al obtener los datos.")
+                    .hideAfter(Duration.seconds(5))
+                    .showError();
             return false;
         }
         if (dtoList.isEmpty()) {
-            Alertas.aviso("Generación de reporte", "No se encontraron registros para esa fecha.");
+            Notifications.create()
+                    .position(Pos.CENTER)
+                    .title("Generación de reporte")
+                    .text("No se encontraron registros para esa fecha.")
+                    .hideAfter(Duration.seconds(5))
+                    .showWarning();
             restableceLabels();
             return false;
         } else {
-            Alertas.exito("Generación de reporte", "Se ha generado el reporte con éxito.");
+            Notifications.create()
+                    .position(Pos.BOTTOM_RIGHT)
+                    .title("Generación de reporte")
+                    .text("Se ha generado el reporte con éxito.")
+                    .hideAfter(Duration.seconds(5))
+                    .showInformation();
             poblarLabels();
             return true;
         }
