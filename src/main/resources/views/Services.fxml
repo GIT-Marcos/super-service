@@ -10,121 +10,136 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<BorderPane maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #313b4f;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ServicesController">
-   <center>
-      <TableView fx:id="tablaServices" BorderPane.alignment="CENTER">
-        <columns>
-          <TableColumn fx:id="colCodigo" prefWidth="76.65670704841614" text="Código" />
-          <TableColumn fx:id="colFechaCarga" prefWidth="134.68653106689453" text="Fecha de carga" />
-            <TableColumn fx:id="colFechaEntrega" prefWidth="148.29844665527344" text="Fecha de entrega" />
-            <TableColumn fx:id="colEstado" prefWidth="113.19403076171875" text="Estado" />
-            <TableColumn fx:id="colPrioridad" prefWidth="117.4925537109375" text="Prioridad" />
-            <TableColumn fx:id="colMontoFaltante" prefWidth="116.05975341796875" text="Monto faltante $" />
-            <TableColumn fx:id="colMontoTotal" prefWidth="111.7611083984375" text="Monto total $" />
-        </columns>
-      </TableView>
-   </center>
-   <right>
-      <VBox alignment="TOP_CENTER" maxWidth="170.0" minWidth="170.0" prefHeight="490.0" prefWidth="170.0" spacing="10.0" BorderPane.alignment="CENTER">
-         <children>
-            <Separator prefWidth="200.0" />
-            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#nuevoService" prefWidth="160.0" text="Nuevo service..." />
-            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#modificarService" prefWidth="160.0" text="Modificar/ver detalles" />
-            <Button layoutX="15.0" layoutY="82.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#agregarPago" prefWidth="160.0" text="Agregar pago" />
-            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#verPagos" prefWidth="160.0" text="Ver pagos..." />
-            <Button layoutX="15.0" layoutY="131.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#generarFactura" prefWidth="160.0" text="Generar factura" />
-            <Button layoutX="15.0" layoutY="246.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#generarTicket" prefWidth="160.0" text="Generar ticket" />
-            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#darDeBaja" prefWidth="160.0" text="Cancelar service" />
-            <Separator prefWidth="200.0" />
-            <Label text="Generación de reportes" textFill="WHITE">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Button maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#reportesAnuales" prefWidth="160.0" text="Reportes anuales" />
-            <Button layoutX="15.0" layoutY="197.0" maxWidth="160.0" minWidth="160.0" mnemonicParsing="false" onAction="#comparacionIngresos" prefWidth="160.0" text="Comparación de ingresos" />
-         </children></VBox>
-   </right>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <top>
-      <HBox prefHeight="150.0" prefWidth="990.0" spacing="5.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox prefHeight="100.0" prefWidth="150.0" spacing="5.0">
-               <children>
-                  <Label text="Filtros para buscar:" textFill="WHITE">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <TextField fx:id="tfCodigo" maxWidth="150.0" prefWidth="50.0" promptText="Código de service..." />
-                  <Button minWidth="150.0" mnemonicParsing="false" onAction="#buscarConFiltros" text="Buscar con filtros" />
-                  <Button minWidth="150.0" mnemonicParsing="false" onAction="#verTodos" text="Ver todos" />
-               </children>
-            </VBox>
-            <VBox prefHeight="130.0" prefWidth="150.0" spacing="5.0">
-               <children>
-                  <CheckComboBox fx:id="ccbPrioridades" minWidth="150.0" showCheckedCount="true" title="Prioridad..." />
-                  <CheckComboBox fx:id="ccbEstados" minWidth="150.0" showCheckedCount="true" title="Estados..." />
-               </children>
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-               <padding>
-                  <Insets top="56.0" />
-               </padding>
-            </VBox>
-            <VBox alignment="TOP_CENTER" prefHeight="130.0" prefWidth="150.0" spacing="4.0">
-               <children>
-                  <Label text="Fecha de carga" textFill="WHITE">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-                  <Label text="Mínima" textFill="WHITE">
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Label>
-                  <DatePicker fx:id="dpMinimaCarga" promptText="dd/MM/yyyy" />
-                  <Label text="Máxima" textFill="WHITE">
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Label>
-                  <DatePicker fx:id="dpMaximaCarga" promptText="dd/MM/yyyy" />
-               </children>
-            </VBox>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
-            <VBox alignment="TOP_CENTER" prefHeight="150.0" prefWidth="150.0" spacing="4.0">
-               <children>
-                  <Label text="Fecha de entrega" textFill="WHITE">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Label>
-                  <Label text="Mínima" textFill="WHITE">
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Label>
-                  <DatePicker fx:id="dpMinimaRetiro" promptText="dd/MM/yyyy" />
-                  <Label text="Máxima" textFill="WHITE">
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Label>
-                  <DatePicker fx:id="dpMaximaRetiro" promptText="dd/MM/yyyy" />
-               </children>
-            </VBox>
-            <VBox prefHeight="150.0" prefWidth="150.0" />
-            <VBox prefHeight="150.0" prefWidth="150.0" />
-         </children>
-      </HBox>
-   </top>
+<BorderPane fx:id="rootPane" maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ServicesController">
+
+    <top>
+        <VBox spacing="8.0" styleClass="top-panel" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <Label text="🔍" textFill="WHITE">
+                            <font><Font size="16.0" /></font>
+                        </Label>
+
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label text="Código" />
+                                <TextField fx:id="tfCodigo" prefWidth="120.0" promptText="Cód. Service" styleClass="text-field" />
+                            </children>
+                        </VBox>
+
+                        <Separator orientation="VERTICAL" />
+
+                        <VBox alignment="CENTER_LEFT" spacing="2.0">
+                            <children>
+                                <Label text="Fecha de Carga:" />
+                                <HBox spacing="5.0">
+                                    <children>
+                                        <DatePicker fx:id="dpMinimaCarga" prefWidth="120.0" promptText="Desde" styleClass="text-field" />
+                                        <DatePicker fx:id="dpMaximaCarga" prefWidth="120.0" promptText="Hasta" styleClass="text-field" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <Separator orientation="VERTICAL" />
+
+                        <VBox alignment="CENTER_LEFT" spacing="2.0">
+                            <children>
+                                <Label text="Fecha de Entrega:" />
+                                <HBox spacing="5.0">
+                                    <children>
+                                        <DatePicker fx:id="dpMinimaRetiro" prefWidth="120.0" promptText="Desde" styleClass="text-field" />
+                                        <DatePicker fx:id="dpMaximaRetiro" prefWidth="120.0" promptText="Hasta" styleClass="text-field" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <VBox alignment="BOTTOM_CENTER">
+                            <children>
+                                <Button defaultButton="true" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="120.0" styleClass="btn-primary" text="🔍 Buscar" />
+                            </children>
+                            <padding>
+                                <Insets bottom="5.0" />
+                            </padding>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <Label text="Filtros Adicionales:" textFill="#b2bec3" />
+
+                        <CheckComboBox fx:id="ccbPrioridades" minWidth="150.0" showCheckedCount="true" styleClass="text-field" title="Prioridad..." />
+
+                        <CheckComboBox fx:id="ccbEstados" minWidth="150.0" showCheckedCount="true" styleClass="text-field" title="Estados..." />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button mnemonicParsing="false" onAction="#verTodos" prefWidth="120.0" styleClass="btn-primary" text="📋 Ver Todos" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tablaServices" styleClass="table-view" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="colCodigo" prefWidth="80.0" text="Código" />
+                <TableColumn fx:id="colFechaCarga" prefWidth="120.0" text="Fecha Carga" />
+                <TableColumn fx:id="colFechaEntrega" prefWidth="120.0" text="Fecha Entrega" />
+                <TableColumn fx:id="colEstado" prefWidth="100.0" text="Estado" />
+                <TableColumn fx:id="colPrioridad" prefWidth="100.0" text="Prioridad" />
+                <TableColumn fx:id="colMontoFaltante" prefWidth="110.0" style="-fx-alignment: CENTER-RIGHT;" text="Faltante ($)" />
+                <TableColumn fx:id="colMontoTotal" prefWidth="110.0" style="-fx-alignment: CENTER-RIGHT;" text="Total ($)" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </TableView>
+    </center>
+
+    <right>
+        <VBox prefWidth="160.0" spacing="8.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+            <children>
+                <Label styleClass="section-label" text="ACCIONES DE SERVICE" />
+
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#nuevoService" styleClass="btn-success" text="➕ Nuevo service" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modificarService" text="✏ Modificar/Detalles" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#agregarPago" styleClass="btn-primary" text="💰 Agregar pago" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#verPagos" styleClass="button" text="📄 Ver pagos" />
+
+                <Separator />
+
+                <Label styleClass="section-label" text="DOCUMENTACIÓN" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generarFactura" styleClass="btn-primary" text="🖨 Generar factura" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generarTicket" styleClass="button" text="📄 Generar ticket" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#darDeBaja" styleClass="btn-danger" text="🚫 Cancelar service" />
+
+                <Separator />
+
+                <Label styleClass="section-label" text="REPORTES" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#reportesAnuales" styleClass="btn-report" text="📊 Anuales" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#comparacionIngresos" styleClass="btn-report" text="📈 Comparación de Ingresos" wrapText="true" />
+            </children>
+        </VBox>
+    </right>
 </BorderPane>
