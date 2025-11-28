@@ -35,7 +35,7 @@ public class VentasController implements Initializable {
     private ObservableList<VentaRepuestoVMtabla> obsListVentasVM = FXCollections.observableArrayList();
     private final VentaRepuestoServ ventaRepuestoServ;
     private final Navigator navigator;
-    private static final int ITEMS_POR_PAGINA = 15;
+    private static final int ITEMS_POR_PAGINA = 30;
 
     @FXML
     private TextField tfBuscar, tfMontoMin, tfMontoMax;
