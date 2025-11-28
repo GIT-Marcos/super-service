@@ -263,7 +263,7 @@ public class CargarServiceController implements Initializable, ModalController<S
                     .showWarning();
             return false;
         }
-        if (this.items.isEmpty()) {
+        if (obtenerTrabajos().isEmpty()) {
             Notifications.create()
                     .hideAfter(Duration.seconds(5))
                     .position(Pos.CENTER)
