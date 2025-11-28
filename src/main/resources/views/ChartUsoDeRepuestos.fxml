@@ -5,57 +5,73 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: #20783f;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.charts.ChartUsoDeRepuestosController">
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <center>
-      <PieChart fx:id="pieChart" style="-fx-background-color: #ffffff;" title="Uso de repuestos" BorderPane.alignment="CENTER" />
-   </center>
-   <top>
-      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox prefHeight="100.0" prefWidth="200.0">
-               <children>
-                  <Label text="Fecha mínima" textFill="WHITE">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <DatePicker fx:id="fechaMin" promptText="dd/MM/yyyy">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                  </DatePicker>
-                  <HBox spacing="5.0">
-                     <children>
-                        <Button mnemonicParsing="false" onAction="#generar" text="Generar" />
-                     </children>
-                  </HBox>
-               </children>
-            </VBox>
-            <VBox prefHeight="100.0" prefWidth="240.0">
-               <children>
-                  <Label text="Fecha máxima" textFill="WHITE">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <DatePicker fx:id="fechaMax" promptText="dd/MM/yyyy" />
-               </children>
-            </VBox>
-            <VBox prefHeight="100.0" prefWidth="100.0" spacing="5.0">
-               <children>
-                  <Button mnemonicParsing="false" onAction="#exportar" prefHeight="26.0" prefWidth="95.0" text="Exportar JPEG" />
-                  <Button mnemonicParsing="false" onAction="#enviarMail" text="Enviar por mail" />
-               </children>
-            </VBox>
-         </children>
-      </HBox>
-   </top>
+<BorderPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="500.0" minWidth="700.0" prefHeight="500.0" prefWidth="700.0" stylesheets="@../styles/deposito.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.charts.ChartUsoDeRepuestosController">
+
+    <!-- PARTE SUPERIOR COMPACTA (Una sola fila) -->
+    <top>
+        <VBox prefHeight="60.0" prefWidth="701.0" styleClass="top-panel" BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <padding>
+                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                    </padding>
+                    <children>
+                        <!-- Título / Icono -->
+                        <Label text="📊" textFill="WHITE">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Label>
+                        <Separator orientation="VERTICAL" />
+
+                        <!-- Filtros de Fecha -->
+                        <Label text="Desde:" />
+                        <DatePicker fx:id="fechaMin" prefWidth="110.0" promptText="dd/MM/yyyy" />
+
+                        <Label text="Hasta:" />
+                        <DatePicker fx:id="fechaMax" prefWidth="110.0" promptText="dd/MM/yyyy" />
+
+                        <!-- Botón Generar -->
+                        <Button defaultButton="true" mnemonicParsing="false" onAction="#generar" styleClass="btn-primary" text="Generar Gráfico" />
+
+                        <!-- Espaciador Flexible -->
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <!-- Botones de Exportación -->
+                        <Button mnemonicParsing="false" onAction="#exportar" styleClass="button" text="💾 JPEG">
+                            <tooltip>
+                                <Tooltip text="Guardar imagen en disco" />
+                            </tooltip>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#enviarMail" styleClass="btn-action" text="✉ Enviar por mail">
+                            <tooltip>
+                                <Tooltip text="Enviar reporte por correo" />
+                            </tooltip>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+
+    <!-- CENTRO: GRÁFICO -->
+    <center>
+        <VBox alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </BorderPane.margin>
+            <children>
+                <PieChart fx:id="pieChart" legendSide="RIGHT" title="Distribución de Uso de Repuestos" VBox.vgrow="ALWAYS" />
+            </children>
+        </VBox>
+    </center>
+
 </BorderPane>
