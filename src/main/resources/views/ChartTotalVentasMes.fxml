@@ -7,38 +7,96 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="rootPane" minHeight="500.0" minWidth="900.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.charts.ChartTotalVentasMesController">
-   <top>
-      <AnchorPane maxHeight="90.0" minHeight="80.0" prefHeight="90.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label layoutX="14.0" layoutY="5.0" text="Seleccione el mes y el año sobre el que quiere generar el reporte">
-               <font>
-                  <Font size="14.0" />
-               </font></Label>
-            <Button layoutX="759.0" layoutY="63.0" mnemonicParsing="false" onAction="#exportarJPG" text="Exportar como JPG" AnchorPane.rightAnchor="14.014903367031067" />
-            <Button layoutX="14.0" layoutY="63.0" mnemonicParsing="false" onAction="#generar" text="Generar" />
-            <ComboBox fx:id="comboMeses" layoutX="14.0" layoutY="28.0" prefWidth="150.0" />
-            <Spinner fx:id="spinnerAnio" layoutX="165.0" layoutY="28.0" />
-            <Button layoutX="758.0" layoutY="32.0" mnemonicParsing="false" onAction="#enviarMail" prefHeight="26.0" prefWidth="117.0" text="Enviar por mail" AnchorPane.rightAnchor="14.328357801057152" />
-         </children>
-      </AnchorPane>
-   </top>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <center>
-      <BarChart fx:id="chart" animated="false" BorderPane.alignment="CENTER">
-        <xAxis>
-          <CategoryAxis />
-        </xAxis>
-        <yAxis>
-          <NumberAxis side="LEFT" />
-        </yAxis>
-      </BarChart>
-   </center>
+<!-- Asegúrate de vincular tu hoja de estilos aquí o desde el controlador -->
+
+<BorderPane fx:id="rootPane" minHeight="500.0" minWidth="900.0" prefHeight="600.0" prefWidth="900.0" styleClass="root" stylesheets="@../styles/ventas.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.charts.ChartTotalVentasMesController">
+
+    <!-- PANEL SUPERIOR: Configuración y Acciones -->
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="15.0" styleClass="top-panel">
+                    <children>
+                        <!-- SECCIÓN IZQUIERDA: Filtros -->
+                        <Label styleClass="section-label" text="Configuración de Reporte:" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                    <children>
+                                        <Label text="Mes" />
+                                        <ComboBox fx:id="comboMeses" prefWidth="140.0" promptText="Seleccionar" styleClass="combo-compact" />
+                                    </children>
+                                </VBox>
+
+                                <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                    <children>
+                                        <Label text="Año" />
+                                        <Spinner fx:id="spinnerAnio" prefWidth="100.0" styleClass="text-field" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Botón Generar (Primary Blue para destacar) -->
+                                <Button mnemonicParsing="false" onAction="#generar" prefWidth="100.0" styleClass="btn-primary" text="📊 Generar">
+                                    <HBox.margin>
+                                        <Insets top="16.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <!-- ESPACIADOR: Empuja los siguientes elementos a la derecha -->
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <!-- SECCIÓN DERECHA: Exportaciones -->
+                        <Separator orientation="VERTICAL" />
+
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                            <children>
+                                <!-- Botones de Reporte (Estilo Report Light Green) -->
+                                <Button mnemonicParsing="false" onAction="#enviarMail" styleClass="btn-report" text="📧 Enviar por Mail">
+                           <font>
+                              <Font size="12.0" />
+                           </font></Button>
+                                <Button mnemonicParsing="false" onAction="#exportarJPG" styleClass="btn-report" text="📷 Exportar JPG">
+                           <font>
+                              <Font size="12.0" />
+                           </font></Button>
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets left="20.0" right="20.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+
+    <!-- PANEL CENTRAL: Gráfico -->
+    <center>
+        <BarChart fx:id="chart" animated="false" legendSide="TOP" title="Total de Ventas por Mes" BorderPane.alignment="CENTER">
+            <xAxis>
+                <CategoryAxis label="Día del mes" side="BOTTOM" tickLabelFill="#2d3436" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Monto de Venta ($)" side="LEFT" tickLabelFill="#2d3436" />
+            </yAxis>
+            <BorderPane.margin>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </BorderPane.margin>
+        </BarChart>
+    </center>
 </BorderPane>

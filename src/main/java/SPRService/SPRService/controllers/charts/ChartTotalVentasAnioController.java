@@ -11,6 +11,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.XYChart;
@@ -20,7 +21,9 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Duration;
 import org.apache.commons.mail.EmailException;
+import org.controlsfx.control.Notifications;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -95,7 +98,7 @@ public class ChartTotalVentasAnioController implements Initializable {
                 Alertas.error("Error", "El correo no puede estar vacío.");
                 return;
             }
-            if (emailDestino.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\n")){
+            if (emailDestino.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\n")) {
                 Alertas.error("Error", "El correo está en mal formato.");
                 return;
             }
@@ -154,7 +157,7 @@ public class ChartTotalVentasAnioController implements Initializable {
 
     private void llenarInfoDelAnio() {
         int anio = spinnerAnio.getValue();
-        lblTitulo.setText("Información del año: " + anio);
+        lblTitulo.setText("Año: " + anio);
         lblCantidadDeVentasAnio.setText(ventaRepuestoServ.cantidadDeVentasEnAnio(anio) + " ventas");
         lblIngresosTotales.setText("$ " + ventaRepuestoServ.ingresosDeVentasEnAnio(anio));
         lblPromedioIngresosPorVenta.setText("$ " + ventaRepuestoServ.ingresosPromedioPorVentaEnAnio(anio));
@@ -217,14 +220,29 @@ public class ChartTotalVentasAnioController implements Initializable {
     private boolean limpiaChartYVerificaDTO(List<?> dtoList) {
         chart.getData().clear();
         if (dtoList == null) {
-            Alertas.aviso("Generación de reporte", "Error al obtener los datos.");
+            Notifications.create()
+                    .title("Generación de reporte")
+                    .text("Error al obtener los datos.")
+                    .position(Pos.CENTER)
+                    .hideAfter(Duration.seconds(5))
+                    .showError();
             return false;
         }
         if (dtoList.isEmpty()) {
-            Alertas.aviso("Generación de reporte", "No se encontraron registros para esa fecha.");
+            Notifications.create()
+                    .title("Generación de reporte")
+                    .text("No se encontraron registros para esa fecha.")
+                    .position(Pos.CENTER)
+                    .hideAfter(Duration.seconds(5))
+                    .showWarning();
             return false;
         } else {
-            Alertas.exito("Generación de reporte", "Se ha generado el reporte con éxito.");
+            Notifications.create()
+                    .title("Generación de reporte")
+                    .text("Se ha generado el reporte con éxito.")
+                    .position(Pos.BOTTOM_RIGHT)
+                    .hideAfter(Duration.seconds(5))
+                    .showInformation();
             llenarInfoDelAnio();
             return true;
         }

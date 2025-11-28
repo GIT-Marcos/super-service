@@ -54,14 +54,16 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
             this.ventaRepuesto = data;
             List<ItemDetalleRetiroViewModel> detalles = data.getNotaRetiro().getDetallesRetiroList().stream()
                     .map(ItemDetalleRetiroViewModel::new).toList();
+            itemsDetalles.clear();
             itemsDetalles.addAll(detalles);
             //todo: remplazar la carga de listas observables grandes.
-            // Esto notifica por cada iteración. Usar .addAll()
+            // Esto notifica por cada iteración. Usar .clear() y .addAll()
 //            data.getNotaRetiro().getDetallesRetiroList().forEach(d ->
 //                    itemsDetalles.add(new ItemDetalleRetiroViewModel(d)));
 
             List<ItemPagoViewModel> pagos = data.getPagos().stream()
                     .map(ItemPagoViewModel::new).toList();
+            itemsPagos.clear();
             itemsPagos.addAll(pagos);
 
             butAgregarPago.setDisable(!data.getEstadoVenta().equals(EstadoVentaRepuesto.PENDIENTE_PAGO));

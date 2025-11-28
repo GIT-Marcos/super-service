@@ -7,95 +7,148 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<BorderPane minHeight="500.0" minWidth="750.0" prefHeight="550.0" prefWidth="800.0" stylesheets="@../styles/ventas.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DetalleVentaController">
 
-<BorderPane minWidth="610.0" prefHeight="490.0" prefWidth="610.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DetalleVentaController">
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <top>
-      <AnchorPane prefHeight="170.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox minWidth="290.0" prefHeight="171.0" prefWidth="290.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <Label text="Código de venta:" />
-                  <Label fx:id="labelCodVenta" text="00 00000 000">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <Separator prefWidth="200.0" />
-                  <Label text="Fecha de venta:" />
-                  <Label fx:id="labelFechaVenta" text="00/00/000">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <Separator prefWidth="200.0" />
-                  <Label text="Monto total:" />
-                  <Label fx:id="labelMontoTotal" text="\$ 0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
-            <VBox layoutX="300.0" minWidth="290.0" prefHeight="171.0" prefWidth="290.0" spacing="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <Label text="Estado venta:" />
-                  <Label fx:id="labelEstadoVenta" text="estado">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <Separator prefWidth="200.0" />
-                  <Label text="Monto faltante:" />
-                  <Label fx:id="labelMontoFaltante" text="\$ 0">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <Separator prefWidth="200.0" />
-                  <Button fx:id="butAgregarPago" disable="true" mnemonicParsing="false" onAction="#irPago" prefHeight="30.0" prefWidth="130.0" text="Agregar Pago">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Button>
-               </children>
-            </VBox>
-         </children>
-      </AnchorPane>
-   </top>
-   <center>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <TabPane layoutX="183.0" layoutY="38.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <tabs>
-                <Tab text="Detalles">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <ListView fx:id="listaDetalles" layoutX="173.0" layoutY="40.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </Tab>
-                <Tab text="Pagos">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <ListView fx:id="listaPagos" layoutX="225.0" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </Tab>
-              </tabs>
-            </TabPane>
-         </children>
-      </AnchorPane>
-   </center>
+    <!-- PANEL SUPERIOR: Información General -->
+    <top>
+        <VBox styleClass="top-panel" BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <Label text="📄" textFill="WHITE">
+                            <font><Font size="24.0" /></font>
+                        </Label>
+
+                        <!-- Bloque Código -->
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label style="-fx-text-fill: #b2bec3;" text="CÓDIGO VENTA" />
+                                <Label fx:id="labelCodVenta" text="00-00000" textFill="WHITE">
+                                    <font><Font name="System Bold" size="16.0" /></font>
+                                </Label>
+                            </children>
+                        </VBox>
+
+                        <Separator opacity="0.3" orientation="VERTICAL" />
+
+                        <!-- Bloque Fecha -->
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label style="-fx-text-fill: #b2bec3;" text="FECHA EMISIÓN" />
+                                <Label fx:id="labelFechaVenta" text="00/00/0000" textFill="WHITE">
+                                    <font><Font size="14.0" /></font>
+                                </Label>
+                            </children>
+                        </VBox>
+
+                        <Separator opacity="0.3" orientation="VERTICAL" />
+
+                        <!-- Bloque Estado -->
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label style="-fx-text-fill: #b2bec3;" text="ESTADO ACTUAL" />
+                                <Label fx:id="labelEstadoVenta" style="-fx-background-color: rgba(255,255,255,0.2); -fx-padding: 2 8 2 8; -fx-background-radius: 10;" text="PENDIENTE" textFill="WHITE">
+                                    <font><Font name="System Bold" size="12.0" /></font>
+                                </Label>
+                            </children>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+                    </children>
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+
+    <!-- DERECHA: Resumen Financiero y Acciones -->
+    <right>
+        <VBox prefWidth="220.0" spacing="10.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <children>
+                <Label styleClass="section-label" text="RESUMEN FINANCIERO" />
+
+                <VBox spacing="5.0" style="-fx-background-color: #f1f2f6; -fx-background-radius: 5; -fx-padding: 10;">
+                    <children>
+                        <Label text="Monto Total:" textFill="#636e72">
+                            <font><Font size="12.0" /></font>
+                        </Label>
+                        <Label fx:id="labelMontoTotal" text="\$ 0">
+                            <font><Font name="System Bold" size="22.0" /></font>
+                        </Label>
+                    </children>
+                </VBox>
+
+                <Separator />
+
+                <Label styleClass="section-label" text="SALDO PENDIENTE" />
+                <Label fx:id="labelMontoFaltante" maxWidth="Infinity" styleClass="alert-label-compact" text="\$ 0">
+                    <font><Font size="18.0" /></font>
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </padding>
+                </Label>
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Separator />
+
+                <Button fx:id="butAgregarPago" disable="true" maxWidth="Infinity" mnemonicParsing="false" onAction="#irPago" prefHeight="40.0" styleClass="btn-action" text="💳  Agregar Pago">
+                    <tooltip><Tooltip text="Registrar un nuevo abono a esta venta" /></tooltip>
+                    <font><Font name="System Bold" size="13.0" /></font>
+                </Button>
+            </children>
+        </VBox>
+    </right>
+
+    <!-- CENTRO: Pestañas de Detalles -->
+    <center>
+        <VBox spacing="5.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="5.0" top="10.0" />
+            </padding>
+            <children>
+                <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                    <tabs>
+                        <Tab text="🛒 Items / Productos">
+                            <content>
+                                <VBox spacing="5.0">
+                                    <padding>
+                                        <Insets top="5.0" />
+                                    </padding>
+                                    <children>
+                                        <ListView fx:id="listaDetalles" styleClass="list-view" VBox.vgrow="ALWAYS" />
+                                    </children>
+                                </VBox>
+                            </content>
+                        </Tab>
+                        <Tab text="💰 Historial de Pagos">
+                            <content>
+                                <VBox spacing="5.0">
+                                    <padding>
+                                        <Insets top="5.0" />
+                                    </padding>
+                                    <children>
+                                        <ListView fx:id="listaPagos" styleClass="list-view" VBox.vgrow="ALWAYS" />
+                                    </children>
+                                </VBox>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </children>
+        </VBox>
+    </center>
+
 </BorderPane>
