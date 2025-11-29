@@ -189,7 +189,7 @@
                         <Label styleClass="section-label" text="MOTIVO DE INGRESO" />
                         <TextArea fx:id="tfMotivos" promptText="Descripción del problema..." styleClass="text-field" wrapText="true" VBox.vgrow="ALWAYS" />
 
-                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#verOrden" text="📄 Ver Orden de Ingreso Original" />
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#verOrden" text="📄 Ver Orden de trabajo" />
                     </children>
                     <padding>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -204,9 +204,9 @@
 
     <!-- FOOTER: GUARDAR -->
     <bottom>
-        <HBox alignment="CENTER_RIGHT" prefHeight="60.0" spacing="15.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+        <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="15.0" styleClass="sidebar" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardar" prefHeight="35.0" prefWidth="200.0" styleClass="btn-success" text="💾  GUARDAR CAMBIOS" />
+                <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardar" prefHeight="30.0" prefWidth="200.0" styleClass="btn-success" text="💾  GUARDAR CAMBIOS" />
             </children>
             <padding>
                 <Insets right="20.0" />

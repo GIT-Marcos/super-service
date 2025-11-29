@@ -11,95 +11,216 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DetalleOrdenController">
-   <top>
-      <HBox prefHeight="61.0" prefWidth="691.0" spacing="5.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox alignment="TOP_CENTER" prefHeight="70.0" prefWidth="150.0">
-               <children>
-                  <Label text="Prioridad" />
-                  <ComboBox fx:id="cbPrioridad" prefWidth="150.0" />
-               </children>
-            </VBox>
-            <VBox alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" prefHeight="70.0" prefWidth="150.0">
-               <children>
-                  <Label text="Estado" />
-                  <ComboBox fx:id="cbEstado" prefWidth="150.0" />
-               </children>
-            </VBox>
-            <VBox alignment="TOP_CENTER" prefHeight="70.0" prefWidth="130.0">
-               <children>
-                  <Label text="Fecha de carga" />
-                  <DatePicker fx:id="dpFechaCarga" disable="true" editable="true" promptText="dd/MM/yyyy" />
-               </children>
-            </VBox>
-            <VBox alignment="TOP_CENTER" prefHeight="70.0" prefWidth="130.0">
-               <children>
-                  <Label text="Fecha de entrega" />
-                  <DatePicker fx:id="dpFechaEntrega" promptText="dd/MM/yyyy" />
-               </children>
-            </VBox>
-            <VBox alignment="CENTER_RIGHT" prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardar" text="GUARDAR" />
-               </children>
-            </VBox>
-         </children>
-      </HBox>
-   </top>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <left>
-      <VBox prefHeight="479.0" prefWidth="425.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label text="Trabajos y repuestos" />
-            <ListView fx:id="lista" prefHeight="428.0" prefWidth="325.0" />
-         </children>
-      </VBox>
-   </left>
-   <right>
-      <VBox alignment="TOP_CENTER" prefHeight="428.0" prefWidth="330.0" spacing="5.0" BorderPane.alignment="CENTER">
-         <children>
-            <HBox alignment="CENTER_LEFT" spacing="4.0">
-               <children>
-                  <ImageView fx:id="imgLogo" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../imgs/logos/car.png" />
-                     </image>
-                  </ImageView>
-                  <Label fx:id="lblModelo" prefHeight="50.0" prefWidth="265.0" text="MODELO DE VEHÍCULO" wrapText="true" />
-               </children>
-            </HBox>
-            <Separator prefWidth="200.0" />
-            <Label text="Motivo de ingreso" />
-            <TextArea fx:id="tfMotivo" prefHeight="150.0" prefWidth="330.0" promptText="Problemas del cliente..." wrapText="true">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </TextArea>
-            <Separator prefWidth="200.0" />
-            <HBox>
-               <children>
-                  <Label fx:id="lblKilometraje" text="Kilometraje" />
-               </children>
-            </HBox>
-            <HBox>
-               <children>
-                  <Label fx:id="lblCombustible" text="Nivel de combustible" />
-               </children>
-            </HBox>
-            <Separator prefWidth="200.0" />
-            <Label text="Inventario" />
-            <TextArea fx:id="tfInventario" prefHeight="80.0" prefWidth="330.0" promptText="Qué tiene dentro..." wrapText="true" />
-            <Separator prefWidth="200.0" />
-            <Label text="Observaciones" />
-            <TextArea fx:id="tfObservaciones" prefHeight="100.0" prefWidth="330.0" promptText="Daños..." wrapText="true" />
-         </children>
-      </VBox>
-   </right>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DetalleOrdenController">
+
+    <!-- HEADER: PANEL DE CONTROL -->
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="80.0" spacing="15.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <children>
+                <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="section-label" text="CONTROL DE ORDEN" />
+                        <HBox spacing="10.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Prioridad:">
+                                            <font>
+                                                <Font size="13.0" />
+                                            </font>
+                                        </Label>
+                                        <ComboBox fx:id="cbPrioridad" prefWidth="130.0" />
+                                    </children>
+                                </VBox>
+                                <VBox>
+                                    <children>
+                                        <Label text="Estado Actual:">
+                                            <font>
+                                                <Font size="13.0" />
+                                            </font>
+                                        </Label>
+                                        <ComboBox fx:id="cbEstado" prefWidth="140.0" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <Separator orientation="VERTICAL" />
+
+                <HBox spacing="10.0">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label text="Fecha de Carga:" textFill="#666666">
+                                    <font>
+                                        <Font size="10.0" />
+                                    </font>
+                                </Label>
+                                <DatePicker fx:id="dpFechaCarga" disable="true" editable="false" prefHeight="29.0" prefWidth="130.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                            </children>
+                        </VBox>
+                        <VBox>
+                            <children>
+                                <Label text="Fecha de Entrega:" textFill="#666666">
+                                    <font>
+                                        <Font size="10.0" />
+                                    </font>
+                                </Label>
+                                <DatePicker fx:id="dpFechaEntrega" prefHeight="29.0" prefWidth="130.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+            </padding>
+        </HBox>
+    </top>
+
+    <!-- BODY: DETALLES -->
+    <center>
+        <GridPane hgap="20.0" styleClass="root">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="55.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="45.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+
+                <!-- COLUMNA IZQUIERDA: ITEMS -->
+                <VBox spacing="10.0">
+                    <children>
+                        <Label styleClass="section-label" text="TRABAJOS Y REPUESTOS SOLICITADOS" />
+                        <ListView fx:id="lista" styleClass="text-field" VBox.vgrow="ALWAYS" />
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </VBox>
+
+                <!-- COLUMNA DERECHA: DATOS TÉCNICOS -->
+                <VBox spacing="10.0" GridPane.columnIndex="1">
+                    <children>
+                        <!-- Encabezado Vehículo -->
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar">
+                            <children>
+                                <ImageView fx:id="imgLogo" fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../imgs/logos/car.png" />
+                                    </image>
+                                </ImageView>
+                                <VBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label styleClass="section-label" text="VEHÍCULO EN TALLER" />
+                                        <Label fx:id="lblModelo" text="MODELO VEHÍCULO" textFill="#2d3436">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </children>
+                            <padding>
+                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                            </padding>
+                        </HBox>
+
+                        <!-- Datos de Estado (Grid compacto) -->
+                        <GridPane hgap="10.0" styleClass="sidebar">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <Label fx:id="lblKilometraje" text="KM: ---" textFill="#636e72">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="lblCombustible" text="Combustible: ---" textFill="#636e72" GridPane.columnIndex="1">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                            <padding>
+                                <Insets left="10.0" right="10.0" />
+                            </padding>
+                        </GridPane>
+
+                        <Separator />
+
+                        <!-- Text Areas -->
+                        <VBox spacing="2.0" VBox.vgrow="ALWAYS">
+                            <children>
+                                <Label text="Motivo de Ingreso:">
+                                    <font>
+                                        <Font size="11.0" />
+                                    </font>
+                                </Label>
+                                <TextArea fx:id="tfMotivo" promptText="Descripción del problema..." styleClass="text-field" wrapText="true" VBox.vgrow="ALWAYS" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="2.0" VBox.vgrow="SOMETIMES">
+                            <children>
+                                <Label text="Inventario:">
+                                    <font>
+                                        <Font size="11.0" />
+                                    </font>
+                                </Label>
+                                <TextArea fx:id="tfInventario" prefHeight="60.0" promptText="Elementos en el vehículo..." styleClass="text-field" wrapText="true" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="2.0" VBox.vgrow="SOMETIMES">
+                            <children>
+                                <Label text="Observaciones:">
+                                    <font>
+                                        <Font size="11.0" />
+                                    </font>
+                                </Label>
+                                <TextArea fx:id="tfObservaciones" prefHeight="60.0" promptText="Notas adicionales..." styleClass="text-field" wrapText="true" />
+                            </children>
+                        </VBox>
+
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </VBox>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </GridPane>
+    </center>
+
+    <!-- FOOTER: ACCIONES -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="15.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardar" prefHeight="30.0" prefWidth="180.0" styleClass="btn-success" text="💾  GUARDAR CAMBIOS" />
+            </children>
+            <padding>
+                <Insets right="20.0" />
+            </padding>
+        </HBox>
+    </bottom>
+
 </BorderPane>

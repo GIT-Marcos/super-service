@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -24,10 +25,14 @@ import javafx.scene.image.ImageView;
 import com.google.inject.Inject;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -40,14 +45,22 @@ public class DetalleOrdenController implements Initializable, DataReceiver<Servi
     private EstadoIngreso estadoIngreso;
     private ObservableList<ItemDetalleViewModel> items = FXCollections.observableArrayList();
 
-    @FXML private ComboBox<PrioridadService> cbPrioridad;
-    @FXML private ComboBox<EstadoService> cbEstado;
-    @FXML private DatePicker dpFechaCarga, dpFechaEntrega;
-    @FXML private ListView<ItemDetalleViewModel> lista;
-    @FXML private TextArea tfMotivo, tfObservaciones, tfInventario;
-    @FXML private Label lblModelo, lblKilometraje, lblCombustible;
-    @FXML private ImageView imgLogo;
-    @FXML private Button btnGuardar;
+    @FXML
+    private ComboBox<PrioridadService> cbPrioridad;
+    @FXML
+    private ComboBox<EstadoService> cbEstado;
+    @FXML
+    private DatePicker dpFechaCarga, dpFechaEntrega;
+    @FXML
+    private ListView<ItemDetalleViewModel> lista;
+    @FXML
+    private TextArea tfMotivo, tfObservaciones, tfInventario;
+    @FXML
+    private Label lblModelo, lblKilometraje, lblCombustible;
+    @FXML
+    private ImageView imgLogo;
+    @FXML
+    private Button btnGuardar;
 
     @Inject
     public DetalleOrdenController(ServiceServ serviceServ) {
@@ -105,8 +118,8 @@ public class DetalleOrdenController implements Initializable, DataReceiver<Servi
             imgLogo.setImage(img);
         }
 
-        if (service.getEstadoService().equals(EstadoService.PAGADO) ||
-                service.getEstadoService().equals(EstadoService.CANCELADO)) {
+        EstadoService estado = service.getEstadoService();
+        if (List.of(EstadoService.PAGADO, EstadoService.CANCELADO, EstadoService.PAGO_PENDIENTE).contains(estado)) {
             btnGuardar.setDisable(true);
             cbEstado.setDisable(true);
         }
@@ -114,8 +127,7 @@ public class DetalleOrdenController implements Initializable, DataReceiver<Servi
 
     @FXML
     private void guardar(ActionEvent event) {
-        if (estaPagado()) return;
-        if (!validar()) return;
+        if (!validarFecha()) return;
         try {
             String motivo = ManejadorInputs.textoGenerico(tfMotivo.getText(), false,
                     "Motivo de ingreso", 500);
@@ -135,47 +147,41 @@ public class DetalleOrdenController implements Initializable, DataReceiver<Servi
             if (!Alertas.confirmacion("Modificar orden", "¿Está seguro que desea guardar la orden?"))
                 return;
             this.paraDevolver = serviceServ.modificarService(service);
-
-            Alertas.exito("Modificar orden", "Se ha guardado la orden con éxito.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.BOTTOM_RIGHT)
+                    .title("Modificar orden")
+                    .text("Se ha guardado la orden con éxito.")
+                    .showInformation();
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
         } catch (IllegalArgumentException e) {
-            Alertas.aviso("Modificar orden", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar orden")
+                    .text(e.getMessage())
+                    .showWarning();
         } catch (RuntimeException e) {
-            Alertas.error("Modificar orden", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar orden")
+                    .text(e.getMessage())
+                    .showError();
             e.printStackTrace();
         }
     }
 
-    private boolean estaPagado() {
-        if (service.getEstadoService() == EstadoService.PAGADO) {
-            Alertas.error("Guardar Orden", "No es posible modificar services que ya han sido pagados.");
-            return true;
-        }
-        if (cbEstado.getValue() == EstadoService.PAGADO) {
-            Alertas.error("Guardar Orden", "No es posible guardar un service con estado: 'Pagado'.");
-            return true;
-        }
-        if (cbEstado.getValue() == EstadoService.CANCELADO) {
-            Alertas.error("Guardar orden", "No es posible guardar un service con estado: 'Cancelado'.");
-            return true;
-        }
-        return false;
-    }
-
-    private boolean validar() {
-        if (this.service.getCliente() == null) {
-            Alertas.aviso("Guardar orden", "Se debe asociar un cliente para el service.");
-            return false;
-        }
-        if (this.orden.getVehiculo() == null) {
-            Alertas.aviso("Guardar orden", "Se debe asociar un vehículo para el service.");
-            return false;
-        }
-        if (this.items.isEmpty()) {
-            Alertas.aviso("Guardar orden", "Deben haber repuestos o trabajos" +
-                    " asignados para poder cargar el service.");
+    private boolean validarFecha() {
+        if (dpFechaEntrega.getValue() != null && dpFechaEntrega.getValue().isBefore(LocalDate.now())) {
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar orden")
+                    .text("La fecha de entrega ya ha pasado.")
+                    .showWarning();
             return false;
         }
         return true;
@@ -189,6 +195,7 @@ public class DetalleOrdenController implements Initializable, DataReceiver<Servi
         cbEstado.getItems().setAll(EstadoService.values());
         cbEstado.getItems().remove(EstadoService.CANCELADO);
         cbEstado.getItems().remove(EstadoService.PAGADO);
+        cbEstado.getItems().remove(EstadoService.PAGO_PENDIENTE);
 
         cbPrioridad.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && !newValue.equals(oldValue)) {
