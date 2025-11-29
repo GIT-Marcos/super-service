@@ -1,6 +1,7 @@
 package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.NotaRetiroDAO;
+import SPRService.SPRService.DTOs.filtros.FiltroNotaRetiro;
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.NotaRetiro;
 import SPRService.SPRService.services.NotaRetiroServ;
@@ -8,8 +9,6 @@ import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
-
-import java.time.LocalDate;
 
 @Singleton
 public class NotaRetiroServImpl implements NotaRetiroServ {
@@ -23,9 +22,8 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
 
     @Transactional
     @Override
-    public ResultadoPaginado<NotaRetiro> buscarPaginado(LocalDate fechaMin, LocalDate fechaMax,
-                                                        int pagina, int tamanioPagina) {
-        return daoNota.buscarPaginado(fechaMin, fechaMax, pagina, tamanioPagina);
+    public ResultadoPaginado<NotaRetiro> buscarPaginado(FiltroNotaRetiro filtros, int pagina, int tamanioPagina) {
+        return daoNota.buscarPaginado(filtros, pagina, tamanioPagina);
     }
 
     @Transactional

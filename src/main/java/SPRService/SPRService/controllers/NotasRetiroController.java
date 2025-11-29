@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.filtros.FiltroNotaRetiro;
 import SPRService.SPRService.util.ResultadoPaginado;
 import SPRService.SPRService.viewModels.tablas.NotaRetiroViewModel;
 import SPRService.SPRService.entities.NotaRetiro;
@@ -23,8 +24,10 @@ import org.controlsfx.control.Notifications;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NotasRetiroController implements Initializable {
@@ -61,7 +64,6 @@ public class NotasRetiroController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         configurarDatePickers();
         configurarTabla();
-
         // Configurar Paginación (esto disparará la primera carga)
         paginacion.setPageFactory(this::cargarPagina);
     }
@@ -109,59 +111,64 @@ public class NotasRetiroController implements Initializable {
 
     /**
      * Invocado por el control de Paginación.
-     * Aplica filtros de Fecha, Tipo (Venta/Service) y Estado (Activa/Inactiva).
+     * Construye el DTO FiltroNotaRetiro y consulta al servicio.
      */
     private Node cargarPagina(int indicePagina) {
         // 1. Obtener fechas
         LocalDate fechaMin = (dateFechaMin != null) ? dateFechaMin.getValue() : null;
         LocalDate fechaMax = (dateFechaMax != null) ? dateFechaMax.getValue() : null;
 
-        // 2. Obtener filtros booleanos de los CheckBox
-        // Nota: verificamos null por si acaso el FXML no inyectó correctamente, aunque en init debería estar bien.
+        // 2. Obtener estados de los CheckBox (Null safety)
         boolean verVentas = chkVentas != null && chkVentas.isSelected();
         boolean verService = chkService != null && chkService.isSelected();
         boolean verOtro = chkOtro != null && chkOtro.isSelected();
         boolean verActivas = chkActivas != null && chkActivas.isSelected();
         boolean verInactivas = chkInactivas != null && chkInactivas.isSelected();
 
-        // OPTIMIZACIÓN: Si el usuario desmarca no consultamos a la BD.
-        if ((!verVentas && !verService) || (!verActivas && !verInactivas)) {
+        // 3. OPTIMIZACIÓN: Si no hay nada seleccionado, no llamar a la BD.
+        boolean ningunTipoSeleccionado = !verVentas && !verService && !verOtro;
+        boolean ningunEstadoSeleccionado = !verActivas && !verInactivas;
+
+        if (ningunTipoSeleccionado || ningunEstadoSeleccionado) {
             notasObsList.clear();
             paginacion.setPageCount(1);
             return new VBox();
         }
 
-        // 3. Determinar el filtro de estado para el servicio
-        // null = Traer todas
-        // true = Solo activas
-        // false = Solo inactivas
-        Boolean filtroEstado = null;
-        if (verActivas && !verInactivas) {
-            filtroEstado = Boolean.TRUE;
-        } else if (!verActivas && verInactivas) {
-            filtroEstado = Boolean.FALSE;
-        }
-        // Si ambas están marcadas (verActivas && verInactivas), filtroEstado queda en NULL (traer todas).
+        // 4. Construir el SET de Tipos de Uso
+        Set<NotaRetiro.TipoUsoRetiro> tiposSeleccionados = new HashSet<>();
+        if (verVentas) tiposSeleccionados.add(NotaRetiro.TipoUsoRetiro.VENTA);
+        if (verService) tiposSeleccionados.add(NotaRetiro.TipoUsoRetiro.SERVICE);
+        if (verOtro) tiposSeleccionados.add(NotaRetiro.TipoUsoRetiro.OTRO);
 
-        // 4. Consultar Servicio con los nuevos parámetros
-        // ATENCIÓN: Debes actualizar NotaRetiroServ.buscarPaginado para aceptar estos argumentos.
-        ResultadoPaginado<NotaRetiro> resultado = notaRetiroServ.buscarPaginado(
+        // 5. Determinar filtro de Estado (Boolean o Null)
+        Boolean estadoFiltro = null;
+        if (verActivas && !verInactivas) {
+            estadoFiltro = Boolean.TRUE;
+        } else if (!verActivas) {
+            estadoFiltro = Boolean.FALSE;
+        }
+
+        // 6. CREAR EL DTO
+        FiltroNotaRetiro filtro = new FiltroNotaRetiro(
                 fechaMin,
                 fechaMax,
-                verVentas,
-                verService,
-                verOtro,
-                filtroEstado,
+                estadoFiltro,
+                tiposSeleccionados
+        );
+
+        // 7. Consultar Servicio usando el DTO
+        ResultadoPaginado<NotaRetiro> resultado = notaRetiroServ.buscarPaginado(
+                filtro,
                 indicePagina,
                 ITEMS_POR_PAGINA_NOTAS
         );
 
-        // 5. Calcular paginación
+        // 8. Actualizar UI (Paginación y Tabla)
         long totalItems = resultado.getCantidadResultados();
         long totalPaginas = (totalItems + ITEMS_POR_PAGINA_NOTAS - 1) / ITEMS_POR_PAGINA_NOTAS;
         paginacion.setPageCount(totalPaginas == 0 ? 1 : (int) totalPaginas);
 
-        // 6. Conversión a ViewModel
         List<NotaRetiroViewModel> listaViewModels = resultado.getLista().stream()
                 .map(NotaRetiroViewModel::new)
                 .collect(Collectors.toList());
@@ -189,7 +196,6 @@ public class NotasRetiroController implements Initializable {
         if (chkOtro != null) chkOtro.setSelected(true);
         if (chkActivas != null) chkActivas.setSelected(true);
         if (chkInactivas != null) chkInactivas.setSelected(true);
-
         aplicarFiltros();
     }
 

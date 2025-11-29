@@ -1,6 +1,7 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.NotaRetiroDAO;
+import SPRService.SPRService.DTOs.filtros.FiltroNotaRetiro;
 import SPRService.SPRService.entities.NotaRetiro;
 import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
@@ -13,7 +14,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +29,7 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
     }
 
     @Override
-    public ResultadoPaginado<NotaRetiro> buscarPaginado(LocalDate fechaMin, LocalDate fechaMax,
-                                                        int pagina, int tamanioPagina) {
+    public ResultadoPaginado<NotaRetiro> buscarPaginado(FiltroNotaRetiro filtros, int pagina, int tamanioPagina) {
         EntityManager em = emProvider.get();
         CriteriaBuilder cb = em.getCriteriaBuilder();
 
@@ -39,8 +38,8 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
         Root<NotaRetiro> countRoot = countQuery.from(NotaRetiro.class);
         countQuery.select(cb.count(countRoot));
 
-        // Aplicamos los mismos predicados de filtro a la consulta de conteo
-        Predicate[] countPredicates = crearPredicados(cb, countRoot, fechaMin, fechaMax);
+        // Generamos los predicados basándonos en el DTO
+        Predicate[] countPredicates = crearPredicados(cb, countRoot, filtros);
         if (countPredicates.length > 0) {
             countQuery.where(countPredicates);
         }
@@ -57,19 +56,22 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
         Root<NotaRetiro> dataRoot = dataQuery.from(NotaRetiro.class);
         dataQuery.select(dataRoot);
 
-        // Aplicamos los predicados de filtro a la consulta de datos
-        Predicate[] dataPredicates = crearPredicados(cb, dataRoot, fechaMin, fechaMax);
+        // Reutilizamos la lógica de predicados
+        Predicate[] dataPredicates = crearPredicados(cb, dataRoot, filtros);
         if (dataPredicates.length > 0) {
             dataQuery.where(dataPredicates);
         }
 
-        // Ordenamos los resultados (lo más común es por fecha descendente)
-        dataQuery.orderBy(cb.desc(dataRoot.get("fecha"))); // <-- Asegúrate que tu entidad NotaRetiro tiene un campo llamado "fecha"
+        // Ordenamos por Fecha descendente (y por ID para desempatar y mantener consistencia en paginación)
+        dataQuery.orderBy(
+                cb.desc(dataRoot.get("fecha")),
+                cb.desc(dataRoot.get("id"))
+        );
 
-        // Creamos la consulta final y aplicamos la paginación
+        // Ejecutamos la consulta paginada
         TypedQuery<NotaRetiro> typedQuery = em.createQuery(dataQuery);
-        typedQuery.setFirstResult(pagina * tamanioPagina); // Offset (desde dónde empezar)
-        typedQuery.setMaxResults(tamanioPagina);         // Limit (cuántos traer)
+        typedQuery.setFirstResult(pagina * tamanioPagina); // Offset
+        typedQuery.setMaxResults(tamanioPagina);         // Limit
 
         List<NotaRetiro> notas = typedQuery.getResultList();
 
@@ -78,19 +80,32 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
     }
 
     /**
-     * Auxiliar para crear un array de predicados (filtros) basados en las fechas.
-     * Esto evita duplicar código y previene errores al usar la API de Criteria.
+     * Crea los filtros SQL basados en el DTO FiltroNotaRetiro.
      */
-    private Predicate[] crearPredicados(CriteriaBuilder cb, Root<NotaRetiro> root,
-                                        LocalDate fechaMin, LocalDate fechaMax) {
+    private Predicate[] crearPredicados(CriteriaBuilder cb, Root<NotaRetiro> root, FiltroNotaRetiro filtros) {
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(cb.equal(root.get("activo"), true));
-        if (fechaMin != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("fecha"), fechaMin));
+
+        if (filtros != null) {
+            // 1. Filtro por Rango de Fechas
+            if (filtros.fechaMin() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("fecha"), filtros.fechaMin()));
+            }
+            if (filtros.fechaMax() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("fecha"), filtros.fechaMax()));
+            }
+
+            // 2. Filtro por Estado (Activo/Inactivo)
+            if (filtros.activo() != null) {
+                predicates.add(cb.equal(root.get("activo"), filtros.activo()));
+            }
+
+            // 3. Filtro por Tipos de Uso (Set IN clause)
+            if (filtros.tipoDeUsos() != null && !filtros.tipoDeUsos().isEmpty()) {
+                // Esto genera SQL: WHERE tipo_uso IN ('VENTA', 'SERVICE', ...)
+                predicates.add(root.get("tipoUso").in(filtros.tipoDeUsos()));
+            }
         }
-        if (fechaMax != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("fecha"), fechaMax));
-        }
+
         return predicates.toArray(new Predicate[0]);
     }
 }
