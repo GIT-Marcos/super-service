@@ -37,7 +37,7 @@
                         <TextField fx:id="tfMarca" prefWidth="130.0" promptText="Marca" />
 
                         <Button fx:id="butBuscar" defaultButton="true" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="100.0" styleClass="btn-primary" text="🔍 Buscar" />
-                        <Button fx:id="btnTodosRepuestos" mnemonicParsing="false" onAction="#todosRepuestos" prefWidth="100.0" styleClass="btn-primary" text="Ver Todos" />
+                        <Button fx:id="btnTodosRepuestos" mnemonicParsing="false" onAction="#todosRepuestos" prefWidth="100.0" styleClass="btn-primary" text="📋 Ver Todos" />
                     </children>
                 </HBox>
 

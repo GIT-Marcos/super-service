@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -116,7 +117,12 @@ public class CargarServiceController implements Initializable, ModalController<S
             tfTrabajo.setText("");
             tfPrecioTrabajo.setText("");
         } catch (RuntimeException e) {
-            Alertas.aviso("Agregar trabajo", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Agregar trabajo")
+                    .text(e.getMessage())
+                    .showWarning();
         }
     }
 
@@ -182,11 +188,6 @@ public class CargarServiceController implements Initializable, ModalController<S
             orden.setEstadoIngreso(estadoIngreso);
             orden.setVehiculo(vehiculo);
             orden.setNotaRetiro(new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, obtenerDetalles()));
-            if (obtenerTrabajos().isEmpty()) {
-                Alertas.aviso("Cargar service", "Debe agregar al menos 1 trabajo para " +
-                        "cargar el service.");
-                return;
-            }
             orden.agregarTrabajos(obtenerTrabajos());
 
             //todo: hacer que tome la fecha del control datepicker
@@ -210,9 +211,19 @@ public class CargarServiceController implements Initializable, ModalController<S
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
         } catch (IllegalArgumentException e) {
-            Alertas.aviso("Cargar service", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Cargar service")
+                    .text(e.getMessage())
+                    .showWarning();
         } catch (RuntimeException e) {
-            Alertas.error("Cargar service", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Cargar service")
+                    .text(e.getMessage())
+                    .showError();
             e.printStackTrace();
         }
     }
@@ -235,16 +246,39 @@ public class CargarServiceController implements Initializable, ModalController<S
 
     private boolean validar() {
         if (this.cliente == null) {
-            Alertas.aviso("Cargar service", "Se debe asociar un cliente para el service.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Cargar service")
+                    .text("Se debe asociar un cliente para el service.")
+                    .showWarning();
             return false;
         }
         if (this.vehiculo == null) {
-            Alertas.aviso("Cargar service", "Se debe asociar un vehículo para el service.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Cargar service")
+                    .text("Se debe asociar un vehículo para el service.")
+                    .showWarning();
             return false;
         }
-        if (this.items.isEmpty()) {
-            Alertas.aviso("Cargar service", "Deben haber repuestos o trabajos" +
-                    " asignados para poder cargar el service.");
+        if (obtenerTrabajos().isEmpty()) {
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Cargar service")
+                    .text("Deben haber al menos 1 trabajo asignado para poder cargar el service.")
+                    .showWarning();
+            return false;
+        }
+        if (dpFechaEntrega.getValue() != null && dpFechaEntrega.getValue().isBefore(LocalDate.now())) {
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Cargar service")
+                    .text("La fecha de entrega ya ha pasado.")
+                    .showWarning();
             return false;
         }
         return true;
@@ -252,7 +286,6 @@ public class CargarServiceController implements Initializable, ModalController<S
 
     private void configControles() {
         dpFechaEntrega.setConverter(new SafeLocalDateConverter());
-        dpFechaEntrega.setPromptText("dd/MM/yyyy");
 
         lvDetalles.setItems(items);
         lvDetalles.setCellFactory(new ItemCellFactory(this::eliminarItem));

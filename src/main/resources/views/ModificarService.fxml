@@ -11,107 +11,207 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ModificarServiceController">
-   <top>
-      <HBox prefHeight="60.0" prefWidth="691.0" spacing="5.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox spacing="3.0">
-               <children>
-                  <Button minWidth="110.0" mnemonicParsing="false" onAction="#cambiarCliente" prefWidth="110.0" text="Cambiar cliente" />
-                  <Button minWidth="110.0" mnemonicParsing="false" onAction="#cambiarVehiculo" text="Cambiar vehículo" />
-               </children>
-            </VBox>
-            <VBox alignment="TOP_CENTER">
-               <children>
-                  <Label text="Prioridad" />
-                  <ComboBox fx:id="cbPrioridad" prefHeight="26.0" prefWidth="120.0" />
-               </children>
-            </VBox>
-            <VBox alignment="TOP_CENTER">
-               <children>
-                  <Label text="Estado" />
-                  <ComboBox fx:id="cbEstado" prefHeight="26.0" prefWidth="130.0" />
-               </children>
-            </VBox>
-            <VBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="130.0">
-               <children>
-                  <Label text="Fecha de carga" />
-                  <DatePicker fx:id="dpFechaCarga" disable="true" editable="true" />
-               </children>
-            </VBox>
-            <VBox prefHeight="60.0" prefWidth="130.0">
-               <children>
-                  <Label text="Editar fecha de entrega" />
-                  <DatePicker fx:id="dpFechaEntrega" promptText="dd/MM/yyyy" />
-               </children>
-            </VBox>
-            <VBox alignment="CENTER">
-               <children>
-                  <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardar" text="GUARDAR" />
-               </children>
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </VBox>
-         </children>
-      </HBox>
-   </top>
-   <left>
-      <VBox prefHeight="430.0" prefWidth="520.0" spacing="5.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label text="Cliente del service">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Label>
-            <Label fx:id="lblCliente" text="*Debe asignar un cliente al service">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Separator prefWidth="200.0" />
-            <Label text="Agregar trabajo" />
-            <CustomTextField fx:id="ctfDesc" promptText="Descripción del trabajo..." />
-            <CustomTextField fx:id="ctfPrecio" promptText="Precio el trabajo..." />
-            <Button mnemonicParsing="false" onAction="#agregarTrabajo" text="+" />
-            <Separator prefWidth="200.0" />
-            <Button mnemonicParsing="false" onAction="#agregarRepuesto" text="Agregar repuesto..." />
-            <Separator prefWidth="200.0" />
-            <ListView fx:id="lista" prefHeight="200.0" prefWidth="200.0" />
-            <Label fx:id="lblTotal" text="TOTAL: $">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-         </children>
-      </VBox>
-   </left>
-   <right>
-      <VBox alignment="TOP_CENTER" spacing="5.0" BorderPane.alignment="CENTER">
-         <children>
-            <ImageView fx:id="imgMarca" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../imgs/logos/car.png" />
-               </image>
-            </ImageView>
-            <Label fx:id="lblAuto" text="*Debe asignar un vehículo al service">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Separator prefWidth="200.0" />
-            <Label text="Motivo de ingreso al taller" />
-            <TextArea fx:id="tfMotivos" prefHeight="180.0" prefWidth="201.0" />
-            <Button mnemonicParsing="false" onAction="#verOrden" text="VER ORDEN DE ESTE SERVICE" />
-         </children>
-      </VBox>
-   </right>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ModificarServiceController">
+
+    <!-- HEADER: ESTADO Y FECHAS -->
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="80.0" spacing="10.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <children>
+                <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="section-label" text="GESTIÓN DE ESTADO" />
+                        <HBox spacing="10.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Estado Actual:">
+                                            <font>
+                                                <Font size="13.0" />
+                                            </font>
+                                        </Label>
+                                        <ComboBox fx:id="cbEstado" prefWidth="140.0" />
+                                    </children>
+                                </VBox>
+                                <Separator orientation="VERTICAL" />
+                                <VBox>
+                                    <children>
+                                        <Label text="Prioridad:">
+                                            <font>
+                                                <Font size="13.0" />
+                                            </font>
+                                        </Label>
+                                        <ComboBox fx:id="cbPrioridad" prefWidth="120.0" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <Separator orientation="VERTICAL" />
+
+                <HBox spacing="10.0">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label text="Fecha Carga:" textFill="#666666">
+                                    <font>
+                                        <Font size="10.0" />
+                                    </font>
+                                </Label>
+                                <DatePicker fx:id="dpFechaCarga" disable="true" prefHeight="29.0" prefWidth="130.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                            </children>
+                        </VBox>
+                        <VBox>
+                            <children>
+                                <Label text="Fecha Entrega:" textFill="#666666">
+                                    <font>
+                                        <Font size="10.0" />
+                                    </font>
+                                </Label>
+                                <DatePicker fx:id="dpFechaEntrega" prefHeight="29.0" prefWidth="130.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+            </padding>
+        </HBox>
+    </top>
+
+    <!-- BODY: DOS COLUMNAS -->
+    <center>
+        <GridPane hgap="20.0" styleClass="root">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="60.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+
+                <!-- COLUMNA IZQUIERDA: DETALLES Y CLIENTE -->
+                <VBox spacing="10.0">
+                    <children>
+                        <!-- Info Cliente -->
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar">
+                            <children>
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="section-label" text="CLIENTE ASIGNADO" />
+                                        <Label fx:id="lblCliente" text="Nombre del Cliente" textFill="#2d3436">
+                                            <font>
+                                                <Font name="System Bold" size="13.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                                <Button mnemonicParsing="false" onAction="#cambiarCliente" styleClass="btn-primary" text="🔄 Cambiar" />
+                            </children>
+                            <padding>
+                                <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
+                            </padding>
+                        </HBox>
+
+                        <Separator />
+
+                        <Label styleClass="section-label" text="ITEMS DEL SERVICE" />
+
+                        <!-- Formulario Agregar -->
+                        <HBox spacing="5.0">
+                            <children>
+                                <CustomTextField fx:id="ctfDesc" promptText="Descripción trabajo..." styleClass="text-field" HBox.hgrow="ALWAYS" />
+                                <CustomTextField fx:id="ctfPrecio" prefWidth="100.0" promptText="Precio..." styleClass="text-field" />
+                                <Button mnemonicParsing="false" onAction="#agregarTrabajo" prefWidth="35.0" styleClass="btn-action" text="+" />
+                            </children>
+                        </HBox>
+
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#agregarRepuesto" styleClass="btn-report" text="📦 Agregar repuesto..." />
+
+                        <ListView fx:id="lista" styleClass="text-field" VBox.vgrow="ALWAYS" />
+
+                        <HBox alignment="CENTER_RIGHT">
+                            <children>
+                                <Label fx:id="lblTotal" text="TOTAL: $ 0.00">
+                                    <font>
+                                        <Font name="System Bold" size="16.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </VBox>
+
+                <!-- COLUMNA DERECHA: VEHICULO -->
+                <VBox spacing="10.0" GridPane.columnIndex="1">
+                    <children>
+                        <!-- Info Auto -->
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="sidebar">
+                            <children>
+                                <ImageView fx:id="imgMarca" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../imgs/logos/car.png" />
+                                    </image>
+                                </ImageView>
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="section-label" text="VEHÍCULO" />
+                                        <Label fx:id="lblAuto" text="Marca Modelo Patente" textFill="#2d3436">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                                <Button mnemonicParsing="false" onAction="#cambiarVehiculo" styleClass="btn-primary" text="🔄 Cambiar" />
+                            </children>
+                            <padding>
+                                <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
+                            </padding>
+                        </HBox>
+
+                        <Separator />
+
+                        <Label styleClass="section-label" text="MOTIVO DE INGRESO" />
+                        <TextArea fx:id="tfMotivos" promptText="Descripción del problema..." styleClass="text-field" wrapText="true" VBox.vgrow="ALWAYS" />
+
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#verOrden" text="📄 Ver Orden de trabajo" />
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </VBox>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </GridPane>
+    </center>
+
+    <!-- FOOTER: GUARDAR -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" prefHeight="40.0" spacing="15.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardar" prefHeight="30.0" prefWidth="200.0" styleClass="btn-success" text="💾  GUARDAR CAMBIOS" />
+            </children>
+            <padding>
+                <Insets right="20.0" />
+            </padding>
+        </HBox>
+    </bottom>
+
 </BorderPane>

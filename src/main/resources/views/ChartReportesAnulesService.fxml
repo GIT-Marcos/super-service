@@ -11,101 +11,195 @@
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="560.0" minWidth="1000.0" prefHeight="535.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.charts.ChartReportesAnualesServiceController">
-   <children>
-      <BorderPane minHeight="560.0" minWidth="900.0" prefHeight="560.0" prefWidth="1000.0">
-         <center>
-            <AreaChart fx:id="chart" animated="false" prefWidth="914.0" BorderPane.alignment="CENTER">
-              <xAxis>
-                <CategoryAxis side="BOTTOM" />
-              </xAxis>
-              <yAxis>
-                <NumberAxis side="LEFT" />
-              </yAxis>
-            </AreaChart>
-         </center>
-         <top>
-            <HBox prefHeight="160.0" prefWidth="991.0" spacing="10.0" BorderPane.alignment="CENTER">
-               <children>
-                  <AnchorPane maxHeight="160.0" minHeight="135.0" prefHeight="160.0" prefWidth="360.0">
-                     <children>
-                        <Spinner fx:id="spinnerAnio" layoutX="14.0" layoutY="27.0" />
-                        <Label layoutX="14.0" layoutY="4.0" text="Seleccione el año sobre el que quiere generar el reporte">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1100.0" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.charts.ChartReportesAnualesServiceController">
+    <children>
+        <BorderPane layoutX="10.0" layoutY="10.0" prefHeight="560.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <center>
+                <VBox spacing="10.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label styleClass="section-label" text="EVOLUCIÓN ANUAL">
+                            <VBox.margin>
+                                <Insets left="20.0" top="10.0" />
+                            </VBox.margin>
                         </Label>
-                        <Button layoutX="145.0" layoutY="65.0" mnemonicParsing="false" onAction="#exportarJPG" text="Exportar como JPG" AnchorPane.leftAnchor="145.0" />
-                        <Button layoutX="15.0" layoutY="100.0" minWidth="300.0" mnemonicParsing="false" onAction="#generarReporteIngresos" prefWidth="300.0" text="Generar reporte de INGRESOS de services por mes" />
-                        <Button layoutX="15.0" layoutY="128.0" minWidth="300.0" mnemonicParsing="false" onAction="#generarReporteCantidad" prefWidth="300.0" text="Generar reporte de CANTIDAD de services por mes" />
-                        <Button layoutX="15.0" layoutY="65.0" mnemonicParsing="false" onAction="#enviarMail" prefHeight="26.0" prefWidth="117.0" text="Enviar por mail" />
-                     </children>
-                  </AnchorPane>
-                  <Separator orientation="VERTICAL" />
-                  <VBox prefHeight="135.0" prefWidth="190.0">
-                     <children>
-                        <Label text="Ingresos de services totales">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="lblIngresosTotales" text="\$ 00000000" />
-                        <Separator prefWidth="200.0" />
-                        <Label text="Ingresos promedio por service" wrapText="true">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="lblPromedioIngresosPorService" text="\$ 00000" />
-                        <Separator prefWidth="200.0" />
-                        <Label text="Cantidad de services en el año" wrapText="true">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="lblCantidadDeServicesAnio" text="000000" />
-                     </children>
-                  </VBox>
-                  <Separator orientation="VERTICAL" />
-                  <VBox prefHeight="135.0" prefWidth="170.0">
-                     <children>
-                        <Label text="Ingresos por trabajos" wrapText="true">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="lblIngresosPorTrabajos" text="\$ 00000" />
-                        <Separator prefWidth="200.0" />
-                        <Label text="Ingresos por repuestos" wrapText="true">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="lblIngresosPorRepuestos" text="\$ 00000" />
-                        <Separator prefWidth="200.0" />
-                        <Label fx:id="lblPorcTrabajos" text="\% Trabajos" textFill="#e36000" wrapText="true">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="lblPorcRepuestos" text="\% Repuestos" textFill="#068000" wrapText="true">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </VBox>
-                  <PieChart fx:id="pieChart" labelLineLength="10.0" labelsVisible="false" legendSide="TOP" maxHeight="120.0" maxWidth="120.0" title="Tipos de ingresos" />
-               </children>
-            </HBox>
-         </top>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
-      </BorderPane>
-   </children>
+                        <AreaChart fx:id="chart" animated="false" legendSide="TOP" prefHeight="400.0" VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis side="BOTTOM" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT" />
+                            </yAxis>
+                        </AreaChart>
+                    </children>
+                </VBox>
+            </center>
+            <top>
+                <!-- Contenedor Superior con estilo Sidebar para fondo blanco y borde limpio -->
+                <HBox prefHeight="180.0" spacing="10.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+                    <children>
+                        <!-- SECCIÓN 1: CONTROLES -->
+                        <VBox alignment="CENTER_LEFT" minWidth="320.0" prefWidth="340.0" spacing="5.0">
+                            <children>
+                                <Label styleClass="section-label" text="CONFIGURACIÓN DE REPORTE" />
+                        <HBox spacing="5.0">
+                           <children>
+                                        <Label text="Año:" />
+                                        <Spinner fx:id="spinnerAnio" prefWidth="80.0" styleClass="text-field" />
+                           </children>
+                        </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                        <Button mnemonicParsing="false" onAction="#enviarMail" styleClass="btn-report" text="📧 Enviar por Mail" />
+                                        <Button mnemonicParsing="false" onAction="#exportarJPG" styleClass="btn-report" text="📷 Exportar JPG" />
+                                    </children>
+                                </HBox>
+                                <Separator prefWidth="200.0" />
+                                <VBox spacing="8.0">
+                                    <children>
+                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#generarReporteIngresos" styleClass="btn-primary" text="📈  Generar reporte de INGRESOS" />
+                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#generarReporteCantidad" styleClass="btn-primary" text="Generar reporte de CANTIDAD" />
+                                    </children>
+                                </VBox>
+                            </children>
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" />
+                            </padding>
+                        </VBox>
+
+                        <Separator orientation="VERTICAL" />
+
+                        <!-- SECCIÓN 2: KPIs GENERALES -->
+                        <VBox alignment="CENTER_LEFT" prefWidth="220.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label styleClass="section-label" text="RESUMEN FINANCIERO" />
+                                <GridPane vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="100.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <VBox>
+                                            <children>
+                                                <Label text="Ingresos Totales">
+                                                    <font>
+                                                        <Font size="11.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblIngresosTotales" text="\$ 0">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </VBox>
+                                        <VBox GridPane.rowIndex="1">
+                                            <children>
+                                                <Label text="Promedio por Service">
+                                                    <font>
+                                                        <Font size="11.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblPromedioIngresosPorService" text="\$ 0">
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </VBox>
+                                        <VBox GridPane.rowIndex="2">
+                                            <children>
+                                                <Label text="Cantidad Total Services">
+                                                    <font>
+                                                        <Font size="11.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblCantidadDeServicesAnio" text="0">
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                            </children>
+                            <padding>
+                                <Insets bottom="10.0" top="10.0" />
+                            </padding>
+                        </VBox>
+
+                        <Separator orientation="VERTICAL" />
+
+                        <!-- SECCIÓN 3: DETALLE Y GRÁFICO -->
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <VBox alignment="CENTER_LEFT" prefWidth="160.0" spacing="5.0">
+                                    <children>
+                                        <Label styleClass="section-label" text="DESGLOSE" />
+                                        <VBox spacing="2.0">
+                                            <children>
+                                                <Label text="Por Trabajos" textFill="#e36000">
+                                                    <font>
+                                                        <Font name="System Bold" size="11.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblIngresosPorTrabajos" text="\$ 0">
+                                                    <font>
+                                                        <Font size="14.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblPorcTrabajos" text="\% Trabajos" textFill="#e36000">
+                                                    <font>
+                                                        <Font size="14.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </VBox>
+                                        <Separator />
+                                        <VBox spacing="2.0">
+                                            <children>
+                                                <Label text="Por Repuestos" textFill="#068000">
+                                                    <font>
+                                                        <Font name="System Bold" size="11.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblIngresosPorRepuestos" text="\$ 0">
+                                                    <font>
+                                                        <Font size="14.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblPorcRepuestos" text="\% Repuestos" textFill="#068000">
+                                                    <font>
+                                                        <Font size="14.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+                                <PieChart fx:id="pieChart" labelLineLength="5.0" labelsVisible="false" legendSide="RIGHT" prefHeight="150.0" prefWidth="220.0" title="Distribución" HBox.hgrow="ALWAYS" />
+                            </children>
+                            <padding>
+                                <Insets bottom="10.0" top="10.0" />
+                            </padding>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets left="5.0" right="5.0" />
+                    </padding>
+                </HBox>
+            </top>
+        </BorderPane>
+    </children>
 </AnchorPane>

@@ -18,12 +18,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
@@ -32,6 +35,7 @@ import org.controlsfx.validation.Validator;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -130,8 +134,8 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
             imgMarca.setImage(img);
         }
 
-        if (service.getEstadoService().equals(EstadoService.PAGADO) ||
-                service.getEstadoService().equals(EstadoService.CANCELADO)) {
+        EstadoService estado = service.getEstadoService();
+        if (List.of(EstadoService.PAGADO, EstadoService.CANCELADO, EstadoService.PAGO_PENDIENTE).contains(estado)) {
             btnGuardar.setDisable(true);
             cbEstado.setDisable(true);
         }
@@ -145,25 +149,17 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
     @FXML
     private void verOrden() {
         Optional<Service> result = navigator.openModal(Views.DETALLE_ORDEN, "Detalle de orden", this.service);
-        if (result.isPresent()) {
-            this.receiveData(result.get());
-        }
+        result.ifPresent(this::receiveData);
     }
 
     @FXML
     private void guardar(ActionEvent event) {
-        if (estaPagado()) return;
         if (!validar()) return;
         try {
             String motivo = ManejadorInputs.textoGenerico(tfMotivos.getText(), false,
                     "Motivo de ingreso", 500);
 
             this.orden.setMotivoIngreso(motivo);
-            if (trabajos.isEmpty()) {
-                Alertas.aviso("Cargar service", "Debe agregar al menos 1 trabajo para " +
-                        "cargar el service.");
-                return;
-            }
 
             LocalDateTime fe = dpFechaEntrega.getValue() == null ? LocalDateTime.now().plusDays(1) :
                     dpFechaEntrega.getValue().atStartOfDay();
@@ -172,15 +168,29 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
             if (!Alertas.confirmacion("Modificar service", "¿Está seguro que desea guardar el service?"))
                 return;
             this.paraDevolver = serviceServ.modificarService(service);
-
-            Alertas.exito("Modificar service", "Se ha guardado el service con éxito.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.BOTTOM_RIGHT)
+                    .title("Modificar service")
+                    .text("Se ha guardado el service con éxito.")
+                    .showInformation();
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
         } catch (IllegalArgumentException e) {
-            Alertas.aviso("Modificar service", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar service")
+                    .text(e.getMessage())
+                    .showWarning();
         } catch (RuntimeException e) {
-            Alertas.error("Modificar service", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar service")
+                    .text(e.getMessage())
+                    .showError();
             e.printStackTrace();
         }
     }
@@ -232,7 +242,12 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
             ctfDesc.setText("");
             ctfPrecio.setText("");
         } catch (RuntimeException e) {
-            Alertas.aviso("Agregar trabajo", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Agregar trabajo")
+                    .text(e.getMessage())
+                    .showWarning();
         }
     }
 
@@ -284,34 +299,41 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
         lblTotal.setText("TOTAL: $ " + totalService);
     }
 
-    private boolean estaPagado() {
-        if (service.getEstadoService() == EstadoService.PAGADO) {
-            Alertas.error("Modificar service", "No es posible modificar services que ya han sido pagados.");
-            return true;
-        }
-        if (cbEstado.getValue() == EstadoService.PAGADO) {
-            Alertas.error("Modificar service", "No es posible Modificar un service con estado: 'Pagado'.");
-            return true;
-        }
-        if (cbEstado.getValue() == EstadoService.CANCELADO) {
-            Alertas.error("Modificar service", "No es posible Modificar un service con estado: 'Cancelado'.");
-            return true;
-        }
-        return false;
-    }
-
     private boolean validar() {
         if (this.cliente == null) {
-            Alertas.aviso("Modificar service", "Se debe asociar un cliente para el service.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar service")
+                    .text("Se debe asociar un cliente para el service.")
+                    .showWarning();
             return false;
         }
         if (this.vehiculo == null) {
-            Alertas.aviso("Modificar service", "Se debe asociar un vehículo para el service.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar service")
+                    .text("Se debe asociar un vehículo para el service.")
+                    .showWarning();
             return false;
         }
-        if (this.items.isEmpty()) {
-            Alertas.aviso("Modificar service", "Deben haber repuestos o trabajos" +
-                    " asignados para poder Modificar el service.");
+        if (dpFechaEntrega.getValue() != null && dpFechaEntrega.getValue().isBefore(LocalDate.now())) {
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar service")
+                    .text("La fecha de entrega ya ha pasado.")
+                    .showWarning();
+            return false;
+        }
+        if (trabajos.isEmpty()) {
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .title("Modificar service")
+                    .text("Debe agregar al menos 1 trabajo para modificar el service.")
+                    .showWarning();
             return false;
         }
         return true;
@@ -329,6 +351,7 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
         cbEstado.getItems().setAll(EstadoService.values());
         cbEstado.getItems().remove(EstadoService.CANCELADO);
         cbEstado.getItems().remove(EstadoService.PAGADO);
+        cbEstado.getItems().remove(EstadoService.PAGO_PENDIENTE);
 
         cbPrioridad.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && !newValue.equals(oldValue)) {
