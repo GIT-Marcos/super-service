@@ -8,7 +8,7 @@
 
 /* --- PANEL SUPERIOR (Compacto) --- */
 .top-panel {
-    -fx-background-color: #263c43;
+    -fx-background-color: #55212d;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 6, 0, 0, 2);
 }
 
