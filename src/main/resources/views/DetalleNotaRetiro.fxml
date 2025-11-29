@@ -1,53 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" spacing="10.0" stylesheets="@../styles/notaRetiro.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DetalleNotaRetiroController">
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="570.0" style="-fx-background-color: #b0b0b0;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DetalleNotaRetiroController">
-   <children>
-      <GridPane>
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="290.28361202927476" minWidth="10.0" prefWidth="186.40302527978562" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="441.447735564431" minWidth="10.0" prefWidth="269.5074069404902" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="441.447735564431" minWidth="10.0" prefWidth="180.2238745601229" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-         <children>
-            <Label text="Número de nota">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Label text="Fecha de nota" GridPane.columnIndex="1">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Label fx:id="labNroNota" text="0000000000" GridPane.rowIndex="1" GridPane.valignment="TOP">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Label fx:id="labFechaNota" text="dd/MM/yyyy" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="TOP">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-         </children>
-      </GridPane>
-      <ListView fx:id="listViewDetalles" prefHeight="240.0" prefWidth="560.0" />
-   </children>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
+    <!-- HEADER: Título del Modal -->
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="top-panel">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <children>
+                <Label styleClass="header-icon" text="📄" textFill="WHITE">
+                    <font>
+                        <Font size="20.0" />
+                    </font>
+                </Label>
+                <VBox>
+                    <children>
+                        <Label text="Detalle de Nota de Retiro" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                        <Label text="Información completa de sus detalles" textFill="#b2bec3" />
+                    </children>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+            </children>
+        </HBox>
+
+        <!-- DATOS GENERALES (GRID) -->
+        <VBox spacing="5.0" style="-fx-background-color: white; -fx-border-color: #dcdcdc; -fx-border-radius: 3; -fx-background-radius: 3;">
+            <padding>
+                <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+            </padding>
+            <VBox.margin>
+                <Insets left="10.0" right="10.0" />
+            </VBox.margin>
+            <children>
+                <GridPane hgap="20.0" vgap="5.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <!-- Etiquetas (Headers) -->
+                        <Label styleClass="section-label" text="NRO. NOTA" />
+                        <Label styleClass="section-label" text="FECHA EMISIÓN" GridPane.columnIndex="1" />
+                        <Label styleClass="section-label" text="TIPO USO" GridPane.columnIndex="2" />
+                        <Label styleClass="section-label" text="ESTADO ACTUAL" GridPane.columnIndex="3" />
+
+                        <!-- Valores -->
+                        <Label fx:id="labNroNota" text="00000" textFill="#2d3436" GridPane.rowIndex="1">
+                            <font>
+                                <Font name="System Bold" size="15.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="labFechaNota" text="dd/MM/yyyy" textFill="#2d3436" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+
+                        <!-- Tipo de Uso (Service/Venta) -->
+                        <Label fx:id="labTipoUso" style="-fx-background-color: #e0e0e0; -fx-padding: 2 8 2 8; -fx-background-radius: 10;" text="TIPO" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+
+                        <!-- Estado (Activa/Anulada) -->
+                        <Label fx:id="labEstado" text="ESTADO" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </GridPane>
+            </children>
+        </VBox>
+
+        <!-- TABLA DE DETALLES -->
+        <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+            </padding>
+            <children>
+                <Label styleClass="section-label" text="REPUESTOS INCLUIDOS" />
+            <ListView fx:id="lista" />
+            </children>
+        </VBox>
+
+        <!-- BOTONES DE ACCIÓN (CERRAR / IMPRIMIR) -->
+        <VBox>
+            <children>
+                <Separator prefWidth="200.0" />
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                    <children>
+                        <Button defaultButton="true" mnemonicParsing="false" onAction="#cerrar" prefWidth="100.0" styleClass="btn-primary" text="Cerrar" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
 </VBox>

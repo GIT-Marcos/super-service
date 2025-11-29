@@ -209,8 +209,7 @@ public class NotasRetiroController implements Initializable {
             mostrarNotificacion("Ver detalles", "Seleccione una nota para ver detalles.", true);
             return;
         }
-        NotaRetiro notaEntidad = vm.getNotaOriginal();
-        navigator.openModal(Views.DETALLE_NOTA_RETIRO, "Detalles de Nota #" + notaEntidad.getId(), notaEntidad);
+        navigator.openModal(Views.DETALLE_NOTA_RETIRO, "Detalles de Nota #" + vm.idNotaProperty().getValue(), vm);
     }
 
     @FXML
