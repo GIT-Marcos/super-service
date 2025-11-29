@@ -10,7 +10,6 @@ import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Singleton
 public class NotaRetiroServImpl implements NotaRetiroServ {
@@ -22,25 +21,11 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
         this.daoNota = daoNota;
     }
 
-    @Deprecated
-    @Transactional
-    @Override
-    public List<NotaRetiro> verTodasPorFecha() {
-        return daoNota.verTodasPorFecha();
-    }
-
     @Transactional
     @Override
     public ResultadoPaginado<NotaRetiro> buscarPaginado(LocalDate fechaMin, LocalDate fechaMax,
                                                         int pagina, int tamanioPagina) {
         return daoNota.buscarPaginado(fechaMin, fechaMax, pagina, tamanioPagina);
-    }
-
-    @Deprecated
-    @Transactional
-    @Override
-    public List<NotaRetiro> buscarPorFecha(LocalDate fechaMin, LocalDate fechaMax) {
-        return daoNota.buscarPorFecha(fechaMin, fechaMax);
     }
 
     @Transactional

@@ -29,15 +29,6 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
     }
 
     @Override
-    public List<NotaRetiro> verTodasPorFecha() {
-        EntityManager em = emProvider.get();
-        return em.createQuery("SELECT DISTINCT n FROM NotaRetiro n " +
-                        "WHERE n.activo = TRUE " +
-                        "ORDER BY n.fecha DESC",
-                NotaRetiro.class).getResultList();
-    }
-
-    @Override
     public ResultadoPaginado<NotaRetiro> buscarPaginado(LocalDate fechaMin, LocalDate fechaMax,
                                                         int pagina, int tamanioPagina) {
         EntityManager em = emProvider.get();
@@ -84,17 +75,6 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
 
         // --- 3. DEVOLVER EL RESULTADO COMPLETO ---
         return new ResultadoPaginado<>(notas, totalResultados);
-    }
-
-    @Override
-    public List<NotaRetiro> buscarPorFecha(LocalDate fechaMin, LocalDate fechaMax) {
-        EntityManager em = emProvider.get();
-        return em.createQuery("SELECT DISTINCT n FROM NotaRetiro n " +
-                                "WHERE n.fecha BETWEEN :fechaMin AND :fechaMax",
-                        NotaRetiro.class)
-                .setParameter("fechaMin", fechaMin)
-                .setParameter("fechaMax", fechaMax)
-                .getResultList();
     }
 
     /**
