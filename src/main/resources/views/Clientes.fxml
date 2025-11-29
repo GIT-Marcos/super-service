@@ -56,7 +56,7 @@
                         <VBox alignment="BOTTOM_LEFT" spacing="5.0">
                             <children>
                                 <Button maxWidth="150.0" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="150.0" styleClass="btn-primary" text="🔍 Buscar con filtros" />
-                                <Button maxWidth="150.0" mnemonicParsing="false" onAction="#todosLosClientes" prefWidth="150.0" styleClass="button" text="Mostrar Todos" />
+                                <Button maxWidth="150.0" mnemonicParsing="false" onAction="#todosLosClientes" prefWidth="150.0" styleClass="btn-primary" text="📋 Ver Todos" />
                             </children>
                         </VBox>
 
