@@ -116,6 +116,7 @@ public class NotaRetiro implements Serializable {
      */
     public enum TipoUsoRetiro {
         VENTA,
-        SERVICE
+        SERVICE,
+        OTRO
     }
 }
