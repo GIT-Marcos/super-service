@@ -24,10 +24,7 @@ import org.controlsfx.control.Notifications;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class NotasRetiroController implements Initializable {
@@ -200,6 +197,12 @@ public class NotasRetiroController implements Initializable {
     }
 
     @FXML
+    private void nuevaNota() {
+        Optional<NotaRetiro> result = navigator.openModal(Views.CARGAR_NOTA, "Nueva Nota de Retiro", null);
+        result.ifPresent(nota -> notasObsList.addFirst(new NotaRetiroViewModel(nota)));
+    }
+
+    @FXML
     private void verDetalles() {
         NotaRetiroViewModel vm = tablaNotas.getSelectionModel().getSelectedItem();
         if (vm == null) {
@@ -238,6 +241,11 @@ public class NotasRetiroController implements Initializable {
                     .showError();
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void generarTicket() {
+
     }
 
     private void mostrarNotificacion(String titulo, String texto, boolean esAdvertencia) {

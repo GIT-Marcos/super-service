@@ -96,7 +96,7 @@
             </padding>
             <children>
                 <Label styleClass="section-label" text="GESTIÓN" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" styleClass="btn-success" text="➕ Nueva nota">
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#nuevaNota" styleClass="btn-success" text="➕ Nueva nota">
                     <tooltip>
                         <Tooltip text="Crear una nueva nota" />
                     </tooltip>
@@ -107,7 +107,7 @@
                 <Separator prefWidth="200.0" />
 
                 <Label styleClass="section-label" text="PROCESOS" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" styleClass="btn-action" text="🖨 Generar ticket" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generarTicket" styleClass="btn-action" text="🖨 Generar ticket" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="5.0" right="5.0" top="5.0" />
