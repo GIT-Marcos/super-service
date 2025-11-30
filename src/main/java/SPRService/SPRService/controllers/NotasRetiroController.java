@@ -2,6 +2,9 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.DTOs.filtros.FiltroNotaRetiro;
 import SPRService.SPRService.util.ResultadoPaginado;
+import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.generadores.GeneradorTXT;
+import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.tablas.NotaRetiroViewModel;
 import SPRService.SPRService.entities.NotaRetiro;
 import SPRService.SPRService.navigation.AppCoordinator;
@@ -13,15 +16,18 @@ import SPRService.SPRService.util.alertas.Alertas;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 
+import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
@@ -243,8 +249,25 @@ public class NotasRetiroController implements Initializable {
     }
 
     @FXML
-    private void generarTicket() {
+    private void generarTicket(ActionEvent event) {
+        NotaRetiroViewModel vm = tablaNotas.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            mostrarNotificacion("Generar ticket", "Seleccione una nota para generar el ticket.", true);
+            return;
+        }
+        File file;
+        if (Alertas.confirmacion("Generar ticket", "¿Quiere generar el ticket en la ruta predeterminada?")) {
+            file = new File("C:\\Users\\Usuario\\Desktop\\nota retiro.txt");
+        } else {
+            file = SimpleDialogs.selectorRuta(event, "Seleccione donde quiere guardar la nota",
+                    "nota retiro.txt",
+                    new FileChooser.ExtensionFilter("Archivos de texto (*.txt)", "*.txt"));
+        }
+        if (file == null) return;
+        GeneradorTXT.generaNotaRetiro(vm.getNotaOriginal().getDetallesRetiroList(), file);
 
+        if (Alertas.confirmacion("Imprimir ticket", "¿Desea imprimir el ticket generado?"))
+            Impresor.imprimirConSistema(file);
     }
 
     private void mostrarNotificacion(String titulo, String texto, boolean esAdvertencia) {

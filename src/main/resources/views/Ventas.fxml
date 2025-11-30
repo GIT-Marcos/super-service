@@ -121,7 +121,7 @@
                     <tooltip><Tooltip text="Ver items de la venta seleccionada" /></tooltip>
                 </Button>
 
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#imprimirFactura" text="🖨 Imprimir">
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#imprimirFactura" text="🖨 Generar Factura">
                     <tooltip><Tooltip text="Generar comprobante" /></tooltip>
                 </Button>
 
