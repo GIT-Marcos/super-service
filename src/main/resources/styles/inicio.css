@@ -67,18 +67,24 @@
     -fx-background-color: #1f618d;
 }
 
-/* --- BOTÓN SECUNDARIO (Salir) --- */
-.btn-secondary {
-    -fx-background-color: transparent;
-    -fx-text-fill: #95a5a6;
-    -fx-font-size: 12px;
+/* --- BOTÓN SALIR (Salir) --- */
+.btn-exit {
+    -fx-background-color: transparent;      /* Fondo transparente */
+    -fx-text-fill: #ffffff;                /* Color del texto */
+    -fx-font-size: 14px;
+    -fx-border-color: #ff5f5f;             /* Borde blanco */
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    /*-fx-background-radius: 5px;*/
     -fx-cursor: hand;
 }
 
-.btn-secondary:hover {
-    -fx-text-fill: #e74c3c; /* Rojo al pasar el mouse sobre Salir */
-    -fx-background-color: rgba(231, 76, 60, 0.1);
-    -fx-background-radius: 3;
+.btn-exit:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);  /* Ligero brillo */
+}
+
+.btn-exit:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.35);
 }
 
 /* --- BOTÓN OUTLINE (Crear Usuario) --- */
@@ -87,7 +93,7 @@
     -fx-border-color: #3498db;
     -fx-border-radius: 4;
     -fx-text-fill: #3498db;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-cursor: hand;
     -fx-padding: 5 15 5 15;
 }

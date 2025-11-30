@@ -1,27 +1,18 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.navigation.AppCoordinator;
-import SPRService.SPRService.navigation.DefaultNavigator;
-import SPRService.SPRService.navigation.Navigator;
-import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.UsuarioServ;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
+import javafx.geometry.Pos;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SessionManager;
-import SPRService.SPRService.util.alertas.Alertas;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 import org.hibernate.HibernateException;
 
 import java.net.URL;
@@ -31,50 +22,37 @@ public class LoginController implements Initializable {
 
     private final UsuarioServ usuarioServ;
     //para evitar loguearse cuando se testea.
-    private boolean flagDebug = true;
+    private boolean flagDebug = false;
     private final AppCoordinator appCoordinator;
-    // navegador solo para moverse en el login
-    private final Navigator localNavigator;
 
-    @FXML
-    private Pane pane;
     @FXML
     private TextField tfNombreUsuario;
     @FXML
     private PasswordField tfContrasenia;
-    @FXML
-    private Label labelRecuContra;
 
     @Inject
-    public LoginController(UsuarioServ usuarioServ, AppCoordinator appCoordinator,
-                           Provider<FXMLLoader> fxmlLoaderProvider) {
+    public LoginController(UsuarioServ usuarioServ, AppCoordinator appCoordinator) {
         this.usuarioServ = usuarioServ;
         this.appCoordinator = appCoordinator;
-        this.localNavigator = new DefaultNavigator(fxmlLoaderProvider);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        localNavigator.bind(pane);
-        // ¡IMPORTANTE! El navegador local necesita saber la ventana para los modales.
-        // Lo hacemos cuando la escena esté disponible.
-        pane.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                localNavigator.setOwnerWindow(newScene.getWindow());
-            }
-        });
+
     }
 
     @FXML
-    private void iniciarSesion(ActionEvent event) {
+    private void iniciarSesion() {
         String nombreUsuario = tfNombreUsuario.getText().trim();
         String inputPass = tfContrasenia.getText().trim();
         if (flagDebug) {
             appCoordinator.onLoginSuccess();
-
-            Node n = ((Node) event.getSource());
-            Stage s = (Stage) n.getScene().getWindow();
-            s.close();
+            Notifications.create()
+                    .position(Pos.BOTTOM_RIGHT)
+                    .hideAfter(Duration.seconds(3))
+                    .title("Inicio sesión")
+                    .text("Sesión iniciada con éxito.")
+                    .showInformation();
         } else {
             try {
                 ManejadorInputs.textoGenerico(nombreUsuario, true, "Nombre de usuario",
@@ -83,36 +61,34 @@ public class LoginController implements Initializable {
                 Usuario usuario = usuarioServ.loguear(nombreUsuario, inputPass);
                 SessionManager.iniciarSesion(usuario);
                 appCoordinator.onLoginSuccess();
-
-                Node n = ((Node) event.getSource());
-                Stage s = (Stage) n.getScene().getWindow();
-                s.close();
+                Notifications.create()
+                        .position(Pos.BOTTOM_RIGHT)
+                        .hideAfter(Duration.seconds(3))
+                        .title("Inicio sesión")
+                        .text("Sesión iniciada con éxito.")
+                        .showInformation();
             } catch (IllegalArgumentException | HibernateException e) {
-                Alertas.aviso("Inicio sesión", e.getMessage());
+                Notifications.create()
+                        .position(Pos.CENTER)
+                        .hideAfter(Duration.seconds(3))
+                        .title("Inicio sesión")
+                        .text(e.getMessage())
+                        .showWarning();
+            } catch (Exception e) {
+                Notifications.create()
+                        .position(Pos.CENTER)
+                        .hideAfter(Duration.seconds(5))
+                        .title("Inicio sesión")
+                        .text("Ha ocurrido un error inesperado al iniciar sesión.")
+                        .showError();
+                e.printStackTrace();
             }
         }
     }
 
     @FXML
-    private void crearUsuario() {
-        localNavigator.navigateTo(Views.CARGAR_USUARIO);
-    }
+    public void recuperarContra() {
 
-    @FXML
-    private void salir(ActionEvent event) {
-        boolean confir = Alertas.confirmacion("Salir del programa",
-                "¿Está seguro que desea salir del programa?");
-        if (!confir) {
-            return;
-        }
-        Node n = ((Node) event.getSource());
-        Stage s = (Stage) n.getScene().getWindow();
-        s.close();
-    }
-
-    @FXML
-    public void clickedRecuperarContrasenia(MouseEvent mouseEvent) {
-        labelRecuContra.setUnderline(true);
     }
 
 

@@ -7,6 +7,7 @@ import SPRService.SPRService.controllers.otros.RateController;
 public enum Views {
 
     // Ventanas principales
+    INICIO("/views/Inicio.fxml", InicioController.class),
     LOGIN("/views/Login.fxml", LoginController.class),
     MAIN("/views/MainView.fxml", MainController.class),
     DEPOSITO("/views/Deposito.fxml", DepositoController.class),

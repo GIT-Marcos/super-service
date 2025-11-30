@@ -51,7 +51,7 @@ public class AppCoordinator {
      * Cierra la ventana de login y lanza la ventana principal.
      */
     public void onLoginSuccess() {
-        primaryStage.close(); // Cierra la ventana de login
+        primaryStage.close(); // Cierra la ventana de inicio
         showMainScreen();
     }
 
@@ -63,17 +63,17 @@ public class AppCoordinator {
     private void showLoginScreen() {
         try {
             FXMLLoader loader = fxmlLoaderProvider.get();
-            loader.setLocation(Objects.requireNonNull(getClass().getResource(Views.LOGIN.getFxmlPath())));
+            loader.setLocation(Objects.requireNonNull(getClass().getResource(Views.INICIO.getFxmlPath())));
             Parent root = loader.load();
 
-            primaryStage.setTitle("Inicio de Sesión");
+            primaryStage.setTitle("Inicio");
             primaryStage.setScene(new Scene(root));
             Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/imgs/icon.png")));
             primaryStage.getIcons().add(icon);
 
             primaryStage.show();
         } catch (IOException e) {
-            throw new RuntimeException("No se pudo cargar la vista de login", e);
+            throw new RuntimeException("No se pudo cargar la vista de inicio", e);
         }
     }
 
