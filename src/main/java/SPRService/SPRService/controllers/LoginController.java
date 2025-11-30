@@ -16,7 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.util.ManejadorInputs;
@@ -31,13 +31,13 @@ public class LoginController implements Initializable {
 
     private final UsuarioServ usuarioServ;
     //para evitar loguearse cuando se testea.
-    private boolean flagDebug = false;
+    private boolean flagDebug = true;
     private final AppCoordinator appCoordinator;
     // navegador solo para moverse en el login
     private final Navigator localNavigator;
 
     @FXML
-    private GridPane pane;
+    private Pane pane;
     @FXML
     private TextField tfNombreUsuario;
     @FXML
@@ -55,6 +55,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        localNavigator.bind(pane);
         // ¡IMPORTANTE! El navegador local necesita saber la ventana para los modales.
         // Lo hacemos cuando la escena esté disponible.
         pane.sceneProperty().addListener((obs, oldScene, newScene) -> {
@@ -94,7 +95,7 @@ public class LoginController implements Initializable {
 
     @FXML
     private void crearUsuario() {
-        localNavigator.openModal(Views.CREAR_USUARIO, "Crear usuario", null);
+        localNavigator.navigateTo(Views.CARGAR_USUARIO);
     }
 
     @FXML

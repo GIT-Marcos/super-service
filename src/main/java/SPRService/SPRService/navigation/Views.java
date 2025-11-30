@@ -20,7 +20,7 @@ public enum Views {
     CARGAR_SERVICE("/views/CargarService.fxml", CargarServiceController.class),
 
     // Ventanas modales:
-    CREAR_USUARIO("/views/CrearUsuario.fxml", CrearUsuarioController.class),
+    CARGAR_USUARIO("/views/CargarUsuario.fxml", CrearUsuarioController.class),
     GUARDAR_REPUESTO("/views/CargarRepuesto.fxml", CargarRepuestoController.class),
     PAGO("/views/Pago.fxml", PagoController.class),
     SELECTOR_FECHA_REPORTE("/views/SelectorFechasReporte.fxml", SelectorFechasReporteController.class),

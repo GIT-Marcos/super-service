@@ -1,0 +1,98 @@
+
+/* --- FONDO GENERAL --- */
+.main-bg {
+    -fx-background-color: linear-gradient(
+            from 100% 0% to 0% 0%,
+            #292E49 0%,
+            #536976 100%
+    );
+}
+
+/* --- TARJETA BLANCA CENTRADA --- */
+.login-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    /* Sombra suave para dar efecto de elevación */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 20, 0, 0, 5);
+}
+
+/* --- CAMPOS DE TEXTO (Inputs) --- */
+.input-field {
+    -fx-background-color: #f7f9f9;
+    -fx-background-radius: 5;
+    -fx-border-color: #dfe6e9;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-padding: 10; /* Hace los inputs más altos y cómodos */
+    -fx-font-size: 13px;
+}
+
+.input-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #3498db; /* Borde azul al escribir */
+    -fx-effect: dropshadow(three-pass-box, rgba(52, 152, 219, 0.2), 5, 0, 0, 0);
+}
+
+/* --- LINK (Recuperar contraseña) --- */
+.link-label {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 11px;
+    -fx-underline: false;
+}
+
+.link-label:hover {
+    -fx-text-fill: #3498db;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+/* --- BOTÓN PRIMARIO (Iniciar Sesión) --- */
+.btn-primary {
+    -fx-background-color: #292E49;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 10 20 10 20;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #536976;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #1f618d;
+}
+
+/* --- BOTÓN SECUNDARIO (Salir) --- */
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: #95a5a6;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-text-fill: #e74c3c; /* Rojo al pasar el mouse sobre Salir */
+    -fx-background-color: rgba(231, 76, 60, 0.1);
+    -fx-background-radius: 3;
+}
+
+/* --- BOTÓN OUTLINE (Crear Usuario) --- */
+.btn-outline {
+    -fx-background-color: transparent;
+    -fx-border-color: #3498db;
+    -fx-border-radius: 4;
+    -fx-text-fill: #3498db;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-padding: 5 15 5 15;
+}
+
+.btn-outline:hover {
+    -fx-background-color: #292E49;
+    -fx-text-fill: white;
+}
