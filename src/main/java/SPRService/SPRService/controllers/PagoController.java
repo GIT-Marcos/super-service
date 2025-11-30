@@ -48,7 +48,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
     @FXML
     private RadioButton radTarjCredito, radTarjDebito, radEfectivo, radTransferencia;
     @FXML
-    private TextField tfMonto, tfUltimos4, tfNroReferencia;
+    private TextField tfMonto, tfUltimos4, tfNroReferencia, tfDniCliente;
     @FXML
     private ComboBox<String> comboMarcaTarjeta, comboBancoTarjeta;
 
@@ -72,7 +72,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
     public void receiveData(Transaccion data) {
         if (data != null) {
             this.transaccion = data;
-            labelTotal.setText("TOTAL: $ " + data.getMontoFaltante());
+            labelTotal.setText("$ " + data.getMontoFaltante());
             // Usa el de la interfaz
             if (transaccion.yaPersistida()) {
                 this.flagAgregarPago = true;

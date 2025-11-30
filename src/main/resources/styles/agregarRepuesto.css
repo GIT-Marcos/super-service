@@ -1,0 +1,140 @@
+
+/* --- CONFIGURACIÓN GENERAL --- */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-background-color: #f4f6f6;
+}
+
+/* --- HEADER --- */
+.header-bar {
+    -fx-background-color: #2c3e50;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+/* --- PANELES (Tarjetas blancas) --- */
+.search-panel, .footer-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 5, 0, 0, 1);
+}
+
+/* El footer no necesita radio superior para parecer pegado al fondo si se desea,
+   pero con margen queda flotante y moderno */
+.footer-panel {
+    -fx-border-color: #ecf0f1;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* --- TEXTO Y ETIQUETAS --- */
+.section-label {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 0;
+}
+
+/* --- CAMPOS DE TEXTO (INPUTS) --- */
+.input-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 6 10 6 10;
+}
+
+.input-field:focused {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(three-pass-box, rgba(52, 152, 219, 0.3), 5, 0, 0, 0);
+}
+
+/* --- BOTONES --- */
+.btn-primary {
+    -fx-background-color: #27ae60; /* Verde para acción de "Agregar" positiva */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 8 20 8 20;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2ecc71;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 3, 0, 0, 1);
+}
+
+.btn-secondary {
+    -fx-background-color: #34495e;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 5 15 5 15;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #2c3e50;
+}
+
+/* --- CHECKBOX --- */
+.check-box {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 2;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #3498db;
+}
+
+/* --- LIST VIEW (Estilo consistente con Ver Pagos) --- */
+.custom-list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #dcdcdc;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+.custom-list-view:focused {
+    -fx-border-color: #bdc3c7;
+    -fx-background-insets: 0;
+}
+
+.custom-list-view .list-cell {
+    -fx-padding: 8 10 8 10;
+    -fx-border-color: transparent transparent #ecf0f1 transparent;
+}
+
+.custom-list-view .list-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.custom-list-view .list-cell:odd {
+    -fx-background-color: rgba(249, 249, 249, 0.5);
+}
+
+.custom-list-view .list-cell:filled:selected {
+    -fx-background-color: #ebf5fb;
+    -fx-text-fill: #2980b9;
+    -fx-border-color: transparent transparent #d6eaf8 transparent;
+}
+
+.custom-list-view .list-cell:filled:hover {
+    -fx-background-color: #f2f3f4;
+}
+
+/* Scrollbars limpias */
+.custom-list-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+.custom-list-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5em;
+}

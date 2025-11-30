@@ -1,0 +1,107 @@
+
+/* --- CONFIGURACIÓN GENERAL --- */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-background-color: #f4f6f6; /* Gris muy claro de fondo */
+}
+
+/* --- HEADER (Barra Superior) --- */
+.header-bar {
+    -fx-background-color: #2c3e50; /* Azul oscuro / Gris noche */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+/* --- BOTONES --- */
+.btn-primary {
+    -fx-background-color: #3498db; /* Azul brillante */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 8 15 8 15;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2980b9;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 3, 0, 0, 1);
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #1f618d;
+}
+
+/* --- TÍTULOS Y ETIQUETAS --- */
+.subtitle-label {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+}
+
+/* --- LIST VIEW PERSONALIZADO --- */
+.custom-list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 1;
+    /* Sombra suave para dar efecto de tarjeta */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+/* Quitar el borde de enfoque azul por defecto de JavaFX */
+.custom-list-view:focused {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+}
+
+/* Estilo de las celdas (filas) */
+.custom-list-view .list-cell {
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 10 10 10 10; /* Más espacio interno */
+    -fx-font-size: 14px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #ecf0f1 transparent; /* Línea separadora sutil */
+}
+
+/* Filas vacías */
+.custom-list-view .list-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* Celdas impares (efecto cebra sutil) */
+.custom-list-view .list-cell:odd {
+    -fx-background-color: rgba(249, 249, 249, 0.5);
+}
+
+/* Celda seleccionada */
+.custom-list-view .list-cell:filled:selected,
+.custom-list-view .list-cell:filled:selected:hover {
+    -fx-background-color: #ebf5fb; /* Azul muy pálido */
+    -fx-text-fill: #2980b9; /* Texto azul */
+    -fx-border-color: transparent transparent #d6eaf8 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Celda al pasar el mouse (Hover) */
+.custom-list-view .list-cell:filled:hover {
+    -fx-background-color: #f2f3f4;
+    -fx-text-fill: #2c3e50;
+}
+
+/* --- SCROLL BAR (Hacerla más fina y moderna) --- */
+.custom-list-view .scroll-bar:vertical,
+.custom-list-view .scroll-bar:vertical .track,
+.custom-list-view .scroll-bar:vertical .track-background {
+    -fx-background-color: transparent;
+}
+
+.custom-list-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5em;
+}
+
+.custom-list-view .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #95a5a6;
+}

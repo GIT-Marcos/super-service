@@ -1,0 +1,115 @@
+
+/* Configuración General */
+.root {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-background-color: #f4f7f6;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #57606f;
+    -fx-font-size: 12px;
+}
+
+/* Radio Buttons */
+.radio-button {
+    -fx-text-fill: #2f3542;
+    -fx-cursor: hand;
+}
+
+/* Botones */
+.button {
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 4;
+}
+
+/* Panel del Header (Monto Total) */
+.header-panel {
+    -fx-background-color: linear-gradient(to right, #2c3e50, #34495e);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 2);
+}
+
+.total-label {
+    -fx-font-size: 24px; /* Fuerza el tamaño desde CSS */
+    -fx-text-fill: #c5ddec;
+}
+
+/* Paneles de Sección (Tarjetas blancas) */
+.card-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);
+    -fx-padding: 15;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 5;
+}
+
+/* Títulos de Sección */
+.section-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 10 0; /* espacio abajo */
+    -fx-border-color: transparent transparent #ecf0f1 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ScrollPane Transparente */
+.scroll-pane-custom {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+.scroll-pane-custom .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Inputs (TextFields, ComboBox, Spinner) */
+.text-field, .combo-box, .spinner {
+    -fx-background-radius: 3;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 3;
+    -fx-pref-height: 30px;
+}
+
+.text-field:focused, .combo-box:focused, .spinner:focused {
+    -fx-border-color: #3498db;
+    -fx-background-color: #fff;
+}
+
+/* Botón Pagar (Verde/Confirmación) */
+.btn-primary {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(39, 174, 96, 0.4), 5, 0, 0, 2);
+}
+.btn-primary:hover {
+    -fx-background-color: #2ecc71;
+}
+.btn-primary:pressed {
+    -fx-background-color: #219150;
+}
+
+/* Botón Volver (Gris/Neutro) */
+.btn-secondary {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #7f8c8d;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 4;
+}
+.btn-secondary:hover {
+    -fx-background-color: #bdc3c7;
+    -fx-text-fill: white;
+}
+
+/* Botón Adjuntar (Outline) */
+.btn-secondary-outline {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2980b9;
+    -fx-border-color: #2980b9;
+    -fx-border-style: dashed;
+    -fx-border-radius: 4;
+}
+.btn-secondary-outline:hover {
+    -fx-background-color: #ebf5fb;
+}
