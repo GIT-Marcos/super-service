@@ -1,367 +1,283 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.filtros.FiltroNotaRetiro;
 import SPRService.SPRService.util.ResultadoPaginado;
-import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
-import SPRService.SPRService.components.CeldaDetalleRetiro;
-import SPRService.SPRService.entities.DetalleRetiro;
+import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.generadores.GeneradorTXT;
+import SPRService.SPRService.util.generadores.Impresor;
+import SPRService.SPRService.viewModels.tablas.NotaRetiroViewModel;
 import SPRService.SPRService.entities.NotaRetiro;
-import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.NotaRetiroServ;
-import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.util.SafeLocalDateConverter;
-import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorTXT;
-import SPRService.SPRService.util.generadores.Impresor;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class NotasRetiroController implements Initializable {
 
     private final NotaRetiroServ notaRetiroServ;
-    private final RepuestoServ repuestoServ;
     private final Navigator navigator;
-    private ObservableList<NotaRetiro> notasObsList = FXCollections.observableArrayList();
-    private ObservableList<DetalleRetiro> detallesObsList = FXCollections.observableArrayList();
-    private ObservableList<RepuestoRowViewModel> obsListRepuestoVM = FXCollections.observableArrayList();
-    private static final int ITEMS_POR_PAGINA_NOTAS = 30;
-
-    @Inject
-    public NotasRetiroController(NotaRetiroServ notaRetiroServ, AppCoordinator appCoordinator, RepuestoServ repuestoServ) {
-        this.notaRetiroServ = notaRetiroServ;
-        this.navigator = appCoordinator.getMainNavigator();
-        this.repuestoServ = repuestoServ;
-    }
+    private final ObservableList<NotaRetiroViewModel> notasObsList = FXCollections.observableArrayList();
+    private static final int ITEMS_POR_PAGINA_NOTAS = 40;
 
     @FXML
-    private ListView<NotaRetiro> listViewNotasRetiro;
+    private TableView<NotaRetiroViewModel> tablaNotas;
     @FXML
-    private Pagination paginacionNotasRetiro;
+    private TableColumn<NotaRetiroViewModel, Long> colNotaId;
+    @FXML
+    private TableColumn<NotaRetiroViewModel, String> colNotaTipo;
+    @FXML
+    private TableColumn<NotaRetiroViewModel, String> colNotaFecha;
+    @FXML
+    private TableColumn<NotaRetiroViewModel, String> colNotaEstado;
+    @FXML
+    private Pagination paginacion;
     @FXML
     private DatePicker dateFechaMin, dateFechaMax;
     @FXML
-    private TextField tfCodBarras, tfMarca, tfNombre;
-    @FXML
-    private ComboBox<String> cbTipoOrden, cbOrdenarPor;
-    @FXML
-    private CheckBox checkVerBajo, checkVerNormal;
-    @FXML
-    private Button btnCrearNota;
-    @FXML
-    private ListView<DetalleRetiro> listViewDetalles;
-    @FXML
-    private TableView<RepuestoRowViewModel> tablaRepuestos;
-    @FXML
-    private TableColumn<RepuestoRowViewModel, String> colCodigo, colNombre, colMarca, colUniMedida;
-    @FXML
-    private TableColumn<RepuestoRowViewModel, Double> colExistente, colMin;
-    @FXML
-    private CheckBox checkGuardar, checkImprimir;
+    private CheckBox chkVentas, chkService, chkActivas, chkInactivas, chkOtro;
 
+    @Inject
+    public NotasRetiroController(NotaRetiroServ notaRetiroServ, AppCoordinator appCoordinator) {
+        this.notaRetiroServ = notaRetiroServ;
+        this.navigator = appCoordinator.getMainNavigator();
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // --- CONFIGURACIÓN TAB 1: NOTAS DE RETIRO ---
-        dateFechaMin.setConverter(new SafeLocalDateConverter());
-        dateFechaMax.setConverter(new SafeLocalDateConverter());
-
-        // 1. Enlazar la lista observable al ListView (se hace una sola vez)
-        listViewNotasRetiro.setItems(this.notasObsList);
-
-        // 2. Configurar cómo se muestra cada celda (tu código original, perfecto)
-        listViewNotasRetiro.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(NotaRetiro item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText("N° de nota: " + item.getId() + " . Fecha de nota: " +
-                            item.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                }
-            }
-        });
-
-        // 3. Conectar el control de paginación a nuestra lógica de carga de datos
-        paginacionNotasRetiro.setPageFactory(this::cargarPagina);
-
-        // --- CONFIGURACIÓN TAB 2: NUEVA NOTA (Sin cambios) ---
-        llenarCombos();
-        this.listViewDetalles.setItems(this.detallesObsList);
-        listViewDetalles.setCellFactory(param -> new CeldaDetalleRetiro());
-        configColumnas();
-        tablaRepuestos.setItems(this.obsListRepuestoVM);
-        seteaEstiloTabla();
-        llenarFilas(repuestoServ.verTodos());
+        configurarDatePickers();
+        configurarTabla();
+        // Configurar Paginación (esto disparará la primera carga)
+        paginacion.setPageFactory(this::cargarPagina);
     }
 
-    private Node cargarPagina(int indicePagina) {
-        // 1. Obtener los filtros actuales de la UI
-        LocalDate fechaMin = dateFechaMin.getValue();
-        LocalDate fechaMax = dateFechaMax.getValue();
+    private void configurarDatePickers() {
+        if (dateFechaMin != null) dateFechaMin.setConverter(new SafeLocalDateConverter());
+        if (dateFechaMax != null) dateFechaMax.setConverter(new SafeLocalDateConverter());
+    }
 
-        // 2. Llamar al servicio paginado
-        ResultadoPaginado<NotaRetiro> resultado = notaRetiroServ.buscarPaginado(
-                fechaMin, fechaMax, indicePagina, ITEMS_POR_PAGINA_NOTAS
+    private void configurarTabla() {
+        tablaNotas.setItems(this.notasObsList);
+
+        if (colNotaId != null)
+            colNotaId.setCellValueFactory(cell -> cell.getValue().idNotaProperty().asObject());
+
+        if (colNotaTipo != null)
+            colNotaTipo.setCellValueFactory(cell -> cell.getValue().tipoProperty());
+
+        if (colNotaFecha != null)
+            colNotaFecha.setCellValueFactory(cell -> cell.getValue().fechaProperty());
+
+        if (colNotaEstado != null) {
+            colNotaEstado.setCellValueFactory(cell -> cell.getValue().estadoProperty());
+
+            colNotaEstado.setCellFactory(column -> new TableCell<NotaRetiroViewModel, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item);
+                        NotaRetiroViewModel vm = getTableView().getItems().get(getIndex());
+                        if (vm.esAnuladaProperty().get()) {
+                            setStyle("-fx-text-fill: #d63031; -fx-font-weight: bold;"); // Rojo
+                        } else {
+                            setStyle("-fx-text-fill: #00b894; -fx-font-weight: bold;"); // Verde
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Invocado por el control de Paginación.
+     * Construye el DTO FiltroNotaRetiro y consulta al servicio.
+     */
+    private Node cargarPagina(int indicePagina) {
+        // 1. Obtener fechas
+        LocalDate fechaMin = (dateFechaMin != null) ? dateFechaMin.getValue() : null;
+        LocalDate fechaMax = (dateFechaMax != null) ? dateFechaMax.getValue() : null;
+
+        // 2. Obtener estados de los CheckBox (Null safety)
+        boolean verVentas = chkVentas != null && chkVentas.isSelected();
+        boolean verService = chkService != null && chkService.isSelected();
+        boolean verOtro = chkOtro != null && chkOtro.isSelected();
+        boolean verActivas = chkActivas != null && chkActivas.isSelected();
+        boolean verInactivas = chkInactivas != null && chkInactivas.isSelected();
+
+        // 3. OPTIMIZACIÓN: Si no hay nada seleccionado, no llamar a la BD.
+        boolean ningunTipoSeleccionado = !verVentas && !verService && !verOtro;
+        boolean ningunEstadoSeleccionado = !verActivas && !verInactivas;
+
+        if (ningunTipoSeleccionado || ningunEstadoSeleccionado) {
+            notasObsList.clear();
+            paginacion.setPageCount(1);
+            return new VBox();
+        }
+
+        // 4. Construir el SET de Tipos de Uso
+        Set<NotaRetiro.TipoUsoRetiro> tiposSeleccionados = new HashSet<>();
+        if (verVentas) tiposSeleccionados.add(NotaRetiro.TipoUsoRetiro.VENTA);
+        if (verService) tiposSeleccionados.add(NotaRetiro.TipoUsoRetiro.SERVICE);
+        if (verOtro) tiposSeleccionados.add(NotaRetiro.TipoUsoRetiro.OTRO);
+
+        // 5. Determinar filtro de Estado (Boolean o Null)
+        Boolean estadoFiltro = null;
+        if (verActivas && !verInactivas) {
+            estadoFiltro = Boolean.TRUE;
+        } else if (!verActivas) {
+            estadoFiltro = Boolean.FALSE;
+        }
+
+        // 6. CREAR EL DTO
+        FiltroNotaRetiro filtro = new FiltroNotaRetiro(
+                fechaMin,
+                fechaMax,
+                estadoFiltro,
+                tiposSeleccionados
         );
 
-        // 3. Actualizar el número total de páginas en el control
+        // 7. Consultar Servicio usando el DTO
+        ResultadoPaginado<NotaRetiro> resultado = notaRetiroServ.buscarPaginado(
+                filtro,
+                indicePagina,
+                ITEMS_POR_PAGINA_NOTAS
+        );
+
+        // 8. Actualizar UI (Paginación y Tabla)
         long totalItems = resultado.getCantidadResultados();
         long totalPaginas = (totalItems + ITEMS_POR_PAGINA_NOTAS - 1) / ITEMS_POR_PAGINA_NOTAS;
-        paginacionNotasRetiro.setPageCount(totalPaginas == 0 ? 1 : (int) totalPaginas);
+        paginacion.setPageCount(totalPaginas == 0 ? 1 : (int) totalPaginas);
 
-        // 4. Poblar la lista observable con los resultados de la página actual
-        notasObsList.setAll(resultado.getLista());
+        List<NotaRetiroViewModel> listaViewModels = resultado.getLista().stream()
+                .map(NotaRetiroViewModel::new)
+                .collect(Collectors.toList());
 
-        return new VBox(); // Devolver un nodo dummy
-    }
+        notasObsList.setAll(listaViewModels);
 
-    private void limpiarFiltrosNotas() {
-        dateFechaMin.setValue(null);
-        dateFechaMax.setValue(null);
-    }
-
-    @FXML
-    private void verTodas() {
-        limpiarFiltrosNotas();
-        aplicarFiltros();
+        return new VBox();
     }
 
     @FXML
     private void aplicarFiltros() {
-        if (paginacionNotasRetiro.getCurrentPageIndex() != 0) {
-            paginacionNotasRetiro.setCurrentPageIndex(0);
+        paginacion.setCurrentPageIndex(0);
+        if (paginacion.getCurrentPageIndex() == 0) {
+            cargarPagina(0);
         }
-        cargarPagina(0);
+    }
+
+    @FXML
+    private void verTodas() {
+        // Resetear controles
+        if (dateFechaMin != null) dateFechaMin.setValue(null);
+        if (dateFechaMax != null) dateFechaMax.setValue(null);
+        if (chkVentas != null) chkVentas.setSelected(true);
+        if (chkService != null) chkService.setSelected(true);
+        if (chkOtro != null) chkOtro.setSelected(true);
+        if (chkActivas != null) chkActivas.setSelected(true);
+        if (chkInactivas != null) chkInactivas.setSelected(true);
+        aplicarFiltros();
+    }
+
+    @FXML
+    private void nuevaNota() {
+        Optional<NotaRetiro> result = navigator.openModal(Views.CARGAR_NOTA, "Nueva Nota de Retiro", null);
+        result.ifPresent(nota -> notasObsList.addFirst(new NotaRetiroViewModel(nota)));
     }
 
     @FXML
     private void verDetalles() {
-        NotaRetiro n = listViewNotasRetiro.getSelectionModel().getSelectedItem();
-        if (n == null) {
-            Alertas.aviso("Detalles de nota re retiro", "Debe seleccionar una nota para " +
-                    "ver sus detalles");
+        NotaRetiroViewModel vm = tablaNotas.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            mostrarNotificacion("Ver detalles", "Seleccione una nota para ver detalles.", true);
             return;
         }
-        navigator.openModal(Views.DETALLE_NOTA_RETIRO,
-                "Detalles de nota de retiro", n);
+        navigator.openModal(Views.DETALLE_NOTA_RETIRO, "Detalles de Nota #" + vm.idNotaProperty().getValue(), vm);
     }
 
     @FXML
-    private void eliminarNota() {
-        NotaRetiro n = listViewNotasRetiro.getSelectionModel().getSelectedItem();
-        if (n == null) {
-            Alertas.aviso("Cancelar nota de retiro", "Debe seleccionar una nota para cancelarla.");
+    private void cancelarNota() {
+        NotaRetiroViewModel vm = tablaNotas.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            mostrarNotificacion("Cancelar Nota", "Seleccione una nota para cancelarla.", true);
             return;
         }
-        if (!Alertas.confirmacion("Cancelar nota de retiro", "Esta acción es irreversible y el stock " +
-                "retirado de los productos se restablecerá.\n ¿Confirmar cancelación de nota e retiro?"))
+        if (vm.esAnuladaProperty().get()) {
+            mostrarNotificacion("Cancelar Nota", "La nota seleccionada ya está anulada.", true);
             return;
+        }
+        if (!Alertas.confirmacion("Cancelar nota de retiro",
+                "Esta acción es irreversible y el stock se restablecerá.\n¿Confirmar cancelación?")) {
+            return;
+        }
         try {
-            notaRetiroServ.cancelarNota(n);
-
-            // IMPORTANTE: En lugar de quitar el item de la lista, recargamos la página actual.
-            // Esto asegura que la vista esté siempre sincronizada con la base de datos.
-            cargarPagina(paginacionNotasRetiro.getCurrentPageIndex()); // <-- CAMBIO CLAVE
-
-            Alertas.exito("Cancelar nota de retiro", "Se ha cancelado la nota de retiro con éxito.");
+            notaRetiroServ.cancelarNota(vm.getNotaOriginal());
+            mostrarNotificacion("Éxito", "Nota cancelada correctamente.", false);
+            cargarPagina(paginacion.getCurrentPageIndex());
         } catch (RuntimeException e) {
-            Alertas.error("Cancelar nota de retiro", "Ha ocurrido un error inesperado al cancelar la nota.");
-            throw new RuntimeException(e);
+            Notifications.create()
+                    .title("Error al cancelar")
+                    .text(e.getMessage())
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .showError();
+            e.printStackTrace();
         }
     }
 
     @FXML
-    private void buscar() {
-        int tipoOrden = cbTipoOrden.getSelectionModel().getSelectedIndex();
-        Boolean verNormal = checkVerNormal.isSelected();
-        Boolean verBajo = checkVerBajo.isSelected();
-        if (!verNormal && !verBajo) {
-            obsListRepuestoVM.clear();
+    private void generarTicket(ActionEvent event) {
+        NotaRetiroViewModel vm = tablaNotas.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            mostrarNotificacion("Generar ticket", "Seleccione una nota para generar el ticket.", true);
             return;
         }
-        List<Repuesto> results = this.repuestoServ.buscarConCriteria(tfCodBarras.getText().trim(),
-                tfNombre.getText().trim(), tfMarca.getText().trim(), verNormal, verBajo,
-                tomarColOrden(), tipoOrden);
-        llenarFilas(results);
-    }
-
-    @FXML
-    private void verTodos() {
-        llenarFilas(repuestoServ.verTodos());
-    }
-
-    @FXML
-    private void agregar() {
-        RepuestoRowViewModel rrvm = tablaRepuestos.getSelectionModel().getSelectedItem();
-        if (rrvm == null) {
-            Alertas.aviso("Agregar repuesto",
-                    "Debe seleccionar un repuesto de la tabla para agregarlo a la venta.");
-            return;
-        }
-        for (DetalleRetiro d : detallesObsList) {
-            if (d.getRepuesto().equals(rrvm.getRepuestoOriginal())) {
-                Alertas.aviso("Agregar repuesto", "Ya se ha añadido ese repuesto a la venta.");
-                return;
-            }
-        }
-        //abrir dialog para cantidad
-        Double cantidad = SimpleDialogs.inputStock();
-        if (cantidad == null) return;
-
-        Repuesto repuesto = rrvm.getRepuestoOriginal();
-        Double existenteStock = repuesto.getStock().getCantidadExistente();
-        if (cantidad > existenteStock) {
-            Alertas.error("Nueva nota de retiro", "La cantidad que se intenta retirar: "
-                    + cantidad + "\n" + "es mayor que el existente: " + repuesto.getStock().getCantidadExistente());
-            return;
-        }
-        Double stockNuevo = existenteStock - cantidad;
-        if (cantidad > stockNuevo) {
-            boolean confir = Alertas.confirmacion("Nueva nota de retiro",
-                    "El stock luego del retiro quedará por " +
-                            "debajo del mínimo tolerado.\n" +
-                            "La cantidad de stock de " + repuesto.getDetalle() +
-                            " quedará por de bajo del mínimo establecido " +
-                            "(" + repuesto.getStock().getCantMinima() + " " + repuesto.getStock().getUnidadMedida() + ").\n" +
-                            "¿Continuar con la venta?");
-            if (!confir) {
-                return;
-            }
-        }
-        DetalleRetiro detalleRetiro = new DetalleRetiro(null, cantidad, repuesto);
-        detallesObsList.add(detalleRetiro);
-        btnCrearNota.setDisable(true);
-    }
-
-    @FXML
-    private void limpiarLista() {
-        this.detallesObsList.clear();
-    }
-
-    @FXML
-    private void emitirNota(ActionEvent event) {
-        if (this.detallesObsList.isEmpty()) {
-            Alertas.aviso("Emisión nota de retiro", "Debe cargar productos para la venta.");
-            return;
-        }
-
         File file;
-        if (checkGuardar.isSelected()) {
+        if (Alertas.confirmacion("Generar ticket", "¿Quiere generar el ticket en la ruta predeterminada?")) {
             file = new File("C:\\Users\\Usuario\\Desktop\\nota retiro.txt");
         } else {
-            file = SimpleDialogs.selectorRuta(event, "Seleccione donde guardar la nora de retiro",
+            file = SimpleDialogs.selectorRuta(event, "Seleccione donde quiere guardar la nota",
                     "nota retiro.txt",
                     new FileChooser.ExtensionFilter("Archivos de texto (*.txt)", "*.txt"));
         }
-        if (file == null) {
-            return;
-        }
+        if (file == null) return;
+        GeneradorTXT.generaNotaRetiro(vm.getNotaOriginal().getDetallesRetiroList(), file);
 
-        try {
-            GeneradorTXT.generaNotaRetiro(this.detallesObsList, file);
-            if (checkImprimir.isSelected()) {
-                Impresor.imprimirConSistema(file);
-            }
-            btnCrearNota.setDisable(false);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        if (Alertas.confirmacion("Imprimir ticket", "¿Desea imprimir el ticket generado?"))
+            Impresor.imprimirConSistema(file);
     }
 
-    @FXML
-    private void crearNota() {
-        if (!Alertas.confirmacion("Nueva nota de retiro", "¿Confirmar creación de nota de retiro?"))
-            return;
+    private void mostrarNotificacion(String titulo, String texto, boolean esAdvertencia) {
+        Notifications n = Notifications.create()
+                .title(titulo)
+                .text(texto)
+                .hideAfter(Duration.seconds(3))
+                .position(Pos.CENTER);
 
-        try {
-            NotaRetiro notaParaCargar = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, detallesObsList);
-            notaRetiroServ.guardarNota(notaParaCargar);
-            Alertas.exito("Nueva nota de retiro", "Se ha creado la nota de retiro con éxito.");
-            detallesObsList.clear();
-            cargarPagina(paginacionNotasRetiro.getCurrentPageIndex());
-            btnCrearNota.setDisable(true);
-            verTodos();
-        } catch (Exception e) {
-            Alertas.error("Nueva nota de retiro", "Error inesperado al guardar la nota.");
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void configColumnas() {
-        colCodigo.setCellValueFactory(new PropertyValueFactory<>("coBarra"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
-        colExistente.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
-        colMin.setCellValueFactory(new PropertyValueFactory<>("cantidadMinima"));
-        colUniMedida.setCellValueFactory(new PropertyValueFactory<>("uniMedida"));
-    }
-
-    private void seteaEstiloTabla() {
-        tablaRepuestos.setRowFactory(tableView -> new TableRow<>() {
-            @Override
-            protected void updateItem(RepuestoRowViewModel item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (item == null || empty) {
-                    setStyle("");
-                } else if (item.getCantidad() <= item.getCantidadMinima()) {
-                    setStyle("-fx-background-color: lightcoral;");
-                } else {
-                    //limpieza de estilo
-                    setStyle("");
-                }
-            }
-        });
-    }
-
-    private void llenarFilas(List<Repuesto> repuestos) {
-        this.obsListRepuestoVM.clear();
-        for (Repuesto r : repuestos) {
-            this.obsListRepuestoVM.add(new RepuestoRowViewModel(r));
-        }
-    }
-
-    private void llenarCombos() {
-        ObservableList<String> obsListOrdenarPor = FXCollections.observableArrayList();
-        obsListOrdenarPor.add("Detalle");
-        obsListOrdenarPor.add("Marca");
-        obsListOrdenarPor.add("Cod Barra");
-        cbOrdenarPor.setItems(obsListOrdenarPor);
-        cbOrdenarPor.getSelectionModel().select(0);
-        ObservableList<String> obsListTipoOrden = FXCollections.observableArrayList();
-        obsListTipoOrden.add("Ascendente");
-        obsListTipoOrden.add("Descendente");
-        cbTipoOrden.setItems(obsListTipoOrden);
-        cbTipoOrden.getSelectionModel().select(0);
-    }
-
-    private String tomarColOrden() {
-        int ordenarPor = cbOrdenarPor.getSelectionModel().getSelectedIndex();
-        //los valores q toma son de los atributos de Repuesto.class
-        return switch (ordenarPor) {
-            case 1 -> "marca";
-            case 2 -> "codBarra";
-            default -> "detalle";
-        };
+        if (esAdvertencia) n.showWarning();
+        else n.showInformation();
     }
 }

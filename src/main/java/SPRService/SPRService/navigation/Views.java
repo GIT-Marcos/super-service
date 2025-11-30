@@ -40,6 +40,7 @@ public enum Views {
     RATE("/views/Rate.fxml", RateController.class),
     VER_PAGOS("/views/VerPagos.fxml", VerPagosController.class),
     CARGAR_VENTA("/views/CargarVenta.fxml", CargarVentaController.class),
+    CARGAR_NOTA("/views/CargarNotaRetiro.fxml", CargarNotaController.class),
 
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
