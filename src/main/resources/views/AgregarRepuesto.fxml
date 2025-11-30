@@ -8,63 +8,109 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-<BorderPane maxHeight="490.0" maxWidth="-Infinity" minHeight="490.0" minWidth="600.0" prefHeight="490.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarRepuestoController">
-   <top>
-      <VBox BorderPane.alignment="CENTER">
-         <children>
-            <Label text="Buscar el repuesto por código de barras, nombre o marca:">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <HBox maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="590.0" spacing="15.0">
-               <children>
-                  <TextField fx:id="tfCodBarras" promptText="Código de barras..." />
-                  <TextField fx:id="tfNombre" promptText="Nombre producto..." />
-                  <TextField fx:id="tfMarca" promptText="Marca producto..." />
-               </children>
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="15.0">
-               <children>
-                  <Button mnemonicParsing="false" onAction="#buscar" text="Buscar" />
-                  <CheckBox fx:id="cbStockBajo" mnemonicParsing="false" selected="true" text="Ver stock bajo" />
-                  <CheckBox fx:id="cbStockNormal" mnemonicParsing="false" selected="true" text="Ver stock normal" />
-               </children>
-            </HBox>
-         </children>
-         <BorderPane.margin>
-            <Insets bottom="10.0" />
-         </BorderPane.margin>
-      </VBox>
-   </top>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <center>
-      <VBox BorderPane.alignment="CENTER">
-         <BorderPane.margin>
-            <Insets bottom="10.0" />
-         </BorderPane.margin>
-         <children>
-            <ListView fx:id="lvRepuestos" prefHeight="290.0" prefWidth="590.0">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-            </ListView>
-            <Label text="Indique la cantidad que se va utilizar de repuesto:">
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Label>
-            <CustomTextField fx:id="ctfCantidad" promptText="Cantidad..." />
-         </children>
-      </VBox>
-   </center>
-   <bottom>
-      <Button mnemonicParsing="false" onAction="#agregarRepuesto" text="Agregar repuesto seleccionado" BorderPane.alignment="CENTER" />
-   </bottom>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="700.0" prefHeight="600.0" prefWidth="700.0" styleClass="root" stylesheets="@../styles/agregarRepuesto.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarRepuestoController">
+
+    <!-- 1. HEADER SUPERIOR -->
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <!-- Título Principal -->
+                <HBox alignment="CENTER_LEFT" styleClass="header-bar">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label text="Catálogo de Repuestos" textFill="WHITE">
+                                    <font>
+                                        <Font name="System Bold" size="18.0" />
+                                    </font>
+                                </Label>
+                                <Label text="Busque y seleccione el ítem para añadir al servicio" textFill="#bdc3c7">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                    </padding>
+                </HBox>
+
+                <!-- Panel de Búsqueda -->
+                <VBox spacing="10.0" styleClass="search-panel">
+                    <children>
+                        <Label styleClass="section-label" text="Filtros de búsqueda:" />
+
+                        <HBox spacing="10.0">
+                            <children>
+                                <TextField fx:id="tfCodBarras" promptText="Cód. Barras" styleClass="input-field" HBox.hgrow="ALWAYS" />
+                                <TextField fx:id="tfNombre" promptText="Nombre del producto" styleClass="input-field" HBox.hgrow="ALWAYS" />
+                                <TextField fx:id="tfMarca" promptText="Marca" styleClass="input-field" HBox.hgrow="ALWAYS" />
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="20.0">
+                            <children>
+                                <CheckBox fx:id="cbStockBajo" mnemonicParsing="false" selected="true" text="Ver stock bajo" />
+                                <CheckBox fx:id="cbStockNormal" mnemonicParsing="false" selected="true" text="Ver stock normal" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button mnemonicParsing="false" onAction="#buscar" prefWidth="100.0" styleClass="btn-secondary" text="🔍 Buscar" />
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                    </padding>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </VBox.margin>
+                </VBox>
+            </children>
+        </VBox>
+    </top>
+
+    <!-- 2. CENTRO: LISTA DE RESULTADOS -->
+    <center>
+        <VBox spacing="5.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label styleClass="section-label" text="Resultados:" />
+                <ListView fx:id="lvRepuestos" styleClass="custom-list-view" VBox.vgrow="ALWAYS" />
+            </children>
+            <padding>
+                <Insets bottom="5.0" left="20.0" right="20.0" top="0.0" />
+            </padding>
+        </VBox>
+    </center>
+
+    <!-- 3. FOOTER: CANTIDAD Y ACCIÓN -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="footer-panel" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="Cantidad a utilizar:">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Label>
+
+                <!-- Campo de cantidad con estilo -->
+                <CustomTextField fx:id="ctfCantidad" prefWidth="100.0" styleClass="input-field" text="1" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button defaultButton="true" mnemonicParsing="false" onAction="#agregarRepuesto" styleClass="btn-primary" text="+ AGREGAR" />
+            </children>
+            <padding>
+                <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+            </padding>
+            <BorderPane.margin>
+                <Insets top="10.0" />
+            </BorderPane.margin>
+        </HBox>
+    </bottom>
 </BorderPane>
