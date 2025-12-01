@@ -2,6 +2,8 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.services.UsuarioServ;
+import SPRService.SPRService.util.EMailSender;
+import SPRService.SPRService.util.SimpleDialogs;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +14,7 @@ import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SessionManager;
 import javafx.util.Duration;
+import org.apache.commons.mail.EmailException;
 import org.controlsfx.control.Notifications;
 import org.hibernate.HibernateException;
 
@@ -21,6 +24,7 @@ import java.util.ResourceBundle;
 public class LoginController implements Initializable {
 
     private final UsuarioServ usuarioServ;
+    private final EMailSender eMailSender;
     //para evitar loguearse cuando se testea.
     private boolean flagDebug = false;
     private final AppCoordinator appCoordinator;
@@ -31,8 +35,9 @@ public class LoginController implements Initializable {
     private PasswordField tfContrasenia;
 
     @Inject
-    public LoginController(UsuarioServ usuarioServ, AppCoordinator appCoordinator) {
+    public LoginController(UsuarioServ usuarioServ, EMailSender eMailSender, AppCoordinator appCoordinator) {
         this.usuarioServ = usuarioServ;
+        this.eMailSender = eMailSender;
         this.appCoordinator = appCoordinator;
     }
 
@@ -88,8 +93,25 @@ public class LoginController implements Initializable {
 
     @FXML
     public void recuperarContra() {
-
+        String direccion = SimpleDialogs.pedirDireccionCorreo("Enviar Correo de recuperación",
+                "Ingrese su dirección de correo para recuperar la contraseña:");
+        if (direccion == null) return;
+        try {
+            eMailSender.enviarMailRecuperacionContrasenia(direccion);
+            Notifications.create()
+                    .title("Recuperar contraseña")
+                    .text("El correo de recuperación se ha enviado con éxito.")
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .showInformation();
+        } catch (EmailException e) {
+            Notifications.create()
+                    .title("Recuperar contraseña")
+                    .text("Fallo al enviar el correo. Verifique su conexión o configuración: " + e.getMessage())
+                    .hideAfter(Duration.seconds(5))
+                    .position(Pos.CENTER)
+                    .showError();
+            e.printStackTrace();
+        }
     }
-
-
 }
