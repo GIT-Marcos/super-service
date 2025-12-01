@@ -93,8 +93,7 @@ public class LoginController implements Initializable {
 
     @FXML
     public void recuperarContra() {
-        String direccion = SimpleDialogs.pedirDireccionCorreo("Enviar Correo de recuperación",
-                "Ingrese su dirección de correo para recuperar la contraseña:");
+        String direccion = SimpleDialogs.pedirMailParaRecuperarContrasenia();
         if (direccion == null) return;
         try {
             eMailSender.enviarMailRecuperacionContrasenia(direccion);
