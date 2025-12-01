@@ -109,4 +109,20 @@ public class SimpleDialogs {
         }
     }
 
+    public static String pedirMailParaEnviarReporte() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Enviar Reporte por Correo");
+        dialog.setHeaderText("Enviar gráfico actual");
+        dialog.setContentText("Ingrese el correo del destinatario:");
+        Optional<String> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
+
+    public static String pedirMailParaRecuperarContrasenia() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Enviar Correo de recuperación");
+        dialog.setContentText("Ingrese su dirección de correo para recuperar la contraseña:");
+        Optional<String> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
 }

@@ -7,6 +7,7 @@ import SPRService.SPRService.controllers.otros.RateController;
 public enum Views {
 
     // Ventanas principales
+    INICIO("/views/Inicio.fxml", InicioController.class),
     LOGIN("/views/Login.fxml", LoginController.class),
     MAIN("/views/MainView.fxml", MainController.class),
     DEPOSITO("/views/Deposito.fxml", DepositoController.class),
@@ -20,7 +21,7 @@ public enum Views {
     CARGAR_SERVICE("/views/CargarService.fxml", CargarServiceController.class),
 
     // Ventanas modales:
-    CREAR_USUARIO("/views/CrearUsuario.fxml", CrearUsuarioController.class),
+    CARGAR_USUARIO("/views/CargarUsuario.fxml", CrearUsuarioController.class),
     GUARDAR_REPUESTO("/views/CargarRepuesto.fxml", CargarRepuestoController.class),
     PAGO("/views/Pago.fxml", PagoController.class),
     SELECTOR_FECHA_REPORTE("/views/SelectorFechasReporte.fxml", SelectorFechasReporteController.class),
