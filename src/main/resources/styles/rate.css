@@ -1,0 +1,103 @@
+
+/* --- CONFIGURACIÓN GENERAL --- */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-background-color: #f4f6f6;
+}
+
+/* --- HEADER --- */
+.header-panel {
+    -fx-background-color: #2c3e50;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);
+}
+
+/* --- PANELES DE PREGUNTAS --- */
+.question-box {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);
+}
+
+.question-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+}
+
+/* --- CONTROLSFX RATING --- */
+.rating {
+    -fx-effect: null; /* Quitar efectos extraños por defecto */
+}
+/* Color de las estrellas llenas (Amarillo/Dorado) */
+.rating > .container > .button.strong {
+    -fx-background-color: #f1c40f;
+}
+/* Color de las estrellas vacías (Gris suave) */
+.rating > .container > .button {
+    -fx-background-color: #ecf0f1;
+    -fx-border-color: #bdc3c7;
+}
+
+/* --- TEXT AREA --- */
+.text-area-custom {
+    -fx-background-color: transparent;
+}
+
+.text-area-custom .content {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 5;
+}
+
+.text-area-custom:focused .content {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(three-pass-box, rgba(52, 152, 219, 0.2), 5, 0, 0, 0);
+}
+
+/* --- SCROLL PANE LIMPIO --- */
+.scroll-pane-custom {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+.scroll-pane-custom > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* --- FOOTER --- */
+.footer-panel {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* --- BOTONES --- */
+.btn-primary {
+    -fx-background-color: #27ae60; /* Verde éxito */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 8 15 8 15;
+}
+.btn-primary:hover {
+    -fx-background-color: #2ecc71;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.btn-secondary {
+    -fx-background-color: white;
+    -fx-text-fill: #7f8c8d;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 7 15 7 15;
+}
+.btn-secondary:hover {
+    -fx-background-color: #f2f3f4;
+    -fx-text-fill: #e74c3c; /* Rojo al cancelar */
+    -fx-border-color: #e74c3c;
+}
