@@ -31,7 +31,7 @@
         <VBox prefWidth="200.0" styleClass="sidebar" BorderPane.alignment="CENTER">
             <children>
 
-                <!-- 1. HEADER DEL SIDEBAR (Logo/Nombre) -->
+                      <!-- 1. HEADER DEL SIDEBAR (Logo/Nombre) -->
                 <VBox alignment="CENTER" spacing="5.0" styleClass="sidebar-header">
                     <children>
                         <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
@@ -47,13 +47,13 @@
                     </padding>
                 </VBox>
 
-                <Separator styleClass="sidebar-separator" />
+                      <Separator styleClass="sidebar-separator" />
 
-                <!-- 2. MENÚ DE NAVEGACIÓN (AHORA CON TOGGLE BUTTONS) -->
+                            <!-- 2. MENÚ DE NAVEGACIÓN (AHORA CON TOGGLE BUTTONS) -->
                 <VBox spacing="5.0" VBox.vgrow="ALWAYS">
                     <children>
 
-                        <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irDeposito" selected="true" styleClass="nav-btn" text="Depósito / Stock">
+                                    <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irDeposito" selected="true" styleClass="nav-btn" text="Depósito / Stock">
                             <graphic>
                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
@@ -66,7 +66,7 @@
                      </toggleGroup>
                         </ToggleButton>
 
-                        <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irNotasRetiro" styleClass="nav-btn" text="Notas Retiro" toggleGroup="$navGroup">
+                                    <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irNotasRetiro" styleClass="nav-btn" text="Notas Retiro" toggleGroup="$navGroup">
                             <graphic>
                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
@@ -85,7 +85,7 @@
                      </graphic>
                   </Button>
 
-                        <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irVentas" styleClass="nav-btn" text="Historial Ventas" toggleGroup="$navGroup">
+                                    <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irVentas" styleClass="nav-btn" text="Historial Ventas" toggleGroup="$navGroup">
                             <graphic>
                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
@@ -95,7 +95,7 @@
                             </graphic>
                         </ToggleButton>
 
-                        <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irVerOrdenes" styleClass="nav-btn" text="Servicios y Ordenes" toggleGroup="$navGroup">
+                                    <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irVerOrdenes" styleClass="nav-btn" text="Servicios y Ordenes" toggleGroup="$navGroup">
                             <graphic>
                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
@@ -105,7 +105,7 @@
                             </graphic>
                         </ToggleButton>
 
-                        <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irVehiculos" styleClass="nav-btn" text="Vehículos" toggleGroup="$navGroup">
+                                    <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irVehiculos" styleClass="nav-btn" text="Vehículos" toggleGroup="$navGroup">
                             <graphic>
                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
@@ -115,7 +115,7 @@
                             </graphic>
                         </ToggleButton>
 
-                        <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irClientes" styleClass="nav-btn" text="Clientes" toggleGroup="$navGroup">
+                                    <ToggleButton maxWidth="1.7976931348623157E308" onAction="#irClientes" styleClass="nav-btn" text="Clientes" toggleGroup="$navGroup">
                             <graphic>
                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
@@ -124,15 +124,24 @@
                                 </ImageView>
                             </graphic>
                         </ToggleButton>
+                  <ToggleButton layoutX="10.0" layoutY="257.0" maxWidth="1.7976931348623157E308" onAction="#irUsuarios" styleClass="nav-btn" text="Usuarios" toggleGroup="$navGroup">
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../imgs/users.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </ToggleButton>
                     </children>
                 </VBox>
 
-                <!-- 3. FOOTER DEL SIDEBAR (Botones normales) -->
+                      <!-- 3. FOOTER DEL SIDEBAR (Botones normales) -->
                 <VBox spacing="5.0">
                     <children>
                         <Separator styleClass="sidebar-separator" />
 
-                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#valorar" styleClass="nav-btn" text="Valorar">
+                              <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#valorar" styleClass="nav-btn" text="Valorar">
                             <graphic>
                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true" styleClass="rate-img">
                                     <image>
@@ -142,7 +151,7 @@
                             </graphic>
                         </Button>
 
-                        <Button maxWidth="1.7976931348623157E308" onAction="#cerrarSesion" styleClass="btn-exit" text="Cerrar Sesión">
+                              <Button maxWidth="1.7976931348623157E308" onAction="#cerrarSesion" styleClass="btn-exit" text="Cerrar Sesión">
                             <VBox.margin>
                                 <Insets left="5.0" right="5.0" />
                             </VBox.margin>
@@ -153,7 +162,7 @@
                     </padding>
                 </VBox>
 
-            </children>
+                  </children>
         </VBox>
     </left>
 </BorderPane>

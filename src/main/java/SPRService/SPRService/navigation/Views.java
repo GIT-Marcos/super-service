@@ -16,6 +16,7 @@ public enum Views {
     VEHICULOS("/views/Vehiculos.fxml", VehiculosController.class),
     CLIENTES("/views/Clientes.fxml", ClienteController.class),
     SERVICES("/views/Services.fxml", ServicesController.class),
+    USUARIOS("/views/Usuarios.fxml", UsuariosController.class),
 
     // Ventanas NO modales
     CARGAR_SERVICE("/views/CargarService.fxml", CargarServiceController.class),

@@ -79,6 +79,11 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void irUsuarios() {
+        navigator.navigateTo(Views.USUARIOS);
+    }
+
+    @FXML
     private void cerrarSesion(ActionEvent event) {
         if (!SessionManager.cerrarSesion()) {
             return;
