@@ -16,6 +16,7 @@ public class ManejadorInputs {
     private static final Pattern PATRON_NROS_DNI = Pattern.compile("^\\d+$");
     private static final Pattern PATRON_PATENTE = Pattern.compile("^[a-zA-Z0-9]*$");
     private static final Pattern PATRON_KILOMETRAJE = Pattern.compile("^\\d{1,7}$");
+    private static final Pattern PATRON_EMAIL = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\n");
 
     // Para evitar que la clase sea instanciada
     private ManejadorInputs() {
@@ -24,6 +25,23 @@ public class ManejadorInputs {
     // ==============================
     // Métodos Públicos de Validación
     // ==============================
+
+    public static String direccionEmail(String input, boolean esObligatorio) {
+        String trimmedInput = (input == null) ? "" : input.strip();
+        if (trimmedInput.isBlank()) {
+            if (esObligatorio) {
+                throw new IllegalArgumentException("La dirección de correo es obligatoria.");
+            }
+            return trimmedInput;
+        }
+        if (trimmedInput.contains(" ")) {
+            throw new IllegalArgumentException("La dirección de correo no puede contener espacios.");
+        }
+        if (!PATRON_EMAIL.matcher(trimmedInput).matches()) {
+            throw new IllegalArgumentException("La dirección de correo está en mal formato.");
+        }
+        return trimmedInput;
+    }
 
     public static Integer kilometraje(String input, boolean esObligatorio) {
         String trimmedInput = (input == null) ? "" : input.strip();

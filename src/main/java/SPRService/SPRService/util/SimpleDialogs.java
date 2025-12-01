@@ -1,11 +1,14 @@
 package SPRService.SPRService.util;
 
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import SPRService.SPRService.util.alertas.Alertas;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.util.Optional;
@@ -109,4 +112,25 @@ public class SimpleDialogs {
         }
     }
 
+    public static String destinatarioEmail() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Enviar Reporte por Correo");
+        dialog.setHeaderText("Enviar gráfico actual");
+        dialog.setContentText("Ingrese el correo del destinatario:");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            try {
+                ManejadorInputs.eMail(result.get(), true);
+            } catch (IllegalArgumentException e) {
+                Notifications.create()
+                        .title("Ingreso de dirección de correo")
+                        .text(e.getMessage())
+                        .position(Pos.CENTER)
+                        .hideAfter(Duration.seconds(5))
+                        .showWarning();
+            }
+            return result.get();
+        }
+        return null;
+    }
 }
