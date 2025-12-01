@@ -1,5 +1,6 @@
 package SPRService.SPRService.util;
 
+import com.google.inject.Singleton;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@Singleton
 public class EMailSender {
 
     private final Properties properties;

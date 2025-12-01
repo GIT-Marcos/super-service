@@ -1,7 +1,7 @@
 package SPRService.SPRService.viewModels;
 
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
-import SPRService.SPRService.util.generadores.GeneradorReportes;
+import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
 import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.entities.Stock;
@@ -237,7 +237,7 @@ public class DepositoViewModel {
         if (file == null) return;
         List<RepuestoRetiradoReporteDTO> reportesDTOs = repuestoServ.repuestosMasRetiradosParaVenta(cantidad,
                 fechaMin, fechaMax);
-        GeneradorReportes.repuestosMasRetiradosEnMes(file, reportesDTOs, fechaMin, fechaMax);
+        GeneradorImagenes.repuestosMasRetiradosEnMes(file, reportesDTOs, fechaMin, fechaMax);
     }
 
     // TODO: el vm no debe conocer las clases de javaFX
