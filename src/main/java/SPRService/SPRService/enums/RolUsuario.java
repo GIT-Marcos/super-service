@@ -1,6 +1,6 @@
 package SPRService.SPRService.enums;
 
-public enum PrivilegioUsuario {
+public enum RolUsuario {
     GERENCIAL("Gerencial"),
     JEFE_TALLER("Jefe Taller"),
     JEFE_VENTAS("Jefe Ventas"),
@@ -13,7 +13,7 @@ public enum PrivilegioUsuario {
 
     private final String nombreRol;
 
-    PrivilegioUsuario(String nombreRol) {
+    RolUsuario(String nombreRol) {
         this.nombreRol = nombreRol;
     }
 

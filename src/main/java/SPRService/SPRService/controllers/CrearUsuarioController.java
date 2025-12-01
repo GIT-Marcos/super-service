@@ -10,7 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import SPRService.SPRService.entities.Usuario;
-import SPRService.SPRService.enums.PrivilegioUsuario;
+import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.exceptions.DuplicateUserException;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.alertas.Alertas;
@@ -25,11 +25,9 @@ public class CrearUsuarioController implements Initializable {
     private final UsuarioServ usuarioServ;
 
     @FXML
-    private TextField tfNombre;
+    private TextField tfNombre, tfContrasenia, tfCorreo;
     @FXML
-    private TextField tfContrasenia;
-    @FXML
-    private ComboBox<PrivilegioUsuario> comboRoles;
+    private ComboBox<RolUsuario> comboRoles;
 
     @Inject
     public CrearUsuarioController(UsuarioServ usuarioServ) {
@@ -42,19 +40,21 @@ public class CrearUsuarioController implements Initializable {
     }
 
     private void llenarComboRoles() {
-        ObservableList<PrivilegioUsuario> datosLista = FXCollections.observableArrayList(PrivilegioUsuario.values());
+        ObservableList<RolUsuario> datosLista = FXCollections.observableArrayList(RolUsuario.values());
         comboRoles.setItems(datosLista);
-        comboRoles.getSelectionModel().select(PrivilegioUsuario.GERENCIAL);
+        comboRoles.getSelectionModel().select(RolUsuario.GERENCIAL);
     }
 
     @FXML
     private void cargarUsuario() {
-        String nombre = tfNombre.getText().trim();
+        String nombre = tfNombre.getText().strip();
         String contrasenia = tfContrasenia.getText();
-        PrivilegioUsuario privilegio = comboRoles.getSelectionModel().getSelectedItem();
+        String correo = tfCorreo.getText().strip();
+        RolUsuario privilegio = comboRoles.getSelectionModel().getSelectedItem();
 
         try {
             ManejadorInputs.textoGenerico(nombre, true, "Nombre de usuario", 20);
+            ManejadorInputs.eMail(correo, true);
             ManejadorInputs.contrasenia(contrasenia);
 
             boolean resultado = Alertas.confirmacion("Confirmación", "¿Está seguro que desea " +
@@ -62,7 +62,7 @@ public class CrearUsuarioController implements Initializable {
             if (!resultado) {
                 return;
             }
-            Usuario usuario = new Usuario(null, nombre, contrasenia, privilegio);
+            Usuario usuario = new Usuario(null, nombre, correo, contrasenia, privilegio);
             usuarioServ.cargarUsuario(usuario);
             limpiarCampos();
             Notifications.create()
@@ -91,8 +91,9 @@ public class CrearUsuarioController implements Initializable {
 
     private void limpiarCampos() {
         tfNombre.setText("");
+        tfCorreo.setText("");
         tfContrasenia.setText("");
-        comboRoles.getSelectionModel().select(PrivilegioUsuario.GERENCIAL);
+        comboRoles.getSelectionModel().select(RolUsuario.GERENCIAL);
     }
 
 }

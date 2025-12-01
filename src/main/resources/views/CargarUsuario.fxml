@@ -42,6 +42,7 @@
       <VBox spacing="10.0">
          <children>
             <TextField fx:id="tfNombre" promptText="Nombre de Usuario" styleClass="input-field" />
+            <TextField fx:id="tfCorreo" layoutX="10.0" layoutY="10.0" promptText="Correo electrónico" styleClass="input-field" />
             <ComboBox fx:id="comboRoles" maxWidth="1.7976931348623157E308" promptText="Seleccione un Rol..." styleClass="input-field" />
             <PasswordField fx:id="tfContrasenia" promptText="Contraseña" styleClass="input-field" />
          </children>
