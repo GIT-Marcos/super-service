@@ -3,7 +3,7 @@ package SPRService.SPRService.controllers.charts;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorMail;
+import SPRService.SPRService.util.EMailSender;
 import SPRService.SPRService.util.generadores.GeneradorReportes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 public class ChartTotalVentasMesController implements Initializable {
 
     private final VentaRepuestoServ ventaRepuestoServ;
+    private final EMailSender eMailSender;
 
     @FXML
     private BorderPane rootPane;
@@ -50,8 +51,9 @@ public class ChartTotalVentasMesController implements Initializable {
     private Spinner<Integer> spinnerAnio;
 
     @Inject
-    public ChartTotalVentasMesController(VentaRepuestoServ ventaRepuestoServ) {
+    public ChartTotalVentasMesController(VentaRepuestoServ ventaRepuestoServ, EMailSender eMailSender) {
         this.ventaRepuestoServ = ventaRepuestoServ;
+        this.eMailSender = eMailSender;
     }
 
     @Override
@@ -128,7 +130,7 @@ public class ChartTotalVentasMesController implements Initializable {
             String cuerpo = "Estimado,\n\nAdjunto encontrará el gráfico de ventas mensual " +
                     "generado por el sistema.\n\n";
 
-            GeneradorMail.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
+            eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
             // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
             Alertas.exito("Envío Exitoso", "El reporte se envió correctamente a " + destinatario);

@@ -4,7 +4,7 @@ import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorMail;
+import SPRService.SPRService.util.EMailSender;
 import SPRService.SPRService.util.generadores.GeneradorReportes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
 public class ChartUsoDeRepuestosController implements Initializable {
 
     private final RepuestoServ repuestoServ;
+    private final EMailSender eMailSender;
     private ObservableList<PieChart.Data> obsPie = FXCollections.observableArrayList();
 
     @FXML
@@ -44,8 +45,9 @@ public class ChartUsoDeRepuestosController implements Initializable {
     private DatePicker fechaMin, fechaMax;
 
     @Inject
-    public ChartUsoDeRepuestosController(RepuestoServ repuestoServ) {
+    public ChartUsoDeRepuestosController(RepuestoServ repuestoServ, EMailSender eMailSender) {
         this.repuestoServ = repuestoServ;
+        this.eMailSender = eMailSender;
     }
 
     @Override
@@ -145,7 +147,7 @@ public class ChartUsoDeRepuestosController implements Initializable {
             String cuerpo = "Estimado,\n\nAdjunto encontrará el gráfico de uso de repuestos generado por el sistema.\n\n" +
                     "Rango de fechas: " + fechaMin.getValue() + " al " + fechaMax.getValue();
 
-            GeneradorMail.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
+            eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
             // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
             Alertas.exito("Envío Exitoso", "El reporte se envió correctamente a " + destinatario);

@@ -2,7 +2,8 @@ package SPRService.SPRService.controllers.otros;
 
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorMail;
+import SPRService.SPRService.util.EMailSender;
+import com.google.inject.Inject;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,12 +19,18 @@ import java.util.ResourceBundle;
 
 public class RateController implements Initializable, ModalController<Boolean> {
 
+    private final EMailSender eMailSender;
     private Boolean result;
 
     @FXML
     private Rating rate, rate2, rate3;
     @FXML
     private TextArea tfComentario;
+
+    @Inject
+    public RateController(EMailSender eMailSender) {
+        this.eMailSender = eMailSender;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -43,7 +50,7 @@ public class RateController implements Initializable, ModalController<Boolean> {
         String comentario = tfComentario.getText().strip();
 
         try {
-            GeneradorMail.enviarReview(comentario, csat, nsp, ces);
+            eMailSender.enviarReview(comentario, csat, nsp, ces);
             this.result = true;
             closeWindow(event);
         } catch (EmailException e) {

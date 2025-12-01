@@ -4,7 +4,7 @@ import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorMail;
+import SPRService.SPRService.util.EMailSender;
 import SPRService.SPRService.util.generadores.GeneradorReportes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -37,6 +37,7 @@ import java.util.ResourceBundle;
 public class ChartComparacionIngresosController implements Initializable {
 
     private final ServiceServ serviceServ;
+    private final EMailSender eMailSender;
     private ObservableList<PieChart.Data> obsPie = FXCollections.observableArrayList();
 
     @FXML
@@ -49,8 +50,9 @@ public class ChartComparacionIngresosController implements Initializable {
     private Label lblCantService, lblCantVentas, lblCantOperaciones, lblIngresosTotales, lblIngVentas, lblIngService;
 
     @Inject
-    public ChartComparacionIngresosController(ServiceServ serviceServ) {
+    public ChartComparacionIngresosController(ServiceServ serviceServ, EMailSender eMailSender) {
         this.serviceServ = serviceServ;
+        this.eMailSender = eMailSender;
     }
 
     @Override
@@ -147,7 +149,7 @@ public class ChartComparacionIngresosController implements Initializable {
             String cuerpo = "Estimado,\n\nAdjunto encontrará el gráfico comparativo de ingresos " +
                     "generado por el sistema.\n\n";
 
-            GeneradorMail.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
+            eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
             // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
             Alertas.exito("Envío Exitoso", "El reporte se envió correctamente a " + destinatario);

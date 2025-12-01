@@ -4,7 +4,7 @@ import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorMail;
+import SPRService.SPRService.util.EMailSender;
 import SPRService.SPRService.util.generadores.GeneradorReportes;
 import com.google.inject.Inject;
 import javafx.embed.swing.SwingFXUtils;
@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.LocalDate;
 import java.time.Year;
 import java.util.*;
 import java.util.List;
@@ -40,6 +39,7 @@ import java.util.List;
 public class ChartTotalVentasAnioController implements Initializable {
 
     private final VentaRepuestoServ ventaRepuestoServ;
+    private final EMailSender eMailSender;
     private final String[] nombresMesesAbreviados = {
             "Ene", "Feb", "Mar", "Abr", "May", "Jun",
             "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
@@ -55,8 +55,9 @@ public class ChartTotalVentasAnioController implements Initializable {
     private Label lblIngresosTotales, lblTitulo, lblCantidadDeVentasAnio, lblPromedioIngresosPorVenta;
 
     @Inject
-    public ChartTotalVentasAnioController(VentaRepuestoServ ventaRepuestoServ) {
+    public ChartTotalVentasAnioController(VentaRepuestoServ ventaRepuestoServ, EMailSender eMailSender) {
         this.ventaRepuestoServ = ventaRepuestoServ;
+        this.eMailSender = eMailSender;
     }
 
     @Override
@@ -138,7 +139,7 @@ public class ChartTotalVentasAnioController implements Initializable {
             String cuerpo = "Estimado,\n\nAdjunto encontrará el gráfico de ventas anual " +
                     "generado por el sistema.\n\n";
 
-            GeneradorMail.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
+            eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
             // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
             Alertas.exito("Envío Exitoso", "El reporte se envió correctamente a " + destinatario);

@@ -5,7 +5,7 @@ import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorMail;
+import SPRService.SPRService.util.EMailSender;
 import SPRService.SPRService.util.generadores.GeneradorReportes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -45,6 +45,7 @@ import java.util.List;
 public class ChartReportesAnualesServiceController implements Initializable {
 
     private final ServiceServ serviceServ;
+    private final EMailSender eMailSender;
     private ObservableList<PieChart.Data> obsPie = FXCollections.observableArrayList();
     private final String[] nombresMesesAbreviados = {
             "Ene", "Feb", "Mar", "Abr", "May", "Jun",
@@ -64,8 +65,9 @@ public class ChartReportesAnualesServiceController implements Initializable {
     private PieChart pieChart;
 
     @Inject
-    public ChartReportesAnualesServiceController(ServiceServ serviceServ) {
+    public ChartReportesAnualesServiceController(ServiceServ serviceServ, EMailSender eMailSender) {
         this.serviceServ = serviceServ;
+        this.eMailSender = eMailSender;
     }
 
     @Override
@@ -158,7 +160,7 @@ public class ChartReportesAnualesServiceController implements Initializable {
             String cuerpo = "Estimado,\n\nAdjunto encontrará el gráfico de service anual " +
                     "generado por el sistema.\n\n";
 
-            GeneradorMail.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
+            eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
             // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
             Alertas.exito("Envío Exitoso", "El reporte se envió correctamente a " + destinatario);

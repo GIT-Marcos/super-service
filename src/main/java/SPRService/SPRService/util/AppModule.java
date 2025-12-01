@@ -15,6 +15,7 @@ public class AppModule extends AbstractModule {
         bind(VehiculoVM.class);
         bind(DepositoViewModel.class);
         bind(CargaRepuestoViewModel.class);
+        bind(EMailSender.class).in(Scopes.SINGLETON);
     }
 
     // Provee un FXMLLoader ya configurado con la fábrica de controladores de Guice.
