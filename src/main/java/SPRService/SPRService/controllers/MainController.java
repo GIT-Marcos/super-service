@@ -7,18 +7,13 @@ import com.google.inject.Inject;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import SPRService.SPRService.util.SessionManager;
-import javafx.util.Duration;
-import org.controlsfx.control.Notifications;
 
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -30,8 +25,6 @@ public class MainController implements Initializable {
     private Pane contentPane;
     @FXML
     private VBox vboxNavBar;
-    @FXML
-    private ImageView rateImg;
 
     @Inject
     public MainController(AppCoordinator appCoordinator) {
@@ -43,21 +36,11 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         navigator.bind(contentPane);
         navigator.navigateTo(Views.DEPOSITO);
-        configurarControles();
     }
 
-    private void configurarControles() {
-        rateImg.setOnMouseClicked(p -> {
-            Optional<Boolean> result = navigator.openModal(Views.RATE, "Valora el sistema", null);
-            if (result.isPresent()) {
-                Notifications.create()
-                        .title("Gracias!!!")
-                        .text("Se ha enviado su valoración\nMuchas gracias!")
-                        .hideAfter(Duration.seconds(3))
-                        .position(Pos.CENTER)
-                        .show();
-            }
-        });
+    @FXML
+    private void valorar() {
+        navigator.openModal(Views.RATE, "Valorar sistema", null);
     }
 
     @FXML
