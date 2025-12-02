@@ -3,13 +3,15 @@ package SPRService.SPRService.services.impl;
 import SPRService.SPRService.DAOs.UsuarioDAO;
 import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.entities.Usuario;
-import SPRService.SPRService.exceptions.DuplicateUserException;
+import SPRService.SPRService.exceptions.DuplicateUserNameException;
 import SPRService.SPRService.services.UsuarioServ;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 import org.hibernate.HibernateException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.mindrot.jbcrypt.BCrypt;
+import org.postgresql.util.PSQLException;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,18 +42,29 @@ public class UsuarioServImpl implements UsuarioServ {
 
     @Transactional
     @Override
-    public void cargarUsuario(Usuario usuario) {
+    public Optional<Usuario> cargarUsuario(Usuario usuario) throws DuplicateUserNameException {
         if (usuario == null) {
             throw new NullPointerException("usuario a cargar nulo.");
         }
         String hashed = BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt());
         usuario.setPassword(hashed);
         try {
-            daoUsuario.cargarUsuario(usuario);
-        } catch (DuplicateUserException e) {
-            throw new RuntimeException("El nombre de usuario: " +
-                    usuario.getNombre() + " ya existe en bd.", e);
+            daoUsuario.save(usuario);
+        } catch (RuntimeException e) {
+            if (e instanceof ConstraintViolationException &&
+                    e.getCause() instanceof PSQLException) {
+                throw new DuplicateUserNameException("El usuario con el nombre: " + usuario.getNombre() +
+                        " ya existe en el sistema.");
+            }
+            throw new RuntimeException("Error inesperado al cargar usuario", e);
         }
+        return Optional.of(usuario);
+    }
+
+    @Transactional
+    @Override
+    public Optional<Usuario> modififcarUsuario(Usuario usuario) {
+        return Optional.empty();
     }
 
     @Transactional

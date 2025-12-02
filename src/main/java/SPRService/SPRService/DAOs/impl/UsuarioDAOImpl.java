@@ -3,7 +3,7 @@ package SPRService.SPRService.DAOs.impl;
 import SPRService.SPRService.DAOs.UsuarioDAO;
 import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.entities.Usuario;
-import SPRService.SPRService.exceptions.DuplicateUserException;
+import SPRService.SPRService.exceptions.DuplicateUserNameException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -78,17 +78,17 @@ public class UsuarioDAOImpl extends GenericDAOImpl<Usuario, Long> implements Usu
                 .getResultList();
     }
 
-    @Override
-    public void cargarUsuario(Usuario usuario) throws DuplicateUserException {
-        EntityManager em = emProvider.get();
-        try {
-            em.persist(usuario);
-        } catch (RuntimeException e) {
-            if (e instanceof ConstraintViolationException &&
-                    e.getCause() instanceof PSQLException) {
-                throw new DuplicateUserException();
-            }
-            throw new RuntimeException("Error inesperado al cargar usuario", e);
-        }
-    }
+//    @Override
+//    public void cargarUsuario(Usuario usuario){
+//        EntityManager em = emProvider.get();
+//        try {
+//            em.persist(usuario);
+//        } catch (RuntimeException e) {
+//            if (e instanceof ConstraintViolationException &&
+//                    e.getCause() instanceof PSQLException) {
+//                throw new DuplicateUserNameException();
+//            }
+//            throw new RuntimeException("Error inesperado al cargar usuario", e);
+//        }
+//    }
 }

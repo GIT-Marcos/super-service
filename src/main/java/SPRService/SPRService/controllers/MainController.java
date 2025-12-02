@@ -85,14 +85,12 @@ public class MainController implements Initializable {
 
     @FXML
     private void cerrarSesion(ActionEvent event) {
-        if (!SessionManager.cerrarSesion()) {
-            return;
+        if (SessionManager.cerrarSesion()) {
+            Node n = ((Node) event.getSource());
+            Stage s = (Stage) n.getScene().getWindow();
+            s.close();
+            appCoordinator.closeSesion();
         }
-        Node n = ((Node) event.getSource());
-        Stage s = (Stage) n.getScene().getWindow();
-        s.close();
-
-        appCoordinator.closeSesion();
     }
 
 

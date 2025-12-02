@@ -18,12 +18,12 @@ public class SimpleDialogs {
         alerta.setHeaderText(null);
         alerta.setContentText(mensaje);
 
-        ButtonType btnSi = new ButtonType("Sí");
-        ButtonType btnNo = new ButtonType("No");
+        ButtonType btnSi = new ButtonType("Sí", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
         alerta.getButtonTypes().setAll(btnSi, btnNo);
 
         Optional<ButtonType> resultado = alerta.showAndWait();
-        return resultado.isPresent() && resultado.get() == ButtonType.OK;
+        return resultado.isPresent() && resultado.get().getButtonData() == ButtonBar.ButtonData.OK_DONE;
     }
 
     /**

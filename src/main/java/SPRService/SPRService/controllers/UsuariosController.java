@@ -2,6 +2,9 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.enums.RolUsuario;
+import SPRService.SPRService.navigation.AppCoordinator;
+import SPRService.SPRService.navigation.Navigator;
+import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.UsuarioServ;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.tablas.UsuarioViewModelTabla;
@@ -10,12 +13,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Duration;
 import org.controlsfx.control.CheckComboBox;
-import org.controlsfx.control.Notifications;
 
 import java.net.URL;
 import java.util.*;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class UsuariosController implements Initializable {
 
     private final UsuarioServ usuarioServ;
+    private final Navigator navigator;
     private ObservableList<UsuarioViewModelTabla> obsListUsuariosVM = FXCollections.observableArrayList();
 
     @FXML
@@ -46,8 +47,9 @@ public class UsuariosController implements Initializable {
     private CheckBox chkActivos, chkInactivos;
 
     @Inject
-    public UsuariosController(UsuarioServ usuarioServ) {
+    public UsuariosController(UsuarioServ usuarioServ, AppCoordinator coordinator) {
         this.usuarioServ = usuarioServ;
+        this.navigator = coordinator.getMainNavigator();
     }
 
     @Override
@@ -55,6 +57,70 @@ public class UsuariosController implements Initializable {
         configurarControles();
         tabla.setItems(obsListUsuariosVM);
         verTodos();
+    }
+
+    @FXML
+    public void verTodos() {
+        tfUsuario.clear();
+        tfCorreo.clear();
+        cbRoles.getCheckModel().clearChecks();
+        List<UsuarioViewModelTabla> nuevosUsuarios = usuarioServ.verTodos().stream()
+                .map(UsuarioViewModelTabla::new)
+                .collect(Collectors.toList());
+
+        obsListUsuariosVM.clear();
+        obsListUsuariosVM.setAll(nuevosUsuarios);
+    }
+
+    @FXML
+    public void buscar() {
+        if (!chkActivos.isSelected() && !chkInactivos.isSelected()) {
+            obsListUsuariosVM.clear();
+            return;
+        }
+        String nombre = tfUsuario.getText().strip();
+        String correo = tfCorreo.getText().strip();
+        Set<RolUsuario> rolesSeleccionados = new HashSet<>(cbRoles.getCheckModel().getCheckedItems());
+        FiltroUsuarioDTO filtros = new FiltroUsuarioDTO(nombre, correo, rolesSeleccionados,
+                chkActivos.isSelected(), chkInactivos.isSelected());
+        List<UsuarioViewModelTabla> usuariosBuscados = usuarioServ.buscar(filtros).stream()
+                .map(UsuarioViewModelTabla::new)
+                .collect(Collectors.toList());
+        obsListUsuariosVM.setAll(usuariosBuscados);
+    }
+
+    @FXML
+    public void nuevo() {
+        Optional<UsuarioViewModelTabla> result = navigator.openModal(Views.CARGAR_USUARIO, "Crear usuario", null);
+        result.ifPresent(obsListUsuariosVM::addFirst);
+    }
+
+    @FXML
+    public void modificar() {
+        UsuarioViewModelTabla seleccionado = tabla.getSelectionModel().getSelectedItem();
+        if (seleccionado != null) {
+            // Lógica para abrir la ventana/escena de modificación, pasando seleccionado.getUsuario().
+            System.out.println("Acción: Modificar Usuario: " + seleccionado.getNombre());
+        } else {
+            // Lógica para mostrar una alerta de que no hay selección.
+            System.out.println("Acción: Selecciona un usuario para modificar.");
+        }
+    }
+
+    @FXML
+    public void darDeBaja() {
+        UsuarioViewModelTabla seleccionado = tabla.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            NotificationHelper.mostrarAdvertencia("Dar de baja",
+                    "Debe seleccionar un usuario para darlo de baja");
+            return;
+        }
+        try {
+            usuarioServ.darDeBaja(seleccionado.getUsuario()).ifPresent(seleccionado::actualizarDatos);
+        } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Dar de baja", "Ha ocurrido un error inesperado.");
+            e.printStackTrace();
+        }
     }
 
     private void configurarControles() {
@@ -90,70 +156,5 @@ public class UsuariosController implements Initializable {
                 }
             };
         });
-    }
-
-    @FXML
-    public void verTodos() {
-        tfUsuario.clear();
-        tfCorreo.clear();
-        cbRoles.getCheckModel().clearChecks();
-        List<UsuarioViewModelTabla> nuevosUsuarios = usuarioServ.verTodos().stream()
-                .map(UsuarioViewModelTabla::new)
-                .collect(Collectors.toList());
-
-        obsListUsuariosVM.clear();
-        obsListUsuariosVM.setAll(nuevosUsuarios);
-    }
-
-    @FXML
-    public void buscar() {
-        if (!chkActivos.isSelected() && !chkInactivos.isSelected()) {
-            obsListUsuariosVM.clear();
-            return;
-        }
-        String nombre = tfUsuario.getText().strip();
-        String correo = tfCorreo.getText().strip();
-        Set<RolUsuario> rolesSeleccionados = new HashSet<>(cbRoles.getCheckModel().getCheckedItems());
-        FiltroUsuarioDTO filtros = new FiltroUsuarioDTO(nombre, correo, rolesSeleccionados,
-                chkActivos.isSelected(), chkInactivos.isSelected());
-        List<UsuarioViewModelTabla> usuariosBuscados = usuarioServ.buscar(filtros).stream()
-                .map(UsuarioViewModelTabla::new)
-                .collect(Collectors.toList());
-        obsListUsuariosVM.setAll(usuariosBuscados);
-    }
-
-    @FXML
-    public void nuevo() {
-        // Lógica para abrir la ventana/escena de creación de nuevo usuario.
-        System.out.println("Acción: Nuevo Usuario");
-        // Ejemplo: Abrir una nueva ventana de diálogo.
-    }
-
-    @FXML
-    public void modificar() {
-        UsuarioViewModelTabla seleccionado = tabla.getSelectionModel().getSelectedItem();
-        if (seleccionado != null) {
-            // Lógica para abrir la ventana/escena de modificación, pasando seleccionado.getUsuario().
-            System.out.println("Acción: Modificar Usuario: " + seleccionado.getNombre());
-        } else {
-            // Lógica para mostrar una alerta de que no hay selección.
-            System.out.println("Acción: Selecciona un usuario para modificar.");
-        }
-    }
-
-    @FXML
-    public void darDeBaja() {
-        UsuarioViewModelTabla seleccionado = tabla.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            NotificationHelper.mostrarAdvertencia("Dar de baja",
-                    "Debe seleccionar un usuario para darlo de baja");
-            return;
-        }
-        try {
-            usuarioServ.darDeBaja(seleccionado.getUsuario()).ifPresent(seleccionado::actualizarDatos);
-        } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Dar de baja", "Ha ocurrido un error inesperado.");
-            e.printStackTrace();
-        }
     }
 }

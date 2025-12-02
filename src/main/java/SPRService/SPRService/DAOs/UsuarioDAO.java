@@ -2,7 +2,7 @@ package SPRService.SPRService.DAOs;
 
 import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.entities.Usuario;
-import SPRService.SPRService.exceptions.DuplicateUserException;
+import SPRService.SPRService.exceptions.DuplicateUserNameException;
 
 import java.util.List;
 
@@ -26,9 +26,9 @@ public interface UsuarioDAO extends GenericDAO<Usuario, Long> {
     /**
      * Para cargar guardar usuarios nuevos.
      *
-     * @throws DuplicateUserException si el usuario que se quiere guardar tiene el mismo
+     * @throws DuplicateUserNameException si el usuario que se quiere guardar tiene el mismo
      *                                nombre que otro que ya existe en bd.
      */
-    void cargarUsuario(Usuario usuario) throws DuplicateUserException;
+//    void cargarUsuario(Usuario usuario);
 
 }
