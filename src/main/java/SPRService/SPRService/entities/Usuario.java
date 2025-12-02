@@ -22,12 +22,16 @@ public class Usuario implements Serializable{
     
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private Boolean activo;
     
     @Enumerated(value = EnumType.STRING)
     @Column(name = "rol")
     private RolUsuario rol;
 
     public Usuario() {
+        this.activo = Boolean.TRUE;
     }
 
     public Usuario(Long id, String nombre, String correo, String password, RolUsuario rol) {
@@ -35,6 +39,7 @@ public class Usuario implements Serializable{
         this.nombre = nombre;
         this.correo = correo;
         this.password = password;
+        this.activo = Boolean.TRUE;
         this.rol = rol;
     }
 
@@ -70,6 +75,14 @@ public class Usuario implements Serializable{
         this.password = password;
     }
 
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
     public RolUsuario getRol() {
         return rol;
     }
@@ -85,6 +98,7 @@ public class Usuario implements Serializable{
                 ", nombre='" + nombre + '\'' +
                 ", correo='" + correo + '\'' +
                 ", password='" + password + '\'' +
+                ", activo=" + activo +
                 ", rol=" + rol +
                 '}';
     }

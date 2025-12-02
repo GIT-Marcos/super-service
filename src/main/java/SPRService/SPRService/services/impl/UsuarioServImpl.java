@@ -1,6 +1,7 @@
 package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.UsuarioDAO;
+import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.exceptions.DuplicateUserException;
 import SPRService.SPRService.services.UsuarioServ;
@@ -20,6 +21,20 @@ public class UsuarioServImpl implements UsuarioServ {
     @Inject
     public UsuarioServImpl(UsuarioDAO daoUsuario) {
         this.daoUsuario = daoUsuario;
+    }
+
+    @Transactional
+    @Override
+    public List<Usuario> verTodos() {
+        return daoUsuario.verTodos();
+    }
+
+    @Transactional
+    @Override
+    public List<Usuario> buscar(FiltroUsuarioDTO filtro) {
+        if (filtro == null) filtro = new FiltroUsuarioDTO(
+                null, null, null, true, true);
+        return daoUsuario.buscar(filtro);
     }
 
     @Transactional
