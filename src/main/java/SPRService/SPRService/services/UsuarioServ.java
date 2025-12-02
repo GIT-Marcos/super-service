@@ -5,6 +5,7 @@ import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.exceptions.DuplicateUserException;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UsuarioServ {
 
@@ -16,4 +17,5 @@ public interface UsuarioServ {
 
     Usuario loguear(String nombre, String inputPass);
 
+    Optional<Usuario> darDeBaja(Usuario usuario);
 }

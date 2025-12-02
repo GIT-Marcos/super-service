@@ -12,6 +12,7 @@ import org.hibernate.HibernateException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class UsuarioServImpl implements UsuarioServ {
@@ -70,5 +71,12 @@ public class UsuarioServImpl implements UsuarioServ {
             }
         }
         return usuario;
+    }
+
+    //TODO: reemplazar en casos con estos usar Optional<>
+    @Override
+    public Optional<Usuario> darDeBaja(Usuario usuario) {
+        usuario.setActivo(Boolean.FALSE);
+        return Optional.ofNullable(daoUsuario.update(usuario));
     }
 }

@@ -3,21 +3,22 @@ package SPRService.SPRService.controllers;
 import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.services.UsuarioServ;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.tablas.UsuarioViewModelTabla;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Duration;
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.Notifications;
 
 import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UsuariosController implements Initializable {
@@ -143,13 +144,16 @@ public class UsuariosController implements Initializable {
     @FXML
     public void darDeBaja() {
         UsuarioViewModelTabla seleccionado = tabla.getSelectionModel().getSelectedItem();
-        if (seleccionado != null) {
-            // Lógica para confirmar la baja y luego llamar a usuarioServ.darDeBaja(seleccionado.getUsuario()).
-            System.out.println("Acción: Dar de Baja Usuario: " + seleccionado.getNombre());
-            // Después de la baja exitosa, se debería recargar la tabla o remover el elemento.
-        } else {
-            // Lógica para mostrar una alerta de que no hay selección.
-            System.out.println("Acción: Selecciona un usuario para dar de baja.");
+        if (seleccionado == null) {
+            NotificationHelper.mostrarAdvertencia("Dar de baja",
+                    "Debe seleccionar un usuario para darlo de baja");
+            return;
+        }
+        try {
+            usuarioServ.darDeBaja(seleccionado.getUsuario()).ifPresent(seleccionado::actualizarDatos);
+        } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Dar de baja", "Ha ocurrido un error inesperado.");
+            e.printStackTrace();
         }
     }
 }
