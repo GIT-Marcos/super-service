@@ -14,7 +14,7 @@ import javafx.collections.ObservableList;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Objects; // Importación necesaria para el mejorado de bindings
+import java.util.Optional;
 
 public class CargaRepuestoViewModel {
 
@@ -104,7 +104,7 @@ public class CargaRepuestoViewModel {
      * @throws IllegalArgumentException si la validación de algún campo falla.
      * @throws DuplicateProductException si ya existe un producto con el mismo código de barras.
      */
-    public Repuesto guardarRepuesto() throws IllegalArgumentException, DuplicateProductException {
+    public Optional<Repuesto> guardarRepuesto() throws IllegalArgumentException, DuplicateProductException {
         validarInputs();
         Repuesto repuestoParaGuardar = construirEntidadDesdeViewModel();
 

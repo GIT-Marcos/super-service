@@ -191,7 +191,7 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
 
         //        resetearEstilosDeError();
         try {
-            this.resultado = viewModel.guardarRepuesto();
+            viewModel.guardarRepuesto().ifPresent(r -> this.resultado = r);
             NotificationHelper.mostrarExito("Guardar repuesto", "Se a guardado con éxito el repuesto: " +
                     viewModel.nombreProductoProperty().getValue());
             cerrar(event);

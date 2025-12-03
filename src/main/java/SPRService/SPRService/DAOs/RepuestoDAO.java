@@ -13,6 +13,8 @@ public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
     // ||    ||==  ((      ||   || || ||_// ||=||
     // ||__| ||___  \\__   ||   \\_// || \\ || ||
 
+    List<Repuesto> validarUnicidadCodBarras(Repuesto r);
+
     List<Repuesto> todosProductosActivos();
 
     /**

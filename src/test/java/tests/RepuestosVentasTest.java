@@ -48,7 +48,6 @@ class RepuestosVentasTest {
         Random random = new Random();
 
         // 1. PREPARAR LA MARCA (Inicialmente sin ID)
-        // Usamos UUID para asegurar que el nombre sea único y no choque con ejecuciones pasadas
         String nombreMarcaUnica = "Marca Test " + UUID.randomUUID().toString().substring(0, 8);
         MarcaRepuesto marcaActual = new MarcaRepuesto(null, nombreMarcaUnica, new HashSet<>());
 
@@ -59,28 +58,26 @@ class RepuestosVentasTest {
         // 2. CREAR LOS REPUESTOS Y GESTIONAR LA MARCA
         for (int i = 0; i < cantidadRepuestos; i++) {
 
+            // Llamada al método auxiliar corregido
             Repuesto repuestoGuardado = crearRepuestoParametrizado(i, marcaActual);
             listaRepuestos.add(repuestoGuardado);
 
-            // --- CORRECCIÓN CLAVE ---
-            // Después de guardar el primer repuesto (i=0), la base de datos ya asignó un ID a la marca.
-            // Debemos actualizar nuestra variable 'marcaActual' con la instancia que viene de la BD.
-            // Si no hacemos esto, en la vuelta i=1, la marca sigue teniendo ID null e intenta insertarse de nuevo.
+            // Actualización de la marca con la que tiene el ID de la base de datos
             if (i == 0) {
-                marcaActual = repuestoGuardado.getMarcaRepuesto(); // Aquí obtenemos la marca CON ID
+                marcaActual = repuestoGuardado.getMarcaRepuesto();
                 assertNotNull(marcaActual.getId(), "La marca ya debería tener ID asignado");
             }
         }
 
         assertEquals(50, listaRepuestos.size(), "Se deberían haber creado 50 repuestos");
 
-        // 3. LÓGICA DE VENTAS (Igual que antes)
+        // 3. LÓGICA DE VENTAS
         int anioActual = Year.now().getValue();
         int totalVentasGeneradas = 0;
 
         for (int mes = 1; mes <= 12; mes++) {
             int numVentasEsteMes = random.nextInt(40);
-            System.out.println("Mes " + mes + ": generando " + numVentasEsteMes + " ventas.");
+            // System.out.println("Mes " + mes + ": generando " + numVentasEsteMes + " ventas."); // Comentado para menos ruido
 
             int diasEnMes = YearMonth.of(anioActual, mes).lengthOfMonth();
 
@@ -97,7 +94,6 @@ class RepuestosVentasTest {
                 VentaRepuesto venta = new VentaRepuesto(null, notaRetiro, new HashSet<>());
                 venta.setFechaVenta(fechaVenta);
 
-                // Ticket único usando UUID para evitar colisiones
                 String ticket = "TKT-" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
 
                 Pago pago = new Pago(null, ticket, venta.getMontoTotal(), null, null,
@@ -108,31 +104,24 @@ class RepuestosVentasTest {
             }
             totalVentasGeneradas += numVentasEsteMes;
         }
-        System.out.println("Fin. Total ventas: " + totalVentasGeneradas);
+        System.out.println("Fin. Total ventas generadas: " + totalVentasGeneradas);
     }
 
     private Repuesto crearRepuestoParametrizado(int index, MarcaRepuesto marca) {
-        // Solución para DuplicateProductException:
-        // Usamos UUID completo o una combinación fuerte para el código de barras.
-        // 'System.nanoTime()' a veces es tan rápido que se repite en bucles cerrados,
-        // UUID es más seguro.
         String uniqueSuffix = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         String codigoBarra = "COD-" + index + "-" + uniqueSuffix;
-
         String nombre = "Repuesto " + index + " " + uniqueSuffix;
 
         BigDecimal precio = new BigDecimal("10000.00").add(new BigDecimal(index));
         Stock stock = new Stock(null, 10000.0, 5.0, "u", "A1", null, null);
 
-        // Boolean activo es obligatorio en tu entidad
-        Boolean activo = true;
-
         // IMPORTANTE: Usamos la 'marca' que recibimos por parámetro.
-        // En la primera vuelta tiene ID null (se crea).
-        // En las siguientes vueltas tiene ID (se asocia).
         Repuesto repuesto = new Repuesto(null, codigoBarra, nombre, precio, marca, stock);
 
-        // Asumiendo que RepuestoServ devuelve la entidad persistida
-        return repuestoServ.cargarRepuesto(repuesto);
+        // --- CORRECCIÓN PARA EL OPTIONAL ---
+        // Como el servicio ahora devuelve Optional<Repuesto>, usamos .orElseThrow()
+        // Esto devuelve el Repuesto si existe, o lanza un error si vino vacío (fallo el test)
+        return repuestoServ.cargarRepuesto(repuesto)
+                .orElseThrow(() -> new RuntimeException("Error en test: El servicio devolvió un Optional vacío al guardar repuesto index " + index));
     }
 }
