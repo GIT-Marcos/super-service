@@ -19,21 +19,47 @@ public class NotaRetiro implements Serializable {
     @Column(nullable = false)
     private LocalDate fecha;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_uso", nullable = false)
+    private TipoUsoRetiro tipoUso;
+
     @Column(nullable = false)
     private Boolean activo;
 
+    //todo: hacer esto un Set
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_nota_retiro")
     private List<DetalleRetiro> detalleRetiroList = new ArrayList<>();
 
     public NotaRetiro() {
+        this.activo = Boolean.TRUE;
     }
 
-    public NotaRetiro(Long id, List<DetalleRetiro> detalleRetiroList) {
+    public NotaRetiro(Long id, TipoUsoRetiro tipoUso, List<DetalleRetiro> detalleRetiroList) {
         this.id = id;
         this.fecha = LocalDate.now();
+        this.tipoUso = tipoUso;
         this.activo = Boolean.TRUE;
         this.detalleRetiroList = detalleRetiroList;
+    }
+
+    public void agregarDetalle(List<DetalleRetiro> detalleRetiros) {
+        if (detalleRetiros != null) {
+            for (DetalleRetiro d : detalleRetiros) {
+                // Evitar duplicados al cargar
+                if (!this.detalleRetiroList.contains(d)) {
+                    this.detalleRetiroList.add(d);
+                }
+            }
+        }
+    }
+
+    /**
+     * Una nota de retiro representa una cantidad de stock que se ha restado para fines comerciales. Si la nota es
+     * cancelada, las cantidades RETIRADAS si o si se deben restablecer.
+     */
+    public void cancelarNota() {
+        this.activo = Boolean.FALSE;
     }
 
     public Long getId() {
@@ -50,6 +76,14 @@ public class NotaRetiro implements Serializable {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
+    }
+
+    public TipoUsoRetiro getTipoUso() {
+        return tipoUso;
+    }
+
+    public void setTipoUso(TipoUsoRetiro tipoUso) {
+        this.tipoUso = tipoUso;
     }
 
     public Boolean getActivo() {
@@ -78,10 +112,11 @@ public class NotaRetiro implements Serializable {
     }
 
     /**
-     * Una nota de retiro representa una cantidad de stock que se ha restado para fines comerciales. Si la nota es
-     * cancelada, las cantidades RETIRADAS si o si se deben restablecer.
+     * Indica si el retiro de repuestos se realizó para una Venta directa o para un Service.
      */
-    public void cancelarNota() {
-        this.activo = Boolean.FALSE;
+    public enum TipoUsoRetiro {
+        VENTA,
+        SERVICE,
+        OTRO
     }
 }

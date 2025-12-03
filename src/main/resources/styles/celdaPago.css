@@ -1,0 +1,219 @@
+/* ==========================================
+   CELDA PAGO
+   ========================================== */
+
+/* Container principal */
+.celda-pago-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 4px;
+    -fx-padding: 6px 8px;
+    -fx-spacing: 3px;
+    -fx-alignment: center-left;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 3, 0, 0, 1);
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+.celda-pago-container:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-cursor: hand;
+    -fx-border-color: #2196F3;
+}
+
+/* Estado cancelado */
+.celda-pago-container.container-cancelado {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #9e9e9e;
+    -fx-opacity: 0.7;
+}
+
+/* VBox contenedor de las 2 filas */
+.celda-pago-info-box {
+    -fx-spacing: 4px;
+}
+
+/* ==========================================
+   FILA SUPERIOR (Forma, Monto, Fecha, Estado)
+   ========================================== */
+
+.celda-pago-fila-superior {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+/* Forma de pago */
+.celda-pago-metodo {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3px 8px;
+    -fx-background-radius: 3px;
+    -fx-min-width: 130px;
+    -fx-alignment: center;
+}
+
+/* Efectivo */
+.celda-pago-metodo.metodo-efectivo {
+    -fx-background-color: #4caf50;
+    -fx-text-fill: white;
+}
+
+/* Tarjeta de débito */
+.celda-pago-metodo.metodo-tarjeta-debito {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+}
+
+/* Tarjeta de crédito */
+.celda-pago-metodo.metodo-tarjeta-credito {
+    -fx-background-color: #9c27b0;
+    -fx-text-fill: white;
+}
+
+/* Transferencia */
+.celda-pago-metodo.metodo-transferencia {
+    -fx-background-color: #ff9800;
+    -fx-text-fill: white;
+}
+
+/* Mercado Pago */
+.celda-pago-metodo.metodo-mercadopago {
+    -fx-background-color: #00b0ff;
+    -fx-text-fill: white;
+}
+
+/* Monto pagado - DESTACADO */
+.celda-pago-monto {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1b5e20;
+    -fx-padding: 3px 10px;
+    -fx-background-color: #e8f5e9;
+    -fx-background-radius: 3px;
+    -fx-min-width: 100px;
+}
+
+/* Fecha */
+.celda-pago-fecha {
+    -fx-font-size: 10px;
+    -fx-text-fill: #616161;
+    -fx-padding: 3px 8px;
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 3px;
+    -fx-min-width: 80px;
+    -fx-alignment: center;
+}
+
+/* Estado */
+.celda-pago-estado {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 3px 8px;
+    -fx-background-radius: 3px;
+    -fx-min-width: 70px;
+    -fx-alignment: center;
+}
+
+.celda-pago-estado.estado-activo {
+    -fx-background-color: #4caf50;
+    -fx-text-fill: white;
+}
+
+.celda-pago-estado.estado-cancelado {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+}
+
+/* ==========================================
+   FILA INFERIOR (DNI, Referencia, Detalles, Descuento)
+   ========================================== */
+
+.celda-pago-fila-inferior {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+/* DNI */
+.celda-pago-dni {
+    -fx-font-size: 10px;
+    -fx-text-fill: #757575;
+    -fx-padding: 2px 6px;
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 2px;
+    -fx-min-width: 90px;
+}
+
+/* Referencia */
+.celda-pago-referencia {
+    -fx-font-size: 10px;
+    -fx-text-fill: #757575;
+    -fx-padding: 2px 6px;
+    -fx-background-color: #e3f2fd;
+    -fx-background-radius: 2px;
+    -fx-min-width: 100px;
+}
+
+/* Detalles (tarjeta, banco) */
+.celda-pago-detalles {
+    -fx-font-size: 10px;
+    -fx-text-fill: #616161;
+    -fx-font-style: italic;
+    -fx-min-width: 150px;
+}
+
+/* Descuento */
+.celda-pago-descuento {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #d32f2f;
+    -fx-padding: 2px 6px;
+    -fx-background-color: #ffebee;
+    -fx-background-radius: 2px;
+    -fx-border-color: #f44336;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+}
+
+/* ==========================================
+   DARK MODE
+   ========================================== */
+
+.dark-theme .celda-pago-container {
+    -fx-background-color: #2c2c2c;
+    -fx-border-color: #404040;
+}
+
+.dark-theme .celda-pago-container:hover {
+    -fx-background-color: #363636;
+}
+
+.dark-theme .celda-pago-monto {
+    -fx-background-color: #1b5e20;
+    -fx-text-fill: #a5d6a7;
+}
+
+.dark-theme .celda-pago-fecha {
+    -fx-background-color: #424242;
+    -fx-text-fill: #9e9e9e;
+}
+
+.dark-theme .celda-pago-dni,
+.dark-theme .celda-pago-referencia {
+    -fx-background-color: #424242;
+    -fx-text-fill: #9e9e9e;
+}
+
+.dark-theme .celda-pago-detalles {
+    -fx-text-fill: #bdbdbd;
+}
+
+.dark-theme .celda-pago-descuento {
+    -fx-background-color: #3e2723;
+    -fx-text-fill: #ffcdd2;
+    -fx-border-color: #d32f2f;
+}
+
+.dark-theme .celda-pago-container.container-cancelado {
+    -fx-background-color: #1c1c1c;
+    -fx-opacity: 0.6;
+}

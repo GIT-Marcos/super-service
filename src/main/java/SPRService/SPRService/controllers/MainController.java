@@ -12,6 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import SPRService.SPRService.util.SessionManager;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -38,13 +39,18 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void valorar() {
+        navigator.openModal(Views.RATE, "Valorar sistema", null);
+    }
+
+    @FXML
     private void irDeposito() {
         navigator.navigateTo(Views.DEPOSITO);
     }
 
     @FXML
     private void irNuevaVenta() {
-        navigator.navigateTo(Views.NUEVA_VENTA);
+        navigator.openModal(Views.CARGAR_VENTA, "Cargar nueva venta", null);
     }
 
     @FXML
@@ -68,15 +74,23 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void cerrarSesion(ActionEvent event) {
-        if (!SessionManager.cerrarSesion()) {
-            return;
-        }
-        Node n = ((Node) event.getSource());
-        Stage s = (Stage) n.getScene().getWindow();
-        s.close();
+    private void irVerOrdenes() {
+        navigator.navigateTo(Views.SERVICES);
+    }
 
-        appCoordinator.closeSesion();
+    @FXML
+    private void irUsuarios() {
+        navigator.navigateTo(Views.USUARIOS);
+    }
+
+    @FXML
+    private void cerrarSesion(ActionEvent event) {
+        if (SessionManager.cerrarSesion()) {
+            Node n = ((Node) event.getSource());
+            Stage s = (Stage) n.getScene().getWindow();
+            s.close();
+            appCoordinator.closeSesion();
+        }
     }
 
 

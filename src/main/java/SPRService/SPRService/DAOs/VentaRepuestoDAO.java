@@ -4,11 +4,9 @@ import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.VentaRepuesto;
-import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
@@ -16,10 +14,6 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
     //LECTURA
 
     ResultadoPaginado<VentaRepuesto> verTodosPaginado(int pagina, int tamanioPagina);
-
-    List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,
-                                     BigDecimal montoMinimo, BigDecimal montomaximo, String nombreColOrdenar,
-                                     Integer tipoOrden, LocalDate fechaMinima, LocalDate fechaMaxima);
 
     ResultadoPaginado<VentaRepuesto> buscarPaginadoConFiltros(FiltroVentaRepuestoDTO filtro,
                                                               int pagina, int tamanioPagina);

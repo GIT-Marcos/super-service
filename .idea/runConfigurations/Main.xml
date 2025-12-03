@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="SPRService.SPRService.Main" />
+    <module name="SPRService" />
+    <option name="VM_PARAMETERS" value="--add-opens javafx.graphics/javafx.scene=org.controlsfx.controls" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="SPRService.SPRService.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

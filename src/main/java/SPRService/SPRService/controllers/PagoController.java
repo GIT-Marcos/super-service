@@ -1,5 +1,8 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.entities.Service;
+import SPRService.SPRService.entities.Transaccion;
+import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import com.google.inject.Inject;
 import javafx.beans.value.ChangeListener;
@@ -23,17 +26,16 @@ import SPRService.SPRService.util.alertas.Alertas;
 import org.hibernate.HibernateException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class PagoController implements Initializable, DataReceiver<VentaRepuesto>, ModalController<VentaRepuesto> {
+public class PagoController implements Initializable, DataReceiver<Transaccion>, ModalController<Transaccion> {
 
-    private VentaRepuesto venta;
+    private Transaccion transaccion;
     // Esta venta solo será inicializada si se concreta alguna operación, carga o modificación.
-    private VentaRepuesto ventaParaDevolver;
-//    private Pago pago;
+    private Transaccion transaccionParaDevolver;
     private final VentaRepuestoServ ventaRepuestoServ;
+    private final ServiceServ serviceServ;
     //para indicar cuando se agrega un pago a una venta ya hecha o es una venta nueva.
     private boolean flagAgregarPago = false;
 
@@ -46,13 +48,14 @@ public class PagoController implements Initializable, DataReceiver<VentaRepuesto
     @FXML
     private RadioButton radTarjCredito, radTarjDebito, radEfectivo, radTransferencia;
     @FXML
-    private TextField tfMonto, tfUltimos4, tfNroReferencia;
+    private TextField tfMonto, tfUltimos4, tfNroReferencia, tfDniCliente;
     @FXML
     private ComboBox<String> comboMarcaTarjeta, comboBancoTarjeta;
 
     @Inject
-    public PagoController(VentaRepuestoServ ventaRepuestoServ) {
+    public PagoController(VentaRepuestoServ ventaRepuestoServ, ServiceServ serviceServ) {
         this.ventaRepuestoServ = ventaRepuestoServ;
+        this.serviceServ = serviceServ;
     }
 
     @Override
@@ -66,50 +69,62 @@ public class PagoController implements Initializable, DataReceiver<VentaRepuesto
      * Nunca pasar nulo.
      */
     @Override
-    public void receiveData(VentaRepuesto data) {
+    public void receiveData(Transaccion data) {
         if (data != null) {
-            this.venta = data;
-            labelTotal.setText("TOTAL: $ " + data.getMontoFaltante());
-            // las ventas para cargar tiene siempre id nulo.
-            if (venta.getId() != null) {
+            this.transaccion = data;
+            labelTotal.setText("$ " + data.getMontoFaltante());
+            // Usa el de la interfaz
+            if (transaccion.yaPersistida()) {
                 this.flagAgregarPago = true;
             }
         }
     }
 
     @Override
-    public Optional<VentaRepuesto> getResult() {
-        return Optional.ofNullable(this.ventaParaDevolver);
+    public Optional<Transaccion> getResult() {
+        return Optional.ofNullable(this.transaccionParaDevolver);
     }
 
     @FXML
     private void pagar(ActionEvent event) {
-        Pago pagoParaCargar;
+        // 1. CAPTURA Y VALIDACIÓN DE INPUTS
 
+        // Obtener el tipo de pago seleccionado
         MetodosPago metodosPago = tomaMetodoPago();
-        String inputMonto = tfMonto.getText().trim();
+
+        // Capturar los valores de los controles
+        String inputMonto = tfMonto.getText();
         Integer inputDescuento = spinDescuento.getValue();
         String marcaTarjeta = comboMarcaTarjeta.getSelectionModel().getSelectedItem();
         String bancoTarjeta = comboBancoTarjeta.getSelectionModel().getSelectedItem();
-        String ultimos4 = tfUltimos4.getText().trim();
-        String nroReferencia = tfNroReferencia.getText().trim();
+        String ultimos4 = tfUltimos4.getText();
+        String nroReferencia = tfNroReferencia.getText();
 
         BigDecimal monto;
         BigDecimal porcentajeDescuento;
         BigDecimal montoPagar;
+
         try {
-            monto = ManejadorInputs.dinero(inputMonto, true);
-            porcentajeDescuento = ManejadorInputs.porcentaje(inputDescuento, false);
+            // Validación de Monto y Descuento
+            monto = ManejadorInputs.dinero(inputMonto, true, false);
+            porcentajeDescuento = ManejadorInputs.porcentaje(inputDescuento.toString(), false);
+
+            // Validación de campos de Tarjeta/Transferencia si aplica
             if (metodosPago != MetodosPago.EFECTIVO) {
-                ManejadorInputs.comboBox(marcaTarjeta, true, null, 30);
-                ManejadorInputs.comboBox(bancoTarjeta, true, null, 30);
+                ManejadorInputs.marcaTarjetaYBanco(marcaTarjeta, true, null, 30);
+                ManejadorInputs.marcaTarjetaYBanco(bancoTarjeta, true, null, 30);
                 ManejadorInputs.ultimos4(ultimos4, true);
                 ManejadorInputs.referenciaTarjeta(nroReferencia, true);
             }
-            if (monto.compareTo(this.venta.getMontoFaltante()) == 1) {
-                Alertas.aviso("Pago", "El monto ingresado es mayor al que se debe pagar.");
+
+            // Validación de Monto vs Monto Faltante
+            if (monto.compareTo(this.transaccion.getMontoFaltante()) == 1) {
+                Alertas.aviso("Pago", "El monto ingresado ($" + monto + ") es mayor al que se " +
+                        "debe pagar ($" + this.transaccion.getMontoFaltante() + ").");
                 return;
             }
+
+            // 2. CÁLCULO DEL MONTO A PAGAR CON DESCUENTO
             if (inputDescuento > 0) {
                 montoPagar = Operador.aplicarDescuento(monto, porcentajeDescuento);
             } else {
@@ -119,32 +134,63 @@ public class PagoController implements Initializable, DataReceiver<VentaRepuesto
             Alertas.aviso("Pago", npe.getMessage());
             return;
         } catch (IllegalArgumentException iae) {
-            Alertas.aviso("pago", iae.getMessage());
+            Alertas.aviso("Pago", iae.getMessage());
             return;
         }
 
-        boolean confirmacion = Alertas.confirmacion("¿Pagar?", "¿Continuar con el pago?\n" +
-                "El total a pagar con descuentos incluidos serán: $ " + montoPagar);
+        // 3. CONFIRMACIÓN DEL USUARIO
+        boolean confirmacion = Alertas.confirmacion("¿Confirmar Pago?",
+                "El total a pagar con descuentos incluidos será: $ " + montoPagar);
         if (!confirmacion) return;
 
-        //todo: hacer bien esto con patrón diseño y herencia de pago y los métodos de pago
-        pagoParaCargar = new Pago(null, null, montoPagar, marcaTarjeta, bancoTarjeta, nroReferencia,
-                porcentajeDescuento, ultimos4, metodosPago, this.venta);
-        this.venta.asociarPago(pagoParaCargar);
+        // 4. CREACIÓN DEL PAGO Y ASOCIACIÓN A LA TRANSACCIÓN
+        Pago pagoParaCargar = new Pago(
+                null, null, montoPagar, marcaTarjeta, bancoTarjeta, nroReferencia,
+                porcentajeDescuento, ultimos4, metodosPago,
+                (this.transaccion instanceof VentaRepuesto ? (VentaRepuesto)this.transaccion : null), // Se asigna solo si es VentaRepuesto
+                (this.transaccion instanceof Service ? (Service)this.transaccion : null) // Se asigna solo si es Service
+        );
 
+        // Asocia el pago. El 'asociarPago' de la entidad se encargará de actualizar su montoFaltante.
+        this.transaccion.asociarPago(pagoParaCargar);
+
+        // 5. PERSISTENCIA DE LA TRANSACCIÓN (DELEGACIÓN)
         try {
+            Transaccion transaccionGuardada;
+            String nombreTransaccion = (this.transaccion instanceof VentaRepuesto) ? "Venta" : "Service";
+
             if (!this.flagAgregarPago) {
-                this.ventaParaDevolver = ventaRepuestoServ.cargarVenta(this.venta);
-                Alertas.exito("Pago", "Venta y pago cargados con éxito.\n" +
-                        "Se ha actualizado el stock.");
+                // Lógica para CARGAR una transacción NUEVA
+                if (this.transaccion instanceof VentaRepuesto) {
+                    transaccionGuardada = ventaRepuestoServ.cargarVenta((VentaRepuesto) this.transaccion);
+                    Alertas.exito("Pago", nombreTransaccion + " y pago cargados con éxito.\nSe ha actualizado el stock.");
+                } else if (this.transaccion instanceof Service) {
+                    transaccionGuardada = serviceServ.cargarService((Service) this.transaccion);
+                    Alertas.exito("Pago", nombreTransaccion + " y pago cargados con éxito.");
+                } else {
+                    throw new IllegalArgumentException("Tipo de transacción no soportado para carga.");
+                }
             } else {
-                this.ventaParaDevolver = ventaRepuestoServ.modificarVenta(this.venta);
-                Alertas.exito("Pago", "Pago cargado a venta correctamente.");
+                // Lógica para MODIFICAR una transacción EXISTENTE (solo agregando un pago)
+                if (this.transaccion instanceof VentaRepuesto) {
+                    transaccionGuardada = ventaRepuestoServ.modificarVenta((VentaRepuesto) this.transaccion);
+                    Alertas.exito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
+                } else if (this.transaccion instanceof Service) {
+                    transaccionGuardada = serviceServ.modificarService((Service) this.transaccion);
+                    Alertas.exito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
+                } else {
+                    throw new IllegalArgumentException("Tipo de transacción no soportado para modificación.");
+                }
             }
+
+            // Almacena la transacción actualizada/guardada para devolverla al modal
+            this.transaccionParaDevolver = transaccionGuardada;
             volver(event);
         } catch (HibernateException e) {
-            Alertas.error("Pago", e.getMessage());
+            Alertas.error("Error de Persistencia", e.getMessage());
             e.printStackTrace();
+        } catch (IllegalArgumentException iae) {
+            Alertas.error("Error de Lógica", iae.getMessage());
         }
     }
 

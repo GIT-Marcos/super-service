@@ -1,6 +1,7 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.RepuestoDAO;
+import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -21,13 +22,14 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
 
     @Inject
     private Provider<EntityManager> emProvider;
+    private final String DTO = "SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO";
 
     public RepuestoDAOImpl() {
         super(Repuesto.class);
     }
 
     @Override
-    public List<Repuesto> allActiveProducts() {
+    public List<Repuesto> todosProductosActivos() {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT DISTINCT r FROM Repuesto r " +
                         "WHERE r.activo = true",
@@ -42,69 +44,6 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
                                 + "r.stock.activo = true",
                         Long.class)
                 .getSingleResult();
-    }
-
-    @Override
-    public List<Boolean> consultaEstado(String codBarra) {
-        EntityManager em = emProvider.get();
-        return em.createQuery("SELECT DISTINCT r.activo FROM Repuesto r " +
-                                "WHERE r.codBarra = :codBarra",
-                        Boolean.class)
-                .setParameter("codBarra", codBarra)
-                .setMaxResults(1)
-                .getResultList();
-    }
-
-    @Override
-    public Long consultarId(String codBarra) {
-        EntityManager em = emProvider.get();
-        return em.createQuery("SELECT r.id FROM Repuesto r " +
-                                "WHERE r.codBarra = :codBarra",
-                        Long.class)
-                .setParameter("codBarra", codBarra)
-                .getSingleResult();
-    }
-
-    @Override
-    public List<Repuesto> buscarConFiltros(String inputParaBuscar, Integer opcionBusqueda, Boolean stockNormal,
-                                           Boolean stockBajo, String nombreColumnaOrnenar, Integer tipoOrden) {
-        EntityManager em = emProvider.get();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Repuesto> query = cb.createQuery(Repuesto.class);
-        Root<Repuesto> root = query.from(Repuesto.class);
-        Join<Repuesto, Stock> joinStock = root.join("stock");
-        List<Predicate> filtros = new ArrayList<>();
-        filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
-
-        //SI SE QUIERE BUSCAR ALGO...
-        if (inputParaBuscar != null) {
-            switch (opcionBusqueda) {
-                case 0: //se eligió cod barra
-                    filtros.add(cb.like(cb.lower(root.get("codBarra")), "%" + inputParaBuscar.toLowerCase() + "%"));
-                    break;
-                case 1: //se eligió detalle
-                    filtros.add(cb.like(cb.lower(root.get("detalle")), "%" + inputParaBuscar.toLowerCase() + "%"));
-                    break;
-                case 2:
-                    filtros.add(cb.like(cb.lower(root.get("marca")), "%" + inputParaBuscar.toLowerCase() + "%"));
-                    break;
-                default:
-                    throw new AssertionError();
-            }
-        }
-        //SI LOS 2 VIENEN VERDADEROS, O SEA QUIERE VER TODOS, NO ENTRA EN NINGÚN IF
-        if (stockNormal && !stockBajo) {
-            filtros.add(cb.greaterThan(joinStock.get("cantidad"), joinStock.get("cantMinima")));
-        } else if (stockBajo && !stockNormal) {
-            filtros.add(cb.lessThanOrEqualTo(joinStock.get("cantidad"), joinStock.get("cantMinima")));
-        }
-        query.where(cb.and(filtros.toArray(new Predicate[0])));
-        if (tipoOrden == 0) {
-            query.orderBy(cb.asc(root.get(nombreColumnaOrnenar)));
-        } else if (tipoOrden == 1) {
-            query.orderBy(cb.desc(root.get(nombreColumnaOrnenar)));
-        }
-        return em.createQuery(query).getResultList();
     }
 
     @Override
@@ -167,8 +106,19 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
     }
 
     @Override
-    public void borradoLogico(Repuesto repuesto) {
+    public ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDate fechaMin, LocalDate fechaMax) {
         EntityManager em = emProvider.get();
-        em.merge(repuesto);
+        return em.createQuery("SELECT new " + DTO + "(" +
+                                "SUM(CASE WHEN n.tipoUso = SPRService.SPRService.entities.NotaRetiro.TipoUsoRetiro.VENTA THEN dr.cantidadRetirada ELSE 0.0 END), " +
+                                "SUM(CASE WHEN n.tipoUso = SPRService.SPRService.entities.NotaRetiro.TipoUsoRetiro.SERVICE THEN dr.cantidadRetirada ELSE 0.0 END) " +
+                                ") " +
+                                "FROM NotaRetiro n " +
+                                "JOIN n.detalleRetiroList dr " +
+                                "WHERE n.fecha BETWEEN :fMin AND :fMax",
+                ReporteUsoDeRepuestosDTO.class)
+                .setParameter("fMin", fechaMin)
+                .setParameter("fMax", fechaMax)
+                .getSingleResult();
     }
+
 }

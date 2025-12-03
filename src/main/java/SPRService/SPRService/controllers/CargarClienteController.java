@@ -20,10 +20,11 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+//todo: bug no carga datos al modificar
 public class CargarClienteController implements Initializable, DataReceiver<Cliente>, ModalController<Cliente> {
 
     private Cliente cliente;
@@ -84,7 +85,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
     private void addEmail() {
         String eMail;
         try {
-            eMail = ManejadorInputs.eMail(tfEmail.getText().strip(), true);
+            eMail = ManejadorInputs.eMail(tfEmail.getText(), true);
         } catch (RuntimeException e) {
             Alertas.aviso("Agregar eMail", e.getMessage());
             return;
@@ -102,7 +103,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
     private void addNro() {
         String nro;
         try {
-            nro = ManejadorInputs.nroTel(tfNro.getText().strip(), true);
+            nro = ManejadorInputs.nroTel(tfNro.getText(), true);
         } catch (RuntimeException e) {
             Alertas.aviso("Agregar número de teléfono.", e.getMessage());
             return;
@@ -123,11 +124,11 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         String nombre;
         String apellido;
         try {
-            dni = ManejadorInputs.dni(tfDNI.getText().strip(), true);
-            nombre = ManejadorInputs.textoGenerico(tfNombre.getText().strip(), true,
-                    2, 40);
-            apellido = ManejadorInputs.textoGenerico(tfApellido.getText().strip(), true,
-                    2, 40);
+            dni = ManejadorInputs.dni(tfDNI.getText(), true);
+            nombre = ManejadorInputs.textoGenerico(tfNombre.getText(), true,
+                    "Nombre", 40);
+            apellido = ManejadorInputs.textoGenerico(tfApellido.getText(), true,
+                    "Apellido", 40);
         } catch (RuntimeException e) {
             Alertas.aviso("Guardar cliente", e.getMessage());
             return;
@@ -143,11 +144,12 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
             datosContacto.setId(null);
             datosContacto.getEmailSet().addAll(obsListEmails);
             datosContacto.getNroTelefonoSet().addAll(obsListNrosTelefono);
-            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new ArrayList<>());
+            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new HashSet<>(),
+                    new HashSet<>());
         } else {
             DatosContacto datosContacto = this.cliente.getContactosCliente();
             clienteParaCargar = new Cliente(this.cliente.getId(), dni, nombre, apellido,
-                    datosContacto, new ArrayList<>());
+                    datosContacto, new HashSet<>(), new HashSet<>());
         }
 
         try {

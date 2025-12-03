@@ -1,22 +1,22 @@
 package SPRService.SPRService.controllers;
 
-import SPRService.SPRService.viewModels.DetalleVentaVM;
+import SPRService.SPRService.components.CeldaPago;
+import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.navigation.*;
+import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
+import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
+import SPRService.SPRService.viewModels.celdas.ItemPagoViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import SPRService.SPRService.viewModels.tablas.PagosVMtabla;
-import SPRService.SPRService.components.TablaDetallesVentaController;
-import SPRService.SPRService.entities.DetalleRetiro;
-import SPRService.SPRService.entities.Pago;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -24,10 +24,9 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
         ModalController<VentaRepuesto> {
 
     private VentaRepuesto ventaRepuesto;
-    // lo mismo que en el controlador de pago con esto
     private VentaRepuesto ventaParaDevolver;
-    private ObservableList<DetalleVentaVM> obsListDetalleVM = FXCollections.observableArrayList();
-    private ObservableList<PagosVMtabla> obsListPagoVM = FXCollections.observableArrayList();
+    private ObservableList<ItemDetalleViewModel> itemsDetalles = FXCollections.observableArrayList();
+    private ObservableList<ItemPagoViewModel> itemsPagos = FXCollections.observableArrayList();
     private final Navigator navigator;
 
     @Inject
@@ -36,12 +35,9 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     }
 
     @FXML
-    private TablaDetallesVentaController tablaDetallesVentaController;
+    private ListView<ItemDetalleViewModel> listaDetalles;
     @FXML
-    private TableView<PagosVMtabla> tablaPagos;
-    @FXML
-    private TableColumn<PagosVMtabla, String> colFecha, colMonto, colMetodo, colTarjeta, colBanco, colDto, colRef,
-            colUltimos;
+    private ListView<ItemPagoViewModel> listaPagos;
     @FXML
     private Label labelCodVenta, labelFechaVenta, labelMontoTotal, labelEstadoVenta, labelMontoFaltante;
     @FXML
@@ -49,27 +45,28 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        configColumnas();
-        tablaPagos.setItems(this.obsListPagoVM);
+        configurarListas();
     }
 
     @Override
     public void receiveData(VentaRepuesto data) {
         if (data != null) {
             this.ventaRepuesto = data;
-            for (DetalleRetiro d : data.getNotaRetiro().getDetallesRetiroList()) {
-                obsListDetalleVM.add(new DetalleVentaVM(d));
-            }
-            tablaDetallesVentaController.setDetalles(data.getNotaRetiro().getDetallesRetiroList());
-            this.obsListPagoVM.clear();
-            for (Pago p : data.getPagosList()) {
-                this.obsListPagoVM.add(new PagosVMtabla(p));
-            }
-            if (data.getEstadoVenta().equals(EstadoVentaRepuesto.PENDIENTE_PAGO)) {
-                butAgregarPago.setDisable(false);
-            } else {
-                butAgregarPago.setDisable(true);
-            }
+            List<ItemDetalleRetiroViewModel> detalles = data.getNotaRetiro().getDetallesRetiroList().stream()
+                    .map(ItemDetalleRetiroViewModel::new).toList();
+            itemsDetalles.clear();
+            itemsDetalles.addAll(detalles);
+            //todo: remplazar la carga de listas observables grandes.
+            // Esto notifica por cada iteración. Usar .clear() y .addAll()
+//            data.getNotaRetiro().getDetallesRetiroList().forEach(d ->
+//                    itemsDetalles.add(new ItemDetalleRetiroViewModel(d)));
+
+            List<ItemPagoViewModel> pagos = data.getPagos().stream()
+                    .map(ItemPagoViewModel::new).toList();
+            itemsPagos.clear();
+            itemsPagos.addAll(pagos);
+
+            butAgregarPago.setDisable(!data.getEstadoVenta().equals(EstadoVentaRepuesto.PENDIENTE_PAGO));
             cargarLabels();
         }
     }
@@ -83,21 +80,23 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     private void irPago() {
         Optional<VentaRepuesto> result = navigator.openModal(Views.PAGO,
                 "Agregar pago", this.ventaRepuesto);
-        if (result.isPresent()) {
-            this.receiveData(result.get());
-            this.ventaParaDevolver = result.get();
-        }
+        result.ifPresent(repuesto -> {
+            receiveData(repuesto);
+            this.ventaParaDevolver = this.ventaRepuesto;
+        });
     }
 
-    private void configColumnas() {
-        colFecha.setCellValueFactory(new PropertyValueFactory<>("fechaPago"));
-        colMonto.setCellValueFactory(new PropertyValueFactory<>("montoPago"));
-        colMetodo.setCellValueFactory(new PropertyValueFactory<>("metodoPago"));
-        colTarjeta.setCellValueFactory(new PropertyValueFactory<>("tarjetaPago"));
-        colBanco.setCellValueFactory(new PropertyValueFactory<>("bancoPago"));
-        colDto.setCellValueFactory(new PropertyValueFactory<>("descuentoPago"));
-        colRef.setCellValueFactory(new PropertyValueFactory<>("nroRefPago"));
-        colUltimos.setCellValueFactory(new PropertyValueFactory<>("ultimos4Pago"));
+    private void configurarListas() {
+        listaPagos.setItems(itemsPagos);
+        listaDetalles.setItems(itemsDetalles);
+
+        listaPagos.setCellFactory(c -> new CeldaPago());
+        listaDetalles.setCellFactory(new ItemCellFactory().setMostrarBotonEliminar(false));
+
+        String css = getClass().getResource("/styles/celdasDetalles.css").toExternalForm();
+        listaDetalles.getStylesheets().add(css);
+        String css2 = getClass().getResource("/styles/celdaPago.css").toExternalForm();
+        listaPagos.getStylesheets().add(css2);
     }
 
     private void cargarLabels() {

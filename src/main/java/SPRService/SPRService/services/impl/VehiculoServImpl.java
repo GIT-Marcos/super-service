@@ -1,9 +1,11 @@
 package SPRService.SPRService.services.impl;
 
+import SPRService.SPRService.DAOs.ClienteDAO;
 import SPRService.SPRService.DAOs.MarcaVehiculoDAO;
 import SPRService.SPRService.DAOs.ModeloVehiculoDAO;
 import SPRService.SPRService.DAOs.VehiculoDAO;
 import SPRService.SPRService.DTOs.ModelosMasRegistradosDTO;
+import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.entities.MarcaVehiculo;
 import SPRService.SPRService.entities.ModeloVehiculo;
 import SPRService.SPRService.entities.Vehiculo;
@@ -24,12 +26,15 @@ public class VehiculoServImpl implements VehiculoServ {
     private final VehiculoDAO daoVehiculo;
     private final MarcaVehiculoDAO daoMarca;
     private final ModeloVehiculoDAO daoModelo;
+    private final ClienteDAO daoCliente;
 
     @Inject
-    public VehiculoServImpl(VehiculoDAO daoVehiculo, MarcaVehiculoDAO daoMarca, ModeloVehiculoDAO daoModelo) {
+    public VehiculoServImpl(VehiculoDAO daoVehiculo, MarcaVehiculoDAO daoMarca,
+                            ModeloVehiculoDAO daoModelo, ClienteDAO daoCliente) {
         this.daoVehiculo = daoVehiculo;
         this.daoMarca = daoMarca;
         this.daoModelo = daoModelo;
+        this.daoCliente = daoCliente;
     }
 
     @Transactional
@@ -76,9 +81,14 @@ public class VehiculoServImpl implements VehiculoServ {
         if (vehiculo == null) throw new NullPointerException("vehiculo nulo en servicio.");
         vehiculo.setPatente(vehiculo.getPatente().toUpperCase(Locale.ROOT));
         try {
+            Cliente clienteDetached = vehiculo.getCliente();
+            if (clienteDetached != null) {
+                vehiculo.setCliente(daoCliente.update(clienteDetached));
+            }
             ModeloVehiculo modeloDetached = vehiculo.getModeloVehiculo();
             ModeloVehiculo modeloGestionado = daoModelo.update(modeloDetached);
             vehiculo.setModeloVehiculo(modeloGestionado);
+
             daoVehiculo.save(vehiculo);
         } catch (PersistenceException e) {
             if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||

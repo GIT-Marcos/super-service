@@ -22,7 +22,7 @@ import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.util.alertas.Alertas;
-import SPRService.SPRService.util.generadores.GeneradorPDF;
+import SPRService.SPRService.util.generadores.GeneradorFacturasPDF;
 
 import java.io.File;
 import java.net.URL;
@@ -35,7 +35,7 @@ public class VentasController implements Initializable {
     private ObservableList<VentaRepuestoVMtabla> obsListVentasVM = FXCollections.observableArrayList();
     private final VentaRepuestoServ ventaRepuestoServ;
     private final Navigator navigator;
-    private static final int ITEMS_POR_PAGINA = 15;
+    private static final int ITEMS_POR_PAGINA = 30;
 
     @FXML
     private TextField tfBuscar, tfMontoMin, tfMontoMax;
@@ -135,7 +135,8 @@ public class VentasController implements Initializable {
 
         Optional<VentaRepuesto> result = navigator.openModal(Views.DETALLE_VENTA, "Detalles de venta",
                         ventaParaDetalles);
-        if (result.isPresent()) vrvm.actualizarDesdeEntidad(result.get());
+        result.ifPresent(venta ->
+                obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(venta)));
     }
 
     @FXML
@@ -158,7 +159,7 @@ public class VentasController implements Initializable {
             return;
         }
         try {
-            GeneradorPDF.generaPDFVenta(ventaParaImpresion, file);
+            GeneradorFacturasPDF.generaPDFVenta(ventaParaImpresion, file);
         } catch (RuntimeException e) {
             e.printStackTrace();
             Alertas.error("Impresión de factura", "Ha ocurrido un error inesperado el imprimir la " +
@@ -208,7 +209,7 @@ public class VentasController implements Initializable {
         try {
             ventaParaCancelar = ventaRepuestoServ.cancelarVenta(ventaParaCancelar, restablecerStock, motivo,
                     usuarioCancelador);
-            vrvm.actualizarDesdeEntidad(ventaParaCancelar);
+            obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(ventaParaCancelar));
             Alertas.exito("Cancelación de venta", "Se ha cancelado la venta con éxito.");
         } catch (RuntimeException e) {
             Alertas.aviso("Cancelación de venta", e.getMessage());
@@ -219,9 +220,9 @@ public class VentasController implements Initializable {
     private FiltroVentaRepuestoDTO recolectarFiltrosActuales() {
         try {
             return new FiltroVentaRepuestoDTO(
-                    ManejadorInputs.codigoVenta(tfBuscar.getText().strip(), false),
-                    ManejadorInputs.dinero(tfMontoMin.getText().strip(), false),
-                    ManejadorInputs.dinero(tfMontoMax.getText().strip(), false),
+                    ManejadorInputs.codigoVenta(tfBuscar.getText(), false),
+                    ManejadorInputs.dinero(tfMontoMin.getText(), false, false),
+                    ManejadorInputs.dinero(tfMontoMax.getText(), false, false),
                     dateFechaMin.getValue(),
                     dateFechaMax.getValue(),
                     tomarEstados(),

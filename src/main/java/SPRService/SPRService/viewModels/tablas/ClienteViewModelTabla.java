@@ -6,7 +6,7 @@ import javafx.beans.property.StringProperty;
 
 public class ClienteViewModelTabla {
 
-    private final Cliente clienteEntity;
+    private Cliente clienteEntity;
     private final StringProperty dni;
     private final StringProperty apellido;
     private final StringProperty nombre;
@@ -19,6 +19,7 @@ public class ClienteViewModelTabla {
     }
 
     public void updateFrom(Cliente clienteActualizado) {
+        this.clienteEntity = clienteActualizado;
         this.dni.set(clienteActualizado.getDni());
         this.apellido.set(clienteActualizado.getApellido());
         this.nombre.set(clienteActualizado.getNombre());

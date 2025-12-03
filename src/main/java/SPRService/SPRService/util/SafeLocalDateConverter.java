@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
- * Usada cuando hay DatePicker.
+ * Usada en los DatePicker, estos tiran NullPointerEx cuando están vacíos.
  */
 public class SafeLocalDateConverter extends StringConverter<LocalDate> {
 

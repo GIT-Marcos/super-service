@@ -2,13 +2,14 @@ package SPRService.SPRService.entities;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "marcas_repuestos")
-public class MarcaRepuesto {
+public class MarcaRepuesto implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

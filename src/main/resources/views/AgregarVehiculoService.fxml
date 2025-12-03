@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="470.0" maxWidth="560.0" minHeight="400.0" minWidth="560.0" prefHeight="470.0" prefWidth="560.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarVehiculoServiceController">
+   <children>
+      <Button layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#cargarNuevoVehiculo" text="Cargar nuevo vehículo" AnchorPane.bottomAnchor="13.208955958097192" AnchorPane.leftAnchor="14.0" />
+      <Button layoutX="307.0" layoutY="361.0" mnemonicParsing="false" onAction="#asignarVehiculo" text="ASIGNAR VEHÍCULO" AnchorPane.bottomAnchor="13.208955958097192" AnchorPane.rightAnchor="16.910451350697443" />
+      <ListView fx:id="lvVehiculos" layoutX="15.0" layoutY="68.05969955502127" minHeight="280.0" prefHeight="280.0" prefWidth="531.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="70.0" />
+      <Label layoutX="15.0" layoutY="3.0" text="Seleccione un vehículo para hacerle service:" AnchorPane.topAnchor="5.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <HBox layoutX="15.0" layoutY="25.0" prefHeight="30.0" spacing="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="30.0">
+         <children>
+            <TextField fx:id="tfPatente" maxWidth="100.0" promptText="Patente..." />
+            <TextField fx:id="tfModelo" promptText="Modelo..." />
+            <TextField fx:id="tfMarca" promptText="Marca..." />
+            <Button mnemonicParsing="false" onAction="#buscar" text="Buscar" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

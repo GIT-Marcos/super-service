@@ -4,72 +4,209 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarRepuestoController">
-  <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-  </columnConstraints>
-  <rowConstraints>
-      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="12.0" valignment="CENTER" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="5.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-  </rowConstraints>
-   <children>
-      <Label text="Código de barras:" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM" />
-      <Label text="Seleccione o cargue la marca del repuesto:" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" />
-      <Label text="Lote:" GridPane.halignment="LEFT" GridPane.rowIndex="12" GridPane.valignment="BOTTOM" />
-      <Button fx:id="btnCerrar" mnemonicParsing="false" onAction="#cerrar" prefWidth="150.0" text="Cerrar" GridPane.halignment="CENTER" GridPane.rowIndex="17" GridPane.valignment="CENTER" />
-      <TextField fx:id="tfCodBarra" maxHeight="28.0" maxWidth="250.0" minHeight="28.0" minWidth="250.0" prefHeight="28.0" prefWidth="250.0" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-      <TextField fx:id="tfNombre" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" prefWidth="284.0" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.valignment="TOP">
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
-      </TextField>
-      <Label text="Nombre repuesto:" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
-      </Label>
-      <Label text="Precio:" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="BOTTOM" />
-      <Label text="Cantidad de Stock:" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
-      <Label text="Observaciones:" GridPane.halignment="LEFT" GridPane.rowIndex="14" GridPane.valignment="BOTTOM" />
-      <Label text="*Los campos &quot;Lote&quot; y &quot;Observaciones&quot; no son obligatorios." underline="true" GridPane.columnSpan="3" GridPane.halignment="LEFT" GridPane.rowIndex="16" GridPane.valignment="BOTTOM" />
-      <ComboBox fx:id="comboMarcas" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" prefWidth="250.0" promptText="Marca del repuesto..." GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-      <Label text="Cantidad de Stock Mínimo:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
-      <TextField fx:id="tfCantidadStockMin" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.columnIndex="2" GridPane.rowIndex="9" GridPane.valignment="TOP" />
-      <TextField fx:id="tfCantidadStock" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.rowIndex="9" GridPane.valignment="TOP" />
-      <TextField fx:id="tfLote" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.rowIndex="13" GridPane.valignment="TOP" />
-      <TextField fx:id="tfObservaciones" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.columnSpan="3" GridPane.rowIndex="15" GridPane.valignment="TOP" />
-      <ComboBox fx:id="comboUniMedidas" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="TOP" />
-      <Label text="Seleccione o escriba la ubicación del repuesto:" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="10" GridPane.valignment="BOTTOM" />
-      <ComboBox fx:id="comboUbicaciones" editable="true" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" prefWidth="220.0" promptText="Nueva ubicación..." GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.valignment="TOP" />
-      <Label text="Unidad de medida:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="BOTTOM" />
-      <TextField fx:id="tfPrecio" maxHeight="28.0" minHeight="28.0" prefHeight="28.0" GridPane.rowIndex="7" GridPane.valignment="TOP" />
-      <Button fx:id="btnCargarRepuesto" maxHeight="40.0" maxWidth="150.0" minHeight="40.0" minWidth="150.0" mnemonicParsing="false" onAction="#cargarRepuesto" prefHeight="40.0" prefWidth="150.0" text="Guardar repuesto" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="17" GridPane.valignment="CENTER" />
-      <Button maxHeight="28.0" minHeight="28.0" mnemonicParsing="false" onAction="#nuevaMarca" prefHeight="28.0" prefWidth="140.0" text="Nueva marca..." GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-   </children>
-   <padding>
-      <Insets bottom="5.0" left="10.0" right="10.0" />
-   </padding>
-</GridPane>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="590.0" minWidth="500.0" prefHeight="590.0" prefWidth="600.0" styleClass="root" stylesheets="@../styles/deposito.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarRepuestoController">
+
+    <!-- 1. HEADER (Estilo top-panel) -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="top-panel" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
+            <children>
+                <Label text="NUEVO REPUESTO" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label text="Complete los datos del formulario" textFill="#bdc3c7">
+                    <font>
+                        <Font size="11.0" />
+                    </font>
+                </Label>
+            </children>
+        </HBox>
+    </top>
+
+    <!-- 2. FORMULARIO CENTRAL (Scrollable por si la pantalla es pequeña) -->
+    <center>
+        <ScrollPane fitToWidth="true" prefWidth="600.0" style="-fx-background-color: transparent; -fx-background: transparent;" BorderPane.alignment="CENTER">
+            <content>
+                <VBox spacing="20.0">
+                    <padding>
+                        <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
+                    </padding>
+                    <children>
+
+                        <!-- SECCIÓN 1: IDENTIFICACIÓN -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label styleClass="section-label" text="IDENTIFICACIÓN DEL PRODUCTO" />
+                                <Separator />
+                                <GridPane hgap="15.0" vgap="15.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="60.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <!-- Cód Barra -->
+                                        <VBox spacing="2.0">
+                                            <children>
+                                                <Label styleClass="section-label" text="CÓDIGO DE BARRAS" />
+                                                <TextField fx:id="tfCodBarra" promptText="Escriba..." />
+                                            </children>
+                                        </VBox>
+                                        <!-- Nombre -->
+                                        <VBox spacing="2.0" GridPane.columnIndex="1">
+                                            <children>
+                                                <Label styleClass="section-label" text="NOMBRE REPUESTO" />
+                                                <TextField fx:id="tfNombre" promptText="Ej: Filtro de aceite..." />
+                                            </children>
+                                        </VBox>
+                                        <!-- Marca -->
+                                        <VBox spacing="2.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label styleClass="section-label" text="MARCA" />
+                                                <HBox spacing="10.0">
+                                                    <children>
+                                                        <ComboBox fx:id="comboMarcas" maxWidth="1.7976931348623157E308" promptText="Seleccionar marca..." HBox.hgrow="ALWAYS" />
+                                                        <Button mnemonicParsing="false" onAction="#nuevaMarca" styleClass="btn-action" text="+ Nueva" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+
+                        <!-- SECCIÓN 2: INVENTARIO Y PRECIO -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label styleClass="section-label" text="INVENTARIO Y COSTOS" />
+                                <Separator />
+                                <GridPane hgap="15.0" vgap="15.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <!-- Precio -->
+                                        <VBox spacing="2.0">
+                                            <children>
+                                                <Label styleClass="section-label" text="PRECIO DE VENTA" />
+                                                <TextField fx:id="tfPrecio" promptText="\$ 0.00" />
+                                            </children>
+                                        </VBox>
+                                        <!-- Unidad Medida -->
+                                        <VBox spacing="2.0" GridPane.columnIndex="1">
+                                            <children>
+                                                <Label styleClass="section-label" text="UNIDAD MEDIDA" />
+                                                <ComboBox fx:id="comboUniMedidas" maxWidth="1.7976931348623157E308" promptText="Seleccionar..." />
+                                            </children>
+                                        </VBox>
+                                        <!-- Stock Actual -->
+                                        <VBox spacing="2.0" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label styleClass="section-label" text="STOCK ACTUAL" />
+                                                <TextField fx:id="tfCantidadStock" promptText="0" />
+                                            </children>
+                                        </VBox>
+                                        <!-- Stock Mínimo -->
+                                        <VBox spacing="2.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label styleClass="section-label" text="STOCK MÍNIMO (ALERTA)" />
+                                                <TextField fx:id="tfCantidadStockMin" promptText="0" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+
+                        <!-- SECCIÓN 3: DETALLES Y UBICACIÓN -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label styleClass="section-label" text="DETALLES Y UBICACIÓN" />
+                                <Separator />
+                                <GridPane hgap="15.0" vgap="15.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <!-- Ubicación -->
+                                        <VBox spacing="2.0">
+                                            <children>
+                                                <Label styleClass="section-label" text="UBICACIÓN FÍSICA" />
+                                                <ComboBox fx:id="comboUbicaciones" editable="true" maxWidth="1.7976931348623157E308" promptText="Depósito..." />
+                                            </children>
+                                        </VBox>
+                                        <!-- Lote -->
+                                        <VBox spacing="2.0" GridPane.columnIndex="1">
+                                            <children>
+                                                <Label styleClass="section-label" text="N° LOTE (OPCIONAL)" />
+                                                <TextField fx:id="tfLote" promptText="Lote..." />
+                                            </children>
+                                        </VBox>
+                                        <!-- Observaciones -->
+                                        <VBox spacing="2.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label styleClass="section-label" text="OBSERVACIONES / NOTAS (OPCIONAL)" />
+                                                <TextField fx:id="tfObservaciones" promptText="Detalles adicionales..." />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                                <Label styleClass="section-label" text="* Los campos 'Lote' y 'Observaciones' no son obligatorios." textFill="#7f8c8d">
+                                    <padding>
+                                        <Insets top="5.0" />
+                                    </padding>
+                                </Label>
+                            </children>
+                        </VBox>
+
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <!-- 3. FOOTER: BOTONES -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
+            </padding>
+            <children>
+                <Button fx:id="btnCerrar" cancelButton="true" mnemonicParsing="false" onAction="#cerrar" styleClass="btn-danger" text="Cancelar" />
+                <Button fx:id="btnCargarRepuesto" defaultButton="true" mnemonicParsing="false" onAction="#cargarRepuesto" prefWidth="160.0" styleClass="btn-success" text="Guardar Repuesto" />
+            </children>
+        </HBox>
+    </bottom>
+
+</BorderPane>

@@ -5,113 +5,162 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.PagoController">
-   <children>
-      <HBox style="-fx-background-color: #456789;">
-         <children>
-            <Label fx:id="labelTotal" text="TOTAL: $ 0" textFill="WHITE">
-               <font>
-                  <Font size="22.0" />
-               </font>
-               <HBox.margin>
-                  <Insets left="5.0" />
-               </HBox.margin>
-            </Label>
-         </children>
-         <padding>
-            <Insets bottom="10.0" top="10.0" />
-         </padding>
-      </HBox>
-      <GridPane>
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Label text="Forma de pago:" />
-            <RadioButton fx:id="radTarjCredito" mnemonicParsing="false" selected="true" text="Tarjeta de crédito" GridPane.rowIndex="1">
-               <toggleGroup>
-                  <ToggleGroup fx:id="radiosFormaPago" />
-               </toggleGroup>
-            </RadioButton>
-            <RadioButton fx:id="radTransferencia" mnemonicParsing="false" text="Transferencia" toggleGroup="$radiosFormaPago" GridPane.rowIndex="2" />
-            <RadioButton fx:id="radTarjDebito" mnemonicParsing="false" text="Tarjeta de débito" toggleGroup="$radiosFormaPago" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <RadioButton fx:id="radEfectivo" mnemonicParsing="false" text="Efectivo" toggleGroup="$radiosFormaPago" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Label text="Cantidad a pagar: $" GridPane.rowIndex="3" />
-            <Label text="Descuento: %" GridPane.rowIndex="4" />
-            <Spinner fx:id="spinDescuento" editable="true" prefHeight="26.0" prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <TextField fx:id="tfMonto" promptText="\$ 00.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-         </children>
-         <VBox.margin>
-            <Insets left="5.0" right="5.0" />
-         </VBox.margin>
-      </GridPane>
-      <Separator prefWidth="200.0">
-         <VBox.margin>
-            <Insets bottom="5.0" top="5.0" />
-         </VBox.margin>
-      </Separator>
-      <GridPane>
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Label text="N° referencia:" GridPane.rowIndex="3" />
-            <Label text="Últimos 4 dígitos tarjeta:" GridPane.rowIndex="2" />
-            <Label text="Marca de tarjeta:" />
-            <Label text="Banco de tarjeta:" GridPane.rowIndex="1" />
-            <ComboBox fx:id="comboMarcaTarjeta" editable="true" prefWidth="150.0" promptText="Nueva tarjeta..." GridPane.columnIndex="1" />
-            <ComboBox fx:id="comboBancoTarjeta" editable="true" prefWidth="150.0" promptText="Nuevo banco..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="tfUltimos4" maxWidth="80.0" minWidth="80.0" prefWidth="80.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField fx:id="tfNroReferencia" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <Button disable="true" mnemonicParsing="false" text="Adjuntar comprobante" GridPane.rowIndex="4" />
-         </children>
-         <VBox.margin>
-            <Insets left="5.0" right="5.0" />
-         </VBox.margin>
-      </GridPane>
-      <GridPane>
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.97013119744105" minWidth="10.0" prefWidth="133.74625424431605" />
-            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="206.8209045097435" minWidth="10.0" prefWidth="206.8209045097435" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-         <children>
-            <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#volver" prefHeight="26.0" prefWidth="90.0" text="Volver" GridPane.rowIndex="1" />
-            <Button fx:id="btnPagar" mnemonicParsing="false" onAction="#pagar" prefHeight="26.0" prefWidth="120.0" text="PAGAR" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-         </children>
-         <VBox.margin>
-            <Insets left="5.0" right="5.0" top="20.0" />
-         </VBox.margin>
-      </GridPane>
-   </children>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="400.0" styleClass="root" stylesheets="@../styles/pago.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.PagoController">
+    <children>
+
+        <!-- HEADER: TOTAL A PAGAR -->
+        <VBox alignment="CENTER" styleClass="header-panel">
+            <children>
+                <Label text="TOTAL A PAGAR" textFill="#bdc3c7">
+                    <font>
+                        <Font size="13.0" />
+                    </font>
+                </Label>
+                <Label fx:id="labelTotal" styleClass="total-label" text="\$ 0.00" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
+            </children>
+            <padding>
+                <Insets bottom="10.0" top="10.0" />
+            </padding>
+        </VBox>
+
+        <!-- CONTENIDO SCROLLABLE -->
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane-custom" VBox.vgrow="ALWAYS">
+            <content>
+                <VBox spacing="15.0">
+                    <padding>
+                        <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                    </padding>
+                    <children>
+
+                        <!-- SECCIÓN 1: FORMA DE PAGO -->
+                        <VBox spacing="8.0" styleClass="card-panel">
+                            <children>
+                                <Label styleClass="section-title" text="1. Forma de Pago" />
+                                <GridPane hgap="10.0" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <RadioButton fx:id="radTarjCredito" mnemonicParsing="false" selected="true" text="Crédito">
+                                            <toggleGroup>
+                                                <ToggleGroup fx:id="radiosFormaPago" />
+                                            </toggleGroup>
+                                        </RadioButton>
+                                        <RadioButton fx:id="radTarjDebito" mnemonicParsing="false" text="Débito" toggleGroup="$radiosFormaPago" GridPane.columnIndex="1" />
+                                        <RadioButton fx:id="radTransferencia" mnemonicParsing="false" text="Transferencia" toggleGroup="$radiosFormaPago" GridPane.rowIndex="1" />
+                                        <RadioButton fx:id="radEfectivo" mnemonicParsing="false" text="Efectivo" toggleGroup="$radiosFormaPago" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+
+                        <!-- SECCIÓN 2: MONTOS -->
+                        <VBox spacing="8.0" styleClass="card-panel">
+                            <children>
+                                <Label styleClass="section-title" text="2. Importes" />
+                                <GridPane hgap="10.0" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Label text="Monto a Pagar:" />
+                                        <TextField fx:id="tfMonto" alignment="CENTER_RIGHT" promptText="\$ 0.00" styleClass="input-field" GridPane.columnIndex="1" />
+
+                                        <Label text="Descuento (%):" GridPane.rowIndex="1" />
+                                        <Spinner fx:id="spinDescuento" editable="true" maxWidth="1.7976931348623157E308" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+
+                        <!-- SECCIÓN 3: DETALLES TRANSACCIÓN (CON DNI AGREGADO) -->
+                        <VBox spacing="8.0" styleClass="card-panel">
+                            <children>
+                                <Label styleClass="section-title" text="3. Detalles Transacción" />
+                                <GridPane hgap="10.0" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="110.0" minWidth="10.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <!-- Fila extra para DNI -->
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <!-- NUEVO CAMPO: DNI CLIENTE (Fila 0) -->
+                                        <Label text="DNI Cliente:" />
+                                        <TextField fx:id="tfDniCliente" promptText="Ingrese DNI" styleClass="input-field" GridPane.columnIndex="1" />
+
+                                        <!-- Elementos desplazados 1 fila hacia abajo -->
+                                        <Label text="Marca / Entidad:" GridPane.rowIndex="1" />
+                                        <ComboBox fx:id="comboMarcaTarjeta" editable="true" maxWidth="1.7976931348623157E308" promptText="Seleccionar..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                        <Label text="Banco:" GridPane.rowIndex="2" />
+                                        <ComboBox fx:id="comboBancoTarjeta" editable="true" maxWidth="1.7976931348623157E308" promptText="Seleccionar..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                        <Label text="Últimos 4 núm:" GridPane.rowIndex="3" />
+                                        <TextField fx:id="tfUltimos4" maxWidth="80.0" promptText="XXXX" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                        <Label text="N° Referencia:" GridPane.rowIndex="4" />
+                                        <TextField fx:id="tfNroReferencia" promptText="Ref. operación" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                                        <Button fx:id="btnAdjuntar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-secondary-outline" text="📎 Adjuntar comprobante" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+
+        <!-- FOOTER: BOTONES -->
+        <VBox style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, -5);">
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
+            <children>
+                <HBox spacing="15.0">
+                    <children>
+                        <Button fx:id="btnVolver" cancelButton="true" mnemonicParsing="false" onAction="#volver" prefHeight="40.0" prefWidth="100.0" styleClass="btn-secondary" text="Cancelar" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnPagar" defaultButton="true" mnemonicParsing="false" onAction="#pagar" prefHeight="40.0" prefWidth="140.0" styleClass="btn-primary" text="CONFIRMAR PAGO" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+    </children>
 </VBox>

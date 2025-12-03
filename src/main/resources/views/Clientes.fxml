@@ -8,105 +8,110 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="600.0" maxWidth="1000.0" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #0563ab;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ClienteController">
-   <right>
-      <VBox alignment="TOP_CENTER" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" BorderPane.alignment="TOP_CENTER">
-         <children>
-            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#nuevoCliente" prefHeight="30.0" prefWidth="150.0" text="Nuevo cliente">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Button>
-            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#modificar" prefHeight="30.0" prefWidth="150.0" text="Detalles/Modificar">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Button>
-            <Button maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#darDeBaja" prefHeight="30.0" prefWidth="150.0" text="Dar de baja">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Button>
-            <Separator prefWidth="200.0">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-            </Separator>
-            <Label text="Generación de reportes" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Button disable="true" maxHeight="30.0" maxWidth="150.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Clientes más frecuentes">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Button>
-         </children>
-      </VBox>
-   </right>
-   <top>
-      <GridPane maxHeight="150.0" minHeight="150.0" prefHeight="150.0" BorderPane.alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Button maxWidth="150.0" minWidth="150.0" mnemonicParsing="false" onAction="#todosLosClientes" prefWidth="150.0" text="Todos los clientes" GridPane.rowIndex="3" />
-            <Button maxWidth="150.0" minWidth="150.0" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="150.0" text="Buscar con filtros" GridPane.rowIndex="2" />
-            <TextField fx:id="tfDNI" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" promptText="DNI..." GridPane.rowIndex="1" />
-            <TextField fx:id="tfNombre" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" promptText="Nombre..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <TextField fx:id="tfApellido" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" promptText="Apellido..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
-            <Label text="Agregar filtros para búsqueda:" textFill="WHITE" GridPane.columnSpan="2">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-         </children>
-      </GridPane>
-   </top>
-   <center>
-      <TableView fx:id="tablaClientes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <columns>
-          <TableColumn fx:id="colDNI" prefWidth="201.3134458065033" text="DNI" />
-            <TableColumn fx:id="colNombre" prefWidth="265.79107666015625" text="Nombre" />
-          <TableColumn fx:id="colApellido" prefWidth="268.6567687988281" text="Apellido" />
-        </columns>
-      </TableView>
-   </center>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
+<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ClienteController">
+
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="top-panel">
+                    <padding>
+                        <Insets bottom="15.0" left="20.0" right="10.0" top="15.0" />
+                    </padding>
+                    <children>
+
+                        <Label styleClass="section-label" text="Filtros de Búsqueda:">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label text="DNI" />
+                                <TextField fx:id="tfDNI" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" promptText="DNI..." styleClass="text-field" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label text="Apellido" />
+                                <TextField fx:id="tfApellido" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" promptText="Apellido..." styleClass="text-field" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label text="Nombre" />
+                                <TextField fx:id="tfNombre" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" promptText="Nombre..." styleClass="text-field" />
+                            </children>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <VBox alignment="BOTTOM_LEFT" spacing="5.0">
+                            <children>
+                                <Button maxWidth="150.0" mnemonicParsing="false" onAction="#buscarConFiltros" prefWidth="150.0" styleClass="btn-primary" text="🔍 Buscar con filtros" />
+                                <Button maxWidth="150.0" mnemonicParsing="false" onAction="#todosLosClientes" prefWidth="150.0" styleClass="btn-primary" text="📋 Ver Todos" />
+                            </children>
+                        </VBox>
+
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tablaClientes" styleClass="table-view" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="colDNI" prefWidth="200.0" text="DNI" />
+                <TableColumn fx:id="colNombre" prefWidth="250.0" text="Nombre" />
+                <TableColumn fx:id="colApellido" prefWidth="250.0" text="Apellido" />
+            </columns>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </center>
+
+    <right>
+        <VBox maxWidth="160.0" minWidth="160.0" prefWidth="160.0" spacing="8.0" styleClass="sidebar" BorderPane.alignment="TOP_CENTER">
+            <children>
+                <Label styleClass="section-label" text="ACCIONES PRINCIPALES">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#nuevoCliente" styleClass="btn-success" text="➕ Nuevo cliente" />
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#modificar" text="✏ Detalles/Modificar" />
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#darDeBaja" styleClass="btn-danger" text="🗑 Dar de baja" />
+
+                <Separator prefWidth="200.0" />
+
+                <Label styleClass="section-label" text="GENERACIÓN DE EPORTES">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+                <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-report" text="🏆 Clientes más frecuentes" wrapText="true">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Button>
+
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </VBox>
+    </right>
 </BorderPane>

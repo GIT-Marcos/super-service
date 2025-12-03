@@ -3,11 +3,10 @@ package SPRService.SPRService.services.impl;
 import SPRService.SPRService.DAOs.StockDAO;
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
 import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
-import SPRService.SPRService.DTOs.VentaRepuestosCantidadEnAnioDTO;
-import SPRService.SPRService.DTOs.VentaRepuestosEnAnioDTO;
+import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
+import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
-import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.services.NotaRetiroServ;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.ResultadoPaginado;
@@ -16,7 +15,6 @@ import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +35,6 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     @Transactional
     @Override
-    public List<VentaRepuesto> verTodas() {
-        return daoVenta.getAll();
-    }
-
-    @Transactional
-    @Override
     public ResultadoPaginado<VentaRepuesto> buscarVentasPaginado(FiltroVentaRepuestoDTO filtro,
                                                                  int pagina, int tamanioPagina) {
         if (filtro == null) filtro = new FiltroVentaRepuestoDTO();
@@ -51,30 +43,30 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     @Transactional
     @Override
-    public List<VentaRepuestosEnAnioDTO> reporteTotalVentasEnAnio(int anio) {
-        List<VentaRepuestosEnAnioDTO> dtos = new ArrayList<>();
+    public List<ReporteIngresosEnAnioPorMesDTO> reporteTotalVentasEnAnio(int anio) {
+        List<ReporteIngresosEnAnioPorMesDTO> dtos = new ArrayList<>();
         List<Object[]> objetosVenta;
         objetosVenta = daoVenta.totalVentasPorMeses(anio);
 
         for (Object[] o : objetosVenta) {
             int nroMes = (int) o[0];
             BigDecimal ingresos = (BigDecimal) o[1];
-            dtos.add(new VentaRepuestosEnAnioDTO(nroMes, ingresos));
+            dtos.add(new ReporteIngresosEnAnioPorMesDTO(nroMes, ingresos));
         }
         return dtos;
     }
 
     @Transactional
     @Override
-    public List<VentaRepuestosCantidadEnAnioDTO> reporteCantidadVentasEnAnio(int anio) {
-        List<VentaRepuestosCantidadEnAnioDTO> dtos = new ArrayList<>();
+    public List<ReporteCantidadEnAnioDTO> reporteCantidadVentasEnAnio(int anio) {
+        List<ReporteCantidadEnAnioDTO> dtos = new ArrayList<>();
         List<Object[]> objetosVenta;
         objetosVenta = daoVenta.cantidadVentasPorMeses(anio);
 
         for (Object[] o : objetosVenta) {
             int nroMes = (int) o[0];
             Long ingresos = (Long) o[1];
-            dtos.add(new VentaRepuestosCantidadEnAnioDTO(nroMes, ingresos));
+            dtos.add(new ReporteCantidadEnAnioDTO(nroMes, ingresos));
         }
         return dtos;
     }
@@ -102,45 +94,6 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
     public Double ingresosPromedioPorVentaEnAnio(int anio) {
         Double result = daoVenta.ingresosPromedioPorVentaEnAnio(anio);
         return Math.round(result * 100.0) / 100.0;
-    }
-
-    @Transactional
-    @Override
-    public List<VentaRepuesto> verVentasHoy() {
-        return daoVenta.buscarVentas(null, null, null,
-                null, "id", 0, LocalDate.now(), LocalDate.now());
-    }
-
-    /**
-     * @param tipoOrden pasar nulo si no importa el orden
-     */
-    @Transactional
-    @Override
-    public List<VentaRepuesto> buscarVentas(Long codVenta, List<EstadoVentaRepuesto> estadosVenta,
-                                            BigDecimal montoMinimo, BigDecimal montomaximo, String nombreColumnaOrnenar,
-                                            Integer tipoOrden, LocalDate fechaMinima, LocalDate fechaMaxima) {
-        if (codVenta == 0L) {
-            codVenta = null;
-        }
-        if (nombreColumnaOrnenar == null) {
-            nombreColumnaOrnenar = "id";
-        }
-        if (tipoOrden == null) {
-            tipoOrden = 0;
-        }
-        if (montoMinimo.compareTo(BigDecimal.ZERO) == 0) {
-            montoMinimo = null;
-        }
-        if (montomaximo.compareTo(BigDecimal.ZERO) == 0) {
-            montomaximo = null;
-        }
-        Long finalCodVenta = codVenta;
-        BigDecimal finalMontoMinimo = montoMinimo;
-        BigDecimal finalMontomaximo = montomaximo;
-        String finalNombreColumnaOrnenar = nombreColumnaOrnenar;
-        Integer finalTipoOrden = tipoOrden;
-        return daoVenta.buscarVentas(finalCodVenta, estadosVenta, finalMontoMinimo, finalMontomaximo,
-                finalNombreColumnaOrnenar, finalTipoOrden, fechaMinima, fechaMaxima);
     }
 
     @Transactional
@@ -176,7 +129,7 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
         }
 
         ventaRepuesto.cancelarVenta();
-        for (Pago p : ventaRepuesto.getPagosList()) {
+        for (Pago p : ventaRepuesto.getPagos()) {
             p.cancelarPago();
         }
         if (restablecerStocks) {

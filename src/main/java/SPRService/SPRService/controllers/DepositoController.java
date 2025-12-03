@@ -111,8 +111,8 @@ public class DepositoController implements Initializable {
     }
 
     @FXML
-    private void masRetiradosParaService() {
-
+    private void usoDeRepuestos() {
+        viewModel.reporteDeUso();
     }
 
     @FXML

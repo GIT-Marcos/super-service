@@ -6,7 +6,7 @@ import SPRService.SPRService.services.VehiculoServ;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.generadores.ExportadorTabla;
-import SPRService.SPRService.util.generadores.GeneradorReportes;
+import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import SPRService.SPRService.viewModels.VehiculoVM;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
@@ -186,7 +186,7 @@ public class VehiculosController implements Initializable {
         if (file == null) {
             return;
         }
-        GeneradorReportes.modelosMasRegistrados(file, vehiculoServ.generarReporteModelosMasRegistrados( cantidad,
+        GeneradorImagenes.modelosMasRegistrados(file, vehiculoServ.generarReporteModelosMasRegistrados( cantidad,
                 fechaMin, fechaMax
         ));
     }

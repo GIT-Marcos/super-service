@@ -1,7 +1,7 @@
 package SPRService.SPRService.viewModels;
 
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
-import SPRService.SPRService.util.generadores.GeneradorReportes;
+import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
 import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.entities.Stock;
@@ -18,7 +18,10 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -113,31 +116,37 @@ public class DepositoViewModel {
     public void modificarRepuesto() {
         RepuestoRowViewModel rrvm = selectedRepuesto.get();
         if (rrvm == null) {
-            Alertas.aviso("Modificar repuesto", "Debe seleccionar un repuesto para modificar.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Modificar repuesto")
+                    .text("Debe seleccionar un repuesto para modificar.")
+                    .position(Pos.CENTER)
+                    .showWarning();
             return;
         }
 
-        Optional<Repuesto> optional = navigator.openModal(Views.GUARDAR_REPUESTO, "Modificar repuesto", rrvm.getRepuestoOriginal());
-        if (optional.isPresent()) {
-            rrvm.updateFrom(optional.get());
+        Optional<Repuesto> result = navigator.openModal(Views.GUARDAR_REPUESTO, "Modificar repuesto", rrvm.getRepuestoOriginal());
+        result.ifPresent(r -> {
+            rrvm.updateFrom(r);
             verificarBajoStock();
-        }
-//        optional.ifPresent(repuestoModificado -> {
-//            rrvm.updateFrom(repuestoModificado);
-//            verificarBajoStock();
-//        });
+        });
     }
 
     public void borrarRepuesto() {
         RepuestoRowViewModel seleccionado = selectedRepuesto.get();
         if (seleccionado == null) {
-            Alertas.aviso("Borrar repuesto", "Debe seleccionar un repuesto para borrar.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Borrar repuesto")
+                    .text("Debe seleccionar un repuesto para borrar.")
+                    .position(Pos.CENTER)
+                    .showWarning();
             return;
         }
 
         Repuesto repBorrar = seleccionado.getRepuestoOriginal();
-        if (!Alertas.confirmacion("Borrado repuesto", "Esta acción es irreversible.\n¿Desea continuar con el borrado?") ||
-                !Alertas.confirmacion("Borrado repuesto", "¿Confirmar borrado de:\n" + repBorrar.getDetalle() + " ?")) {
+        if (!Alertas.confirmacion("Borrar repuesto", "Esta acción es irreversible.\n¿Desea continuar con el borrado?") ||
+                !Alertas.confirmacion("Borrar repuesto", "¿Confirmar borrado de:\n" + repBorrar.getDetalle() + " ?")) {
             return;
         }
 
@@ -145,16 +154,31 @@ public class DepositoViewModel {
             repuestoServ.borrarRepuesto(repBorrar);
             repuestosViewModels.remove(seleccionado);
             verificarBajoStock();
-            Alertas.exito("Borrado repuesto", "Se ha borrado el repuesto con éxito.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Borrar repuesto")
+                    .text("Se ha borrado el repuesto con éxito.")
+                    .position(Pos.BOTTOM_RIGHT)
+                    .showInformation();
         } catch (RuntimeException e) {
-            Alertas.error("Borrado repuesto", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Borrar repuesto")
+                    .text("Ha ocurrido un error al borrar el repuesto.")
+                    .position(Pos.CENTER)
+                    .showError();
         }
     }
 
     public void ingresarStock() {
         RepuestoRowViewModel repuestoSeleccionado = selectedRepuesto.get();
         if (repuestoSeleccionado == null) {
-            Alertas.aviso("Ingresar stock", "Debe seleccionar un repuesto para ingresarle stock.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Ingresar stock")
+                    .text("Debe seleccionar un repuesto para ingresarle stock.")
+                    .position(Pos.CENTER)
+                    .showWarning();
             return;
         }
 
@@ -167,11 +191,26 @@ public class DepositoViewModel {
             r.setStock(stock);
             repuestoSeleccionado.updateFrom(r);
             verificarBajoStock();
-            Alertas.exito("Ingreso stock", "Se ha agregado stock con éxito.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Ingresar stock")
+                    .text("Se ha agregado stock con éxito.")
+                    .position(Pos.CENTER)
+                    .showInformation();
         } catch (IllegalArgumentException e) {
-            Alertas.aviso("Ingreso stock", e.getMessage());
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Ingresar stock")
+                    .text(e.getMessage())
+                    .position(Pos.BOTTOM_RIGHT)
+                    .showWarning();
         } catch (RuntimeException e) {
-            Alertas.aviso("Ingreso stock", "Ha ocurrido un error al agregar stock.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Ingresar stock")
+                    .text("Ha ocurrido un error al agregar stock.")
+                    .position(Pos.CENTER)
+                    .showError();
         }
     }
 
@@ -198,13 +237,18 @@ public class DepositoViewModel {
         if (file == null) return;
         List<RepuestoRetiradoReporteDTO> reportesDTOs = repuestoServ.repuestosMasRetiradosParaVenta(cantidad,
                 fechaMin, fechaMax);
-        GeneradorReportes.repuestosMasRetiradosEnMes(file, reportesDTOs, fechaMin, fechaMax);
+        GeneradorImagenes.repuestosMasRetiradosEnMes(file, reportesDTOs, fechaMin, fechaMax);
     }
 
     // TODO: el vm no debe conocer las clases de javaFX
     public void exportarTabla(ActionEvent event) {
         if (repuestosViewModels.isEmpty()) {
-            Alertas.aviso("Generar tabla", "No hay repuestos para generar.");
+            Notifications.create()
+                    .hideAfter(Duration.seconds(5))
+                    .title("Generar tabla")
+                    .text("No hay repuestos para generar la tabla.")
+                    .position(Pos.CENTER)
+                    .showInformation();
             return;
         }
 
@@ -229,6 +273,10 @@ public class DepositoViewModel {
         }
     }
 
+    public void reporteDeUso() {
+        navigator.openModal(Views.CHART_USO_REPUESTOS, "Reporte de uso", null);
+    }
+
     // --- Lógica Privada ---
     private void actualizarTabla(List<Repuesto> listaRepuestos) {
         repuestosViewModels.setAll(
@@ -244,7 +292,15 @@ public class DepositoViewModel {
     }
 
     // --- Getters para las Propiedades (para el binding en el Controller) ---
-    public ListProperty<RepuestoRowViewModel> repuestosViewModelsProperty() { return repuestosViewModels; }
-    public ObjectProperty<RepuestoRowViewModel> selectedRepuestoProperty() { return selectedRepuesto; }
-    public BooleanProperty avisoStockBajoVisibleProperty() { return avisoStockBajoVisible; }
+    public ListProperty<RepuestoRowViewModel> repuestosViewModelsProperty() {
+        return repuestosViewModels;
+    }
+
+    public ObjectProperty<RepuestoRowViewModel> selectedRepuestoProperty() {
+        return selectedRepuesto;
+    }
+
+    public BooleanProperty avisoStockBajoVisibleProperty() {
+        return avisoStockBajoVisible;
+    }
 }

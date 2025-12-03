@@ -1,6 +1,5 @@
 package SPRService.SPRService.entities;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,13 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.Objects;
 
 @Entity
 @Table(name = "vehiculos")
@@ -47,20 +43,17 @@ public class Vehiculo implements Serializable {
     @JoinColumn(nullable = false, name = "fk_modelo")
     private ModeloVehiculo modeloVehiculo;
 
-    //RELACIÓN 1 a * CON ESTADO INGRESO
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(nullable = true, name = "fk_estado_ingreso")
-    private List<DatosIngresoAuto> estadoIngreso = new ArrayList<>();
-
     @ManyToOne()
-    @JoinColumn(nullable = true, name = "fk_cliente")
+    @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
+
+    //todo: hacer bidireccional con service
 
     public Vehiculo() {
     }
 
     public Vehiculo(Long id, String patente, String nroChasis, String nroMotor, String color, Boolean estado,
-                    ModeloVehiculo modeloVehiculo, List<DatosIngresoAuto> estadoIngreso, Cliente cliente) {
+                    ModeloVehiculo modeloVehiculo, Cliente cliente) {
         this.id = id;
         this.patente = patente;
         this.nroChasis = nroChasis;
@@ -69,7 +62,6 @@ public class Vehiculo implements Serializable {
         this.fechaRegistro = LocalDate.now();
         this.estado = estado;
         this.modeloVehiculo = modeloVehiculo;
-        this.estadoIngreso = estadoIngreso;
         this.cliente = cliente;
     }
 
@@ -129,14 +121,6 @@ public class Vehiculo implements Serializable {
         this.modeloVehiculo = modeloVehiculo;
     }
 
-    public List<DatosIngresoAuto> getEstadoIngreso() {
-        return estadoIngreso;
-    }
-
-    public void setEstadoIngreso(List<DatosIngresoAuto> estadoIngreso) {
-        this.estadoIngreso = estadoIngreso;
-    }
-
     public Cliente getCliente() {
         return cliente;
     }
@@ -164,5 +148,16 @@ public class Vehiculo implements Serializable {
                 ", fechaRegistro=" + fechaRegistro +
                 ", estado=" + estado +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Vehiculo vehiculo)) return false;
+        return Objects.equals(patente, vehiculo.patente);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(patente);
     }
 }

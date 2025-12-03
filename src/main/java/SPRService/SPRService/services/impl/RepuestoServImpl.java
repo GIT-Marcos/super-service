@@ -2,6 +2,7 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.MarcaRepuestoDAO;
 import SPRService.SPRService.DAOs.RepuestoDAO;
+import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import SPRService.SPRService.entities.Repuesto;
@@ -31,34 +32,13 @@ public class RepuestoServImpl implements RepuestoServ {
     @Transactional
     @Override
     public List<Repuesto> verTodos() {
-        return daoRepuesto.allActiveProducts();
+        return daoRepuesto.todosProductosActivos();
     }
 
     @Transactional
     @Override
     public Long contarStockBajo() {
         return daoRepuesto.cuentaRespBajoStock();
-    }
-
-    /**
-     * @param tipoOrden pasar nulo si no importa el orden
-     */
-    @Transactional
-    @Deprecated
-    @Override
-    public List<Repuesto> buscarConFiltros(String inputParaBuscar, Integer opcionBusqueda,
-                                           Boolean stockNormal, Boolean stockBajo, String nombreColumnaOrnenar,
-                                           Integer tipoOrden) {
-        if (nombreColumnaOrnenar == null) {
-            nombreColumnaOrnenar = "detalle";
-        }
-        if (tipoOrden == null) {
-            tipoOrden = 0;
-        }
-        Integer finalTipoOrden = tipoOrden;
-        String finalNombreColumnaOrnenar = nombreColumnaOrnenar;
-        return daoRepuesto.buscarConFiltros(inputParaBuscar, opcionBusqueda, stockNormal,
-                stockBajo, finalNombreColumnaOrnenar, finalTipoOrden);
     }
 
     @Transactional
@@ -108,12 +88,24 @@ public class RepuestoServImpl implements RepuestoServ {
 
     @Transactional
     @Override
+    public ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDate fechaMin, LocalDate fechaMax) {
+        if (fechaMin == null) fechaMin = LocalDate.of(1900, 1, 1);
+        if (fechaMax == null) fechaMax = LocalDate.now();
+        ReporteUsoDeRepuestosDTO dto = daoRepuesto.usoDeRepuestos(fechaMin, fechaMax);
+        if (dto.paraService() == null || dto.paraVenta() == null) {
+            return null;
+        }
+        return dto;
+    }
+
+    @Transactional
+    @Override
     public Repuesto cargarRepuesto(Repuesto repuesto) {
         if (repuesto == null || repuesto.getStock() == null)
             throw new NullPointerException("Error: el repuesto o el stock es nulo.");
         try {
             MarcaRepuesto marcaAttached = daoMarca.update(repuesto.getMarcaRepuesto());
-            repuesto.setMarcaRepuesto(marcaAttached);
+            repuesto.vincularRepuestoYMarca(marcaAttached);
             daoRepuesto.save(repuesto);
         } catch (PersistenceException e) {
             if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
@@ -145,28 +137,4 @@ public class RepuestoServImpl implements RepuestoServ {
         r.setCodBarra(r.getCodBarra() + ".DEL" + r.getId());
         daoRepuesto.update(r);
     }
-
-//    @Transactional
-//    private Boolean consultarEstado(Repuesto r) {
-//        List<Boolean> list = dao.consultaEstado(r.getCodBarra());
-//        if (list.isEmpty()) return null;
-//        return list.getFirst();
-//    }
-
-    /**
-     * Usado cuando un repuesto se tiene que cargar o modificar y ya existe uno
-     * BORRADO LÓGICAMENTE y con su mismo código de barras que es único.
-     *
-     * @param r con datos que sobreescriben los que ya están en db.
-     */
-//    // todo: esto va en la interfaz?
-//    @Transactional
-//    private void activaRepuesto(Repuesto r) {
-//        r.setActivo(Boolean.TRUE);
-//        r.getStock().setActivo(Boolean.TRUE);
-//        Long id = dao.consultarId(r.getCodBarra());
-//        r.setId(id);
-//        dao.update(r);
-//    }
-
 }

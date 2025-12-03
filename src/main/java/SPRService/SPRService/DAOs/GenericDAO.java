@@ -1,7 +1,5 @@
 package SPRService.SPRService.DAOs;
 
-import org.hibernate.Session;
-
 import java.util.List;
 
 /**
@@ -22,4 +20,6 @@ public interface GenericDAO<T, ID> {
 
     void delete(T t);
 
+    //TODO: ver mejores soluciones al hacer merge
+    void flush();
 }

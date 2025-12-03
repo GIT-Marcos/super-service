@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="650.0" minWidth="1000.0" prefHeight="680.0" prefWidth="1000.0" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarServiceController">
+
+    <!-- HEADER: IDENTIFICACIÓN -->
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="80.0" spacing="20.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <children>
+                <ImageView fx:id="imgLogo" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../imgs/logos/car.png" />
+                    </image>
+                </ImageView>
+                <VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="section-label" text="NUEVA ORDEN DE SERVICIO" />
+                        <HBox spacing="15.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Vehículo Asignado:">
+                                            <font>
+                                                <Font size="13.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="lblVehiculo" text="* Sin asignar" textFill="#d63031">
+                                            <font>
+                                                <Font name="System Bold" size="13.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                                <Separator orientation="VERTICAL" />
+                                <VBox>
+                                    <children>
+                                        <Label text="Cliente Asignado:">
+                                            <font>
+                                                <Font size="13.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="lblCliente" text="* Sin asignar" textFill="#d63031">
+                                            <font>
+                                                <Font name="System Bold" size="13.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#asignarCliente" prefHeight="30.0" styleClass="btn-primary" text="👤 Asignar Cliente" />
+                        <Button mnemonicParsing="false" onAction="#asignarVehiculo" prefHeight="30.0" styleClass="btn-primary" text="🚗 Asignar Vehículo" />
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+            </padding>
+        </HBox>
+    </top>
+
+    <!-- BODY: DOS COLUMNAS -->
+    <center>
+        <GridPane hgap="20.0" styleClass="root">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="55.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="45.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+
+                <!-- COLUMNA IZQUIERDA: COMERCIAL (Trabajos y Costos) -->
+                <VBox spacing="10.0">
+                    <children>
+                        <Label styleClass="section-label" text="DETALLE DE TRABAJOS Y REPUESTOS" />
+
+                        <!-- Formulario Agregar -->
+                        <HBox spacing="5.0">
+                            <children>
+                                <CustomTextField fx:id="tfTrabajo" promptText="Descripción del trabajo..." styleClass="text-field" HBox.hgrow="ALWAYS" />
+                                <CustomTextField fx:id="tfPrecioTrabajo" prefWidth="120.0" promptText="Precio ($)..." styleClass="text-field" />
+                                <Button mnemonicParsing="false" onAction="#agregarTrabajo" prefWidth="40.0" styleClass="btn-action" text="+" />
+                            </children>
+                        </HBox>
+
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irAgregarRepuesto" styleClass="btn-report" text="📦 Agregar Repuesto / Insumo..." />
+
+                        <!-- Lista -->
+                        <ListView fx:id="lvDetalles" styleClass="text-field" VBox.vgrow="ALWAYS" />
+
+                        <!-- Total -->
+                        <HBox alignment="CENTER_RIGHT" styleClass="sidebar">
+                            <children>
+                                <Label fx:id="lblTotal" text="TOTAL: $ 0.00">
+                                    <font>
+                                        <Font name="System Bold" size="18.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </VBox>
+
+                <!-- COLUMNA DERECHA: TÉCNICA (Estado Vehículo) -->
+                <VBox spacing="10.0" GridPane.columnIndex="1">
+                    <children>
+                        <Label styleClass="section-label" text="ESTADO DE INGRESO" />
+
+                        <GridPane hgap="10.0" vgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Kilometraje Actual:" />
+                                        <CustomTextField fx:id="tfKilometros" promptText="ej. 150000" styleClass="text-field" />
+                                    </children>
+                                </VBox>
+                                <VBox GridPane.columnIndex="1">
+                                    <children>
+                                        <Label text="Combustible (%):" />
+                                        <Slider fx:id="sliCombustible" blockIncrement="5.0" showTickLabels="true" showTickMarks="true" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </GridPane>
+
+                        <VBox VBox.vgrow="ALWAYS">
+                            <children>
+                                <Label text="Motivo de Ingreso (Falla reportada):" />
+                                <TextArea fx:id="tfMotivoIngreso" promptText="Describa el problema..." styleClass="text-field" wrapText="true" VBox.vgrow="ALWAYS" />
+                            </children>
+                        </VBox>
+
+                        <VBox prefHeight="100.0">
+                            <children>
+                                <Label text="Inventario / Pertenencias:" />
+                                <TextArea fx:id="tfInventario" promptText="Rueda auxilio, herramientas, etc..." styleClass="text-field" wrapText="true" />
+                            </children>
+                        </VBox>
+
+                        <VBox prefHeight="100.0">
+                            <children>
+                                <Label text="Observaciones Técnicas:" />
+                                <TextArea fx:id="tfObservaciones" promptText="Rayones, golpes previos..." styleClass="text-field" wrapText="true" />
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </VBox>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </GridPane>
+    </center>
+
+    <!-- FOOTER: ACCIONES FINALES -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="20.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+            <children>
+                <VBox>
+                    <children>
+                        <Label text="Prioridad">
+                            <font>
+                                <Font size="11.0" />
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="cbPrioridad" prefWidth="150.0" styleClass="combo-compact" />
+                    </children>
+                </VBox>
+                <VBox>
+                    <children>
+                        <Label text="Fecha de Entrega Est.">
+                            <font>
+                                <Font size="11.0" />
+                            </font>
+                        </Label>
+                        <DatePicker fx:id="dpFechaEntrega" prefWidth="140.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                    </children>
+                </VBox>
+
+                <Separator orientation="VERTICAL" />
+
+                <VBox alignment="CENTER_LEFT" spacing="5.0">
+                    <children>
+                        <CheckBox fx:id="cbImprimir" mnemonicParsing="false" text="Imprimir ticket al guardar">
+                     <font>
+                        <Font size="14.0" />
+                     </font></CheckBox>
+                        <CheckBox fx:id="cbRutaPredeterminada" mnemonicParsing="false" selected="true" text="Usar ruta predeterminada">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </CheckBox>
+                    </children>
+                </VBox>
+
+                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#cargarService" prefHeight="40.0" prefWidth="200.0" styleClass="btn-success" text="✅  CONFIRMAR Y CARGAR" />
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets left="20.0" right="20.0" />
+            </padding>
+        </HBox>
+    </bottom>
+
+</BorderPane>

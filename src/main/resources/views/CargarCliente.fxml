@@ -9,128 +9,104 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="480.0" prefWidth="450.0" style="-fx-background-color: #0563ab;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarClienteController">
-   <top>
-      <GridPane BorderPane.alignment="CENTER">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints maxHeight="35.0" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <TextField fx:id="tfDNI" maxWidth="140.0" promptText="DNI..." GridPane.rowIndex="2" />
-            <TextField fx:id="tfNombre" maxWidth="140.0" promptText="Nombre..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField fx:id="tfApellido" maxWidth="140.0" promptText="Apellido..." GridPane.columnIndex="2" GridPane.rowIndex="2" />
-            <Label text="DNI (*)" textFill="WHITE" GridPane.rowIndex="1">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label text="Nombre (*)" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label text="Apellido (*)" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Label text="Los campos marcados con (*) son obligatorios y debe haber al menos un dato de contacto." textFill="WHITE" wrapText="true" GridPane.columnSpan="2147483647">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Label>
-            <Label text="Datos de contacto (*):" textFill="WHITE" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Label>
-            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
-            <Label text="*Click derecho para quitar de la lista" textFill="WHITE" GridPane.columnSpan="2147483647" GridPane.rowIndex="5">
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Label>
-         </children>
-         <BorderPane.margin>
-            <Insets bottom="5.0" />
-         </BorderPane.margin>
-      </GridPane>
-   </top>
-   <left>
-      <VBox prefHeight="216.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label text="eMails" textFill="WHITE">
-               <font>
-                  <Font size="16.0" />
-               </font></Label>
-            <TextField fx:id="tfEmail" prefWidth="157.0" promptText="eMail@ejemplo.com">
-               <VBox.margin>
-                  <Insets bottom="5.0" />
-               </VBox.margin></TextField>
-            <Button mnemonicParsing="false" onAction="#addEmail" text="+">
-               <VBox.margin>
-                  <Insets bottom="5.0" />
-               </VBox.margin>
-            </Button>
-            <ListView fx:id="lvEmails" prefHeight="200.0" prefWidth="200.0" />
-         </children>
-      </VBox>
-   </left>
-   <right>
-      <VBox prefHeight="216.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label text="N°s de teléfono" textFill="WHITE">
-               <font>
-                  <Font size="16.0" />
-               </font></Label>
-            <TextField fx:id="tfNro" promptText="351 123 456">
-               <VBox.margin>
-                  <Insets bottom="5.0" />
-               </VBox.margin></TextField>
-            <Button mnemonicParsing="false" onAction="#addNro" text="+">
-               <VBox.margin>
-                  <Insets bottom="5.0" />
-               </VBox.margin>
-            </Button>
-            <ListView fx:id="lvNrosTelefono" prefHeight="200.0" prefWidth="200.0" />
-         </children>
-      </VBox>
-   </right>
-   <bottom>
-      <GridPane BorderPane.alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" />
-            <Button mnemonicParsing="false" onAction="#guardar" text="Guardar cliente" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-            <Button mnemonicParsing="false" onAction="#cancelar" text="Cancelar" GridPane.rowIndex="1" />
-         </children>
-         <padding>
-            <Insets top="5.0" />
-         </padding>
-      </GridPane>
-   </bottom>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
+<BorderPane prefHeight="500.0" prefWidth="550.0" styleClass="root" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarClienteController">
+    <top>
+        <VBox styleClass="top-panel" BorderPane.alignment="CENTER">
+            <children>
+                <Label styleClass="alert-label-compact" text="Los campos marcados con (*) son obligatorios y debe haber al menos un dato de contacto." wrapText="true">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                    </VBox.margin>
+                    <font>
+                        <Font size="10.0" />
+                    </font>
+                </Label>
+                <GridPane hgap="10.0" VBox.vgrow="SOMETIMES">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <Label text="DNI (*)" GridPane.valignment="BOTTOM" />
+                        <TextField fx:id="tfDNI" promptText="DNI..." GridPane.rowIndex="1" />
+                        <Label text="Nombre (*)" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
+                        <TextField fx:id="tfNombre" promptText="Nombre..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label text="Apellido (*)" GridPane.columnIndex="2" GridPane.valignment="BOTTOM" />
+                        <TextField fx:id="tfApellido" promptText="Apellido..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+                    </padding>
+                </GridPane>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <GridPane hgap="10.0" BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <VBox spacing="5.0">
+                    <children>
+                        <Label styleClass="section-label" text="EMAILS:" />
+                        <HBox spacing="5.0">
+                            <children>
+                                <TextField fx:id="tfEmail" promptText="eMail@ejemplo.com" HBox.hgrow="ALWAYS" />
+                                <Button mnemonicParsing="false" onAction="#addEmail" styleClass="btn-action" text="+" />
+                            </children>
+                        </HBox>
+                        <ListView fx:id="lvEmails" VBox.vgrow="ALWAYS" />
+                        <Label styleClass="section-label" text="*Click derecho para quitar de la lista" />
+                    </children>
+                </VBox>
+                <VBox spacing="5.0" GridPane.columnIndex="1">
+                    <children>
+                        <Label styleClass="section-label" text="N°S DE TELÉFONO:" />
+                        <HBox spacing="5.0">
+                            <children>
+                                <TextField fx:id="tfNro" promptText="351 123 456" HBox.hgrow="ALWAYS" />
+                                <Button mnemonicParsing="false" onAction="#addNro" styleClass="btn-action" text="+" />
+                            </children>
+                        </HBox>
+                        <ListView fx:id="lvNrosTelefono" VBox.vgrow="ALWAYS" />
+                        <Label styleClass="section-label" text="*Click derecho para quitar de la lista" />
+                    </children>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </GridPane>
+    </center>
+    <bottom>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <Separator prefWidth="200.0" />
+                <HBox alignment="CENTER_RIGHT" prefHeight="35.0" spacing="10.0">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#cancelar" styleClass="btn-danger" text="Cancelar" />
+                        <Button mnemonicParsing="false" onAction="#guardar" styleClass="btn-primary" text="Guardar Cliente" />
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </VBox>
+    </bottom>
 </BorderPane>

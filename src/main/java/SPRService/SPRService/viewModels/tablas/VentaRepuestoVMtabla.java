@@ -59,24 +59,4 @@ public class VentaRepuestoVMtabla {
         return montoVenta;
     }
 
-    public void actualizarDesdeEntidad(VentaRepuesto v) {
-        // - Propiedades de entidad original
-        this.ventaRepuesto.setId(v.getId());
-        this.ventaRepuesto.setActivo(v.getActivo());
-        this.ventaRepuesto.setEstadoVenta(v.getEstadoVenta());
-        this.ventaRepuesto.setFechaVenta(v.getFechaVenta());
-        this.ventaRepuesto.setMontoFaltante(v.getMontoFaltante());
-        this.ventaRepuesto.setMontoTotal(v.getMontoTotal());
-        // -- Nota de retiro
-        this.ventaRepuesto.setNotaRetiro(v.getNotaRetiro());
-//        this.ventaRepuesto.getNotaRetiro().setId(v.getNotaRetiro().getId());
-        // -- Pagos
-        this.ventaRepuesto.setPagosList(v.getPagosList());
-
-        // - Propiedades de VM
-        this.codVenta.set(v.getId());
-        this.estadoVenta.set(v.getEstadoVenta().toString());
-        this.fechaVenta.set(v.getFechaVenta().toString());
-        this.montoVenta.set("$ " + v.getMontoTotal());
-    }
 }

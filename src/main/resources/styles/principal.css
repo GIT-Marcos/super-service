@@ -1,0 +1,105 @@
+
+/* --- CONFIGURACIÓN GENERAL --- */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* --- ÁREA DE CONTENIDO (Derecha) --- */
+.content-area {
+    -fx-background-color: #ecf0f1; /* Gris muy claro, neutro */
+}
+
+/* --- SIDEBAR (Izquierda) --- */
+.sidebar {
+    -fx-background-color: linear-gradient(
+            from 100% 0% to 0% 0%,
+            #292E49 0%,
+            #536976 100%
+    );
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0); /* Sombra hacia la derecha */
+}
+
+/* --- HEADER DEL SIDEBAR --- */
+.sidebar-header {
+    -fx-background-color: #253342; /* Un tono ligeramente más oscuro */
+}
+
+.brand-label {
+    -fx-text-fill: #ecf0f1;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-padding: 5 0 0 0;
+}
+
+/* Separadores sutiles */
+.sidebar-separator .line {
+    -fx-border-color: #34495e;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* --- BOTONES DE NAVEGACIÓN --- */
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #bdc3c7; /* Gris claro texto inactivo */
+    -fx-alignment: CENTER_LEFT; /* Icono y texto a la izquierda */
+    -fx-font-size: 14px;
+    -fx-padding: 10 15 10 20; /* Espaciado interno generoso */
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 0 4; /* Prepara borde izquierdo para hover */
+}
+
+/* Efecto Hover (Pasar el mouse) */
+.nav-btn:hover {
+    -fx-background-color: #34495e; /* Azul un poco más claro */
+    -fx-text-fill: white;
+    -fx-border-color: #3498db; /* Borde azul brillante a la izquierda */
+}
+
+/* Efecto Presionado */
+.nav-btn:pressed {
+    -fx-background-color: #1abc9c;
+    -fx-border-color: #16a085;
+}
+
+/* Esto hace que el botón se marque cuando está presionado */
+.nav-btn:selected {
+    -fx-background-color: #34495e; /* Color de fondo 'activo' */
+    -fx-text-fill: white;
+    -fx-border-color: #3498db;     /* Borde izquierdo azul */
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Para iconos dentro de botones, asegurar que no bloqueen clicks */
+.nav-btn .image-view {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 2, 0, 0, 1);
+}
+
+/* --- BOTÓN DE CERRAR SESIÓN (Diferente estilo) --- */
+.btn-exit {
+    -fx-background-color: transparent;      /* Fondo transparente */
+    -fx-text-fill: #ffffff;                /* Color del texto */
+    -fx-font-size: 14px;
+    -fx-border-color: #ff5f5f;             /* Borde blanco */
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    /*-fx-background-radius: 5px;*/
+    -fx-cursor: hand;
+}
+
+.btn-exit:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);  /* Ligero brillo */
+}
+
+.rate-img {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0.2, 0, 1);
+    -fx-translate-y: 1px;
+    -fx-opacity: 0.7;
+    -fx-cursor: hand;
+}
+
+.rate-img:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 8, 0.3, 0, 2);
+    -fx-translate-y: 0;
+    -fx-opacity: 1;
+}
