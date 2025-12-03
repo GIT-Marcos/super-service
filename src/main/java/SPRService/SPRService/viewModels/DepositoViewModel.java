@@ -71,6 +71,11 @@ public class DepositoViewModel {
     // --- Acciones (Métodos públicos llamados por el Controller) ---
 
     public void cargarTodosRepuestos() {
+        codigoFiltro.setValue("");
+        nombreFiltro.setValue("");
+        marcaFiltro.setValue("");
+        mostrarNormal.setValue(true);
+        mostrarBajo.setValue(true);
         List<Repuesto> todos = repuestoServ.verTodos();
         actualizarTabla(todos);
     }
