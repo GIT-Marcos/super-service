@@ -174,12 +174,14 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
 
     @FXML
     private void nuevaMarca() {
-        String nombreMarca = SimpleDialogs.nombreMarcaRepuesto();
-        if (nombreMarca == null) return;
         try {
+            String nombreMarca = SimpleDialogs.nombreMarcaRepuesto();
+            if (nombreMarca == null) return;
             viewModel.crearNuevaMarca(nombreMarca);
+        } catch (IllegalArgumentException e) {
+            NotificationHelper.mostrarAdvertencia("Crear nueva marca de repuestos", e.getMessage());
         } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Crear nueva marca de repuestos", "Ha ocurrido un error inesperado.");
+            NotificationHelper.mostrarError("Crear nueva marca de repuestos", e.getMessage());
             e.printStackTrace();
         }
     }

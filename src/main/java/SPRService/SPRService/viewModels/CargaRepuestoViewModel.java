@@ -117,15 +117,15 @@ public class CargaRepuestoViewModel {
 
     /**
      * Crea una nueva marca, la persiste y la selecciona en el ComboBox.
-     * @param nombreMarca El nombre para la nueva marca.
-     * @return La nueva MarcaRepuesto creada.
      */
-    public MarcaRepuesto crearNuevaMarca(String nombreMarca) {
+    public void crearNuevaMarca(String nombreMarca) {
         MarcaRepuesto nuevaMarca = new MarcaRepuesto(null, nombreMarca, new HashSet<>());
-        nuevaMarca = marcaRepuestoService.cargarMarca(nuevaMarca);
-        marcasDisponibles.addFirst(nuevaMarca);
-        marcaSeleccionada.set(nuevaMarca);
-        return nuevaMarca;
+        marcaRepuestoService.cargarMarca(nuevaMarca)
+                .ifPresent(m -> {
+                    marcasDisponibles.addFirst(nuevaMarca);
+                    marcaSeleccionada.set(nuevaMarca);
+
+        });
     }
 
     /**
