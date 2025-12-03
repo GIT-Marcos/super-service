@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
+@Deprecated
 public class Alertas {
 
     public static void error(String titulo, String mensaje) {
@@ -37,6 +38,10 @@ public class Alertas {
         alerta.setTitle(titulo);
         alerta.setHeaderText(null);
         alerta.setContentText(mensaje);
+
+        ButtonType btnSi = new ButtonType("Sí");
+        ButtonType btnNo = new ButtonType("No");
+        alerta.getButtonTypes().setAll(btnSi, btnNo);
 
         Optional<ButtonType> resultado = alerta.showAndWait();
         return resultado.isPresent() && resultado.get() == ButtonType.OK;

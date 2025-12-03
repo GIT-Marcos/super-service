@@ -1,7 +1,7 @@
 package SPRService.SPRService.entities;
 
 import jakarta.persistence.*;
-import SPRService.SPRService.enums.PrivilegioUsuario;
+import SPRService.SPRService.enums.RolUsuario;
 
 import java.io.Serializable;
 
@@ -16,22 +16,31 @@ public class Usuario implements Serializable{
     
     @Column(nullable = false, unique = true)
     private String nombre;
+
+    @Column(nullable = false)
+    private String correo;
     
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private Boolean activo;
     
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "privilegio")
-    private PrivilegioUsuario privilegio;
+    @Column(name = "rol")
+    private RolUsuario rol;
 
     public Usuario() {
+        this.activo = Boolean.TRUE;
     }
 
-    public Usuario(Long id, String nombre, String password, PrivilegioUsuario privilegio) {
+    public Usuario(Long id, String nombre, String correo, String password, RolUsuario rol) {
         this.id = id;
         this.nombre = nombre;
+        this.correo = correo;
         this.password = password;
-        this.privilegio = privilegio;
+        this.activo = Boolean.TRUE;
+        this.rol = rol;
     }
 
     public Long getId() {
@@ -50,6 +59,14 @@ public class Usuario implements Serializable{
         this.nombre = nombre;
     }
 
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -58,19 +75,31 @@ public class Usuario implements Serializable{
         this.password = password;
     }
 
-    public PrivilegioUsuario getPrivilegio() {
-        return privilegio;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setPrivilegio(PrivilegioUsuario privilegio) {
-        this.privilegio = privilegio;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
+    public RolUsuario getRol() {
+        return rol;
+    }
+
+    public void setRol(RolUsuario rol) {
+        this.rol = rol;
     }
 
     @Override
     public String toString() {
-        return "Usuario{" + "id=" + id + ", nombre=" + nombre + ", password=" + password + ", privilegio=" + privilegio + '}';
+        return "Usuario{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", correo='" + correo + '\'' +
+                ", password='" + password + '\'' +
+                ", activo=" + activo +
+                ", rol=" + rol +
+                '}';
     }
-    
-    
-    
 }

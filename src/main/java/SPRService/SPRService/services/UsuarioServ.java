@@ -1,12 +1,23 @@
 package SPRService.SPRService.services;
 
+import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.entities.Usuario;
-import SPRService.SPRService.exceptions.DuplicateUserException;
+import SPRService.SPRService.exceptions.DuplicateUserNameException;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface UsuarioServ {
 
-    void cargarUsuario(Usuario usuario) throws DuplicateUserException;
+    List<Usuario> verTodos();
+
+    List<Usuario> buscar(FiltroUsuarioDTO filtro);
 
     Usuario loguear(String nombre, String inputPass);
 
+    Optional<Usuario> cargarUsuario(Usuario usuario) throws DuplicateUserNameException;
+
+    Optional<Usuario> modificarUsuario(Usuario usuario, String inputPassOriginal) throws DuplicateUserNameException;
+
+    Optional<Usuario> darDeBaja(Usuario usuario);
 }

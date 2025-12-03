@@ -7,24 +7,24 @@ import java.io.Serializable;
  * Lanzado cuando se intenta cargar un usuario a bd con un nombre que
  * pertenece a otro ya cargado.
  */
-public class DuplicateUserException extends Exception implements Serializable {
+public class DuplicateUserNameException extends Exception implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public DuplicateUserException() {
+    public DuplicateUserNameException() {
         super();
     }
 
-    public DuplicateUserException(String message) {
+    public DuplicateUserNameException(String message) {
         super(message);
     }
 
-    public DuplicateUserException(Throwable cause) {
+    public DuplicateUserNameException(Throwable cause) {
         super(cause);
     }
 
-    public DuplicateUserException(String message, Throwable cause) {
+    public DuplicateUserNameException(String message, Throwable cause) {
         super(message, cause);
     }
 }

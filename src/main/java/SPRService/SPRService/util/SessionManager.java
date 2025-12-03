@@ -17,13 +17,11 @@ public class SessionManager {
     }
 
     public static boolean cerrarSesion() {
-        boolean confir = Alertas.confirmacion("Cerrar sesión",
-                "¿Está seguro de que quiere cerrar sesión?");
-        if (!confir) {
-            return false;
+        if (SimpleDialogs.confirmacion("Cerrar sesión", "¿Está seguro que desea cerrar sesión?")) {
+            usuarioSesion = null;
+            return true;
         }
-        usuarioSesion = null;
-        return true;
+        return false;
     }
 
     public static boolean haySesionActiva() {

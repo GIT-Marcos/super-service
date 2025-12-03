@@ -12,6 +12,51 @@ import java.util.Optional;
 
 public class SimpleDialogs {
 
+    public static boolean confirmacion(String titulo, String mensaje) {
+        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(mensaje);
+
+        ButtonType btnSi = new ButtonType("Sí", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alerta.getButtonTypes().setAll(btnSi, btnNo);
+
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return resultado.isPresent() && resultado.get().getButtonData() == ButtonBar.ButtonData.OK_DONE;
+    }
+
+    /**
+     * Para preguntar al usuario como se debe proceder en la cancelación de la venta.
+     * @return Un objeto Boolean:
+     *         - {@code true} si el usuario presiona "Restablecer stocks".
+     *         - {@code false} si el usuario presiona "NO restablecer".
+     *         - {@code null} si el usuario presiona "Cancelar" o cierra la ventana.
+     */
+    public static Boolean confirmacionRestablecerStocks() {
+        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+        alerta.setTitle("Cancelación de venta");
+        alerta.setHeaderText(null);
+        alerta.setContentText("¿Desea restablecer los " +
+                "existentes de stock en los productos vendidos?");
+
+        ButtonType botonRestablecer = new ButtonType("RESTABLECER TODOS los stocks");
+        ButtonType botonNoRestablecer = new ButtonType("NO restablecer stocks");
+        ButtonType botonCancelar = new ButtonType("Cancelar operación", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alerta.getButtonTypes().setAll(botonRestablecer, botonNoRestablecer, botonCancelar);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+
+        if (resultado.isPresent()) {
+            if (resultado.get() == botonRestablecer) {
+                return true;
+            } else if (resultado.get() == botonNoRestablecer) {
+                return false;
+            }
+        }
+        return null;
+    }
+
     public static String nombreMarcaRepuesto() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Crear nueva marca de repuestos");
