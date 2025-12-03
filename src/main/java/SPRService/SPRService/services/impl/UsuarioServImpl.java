@@ -29,7 +29,7 @@ public class UsuarioServImpl implements UsuarioServ {
     @Transactional
     @Override
     public List<Usuario> verTodos() {
-        return daoUsuario.verTodos();
+        return daoUsuario.getAll();
     }
 
     @Transactional
@@ -63,8 +63,32 @@ public class UsuarioServImpl implements UsuarioServ {
 
     @Transactional
     @Override
-    public Optional<Usuario> modififcarUsuario(Usuario usuario) {
-        return Optional.empty();
+    public Optional<Usuario> modificarUsuario(Usuario usuario, String inputPassOriginal) throws DuplicateUserNameException {
+        try {
+            Usuario usuarioOriginal = daoUsuario.getById(usuario.getId());
+            verificarPass(inputPassOriginal, usuarioOriginal);
+            String hashed = BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt());
+            usuario.setPassword(hashed);
+
+            Usuario updated = daoUsuario.update(usuario);
+            daoUsuario.flush();
+            return Optional.ofNullable(updated);
+        } catch (RuntimeException e) {
+            if (e instanceof ConstraintViolationException &&
+                    e.getCause() instanceof PSQLException) {
+                throw new DuplicateUserNameException("El usuario con el nombre: " + usuario.getNombre() +
+                        " ya existe en el sistema.");
+            } else if (e instanceof IllegalArgumentException) {
+                throw e;
+            }
+            throw new RuntimeException("Error inesperado al cargar usuario", e);
+        }
+    }
+
+    private void verificarPass(String inputPassOriginal, Usuario u) {
+        if (!BCrypt.checkpw(inputPassOriginal, u.getPassword()))
+            throw new IllegalArgumentException("La contraseña ingresada no es correcta para el usuario: " +
+                    u.getNombre());
     }
 
     @Transactional
@@ -86,7 +110,8 @@ public class UsuarioServImpl implements UsuarioServ {
         return usuario;
     }
 
-    //TODO: reemplazar en casos con estos usar Optional<>
+    //TODO: reemplazar en casos como estos usar Optional<>
+    @Transactional
     @Override
     public Optional<Usuario> darDeBaja(Usuario usuario) {
         usuario.setActivo(Boolean.FALSE);

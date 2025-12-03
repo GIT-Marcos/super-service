@@ -6,6 +6,7 @@ import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.UsuarioServ;
+import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.tablas.UsuarioViewModelTabla;
 import com.google.inject.Inject;
@@ -98,13 +99,14 @@ public class UsuariosController implements Initializable {
     @FXML
     public void modificar() {
         UsuarioViewModelTabla seleccionado = tabla.getSelectionModel().getSelectedItem();
-        if (seleccionado != null) {
-            // Lógica para abrir la ventana/escena de modificación, pasando seleccionado.getUsuario().
-            System.out.println("Acción: Modificar Usuario: " + seleccionado.getNombre());
-        } else {
-            // Lógica para mostrar una alerta de que no hay selección.
-            System.out.println("Acción: Selecciona un usuario para modificar.");
+        if (seleccionado == null) {
+            NotificationHelper.mostrarAdvertencia("Modificar usuario",
+                    "Selecciona un usuario de la tabla para modificarlo.");
+            return;
         }
+
+        Optional<UsuarioViewModelTabla> result = navigator.openModal(Views.MODIFICAR_USUARIO, "Detalles/Modificar usuario", seleccionado);
+        result.ifPresent(vm -> obsListUsuariosVM.set(obsListUsuariosVM.indexOf(seleccionado), vm));
     }
 
     @FXML
@@ -115,11 +117,19 @@ public class UsuariosController implements Initializable {
                     "Debe seleccionar un usuario para darlo de baja");
             return;
         }
-        try {
-            usuarioServ.darDeBaja(seleccionado.getUsuario()).ifPresent(seleccionado::actualizarDatos);
-        } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Dar de baja", "Ha ocurrido un error inesperado.");
-            e.printStackTrace();
+        if (!seleccionado.getUsuario().getActivo()) {
+            NotificationHelper.mostrarAdvertencia("Dar de baja",
+                    "Este usuario ya está INACTIVO.");
+            return;
+        }
+        if (SimpleDialogs.confirmacion("Dar de baja",
+                "¿Está seguro que quiere dar de baja a este usuario?")) {
+            try {
+                usuarioServ.darDeBaja(seleccionado.getUsuario()).ifPresent(seleccionado::actualizarDatos);
+            } catch (RuntimeException e) {
+                NotificationHelper.mostrarError("Dar de baja", "Ha ocurrido un error inesperado.");
+                e.printStackTrace();
+            }
         }
     }
 

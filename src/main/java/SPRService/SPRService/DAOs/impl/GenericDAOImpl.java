@@ -60,4 +60,10 @@ public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
         EntityManager em = emProvider.get();
         em.remove(entity);
     }
+
+    @Override
+    public void flush() {
+        EntityManager em = emProvider.get();
+        em.flush();
+    }
 }

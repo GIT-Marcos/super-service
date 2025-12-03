@@ -17,7 +17,7 @@ public interface UsuarioServ {
 
     Optional<Usuario> cargarUsuario(Usuario usuario) throws DuplicateUserNameException;
 
-    Optional<Usuario> modififcarUsuario(Usuario usuario);
+    Optional<Usuario> modificarUsuario(Usuario usuario, String inputPassOriginal) throws DuplicateUserNameException;
 
     Optional<Usuario> darDeBaja(Usuario usuario);
 }

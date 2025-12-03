@@ -3,7 +3,6 @@ package SPRService.SPRService.DAOs.impl;
 import SPRService.SPRService.DAOs.UsuarioDAO;
 import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.entities.Usuario;
-import SPRService.SPRService.exceptions.DuplicateUserNameException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -12,8 +11,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import org.hibernate.exception.ConstraintViolationException;
-import org.postgresql.util.PSQLException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +24,6 @@ public class UsuarioDAOImpl extends GenericDAOImpl<Usuario, Long> implements Usu
 
     public UsuarioDAOImpl() {
         super(Usuario.class);
-    }
-
-    @Override
-    public List<Usuario> verTodos() {
-        EntityManager em = emProvider.get();
-        return em.createQuery("SELECT u FROM Usuario u",
-                        Usuario.class)
-                .getResultList();
     }
 
     @Override
@@ -77,18 +66,4 @@ public class UsuarioDAOImpl extends GenericDAOImpl<Usuario, Long> implements Usu
                 .setMaxResults(1)
                 .getResultList();
     }
-
-//    @Override
-//    public void cargarUsuario(Usuario usuario){
-//        EntityManager em = emProvider.get();
-//        try {
-//            em.persist(usuario);
-//        } catch (RuntimeException e) {
-//            if (e instanceof ConstraintViolationException &&
-//                    e.getCause() instanceof PSQLException) {
-//                throw new DuplicateUserNameException();
-//            }
-//            throw new RuntimeException("Error inesperado al cargar usuario", e);
-//        }
-//    }
 }

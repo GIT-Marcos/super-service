@@ -33,6 +33,10 @@ public class UsuarioViewModelTabla {
         this.nombre.set(u.getNombre());
         this.correo.set(u.getCorreo());
         this.rol.set(u.getRol().toString());
+        // Lógica de presentación del estado
+        boolean activa = u.getActivo() != null && u.getActivo();
+        this.estado.set(activa ? "ACTIVO" : "ANULADO");
+        this.esAnulada.set(!activa);
     }
 
     public Usuario getUsuario() {
