@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Objects; // Importación necesaria para el mejorado de bindings
 
 public class CargaRepuestoViewModel {
 
@@ -25,18 +26,17 @@ public class CargaRepuestoViewModel {
     private Repuesto repuestoOriginal; // Guarda el estado original para la modificación
 
     // --- PROPIEDADES PARA BINDING CON LA VISTA (FXML) ---
-
-    // Propiedades del Repuesto
-    private final StringProperty codBarras = new SimpleStringProperty("");
-    private final StringProperty nombreProducto = new SimpleStringProperty("");
-    private final ObjectProperty<BigDecimal> precio = new SimpleObjectProperty<>(BigDecimal.ZERO);
+    // ¡CAMBIADAS A StringProperty!
+    private final StringProperty codBarras = new SimpleStringProperty();
+    private final StringProperty nombreProducto = new SimpleStringProperty();
+    private final StringProperty precio = new SimpleStringProperty(); // Ahora String
     private final ObjectProperty<MarcaRepuesto> marcaSeleccionada = new SimpleObjectProperty<>();
 
     // Propiedades del Stock
-    private final DoubleProperty cantidadExistente = new SimpleDoubleProperty(0.0);
-    private final DoubleProperty cantidadMinima = new SimpleDoubleProperty(0.0);
-    private final StringProperty lote = new SimpleStringProperty("");
-    private final StringProperty observaciones = new SimpleStringProperty("");
+    private final StringProperty cantidadExistente = new SimpleStringProperty(); // Ahora String
+    private final StringProperty cantidadMinima = new SimpleStringProperty(); // Ahora String
+    private final StringProperty lote = new SimpleStringProperty();
+    private final StringProperty observaciones = new SimpleStringProperty();
     private final StringProperty uniMedidaSeleccionada = new SimpleStringProperty();
     private final StringProperty ubicacionSeleccionada = new SimpleStringProperty();
 
@@ -74,7 +74,8 @@ public class CargaRepuestoViewModel {
 
         codBarras.set(repuesto.getCodBarra());
         nombreProducto.set(repuesto.getDetalle());
-        precio.set(repuesto.getPrecio());
+        // Se convierten los valores numéricos a String
+        precio.set(repuesto.getPrecio().toPlainString());
 
         // Si la marca no está en la lista, la añade temporalmente para que se muestre
         if (!marcasDisponibles.contains(repuesto.getMarcaRepuesto())) {
@@ -83,8 +84,9 @@ public class CargaRepuestoViewModel {
         marcaSeleccionada.set(repuesto.getMarcaRepuesto());
 
         Stock stock = repuesto.getStock();
-        cantidadExistente.set(stock.getCantidadExistente());
-        cantidadMinima.set(stock.getCantMinima());
+        // Se convierten los valores numéricos a String
+        cantidadExistente.set(String.valueOf(stock.getCantidadExistente()));
+        cantidadMinima.set(String.valueOf(stock.getCantMinima()));
         lote.set(stock.getLote());
         observaciones.set(stock.getObservaciones());
         uniMedidaSeleccionada.set(stock.getUnidadMedida());
@@ -133,10 +135,10 @@ public class CargaRepuestoViewModel {
         repuestoOriginal = null;
         codBarras.set("");
         nombreProducto.set("");
-        precio.set(BigDecimal.ZERO);
+        precio.set("0.00");
         marcaSeleccionada.set(null);
-        cantidadExistente.set(0.0);
-        cantidadMinima.set(0.0);
+        cantidadExistente.set("0.0");
+        cantidadMinima.set("0.0");
         lote.set("");
         observaciones.set("");
         ubicacionSeleccionada.set(null);
@@ -151,20 +153,32 @@ public class CargaRepuestoViewModel {
     // --- MÉTODOS PRIVADOS AUXILIARES ---
 
     private void validarInputs() throws IllegalArgumentException {
+        // En el ViewModel se asume que los valores vienen como String (de los TextField)
+        // y se validan con el ManejadorInputs.
+        // Las validaciones de campos numéricos (precio, stock) también manejan el formato.
+
         if (marcaSeleccionada.get() == null) {
             throw new IllegalArgumentException("Debe seleccionar una marca para el repuesto.");
         }
+
+        // Uso de ManejadorInputs con los StringProperty
         ManejadorInputs.codBarras(codBarras.getValue(), true);
         ManejadorInputs.textoGenerico(nombreProducto.getValue(), true, "Nombre de repuesto",
                 60);
-        ManejadorInputs.dinero(precio.getValue().toString(), true, false);
-        ManejadorInputs.cantidadStock(cantidadExistente.getValue().toString(), true);
-        ManejadorInputs.cantidadStock(cantidadMinima.getValue().toString(), true);
-        // La conversión de String a BigDecimal/Double se haría en el Controller,
-        // pero idealmente se usarían TextFormatters para evitar inputs inválidos.
-        // Aquí asumimos que los bindings ya han poblado las propiedades correctamente.
-        ManejadorInputs.textoGenerico(uniMedidaSeleccionada.getValue(), true, null, 20);
-        ManejadorInputs.textoGenerico(ubicacionSeleccionada.getValue(), true, null, 20);
+        // ManejadorInputs.dinero realiza validación de formato numérico de String a BigDecimal
+        ManejadorInputs.dinero(precio.getValue(), true, false);
+        // ManejadorInputs.cantidadStock realiza validación de formato numérico de String a Double
+        ManejadorInputs.cantidadStock(cantidadExistente.getValue(), true);
+        ManejadorInputs.cantidadStock(cantidadMinima.getValue(), true);
+
+        // Se reemplaza ManejadorInputs para combobox/selecciones por una verificación de nulidad simple si es requerido.
+        if (uniMedidaSeleccionada.getValue() == null || uniMedidaSeleccionada.getValue().trim().isEmpty()) {
+            throw new IllegalArgumentException("Debe seleccionar una unidad de medida.");
+        }
+        if (ubicacionSeleccionada.getValue() == null || ubicacionSeleccionada.getValue().trim().isEmpty()) {
+            throw new IllegalArgumentException("Debe seleccionar una ubicación.");
+        }
+
         ManejadorInputs.textoGenerico(lote.getValue(), false, null, 40);
         ManejadorInputs.textoGenerico(observaciones.getValue(), false, null, 100);
     }
@@ -183,18 +197,20 @@ public class CargaRepuestoViewModel {
             repuesto.setStock(stock);
         }
 
-        // Poblar Stock
-        stock.setCantidadExistente(cantidadExistente.get());
-        stock.setCantMinima(cantidadMinima.get());
+        // Poblar Stock - Conversión de String a Double
+        // Los valores se parsean después de la validación
+        stock.setCantidadExistente(Double.parseDouble(cantidadExistente.get()));
+        stock.setCantMinima(Double.parseDouble(cantidadMinima.get()));
         stock.setUnidadMedida(uniMedidaSeleccionada.get());
         stock.setUbicacion(ubicacionSeleccionada.get());
         stock.setLote(lote.get());
         stock.setObservaciones(observaciones.get());
 
-        // Poblar Repuesto
+        // Poblar Repuesto - Conversión de String a BigDecimal
+        // Los valores se parsean después de la validación
         repuesto.setCodBarra(codBarras.get());
         repuesto.setDetalle(nombreProducto.get());
-        repuesto.setPrecio(precio.get());
+        repuesto.setPrecio(new BigDecimal(precio.get()));
         repuesto.setMarcaRepuesto(marcaSeleccionada.get());
 
         return repuesto;
@@ -213,13 +229,14 @@ public class CargaRepuestoViewModel {
     }
 
     // --- GETTERS PARA LAS PROPIEDADES (para que la Vista pueda acceder a ellas) ---
+    // Ahora todas las propiedades enlazadas a TextField son StringProperty
 
     public StringProperty codBarrasProperty() { return codBarras; }
     public StringProperty nombreProductoProperty() { return nombreProducto; }
-    public ObjectProperty<BigDecimal> precioProperty() { return precio; }
+    public StringProperty precioProperty() { return precio; }
     public ObjectProperty<MarcaRepuesto> marcaSeleccionadaProperty() { return marcaSeleccionada; }
-    public DoubleProperty cantidadExistenteProperty() { return cantidadExistente; }
-    public DoubleProperty cantidadMinimaProperty() { return cantidadMinima; }
+    public StringProperty cantidadExistenteProperty() { return cantidadExistente; }
+    public StringProperty cantidadMinimaProperty() { return cantidadMinima; }
     public StringProperty loteProperty() { return lote; }
     public StringProperty observacionesProperty() { return observaciones; }
     public StringProperty uniMedidaSeleccionadaProperty() { return uniMedidaSeleccionada; }
