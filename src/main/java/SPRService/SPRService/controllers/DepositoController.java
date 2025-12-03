@@ -1,5 +1,7 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.DepositoViewModel;
 import com.google.inject.Inject;
 import javafx.event.ActionEvent;
@@ -8,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
+import javafx.stage.FileChooser;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -92,21 +95,64 @@ public class DepositoController implements Initializable {
 
     @FXML
     private void modRepuesto() {
-        viewModel.modificarRepuesto();
+        RepuestoRowViewModel vm = tablaRepuestos.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            NotificationHelper.mostrarAdvertencia("Detalles/Modificar",
+                    "Debe seleccionar un repuesto.");
+            return;
+        }
+        viewModel.modificarRepuesto(vm);
     }
 
     @FXML
     private void borrarRepuesto() {
-        viewModel.borrarRepuesto();
+        RepuestoRowViewModel vm = tablaRepuestos.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            NotificationHelper.mostrarAdvertencia("Borrar", "Seleccione un repuesto para borrarlo.");
+            return;
+        }
+        if (!SimpleDialogs.confirmacion("Borrar repuesto", "Esta acción es irreversible.\n¿Desea continuar con el borrado?"))
+            return;
+        if (!SimpleDialogs.confirmacion("Borrar repuesto", "¿Confirmar borrado de:\n" + vm.getNombre() + " ?") )
+            return;
+
+        try {
+            viewModel.borrarRepuesto(vm);
+            NotificationHelper.mostrarExito("Borrar repuesto", "Se ha borrado el repuesto con éxito.");
+        } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Borrar repuesto", "Ha ocurrido un error al borrar.");
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void ingresarStock() {
-        viewModel.ingresarStock();
+        RepuestoRowViewModel vm = tablaRepuestos.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            NotificationHelper.mostrarAdvertencia("Ingresar stock",
+                    "Debe seleccionar un repuesto para ingresarle stock.");
+            return;
+        }
+
+        Double cantidad = SimpleDialogs.inputStock();
+        if (cantidad == null) return;
+        try {
+            viewModel.ingresarStock(vm, cantidad);
+            NotificationHelper.mostrarExito("Ingreso de stock", "Se ha ingresado el stock con éxito.");
+        } catch (IllegalArgumentException e) {
+            NotificationHelper.mostrarAdvertencia("Ingreso de stock", e.getMessage());
+        } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Ingreso de stock", "Ha ocurrido un error inesperado.");
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void masRetiradosParaVenta(ActionEvent event) {
+        if (tablaRepuestos.getItems().isEmpty()) {
+            NotificationHelper.mostrarAdvertencia("Exportar tabla", "No hay repuestos para generar la tabla.");
+            return;
+        }
         viewModel.generarReporteMasRetiradosParaVenta(event);
     }
 
