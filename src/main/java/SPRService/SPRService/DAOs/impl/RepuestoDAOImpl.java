@@ -29,10 +29,22 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
     }
 
     @Override
+    public List<Repuesto> validarUnicidadCodBarras(Repuesto r) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("SELECT r FROM Repuesto r " +
+                                "WHERE r.codBarra = :cod",
+                Repuesto.class)
+                .setParameter("cod", r.getCodBarra())
+                .setMaxResults(1)
+                .getResultList();
+    }
+
+    @Override
     public List<Repuesto> todosProductosActivos() {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT DISTINCT r FROM Repuesto r " +
-                        "WHERE r.activo = true",
+                        "WHERE r.activo = true " +
+                        "ORDER BY r.detalle",
                 Repuesto.class).getResultList();
     }
 

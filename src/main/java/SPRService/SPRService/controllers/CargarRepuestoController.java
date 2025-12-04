@@ -1,31 +1,30 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.entities.MarcaRepuesto;
+import SPRService.SPRService.entities.Repuesto;
+import SPRService.SPRService.entities.Ubicacion;
 import SPRService.SPRService.exceptions.DuplicateProductException;
+import SPRService.SPRService.navigation.DataReceiver;
+import SPRService.SPRService.navigation.ModalController;
+import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.CargaRepuestoViewModel;
 import com.google.inject.Inject;
-import jakarta.persistence.PersistenceException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.stage.Stage;
-import SPRService.SPRService.entities.Repuesto;
-import SPRService.SPRService.navigation.DataReceiver;
-import SPRService.SPRService.navigation.ModalController;
-import SPRService.SPRService.util.alertas.Alertas;
-import javafx.util.converter.BigDecimalStringConverter;
-import javafx.util.converter.DoubleStringConverter;
+import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.UnaryOperator;
 
 public class CargarRepuestoController implements Initializable, DataReceiver<Repuesto>, ModalController<Repuesto> {
 
@@ -33,12 +32,13 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
     private Repuesto resultado;
 
     @FXML
-    private TextField tfCodBarra, tfNombre, tfPrecio, tfCantidadStock, tfCantidadStockMin, tfLote,
-            tfObservaciones;
+    private TextField tfCodBarra, tfNombre, tfPrecio, tfCantidadStock, tfCantidadStockMin, tfLote, tfObservaciones;
     @FXML
     private ComboBox<MarcaRepuesto> comboMarcas;
     @FXML
-    private ComboBox<String> comboUniMedidas, comboUbicaciones;
+    private ComboBox<String> comboUniMedidas;
+    @FXML
+    private ComboBox<Ubicacion> comboUbicaciones;
 
     @Inject
     public CargarRepuestoController(CargaRepuestoViewModel viewModel) {
@@ -48,73 +48,75 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         viewModel.inicializar();
-        configurarFormattersNumericos();
         bindControls();
+        configurarValidacionesDeColor();
 
         Platform.runLater(() -> {
             Stage s = (Stage) tfCodBarra.getScene().getWindow();
-            s.setOnCloseRequest(event -> {
-                this.viewModel.limpiar();
-            });
+            s.setOnCloseRequest(event -> this.viewModel.limpiar());
         });
     }
 
-    private void configurarFormattersNumericos() {
-        UnaryOperator<TextFormatter.Change> filtroDecimal = change -> {
-            String nuevoTexto = change.getText().replace(',', '.');
-            change.setText(nuevoTexto);
-
-            String textoCompleto = change.getControlNewText();
-            if (textoCompleto.isEmpty() || textoCompleto.matches("\\d*\\.?\\d*")) {
-                return change;
-            }
-            return null;
-        };
-
-        // El TextFormatter actúa como guardián para prevenir texto inválido.
-        tfCantidadStock.setTextFormatter(new TextFormatter<>(filtroDecimal));
-        tfCantidadStockMin.setTextFormatter(new TextFormatter<>(filtroDecimal));
-        tfPrecio.setTextFormatter(new TextFormatter<>(filtroDecimal));
-    }
-
     private void bindControls() {
-        // ... otros bindings ...
         tfCodBarra.textProperty().bindBidirectional(viewModel.codBarrasProperty());
         tfNombre.textProperty().bindBidirectional(viewModel.nombreProductoProperty());
         tfLote.textProperty().bindBidirectional(viewModel.loteProperty());
         tfObservaciones.textProperty().bindBidirectional(viewModel.observacionesProperty());
+        tfCantidadStock.textProperty().bindBidirectional(viewModel.cantidadExistenteProperty());
+        tfCantidadStockMin.textProperty().bindBidirectional(viewModel.cantidadMinimaProperty());
+        tfPrecio.textProperty().bindBidirectional(viewModel.precioProperty());
 
-        // --- BINDING PARA DOUBLE ---
-        // Se enlaza el String del TextField con el Double del ViewModel.
-        // Se usa .asObject() para que el compilador vea la propiedad como Property<Double>
-        // y pueda hacer coincidir los tipos con el DoubleStringConverter.
-        tfCantidadStock.textProperty().bindBidirectional(
-                viewModel.cantidadExistenteProperty().asObject(), new DoubleStringConverter());
-
-        tfCantidadStockMin.textProperty().bindBidirectional(
-                viewModel.cantidadMinimaProperty().asObject(), new DoubleStringConverter());
-
-        // --- BINDING PARA BIGDECIMAL ---
-        // Aquí no se necesita .asObject() porque viewModel.precioProperty()
-        // ya es de tipo ObjectProperty<BigDecimal>, que implementa Property<BigDecimal>.
-        // Los tipos ya coinciden de forma natural.
-        tfPrecio.textProperty().bindBidirectional(
-                viewModel.precioProperty(), new BigDecimalStringConverter());
-
-        // ... bindings para los ComboBox ...
         comboMarcas.setItems(viewModel.getMarcasDisponibles());
         comboMarcas.valueProperty().bindBidirectional(viewModel.marcaSeleccionadaProperty());
+
         comboUniMedidas.setItems(viewModel.getUnidadesDeMedida());
         comboUniMedidas.valueProperty().bindBidirectional(viewModel.uniMedidaSeleccionadaProperty());
+
         comboUbicaciones.setItems(viewModel.getUbicacionesDisponibles());
         comboUbicaciones.valueProperty().bindBidirectional(viewModel.ubicacionSeleccionadaProperty());
+
+        // Converter para mostrar solo el nombre de la ubicación
+        comboUbicaciones.setConverter(new StringConverter<Ubicacion>() {
+            @Override
+            public String toString(Ubicacion ubicacion) {
+                return (ubicacion != null) ? ubicacion.getUbicacion() : null;
+            }
+            @Override
+            public Ubicacion fromString(String string) {
+                return comboUbicaciones.getItems().stream()
+                        .filter(u -> u.getUbicacion().equals(string))
+                        .findFirst().orElse(null);
+            }
+        });
+    }
+
+    private void configurarValidacionesDeColor() {
+        tfCodBarra.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfCodBarra, () -> ManejadorInputs.codBarras(tfCodBarra.getText(), true)); });
+        tfNombre.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfNombre, () -> ManejadorInputs.textoGenerico(tfNombre.getText(), true, "Nombre", 60)); });
+        tfPrecio.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfPrecio, () -> ManejadorInputs.dinero(tfPrecio.getText(), true, false)); });
+        tfCantidadStock.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfCantidadStock, () -> ManejadorInputs.cantidadStock(tfCantidadStock.getText(), true)); });
+        tfCantidadStockMin.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfCantidadStockMin, () -> ManejadorInputs.cantidadStock(tfCantidadStockMin.getText(), true)); });
+
+        tfLote.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfLote, () -> ManejadorInputs.textoGenerico(tfLote.getText(), false, null, 40)); });
+        tfObservaciones.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfObservaciones, () -> ManejadorInputs.textoGenerico(tfObservaciones.getText(), false, null, 100)); });
+
+        comboMarcas.valueProperty().addListener((obs, ov, nv) -> setValidationStyle(comboMarcas, nv != null, "Seleccione marca."));
+        comboUbicaciones.valueProperty().addListener((obs, ov, nv) -> setValidationStyle(comboUbicaciones, nv != null, "Seleccione ubicación."));
+    }
+
+    private void validarCampo(Control control, Runnable validator) {
+        try { validator.run(); setValidationStyle(control, true, null); }
+        catch (IllegalArgumentException e) { setValidationStyle(control, false, e.getMessage()); }
+    }
+
+    private void setValidationStyle(Control control, boolean isValid, String tooltipText) {
+        if (!isValid) control.setStyle("-fx-border-color: red; -fx-border-width: 1px;");
+        else control.setStyle("");
     }
 
     @Override
     public void receiveData(Repuesto data) {
-        if (data != null) {
-            viewModel.poblarParaModificacion(data);
-        }
+        if (data != null) viewModel.poblarParaModificacion(data);
     }
 
     @Override
@@ -124,30 +126,34 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
 
     @FXML
     private void nuevaMarca() {
-        String nombreMarca = SimpleDialogs.nombreMarcaRepuesto();
-        if (nombreMarca == null) return;
         try {
+            String nombreMarca = SimpleDialogs.nombreMarcaRepuesto();
+            if (nombreMarca == null) return;
             viewModel.crearNuevaMarca(nombreMarca);
-        } catch (RuntimeException e) {
-            Alertas.error("Crear nueva marca de repuestos", e.getMessage());
+        } catch (Exception e) {
+            NotificationHelper.mostrarAdvertencia("Nueva Marca", e.getMessage());
         }
     }
 
     @FXML
-    private void cargarRepuesto(ActionEvent event) {
-        boolean resultado = Alertas.confirmacion("Guardar repuesto",
-                "¿Está seguro que desea guardar el repuesto?");
-        if (!resultado) return;
+    private void nuevaUbicacion() {
+        String nombreUbicacion = SimpleDialogs.nombreUbicacion();
+        if (nombreUbicacion == null) return;
+        viewModel.crearNuevaUbicacion(nombreUbicacion);
+    }
 
+    @FXML
+    private void cargarRepuesto(ActionEvent event) {
+        if (!SimpleDialogs.confirmacion("Guardar repuesto", "¿Está seguro que desea guardar el repuesto?")) return;
         try {
-            this.resultado = viewModel.guardarRepuesto();
-            Alertas.exito("Guardar repuesto", "Se a guardado con éxito el repuesto: " +
-                    viewModel.nombreProductoProperty().getValue());
+            viewModel.guardarRepuesto().ifPresent(r -> this.resultado = r);
+            NotificationHelper.mostrarExito("Guardar", "Repuesto guardado con éxito.");
             cerrar(event);
         } catch (IllegalArgumentException | DuplicateProductException e) {
-            Alertas.aviso("Error de validación", e.getMessage());
-        } catch (PersistenceException e) {
-            Alertas.error("Error de Base de Datos", "Ocurrió un error al intentar guardar el repuesto.");
+            NotificationHelper.mostrarAdvertencia("Validación", e.getMessage());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            NotificationHelper.mostrarError("Error BD", "Error al guardar repuesto.");
         }
     }
 
@@ -158,5 +164,4 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
         Stage s = (Stage) n.getScene().getWindow();
         s.close();
     }
-
 }

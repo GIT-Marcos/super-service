@@ -2,31 +2,36 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.MarcaRepuestoDAO;
 import SPRService.SPRService.DAOs.RepuestoDAO;
+import SPRService.SPRService.DAOs.UbicacionDAO;
 import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import SPRService.SPRService.entities.Repuesto;
+import SPRService.SPRService.entities.Ubicacion;
 import SPRService.SPRService.exceptions.DuplicateProductException;
 import SPRService.SPRService.services.RepuestoServ;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
-import jakarta.persistence.PersistenceException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Singleton
 public class RepuestoServImpl implements RepuestoServ {
 
     private final RepuestoDAO daoRepuesto;
     private final MarcaRepuestoDAO daoMarca;
+    private final UbicacionDAO daoUbicacion;
 
     @Inject
-    public RepuestoServImpl(RepuestoDAO daoRepuesto, MarcaRepuestoDAO daoMarca) {
+    public RepuestoServImpl(RepuestoDAO daoRepuesto, MarcaRepuestoDAO daoMarca, UbicacionDAO daoUbicacion) {
         this.daoRepuesto = daoRepuesto;
         this.daoMarca = daoMarca;
+        this.daoUbicacion = daoUbicacion;
     }
 
     @Transactional
@@ -100,30 +105,48 @@ public class RepuestoServImpl implements RepuestoServ {
 
     @Transactional
     @Override
-    public Repuesto cargarRepuesto(Repuesto repuesto) {
+    public Optional<Repuesto> cargarRepuesto(Repuesto repuesto) {
         if (repuesto == null || repuesto.getStock() == null)
             throw new NullPointerException("Error: el repuesto o el stock es nulo.");
         try {
+            verificarUnicidadCodBarras(repuesto);
             MarcaRepuesto marcaAttached = daoMarca.update(repuesto.getMarcaRepuesto());
             repuesto.vincularRepuestoYMarca(marcaAttached);
+
+            Ubicacion ubicacionAttached = daoUbicacion.update(repuesto.getStock().getUbicacion());
+            repuesto.getStock().asociarUbicacion(ubicacionAttached);
+
             daoRepuesto.save(repuesto);
-        } catch (PersistenceException e) {
-            if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
-                    e.getCause() instanceof org.postgresql.util.PSQLException) {
-                throw new DuplicateProductException("Ya existe un producto con el código de barras: "
-                + repuesto.getCodBarra() + " en el sistema.");
-            } else {
-                throw e;
-            }
+        } catch (DuplicateProductException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
-        return repuesto;
+        return Optional.of(repuesto);
+    }
+
+    @Transactional
+    private void verificarUnicidadCodBarras(Repuesto r) throws DuplicateProductException {
+        long idParaGuardar = (r.getId() != null) ? r.getId() : 0;
+        List<Repuesto> results = daoRepuesto.validarUnicidadCodBarras(r);
+        // Si el id es el mismo se encontró a sí mismo
+        if (!results.isEmpty() && !Objects.equals(idParaGuardar, results.getFirst().getId())) {
+            if (Objects.equals(r.getCodBarra(), results.getFirst().getCodBarra()))
+                throw new DuplicateProductException("Ya existe un repuesto con ese código de barras: " + r.getCodBarra());
+        }
     }
 
     @Transactional
     @Override
-    public Repuesto modificarRepuesto(Repuesto repuesto) {
-        if (repuesto.getStock() == null) throw new NullPointerException("Error: el stock es nulo.");
-        return daoRepuesto.update(repuesto);
+    public Optional<Repuesto> modificarRepuesto(Repuesto repuesto) {
+        try {
+            verificarUnicidadCodBarras(repuesto);
+            return Optional.ofNullable(daoRepuesto.update(repuesto));
+        } catch (DuplicateProductException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Transactional

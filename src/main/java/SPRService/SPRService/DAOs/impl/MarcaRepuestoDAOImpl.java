@@ -29,4 +29,15 @@ public class MarcaRepuestoDAOImpl extends GenericDAOImpl<MarcaRepuesto, Long> im
                 MarcaRepuesto.class).getResultList();
         return new HashSet<>(l);
     }
+
+    @Override
+    public List<MarcaRepuesto> validarUnicidadNombre(MarcaRepuesto m) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("SELECT m FROM MarcaRepuesto m " +
+                                "WHERE m.nombreMarca = :nombre",
+                        MarcaRepuesto.class)
+                .setParameter("nombre", m.getNombreMarca())
+                .setMaxResults(1)
+                .getResultList();
+    }
 }

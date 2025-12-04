@@ -1,5 +1,6 @@
 package SPRService.SPRService.util;
 
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -72,6 +73,25 @@ public class SimpleDialogs {
                     100);
         } catch (NullPointerException | IllegalArgumentException e) {
             Alertas.aviso("Crear nueva marca de repuestos", e.getMessage());
+            return null;
+        }
+    }
+
+    public static String nombreUbicacion() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Crear nueva ubicación");
+        dialog.setHeaderText("Indique el nombre de la nueva ubicación que desea cargar en el sistema.");
+        dialog.setContentText("Nombre: ");
+
+        Optional<String> opt = dialog.showAndWait();
+        if (opt.isEmpty()) {
+            return null;
+        }
+        try {
+            return ManejadorInputs.textoGenerico(opt.get(), true, "Nombre de ubicación",
+                    100);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            NotificationHelper.mostrarAdvertencia("Crear nueva ubicación", e.getMessage());
             return null;
         }
     }

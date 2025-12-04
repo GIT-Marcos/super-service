@@ -23,9 +23,6 @@ public class Stock implements Serializable {
     @Column(name = "unidad_medida", nullable = false)
     private String unidadMedida;
 
-    @Column(nullable = false)
-    private String ubicacion;
-
     @Column
     private String lote;
 
@@ -35,19 +32,29 @@ public class Stock implements Serializable {
     @Column(nullable = false)
     private Boolean activo;
 
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @JoinColumn(name = "fk_ubicacion", nullable = false)
+    private Ubicacion ubicacion;
+
     public Stock() {
+        this.activo = Boolean.TRUE;
     }
 
-    public Stock(Long id, Double cantidadExistente, Double cantMinima, String unidadMedida, String ubicacion,
-                 String lote, String observaciones) {
+    public Stock(Long id, Double cantidadExistente, Double cantMinima, String unidadMedida,
+                 String lote, String observaciones, Ubicacion ubicacion) {
         this.id = id;
         this.cantidadExistente = cantidadExistente;
         this.cantMinima = cantMinima;
         this.unidadMedida = unidadMedida;
-        this.ubicacion = ubicacion;
         this.lote = lote;
         this.observaciones = observaciones;
         this.activo = Boolean.TRUE;
+        asociarUbicacion(ubicacion);
+    }
+
+    public void asociarUbicacion(Ubicacion u) {
+        this.ubicacion = u;
+        u.getStocks().add(this);
     }
 
     public Long getId() {
@@ -82,14 +89,6 @@ public class Stock implements Serializable {
         this.unidadMedida = unidadMedida;
     }
 
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
-    }
-
     public String getLote() {
         return lote;
     }
@@ -112,6 +111,14 @@ public class Stock implements Serializable {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public Ubicacion getUbicacion() {
+        return ubicacion;
+    }
+
+    public void setUbicacion(Ubicacion ubicacion) {
+        this.ubicacion = ubicacion;
     }
 
     @Override

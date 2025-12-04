@@ -6,6 +6,7 @@ import SPRService.SPRService.entities.Repuesto;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface RepuestoServ {
 
@@ -17,9 +18,9 @@ public interface RepuestoServ {
                                      Boolean verStockNormal, Boolean verStockBajo,
                                      String colParaOrdenar, Integer tipoOrden);
 
-    Repuesto cargarRepuesto(Repuesto repuesto);
+    Optional<Repuesto> cargarRepuesto(Repuesto repuesto);
 
-    Repuesto modificarRepuesto(Repuesto repuesto);
+    Optional<Repuesto> modificarRepuesto(Repuesto repuesto);
 
     void borrarRepuesto(Repuesto repuesto);
 

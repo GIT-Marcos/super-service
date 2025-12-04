@@ -27,6 +27,7 @@ module navegador2.SPRService {
     opens SPRService.SPRService.DTOs to javafx.base;
     opens SPRService.SPRService.viewModels to javafx.base;
     opens SPRService.SPRService.DAOs.impl to com.google.guice;
+    opens SPRService.SPRService.DAOs to com.google.guice;
 
     // Exporta lo que deba ser visible para otros módulos (incluido Scene Builder)
     exports SPRService.SPRService;
