@@ -12,7 +12,6 @@ import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.NotaRetiroServ;
 import SPRService.SPRService.util.SafeLocalDateConverter;
-import SPRService.SPRService.util.alertas.Alertas;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -229,7 +228,7 @@ public class NotasRetiroController implements Initializable {
             mostrarNotificacion("Cancelar Nota", "La nota seleccionada ya está anulada.", true);
             return;
         }
-        if (!Alertas.confirmacion("Cancelar nota de retiro",
+        if (!SimpleDialogs.confirmacion("Cancelar nota de retiro",
                 "Esta acción es irreversible y el stock se restablecerá.\n¿Confirmar cancelación?")) {
             return;
         }
@@ -256,7 +255,7 @@ public class NotasRetiroController implements Initializable {
             return;
         }
         File file;
-        if (Alertas.confirmacion("Generar ticket", "¿Quiere generar el ticket en la ruta predeterminada?")) {
+        if (SimpleDialogs.confirmacion("Generar ticket", "¿Quiere generar el ticket en la ruta predeterminada?")) {
             file = new File("C:\\Users\\Usuario\\Desktop\\nota retiro.txt");
         } else {
             file = SimpleDialogs.selectorRuta(event, "Seleccione donde quiere guardar la nota",
@@ -266,7 +265,7 @@ public class NotasRetiroController implements Initializable {
         if (file == null) return;
         GeneradorTXT.generaNotaRetiro(vm.getNotaOriginal().getDetallesRetiroList(), file);
 
-        if (Alertas.confirmacion("Imprimir ticket", "¿Desea imprimir el ticket generado?"))
+        if (SimpleDialogs.confirmacion("Imprimir ticket", "¿Desea imprimir el ticket generado?"))
             Impresor.imprimirConSistema(file);
     }
 

@@ -102,7 +102,7 @@
                         <Font name="System Bold" size="14.0" />
                     </font>
                 </Label>
-                <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-report" text="🏆 Clientes más frecuentes" wrapText="true">
+                <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-report" text="🏆 Clientes con más services" wrapText="true">
                     <font>
                         <Font size="12.0" />
                     </font>

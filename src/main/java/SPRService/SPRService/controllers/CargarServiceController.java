@@ -12,7 +12,6 @@ import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SimpleDialogs;
-import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
@@ -194,7 +193,7 @@ public class CargarServiceController implements Initializable, ModalController<S
             Service service = new Service(LocalDateTime.now().plusDays(1), cbPrioridad.getValue(), this.cliente,
                     orden);
 
-            if (!Alertas.confirmacion("Cargar service", "¿Está seguro que desea cargar?")) return;
+            if (!SimpleDialogs.confirmacion("Cargar service", "¿Está seguro que desea cargar?")) return;
             this.service = serviceServ.cargarService(service);
             Notifications.create()
                     .title("Cargar service")
@@ -203,7 +202,7 @@ public class CargarServiceController implements Initializable, ModalController<S
                     .position(Pos.BOTTOM_RIGHT)
                     .showInformation();
 
-            if (Alertas.confirmacion("Generar ticket de service", "¿Quiere generar un ticket?")) {
+            if (SimpleDialogs.confirmacion("Generar ticket de service", "¿Quiere generar un ticket?")) {
                 gestionarTicket(event, this.service);
             }
 

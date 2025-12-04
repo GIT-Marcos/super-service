@@ -8,7 +8,7 @@ import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemTrabajoViewModel;
@@ -144,7 +144,7 @@ public class DetalleOrdenController implements Initializable, DataReceiver<Servi
                     dpFechaEntrega.getValue().atStartOfDay();
             service.setFechaEntrega(fe);
 
-            if (!Alertas.confirmacion("Modificar orden", "¿Está seguro que desea guardar la orden?"))
+            if (!SimpleDialogs.confirmacion("Modificar orden", "¿Está seguro que desea guardar la orden?"))
                 return;
             this.paraDevolver = serviceServ.modificarService(service);
             Notifications.create()

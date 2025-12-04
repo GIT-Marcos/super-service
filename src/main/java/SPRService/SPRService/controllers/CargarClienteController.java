@@ -7,7 +7,8 @@ import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.ClienteServ;
 import SPRService.SPRService.util.ManejadorInputs;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import com.google.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import javafx.collections.FXCollections;
@@ -28,6 +29,7 @@ import java.util.ResourceBundle;
 public class CargarClienteController implements Initializable, DataReceiver<Cliente>, ModalController<Cliente> {
 
     private Cliente cliente;
+    private Cliente clienteParaDevolver;
     private final ClienteServ clienteServ;
     private boolean flagModifyMode = false;
     private ObservableList<String> obsListEmails = FXCollections.observableArrayList();
@@ -77,8 +79,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
 
     @Override
     public Optional<Cliente> getResult() {
-        // todo: cambiar el resto de los usos de Optional por esta forma
-        return Optional.ofNullable(this.cliente);
+        return Optional.ofNullable(this.clienteParaDevolver);
     }
 
     @FXML
@@ -87,7 +88,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         try {
             eMail = ManejadorInputs.eMail(tfEmail.getText(), true);
         } catch (RuntimeException e) {
-            Alertas.aviso("Agregar eMail", e.getMessage());
+            NotificationHelper.mostrarAdvertencia("Agregar eMail", e.getMessage());
             return;
         }
         if (obsListEmails.contains(eMail)) {
@@ -105,7 +106,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         try {
             nro = ManejadorInputs.nroTel(tfNro.getText(), true);
         } catch (RuntimeException e) {
-            Alertas.aviso("Agregar número de teléfono.", e.getMessage());
+            NotificationHelper.mostrarAdvertencia("Agregar número de teléfono.", e.getMessage());
             return;
         }
         if (obsListNrosTelefono.contains(nro)) {
@@ -119,45 +120,68 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
 
     @FXML
     private void guardar(ActionEvent event) {
-        Cliente clienteParaCargar;
+        // 1. Validaciones de campos de texto
         String dni;
         String nombre;
         String apellido;
         try {
             dni = ManejadorInputs.dni(tfDNI.getText(), true);
-            nombre = ManejadorInputs.textoGenerico(tfNombre.getText(), true,
-                    "Nombre", 40);
-            apellido = ManejadorInputs.textoGenerico(tfApellido.getText(), true,
-                    "Apellido", 40);
+            nombre = ManejadorInputs.textoGenerico(tfNombre.getText(), true, "Nombre", 40);
+            apellido = ManejadorInputs.textoGenerico(tfApellido.getText(), true, "Apellido", 40);
         } catch (RuntimeException e) {
-            Alertas.aviso("Guardar cliente", e.getMessage());
+            NotificationHelper.mostrarError("Guardar cliente", e.getMessage());
             return;
         }
+
+        // 2. Validación de listas de contacto
         if (obsListEmails.isEmpty() && obsListNrosTelefono.isEmpty()) {
-            Alertas.aviso("Datos de contacto", "Debe haber al menos un dato de contacto.");
+            NotificationHelper.mostrarAdvertencia("Datos de contacto", "Debe haber al menos un dato de contacto.");
             return;
         }
 
-        if (!Alertas.confirmacion("Guardar cliente", "¿Confirmar guardado de cliente?")) return;
+        if (!SimpleDialogs.confirmacion("Guardar cliente", "¿Confirmar guardado de cliente?")) return;
+
+        // 3. PREPARACIÓN DE DATOS CONTACTO (Aquí estaba el error)
+        DatosContacto datosContacto;
+
         if (!flagModifyMode) {
-            DatosContacto datosContacto = new DatosContacto();
-            datosContacto.setId(null);
-            datosContacto.getEmailSet().addAll(obsListEmails);
-            datosContacto.getNroTelefonoSet().addAll(obsListNrosTelefono);
-            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new HashSet<>(),
-                    new HashSet<>());
+            // MODO NUEVO: Creamos uno nuevo
+            datosContacto = new DatosContacto();
+            datosContacto.setId(null); // Aseguramos que sea null para que se cree
         } else {
-            DatosContacto datosContacto = this.cliente.getContactosCliente();
-            clienteParaCargar = new Cliente(this.cliente.getId(), dni, nombre, apellido,
-                    datosContacto, new HashSet<>(), new HashSet<>());
+            // MODO EDICIÓN: Usamos el existente
+            datosContacto = this.cliente.getContactosCliente();
         }
 
+        // --- PASO CRUCIAL: ACTUALIZAR EL CONTENIDO DEL OBJETO ---
+        // Limpiamos los sets actuales y agregamos lo que hay en la vista
+        datosContacto.getEmailSet().clear();
+        datosContacto.getEmailSet().addAll(obsListEmails);
+
+        datosContacto.getNroTelefonoSet().clear();
+        datosContacto.getNroTelefonoSet().addAll(obsListNrosTelefono);
+        // --------------------------------------------------------
+
+        // 4. Construcción del objeto Cliente
+        Cliente clienteParaCargar;
+        if (!flagModifyMode) {
+            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new HashSet<>(), new HashSet<>());
+        } else {
+            // Preservamos el ID y las relaciones existentes (ventas, etc) si es necesario,
+            // aunque aquí pasamos HashSets vacíos asumiendo que el Servicio hace un 'merge' o ignora esos campos.
+            clienteParaCargar = new Cliente(this.cliente.getId(), dni, nombre, apellido,
+                    datosContacto, this.cliente.getVehiculos(), this.cliente.getServices());
+            // Nota: He cambiado 'new HashSet<>()' por los getters originales del cliente
+            // para no perder referencias si tu servicio usa este objeto directamente.
+        }
+
+        // 5. Llamada al Servicio
         try {
             if (!flagModifyMode) {
-                clienteParaCargar = clienteServ.saveClient(clienteParaCargar);
+                this.clienteParaDevolver = clienteServ.saveClient(clienteParaCargar);
             } else {
                 try {
-                    clienteParaCargar = clienteServ.editClient(clienteParaCargar);
+                    this.clienteParaDevolver = clienteServ.editClient(clienteParaCargar);
                 } catch (PersistenceException e) {
                     if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
                             e.getCause() instanceof org.postgresql.util.PSQLException) {
@@ -166,21 +190,16 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
                     } else {
                         throw e;
                     }
-                } catch (RuntimeException e) {
-                    throw new RuntimeException("Error inesperado al guardar el cliente.", e);
                 }
             }
-            Alertas.exito("Guardar cliente", "Se han guardado los datos del cliente con éxito.");
+            NotificationHelper.mostrarExito("Guardar cliente", "Se han guardado los datos del cliente con éxito.");
             cancelar(event);
         } catch (DuplicateClientDNI e) {
-            Alertas.aviso("Guardar cliente", e.getMessage());
-            return;
+            NotificationHelper.mostrarAdvertencia("Guardar cliente", e.getMessage());
         } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Guardar cliente", e.getMessage());
             e.printStackTrace();
-            Alertas.aviso("Guardar cliente", e.getMessage());
-            return;
         }
-        this.cliente = clienteParaCargar;
     }
 
     @FXML

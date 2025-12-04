@@ -15,7 +15,7 @@ import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.GeneradorFacturasPDF;
 import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
@@ -108,7 +108,7 @@ public class ServicesController implements Initializable {
         SPRService.SPRService.viewModels.tablas.ServiceRowViewModel dto =
                 tablaServices.getSelectionModel().getSelectedItem();
         if (dto == null) {
-            Alertas.aviso("Detalles de service", "Debes seleccionar un service se la tabla para " +
+            NotificationHelper.mostrarAdvertencia("Detalles de service", "Debes seleccionar un service se la tabla para " +
                     "ver sus detalles.");
             return;
         }
@@ -123,19 +123,17 @@ public class ServicesController implements Initializable {
     private void agregarPago() {
         SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            Alertas.aviso("Agregar pago", "Debe seleccionar un service para agregarle el pago.");
+            NotificationHelper.mostrarAdvertencia("Agregar pago", "Debe seleccionar un service para agregarle el pago.");
             return;
         }
         if (vm.getService().getEstadoService() == EstadoService.CANCELADO ||
                 vm.getService().getEstadoService() == EstadoService.PAGADO) {
-            Alertas.aviso("Agregar pago", "No se pueden agregar pagos a las ventas que están canceladas" +
+            NotificationHelper.mostrarAdvertencia("Agregar pago", "No se pueden agregar pagos a las ventas que están canceladas" +
                     " o pagadas");
             return;
         }
         Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", vm.getService());
-        if (result.isPresent()) {
-            obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(result.get()));
-        }
+        result.ifPresent(service -> obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(service)));
     }
 
     @FXML
@@ -143,7 +141,7 @@ public class ServicesController implements Initializable {
         SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm =
                 tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            Alertas.aviso("Agregar pago", "Debe seleccionar un service para ver sus pagos.");
+            NotificationHelper.mostrarAdvertencia("Agregar pago", "Debe seleccionar un service para ver sus pagos.");
             return;
         }
         Optional<ServiceRowViewModel> result = navigator.openModal(Views.VER_PAGOS, "Ver pagos", vm);
@@ -157,11 +155,11 @@ public class ServicesController implements Initializable {
     private void generarFactura(ActionEvent event) {
         ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            Alertas.aviso("Factura service", "Debe seleccionar un service para imprimir su factura.");
+            NotificationHelper.mostrarAdvertencia("Factura service", "Debe seleccionar un service para imprimir su factura.");
             return;
         }
         if (vm.getService().getEstadoService() == EstadoService.CANCELADO) {
-            Alertas.aviso("Factura service", "No es posible generar facturas de services cancelados.");
+            NotificationHelper.mostrarAdvertencia("Factura service", "No es posible generar facturas de services cancelados.");
             return;
         }
 
@@ -204,7 +202,7 @@ public class ServicesController implements Initializable {
         if (file == null) return;
         GeneradorTXT.generarTicketRetiroService(new TicketRetiroServiceDTO(vm.getService()), file);
 
-        if (Alertas.confirmacion("Generar ticket", "¿Desea imprimir el ticket?"))
+        if (SimpleDialogs.confirmacion("Generar ticket", "¿Desea imprimir el ticket?"))
             Impresor.imprimirConSistema(file);
     }
 
@@ -212,42 +210,42 @@ public class ServicesController implements Initializable {
     private void darDeBaja() {
         SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            Alertas.aviso("Cancelar service", "Debe seleccionar un service para cancelarlo.");
+            NotificationHelper.mostrarAdvertencia("Cancelar service", "Debe seleccionar un service para cancelarlo.");
             return;
         }
 
         if (vm.getService().getEstadoService() == EstadoService.PAGADO ||
                 vm.getService().getEstadoService() == EstadoService.CANCELADO) {
-            Alertas.aviso("Cancelar service", "No es posible cancelar services en estado 'Pagado' o " +
+            NotificationHelper.mostrarAdvertencia("Cancelar service", "No es posible cancelar services en estado 'Pagado' o " +
                     "'Cancelado'.");
             return;
         }
 
         Usuario usuarioCancelador = SessionManager.getUsuarioSesion();
         if (usuarioCancelador == null) {
-            Alertas.error("Cancelación de venta", "No hay usuario en la sesión activa.");
+            NotificationHelper.mostrarError("Cancelación de venta", "No hay usuario en la sesión activa.");
             return;
         }
 
-        if (!Alertas.confirmacion("Cancelar service", "¿Está seguro de que desea cancelar el service?"))
+        if (!SimpleDialogs.confirmacion("Cancelar service", "¿Está seguro de que desea cancelar el service?"))
             return;
 
         String motivo = SimpleDialogs.motivoBorrado();
         if (motivo == null) return;
 
-        boolean confirmacion2 = Alertas.confirmacion("Cancelar service", "Esta acción es " +
+        boolean confirmacion2 = SimpleDialogs.confirmacion("Cancelar service", "Esta acción es " +
                 "irreversible.\n ¿Confirmar el borrado de service?");
         if (!confirmacion2) return;
 
-        Boolean restablecerStock = Alertas.confirmacionRestablecerStocks();
+        Boolean restablecerStock = SimpleDialogs.confirmacionRestablecerStocks();
         if (restablecerStock == null) return;
 
         try {
             Service cancelado = serviceServ.cancelarService(vm.getService(), restablecerStock, motivo, usuarioCancelador);
             obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(cancelado));
-            Alertas.exito("Cancelar service", "Se ha cancelado el service con éxito.");
+            NotificationHelper.mostrarExito("Cancelar service", "Se ha cancelado el service con éxito.");
         } catch (RuntimeException e) {
-            Alertas.aviso("Cancelar service", e.getMessage());
+            NotificationHelper.mostrarError("Cancelar service", e.getMessage());
             throw e;
         }
     }

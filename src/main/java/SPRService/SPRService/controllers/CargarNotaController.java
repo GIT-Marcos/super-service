@@ -9,7 +9,6 @@ import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.NotaRetiroServ;
 import SPRService.SPRService.util.SimpleDialogs;
-import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
@@ -104,9 +103,9 @@ public class CargarNotaController implements Initializable, ModalController<Nota
                     .showWarning();
             return;
         }
-        if (!Alertas.confirmacion("Cargar nota", "¿Esté seguro que desea cargar esta Nota de Retiro?"))
+        if (!SimpleDialogs.confirmacion("Cargar nota", "¿Esté seguro que desea cargar esta Nota de Retiro?"))
             return;
-        if (Alertas.confirmacion("Cargar nota", "¿Desea crear un archivo de texto de la nota de retiro?")) {
+        if (SimpleDialogs.confirmacion("Cargar nota", "¿Desea crear un archivo de texto de la nota de retiro?")) {
             gestionarNota(event);
         }
 

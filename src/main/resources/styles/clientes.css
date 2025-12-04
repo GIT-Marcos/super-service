@@ -14,8 +14,14 @@
 
 /* Etiquetas en panel oscuro */
 .top-panel .label, .top-panel .check-box {
-    -fx-text-fill: #dfe6e9;
     -fx-font-size: 12px;
+    -fx-text-fill: white; /* Color interior del texto */
+
+    /* Borde negro simulado con sombras en varias direcciones */
+    -fx-effect: dropshadow( one-pass-box , black , 2 , 0 , 1 , 0 ),
+    dropshadow( one-pass-box , black , 2 , 0 , -1 , 0 ),
+    dropshadow( one-pass-box , black , 2 , 0 , 0 , 1 ),
+    dropshadow( one-pass-box , black , 2 , 0 , 0 , -1 );
 }
 
 /* Inputs (TextFields) */

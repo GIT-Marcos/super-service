@@ -3,7 +3,7 @@ package SPRService.SPRService.controllers;
 import SPRService.SPRService.navigation.DefaultNavigator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.SimpleDialogs;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import javafx.event.ActionEvent;
@@ -47,7 +47,7 @@ public class InicioController implements Initializable {
 
     @FXML
     private void salir(ActionEvent event) {
-        if (!Alertas.confirmacion("Salir del programa",
+        if (!SimpleDialogs.confirmacion("Salir del programa",
                 "¿Está seguro que desea salir del programa?"))
             return;
 
