@@ -6,6 +6,7 @@ import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.*;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,7 +22,6 @@ import SPRService.SPRService.viewModels.tablas.VentaRepuestoVMtabla;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
-import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.generadores.GeneradorFacturasPDF;
 
 import java.io.File;
@@ -128,7 +128,7 @@ public class VentasController implements Initializable {
         VentaRepuesto ventaParaDetalles;
         VentaRepuestoVMtabla vrvm = tablaVentas.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
-            Alertas.aviso("Detalles de venta", "Debe seleccionar una venta para ver sus detalles.");
+            NotificationHelper.mostrarAdvertencia("Detalles de venta", "Debe seleccionar una venta para ver sus detalles.");
             return;
         }
         ventaParaDetalles = vrvm.getVentaRepuesto();
@@ -144,11 +144,12 @@ public class VentasController implements Initializable {
         VentaRepuesto ventaParaImpresion;
         VentaRepuestoVMtabla vrvm = tablaVentas.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
-            Alertas.aviso("Impresión de venta", "Debe seleccionar una venta para imprimir su factura.");
+            NotificationHelper.mostrarAdvertencia("Impresión de venta",
+                    "Debe seleccionar una venta para imprimir su factura.");
             return;
         } else if (vrvm.getVentaRepuesto().getEstadoVenta() == EstadoVentaRepuesto.CANCELADO) {
-            Alertas.aviso("Impresión de venta", "Esta venta ya está cancelada y no es posible imprimir " +
-                    "su factura.");
+            NotificationHelper.mostrarAdvertencia("Impresión de venta",
+                    "Esta venta ya está cancelada y no es posible imprimir su factura.");
             return;
         }
         ventaParaImpresion = vrvm.getVentaRepuesto();
@@ -161,9 +162,9 @@ public class VentasController implements Initializable {
         try {
             GeneradorFacturasPDF.generaPDFVenta(ventaParaImpresion, file);
         } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Impresión de factura",
+                    "Ha ocurrido un error inesperado el imprimir la factura.");
             e.printStackTrace();
-            Alertas.error("Impresión de factura", "Ha ocurrido un error inesperado el imprimir la " +
-                    "factura.");
         }
     }
 
@@ -182,17 +183,17 @@ public class VentasController implements Initializable {
         VentaRepuesto ventaParaCancelar;
         VentaRepuestoVMtabla vrvm = tablaVentas.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
-            Alertas.aviso("Cancelación de venta", "Debe seleccionar una venta para cancelarla.");
+            NotificationHelper.mostrarAdvertencia("Cancelación de venta", "Debe seleccionar una venta para cancelarla.");
             return;
         } else if (vrvm.getVentaRepuesto().getEstadoVenta() == EstadoVentaRepuesto.CANCELADO) {
-            Alertas.aviso("Cancelación de venta", "Esta venta ya está cancelada.");
+            NotificationHelper.mostrarAdvertencia("Cancelación de venta", "Esta venta ya está cancelada.");
             return;
         }
         ventaParaCancelar = vrvm.getVentaRepuesto();
 
         Usuario usuarioCancelador = SessionManager.getUsuarioSesion();
         if (usuarioCancelador == null) {
-            Alertas.error("Cancelación de venta", "No hay usuario en la sesión activa.");
+            NotificationHelper.mostrarAdvertencia("Cancelación de venta", "No hay usuario en la sesión activa.");
             return;
         }
 
@@ -210,9 +211,9 @@ public class VentasController implements Initializable {
             ventaParaCancelar = ventaRepuestoServ.cancelarVenta(ventaParaCancelar, restablecerStock, motivo,
                     usuarioCancelador);
             obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(ventaParaCancelar));
-            Alertas.exito("Cancelación de venta", "Se ha cancelado la venta con éxito.");
+            NotificationHelper.mostrarExito("Cancelación de venta", "Se ha cancelado la venta con éxito.");
         } catch (RuntimeException e) {
-            Alertas.aviso("Cancelación de venta", e.getMessage());
+            NotificationHelper.mostrarError("Cancelación de venta", e.getMessage());
             throw e;
         }
     }
@@ -232,7 +233,7 @@ public class VentasController implements Initializable {
         } catch (Exception e) {
             // Manejar la excepción, quizás mostrar una alerta
             // y devolver un DTO vacío para no romper la carga.
-            Alertas.aviso("Filtro inválidos", e.getMessage());
+            NotificationHelper.mostrarAdvertencia("Filtro inválidos", e.getMessage());
             return new FiltroVentaRepuestoDTO(); // Devuelve filtros por defecto
         }
     }
