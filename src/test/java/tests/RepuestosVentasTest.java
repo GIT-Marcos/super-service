@@ -47,37 +47,52 @@ class RepuestosVentasTest {
         System.out.println("--- Iniciando test de población para un año completo ---");
         Random random = new Random();
 
-        // 1. PREPARAR LA MARCA (Inicialmente sin ID)
+        // 1. PREPARAR LA MARCA Y LA UBICACIÓN (Inicialmente sin ID)
         String nombreMarcaUnica = "Marca Test " + UUID.randomUUID().toString().substring(0, 8);
         MarcaRepuesto marcaActual = new MarcaRepuesto(null, nombreMarcaUnica, new HashSet<>());
+
+        // CAMBIO: Creamos la Ubicación objeto.
+        // Al principio tiene ID null. El CascadeType.PERSIST del Stock la guardará.
+        Ubicacion u = new Ubicacion(null, "DEPOSITO A TEST", new ArrayList<>());
 
         System.out.println("Generando 50 repuestos de prueba...");
         List<Repuesto> listaRepuestos = new ArrayList<>();
         int cantidadRepuestos = 50;
 
-        // 2. CREAR LOS REPUESTOS Y GESTIONAR LA MARCA
+        // 2. CREAR LOS REPUESTOS
         for (int i = 0; i < cantidadRepuestos; i++) {
 
-            // Llamada al método auxiliar corregido
-            Repuesto repuestoGuardado = crearRepuestoParametrizado(i, marcaActual);
+            // Llamada al método auxiliar pasando la ubicación
+            Repuesto repuestoGuardado = crearRepuestoParametrizado(i, marcaActual, u);
             listaRepuestos.add(repuestoGuardado);
 
-            // Actualización de la marca con la que tiene el ID de la base de datos
+            // CAMBIO IMPORTANTE:
+            // En la primera iteración, 'marcaActual' y 'u' (ubicación) se guardan en BD y obtienen un ID.
+            // Debemos actualizar nuestras variables locales con las instancias gestionadas (con ID).
+            // Si no hacemos esto, en la iteración i=1, JPA intentará insertar "DEPOSITO A TEST" de nuevo
+            // y fallará por Unique Constraint o por pasar una entidad "detached".
             if (i == 0) {
                 marcaActual = repuestoGuardado.getMarcaRepuesto();
+                u = repuestoGuardado.getStock().getUbicacion(); // Actualizamos la referencia de Ubicación
+
                 assertNotNull(marcaActual.getId(), "La marca ya debería tener ID asignado");
+                assertNotNull(u.getId(), "La ubicación ya debería tener ID asignado");
             }
         }
 
         assertEquals(50, listaRepuestos.size(), "Se deberían haber creado 50 repuestos");
+        // Verificación extra: Todos los stocks tienen la misma ubicación (mismo ID)
+        Long idUbicacionEsperado = listaRepuestos.getFirst().getStock().getUbicacion().getId();
+        for(Repuesto r : listaRepuestos) {
+            assertEquals(idUbicacionEsperado, r.getStock().getUbicacion().getId(), "Todos los stocks deben compartir la misma ubicación");
+        }
 
-        // 3. LÓGICA DE VENTAS
+        // 3. LÓGICA DE VENTAS (Igual que antes)
         int anioActual = Year.now().getValue();
         int totalVentasGeneradas = 0;
 
         for (int mes = 1; mes <= 12; mes++) {
             int numVentasEsteMes = random.nextInt(40);
-            // System.out.println("Mes " + mes + ": generando " + numVentasEsteMes + " ventas."); // Comentado para menos ruido
 
             int diasEnMes = YearMonth.of(anioActual, mes).lengthOfMonth();
 
@@ -107,20 +122,20 @@ class RepuestosVentasTest {
         System.out.println("Fin. Total ventas generadas: " + totalVentasGeneradas);
     }
 
-    private Repuesto crearRepuestoParametrizado(int index, MarcaRepuesto marca) {
+    private Repuesto crearRepuestoParametrizado(int index, MarcaRepuesto marca, Ubicacion u) {
         String uniqueSuffix = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         String codigoBarra = "COD-" + index + "-" + uniqueSuffix;
         String nombre = "Repuesto " + index + " " + uniqueSuffix;
 
         BigDecimal precio = new BigDecimal("10000.00").add(new BigDecimal(index));
-        Stock stock = new Stock(null, 10000.0, 5.0, "u", "A1", null, null);
+
+        // CAMBIO: Constructor de Stock recibe el objeto Ubicacion 'u'
+        Stock stock = new Stock(null, 10000.0, 5.0, "Unidad", "A1", null, u);
 
         // IMPORTANTE: Usamos la 'marca' que recibimos por parámetro.
         Repuesto repuesto = new Repuesto(null, codigoBarra, nombre, precio, marca, stock);
 
         // --- CORRECCIÓN PARA EL OPTIONAL ---
-        // Como el servicio ahora devuelve Optional<Repuesto>, usamos .orElseThrow()
-        // Esto devuelve el Repuesto si existe, o lanza un error si vino vacío (fallo el test)
         return repuestoServ.cargarRepuesto(repuesto)
                 .orElseThrow(() -> new RuntimeException("Error en test: El servicio devolvió un Optional vacío al guardar repuesto index " + index));
     }

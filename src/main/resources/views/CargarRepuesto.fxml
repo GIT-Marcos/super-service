@@ -18,14 +18,14 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="590.0" minWidth="500.0" prefHeight="590.0" prefWidth="600.0" styleClass="root" stylesheets="@../styles/deposito.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarRepuestoController">
 
-    <!-- 1. HEADER (Estilo top-panel) -->
+    <!-- 1. HEADER -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="top-panel" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
             </padding>
             <children>
-                <Label text="NUEVO REPUESTO" textFill="WHITE">
+                <Label text="REPUESTO" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="16.0" />
                     </font>
@@ -40,7 +40,7 @@
         </HBox>
     </top>
 
-    <!-- 2. FORMULARIO CENTRAL (Scrollable por si la pantalla es pequeña) -->
+    <!-- 2. FORMULARIO CENTRAL -->
     <center>
         <ScrollPane fitToWidth="true" prefWidth="600.0" style="-fx-background-color: transparent; -fx-background: transparent;" BorderPane.alignment="CENTER">
             <content>
@@ -144,7 +144,7 @@
                             </children>
                         </VBox>
 
-                        <!-- SECCIÓN 3: DETALLES Y UBICACIÓN -->
+                        <!-- SECCIÓN 3: DETALLES Y UBICACIÓN (MODIFICADA) -->
                         <VBox spacing="8.0">
                             <children>
                                 <Label styleClass="section-label" text="DETALLES Y UBICACIÓN" />
@@ -159,11 +159,16 @@
                                         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                                     </rowConstraints>
                                     <children>
-                                        <!-- Ubicación -->
+                                        <!-- Ubicación (CON BOTÓN AGREGADO) -->
                                         <VBox spacing="2.0">
                                             <children>
                                                 <Label styleClass="section-label" text="UBICACIÓN FÍSICA" />
-                                                <ComboBox fx:id="comboUbicaciones" editable="true" maxWidth="1.7976931348623157E308" promptText="Depósito..." />
+                                                <HBox spacing="10.0">
+                                                    <children>
+                                                        <ComboBox fx:id="comboUbicaciones" maxWidth="1.7976931348623157E308" promptText="Ubicación..." HBox.hgrow="ALWAYS" />
+                                                        <Button mnemonicParsing="false" onAction="#nuevaUbicacion" styleClass="btn-action" text="+ Nueva" />
+                                                    </children>
+                                                </HBox>
                                             </children>
                                         </VBox>
                                         <!-- Lote -->
@@ -196,7 +201,7 @@
         </ScrollPane>
     </center>
 
-    <!-- 3. FOOTER: BOTONES -->
+    <!-- 3. FOOTER -->
     <bottom>
         <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
             <padding>

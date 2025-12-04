@@ -2,10 +2,12 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.MarcaRepuestoDAO;
 import SPRService.SPRService.DAOs.RepuestoDAO;
+import SPRService.SPRService.DAOs.UbicacionDAO;
 import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import SPRService.SPRService.entities.Repuesto;
+import SPRService.SPRService.entities.Ubicacion;
 import SPRService.SPRService.exceptions.DuplicateProductException;
 import SPRService.SPRService.services.RepuestoServ;
 import com.google.inject.Inject;
@@ -23,11 +25,13 @@ public class RepuestoServImpl implements RepuestoServ {
 
     private final RepuestoDAO daoRepuesto;
     private final MarcaRepuestoDAO daoMarca;
+    private final UbicacionDAO daoUbicacion;
 
     @Inject
-    public RepuestoServImpl(RepuestoDAO daoRepuesto, MarcaRepuestoDAO daoMarca) {
+    public RepuestoServImpl(RepuestoDAO daoRepuesto, MarcaRepuestoDAO daoMarca, UbicacionDAO daoUbicacion) {
         this.daoRepuesto = daoRepuesto;
         this.daoMarca = daoMarca;
+        this.daoUbicacion = daoUbicacion;
     }
 
     @Transactional
@@ -108,6 +112,10 @@ public class RepuestoServImpl implements RepuestoServ {
             verificarUnicidadCodBarras(repuesto);
             MarcaRepuesto marcaAttached = daoMarca.update(repuesto.getMarcaRepuesto());
             repuesto.vincularRepuestoYMarca(marcaAttached);
+
+            Ubicacion ubicacionAttached = daoUbicacion.update(repuesto.getStock().getUbicacion());
+            repuesto.getStock().asociarUbicacion(ubicacionAttached);
+
             daoRepuesto.save(repuesto);
         } catch (DuplicateProductException e) {
             throw e;

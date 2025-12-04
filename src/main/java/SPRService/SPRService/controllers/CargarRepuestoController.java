@@ -1,7 +1,11 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.entities.MarcaRepuesto;
+import SPRService.SPRService.entities.Repuesto;
+import SPRService.SPRService.entities.Ubicacion;
 import SPRService.SPRService.exceptions.DuplicateProductException;
+import SPRService.SPRService.navigation.DataReceiver;
+import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
@@ -16,9 +20,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import SPRService.SPRService.entities.Repuesto;
-import SPRService.SPRService.navigation.DataReceiver;
-import SPRService.SPRService.navigation.ModalController;
+import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.util.Optional;
@@ -30,12 +32,13 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
     private Repuesto resultado;
 
     @FXML
-    private TextField tfCodBarra, tfNombre, tfPrecio, tfCantidadStock, tfCantidadStockMin, tfLote,
-            tfObservaciones;
+    private TextField tfCodBarra, tfNombre, tfPrecio, tfCantidadStock, tfCantidadStockMin, tfLote, tfObservaciones;
     @FXML
     private ComboBox<MarcaRepuesto> comboMarcas;
     @FXML
-    private ComboBox<String> comboUniMedidas, comboUbicaciones;
+    private ComboBox<String> comboUniMedidas;
+    @FXML
+    private ComboBox<Ubicacion> comboUbicaciones;
 
     @Inject
     public CargarRepuestoController(CargaRepuestoViewModel viewModel) {
@@ -45,126 +48,75 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         viewModel.inicializar();
-        // REMOVIDO: configurarFormattersNumericos();
         bindControls();
-        configurarValidacionesDeColor(); // NUEVO: Configura las validaciones visuales
+        configurarValidacionesDeColor();
 
         Platform.runLater(() -> {
             Stage s = (Stage) tfCodBarra.getScene().getWindow();
-            s.setOnCloseRequest(event -> {
-                this.viewModel.limpiar();
-            });
+            s.setOnCloseRequest(event -> this.viewModel.limpiar());
         });
     }
 
-    // REMOVIDO: configurarFormattersNumericos()
-
     private void bindControls() {
-        // Mejorado: Ahora todas las propiedades de texto en el ViewModel son StringProperty
-        // No se necesitan StringConverters ni .asObject() para los TextFields.
-
         tfCodBarra.textProperty().bindBidirectional(viewModel.codBarrasProperty());
         tfNombre.textProperty().bindBidirectional(viewModel.nombreProductoProperty());
         tfLote.textProperty().bindBidirectional(viewModel.loteProperty());
         tfObservaciones.textProperty().bindBidirectional(viewModel.observacionesProperty());
-
-        // Campos numéricos (ahora StringProperty en el ViewModel)
         tfCantidadStock.textProperty().bindBidirectional(viewModel.cantidadExistenteProperty());
         tfCantidadStockMin.textProperty().bindBidirectional(viewModel.cantidadMinimaProperty());
         tfPrecio.textProperty().bindBidirectional(viewModel.precioProperty());
 
-        // ComboBox bindings
         comboMarcas.setItems(viewModel.getMarcasDisponibles());
         comboMarcas.valueProperty().bindBidirectional(viewModel.marcaSeleccionadaProperty());
+
         comboUniMedidas.setItems(viewModel.getUnidadesDeMedida());
         comboUniMedidas.valueProperty().bindBidirectional(viewModel.uniMedidaSeleccionadaProperty());
+
         comboUbicaciones.setItems(viewModel.getUbicacionesDisponibles());
         comboUbicaciones.valueProperty().bindBidirectional(viewModel.ubicacionSeleccionadaProperty());
+
+        // Converter para mostrar solo el nombre de la ubicación
+        comboUbicaciones.setConverter(new StringConverter<Ubicacion>() {
+            @Override
+            public String toString(Ubicacion ubicacion) {
+                return (ubicacion != null) ? ubicacion.getUbicacion() : null;
+            }
+            @Override
+            public Ubicacion fromString(String string) {
+                return comboUbicaciones.getItems().stream()
+                        .filter(u -> u.getUbicacion().equals(string))
+                        .findFirst().orElse(null);
+            }
+        });
     }
 
-    /**
-     * Establece listeners para la validación visual de los campos.
-     */
     private void configurarValidacionesDeColor() {
-        // VALIDACIONES OBLIGATORIAS y DE FORMATO
-        // Escucha cambios en el foco (para validar al salir del campo)
-        tfCodBarra.focusedProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue) validarCampo(tfCodBarra,
-                    () -> ManejadorInputs.codBarras(tfCodBarra.getText(), true));
-        });
+        tfCodBarra.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfCodBarra, () -> ManejadorInputs.codBarras(tfCodBarra.getText(), true)); });
+        tfNombre.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfNombre, () -> ManejadorInputs.textoGenerico(tfNombre.getText(), true, "Nombre", 60)); });
+        tfPrecio.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfPrecio, () -> ManejadorInputs.dinero(tfPrecio.getText(), true, false)); });
+        tfCantidadStock.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfCantidadStock, () -> ManejadorInputs.cantidadStock(tfCantidadStock.getText(), true)); });
+        tfCantidadStockMin.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfCantidadStockMin, () -> ManejadorInputs.cantidadStock(tfCantidadStockMin.getText(), true)); });
 
-        tfNombre.focusedProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue) validarCampo(tfNombre,
-                    () -> ManejadorInputs.textoGenerico(tfNombre.getText(), true, "Nombre de repuesto", 60));
-        });
+        tfLote.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfLote, () -> ManejadorInputs.textoGenerico(tfLote.getText(), false, null, 40)); });
+        tfObservaciones.focusedProperty().addListener((obs, ov, nv) -> { if (!nv) validarCampo(tfObservaciones, () -> ManejadorInputs.textoGenerico(tfObservaciones.getText(), false, null, 100)); });
 
-        // Se valida el precio y stock como numérico al perder el foco
-        tfPrecio.focusedProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue) validarCampo(tfPrecio,
-                    () -> ManejadorInputs.dinero(tfPrecio.getText(), true, false));
-        });
-
-        tfCantidadStock.focusedProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue) validarCampo(tfCantidadStock,
-                    () -> ManejadorInputs.cantidadStock(tfCantidadStock.getText(), true));
-        });
-
-        tfCantidadStockMin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue) validarCampo(tfCantidadStockMin,
-                    () -> ManejadorInputs.cantidadStock(tfCantidadStockMin.getText(), true));
-        });
-
-        // VALIDACIONES OPCIONALES (solo para cambiar el color si no cumplen el formato/largo)
-        tfLote.focusedProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue) validarCampo(tfLote,
-                    () -> ManejadorInputs.textoGenerico(tfLote.getText(), false, null, 40));
-        });
-        tfObservaciones.focusedProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue) validarCampo(tfObservaciones,
-                    () -> ManejadorInputs.textoGenerico(tfObservaciones.getText(), false, null, 100));
-        });
-
-        // Validación para ComboBox (al cambiar la selección)
-        comboMarcas.valueProperty().addListener((obs, oldValue, newValue) ->
-                setValidationStyle(comboMarcas, newValue != null, "Debe seleccionar una marca."));
+        comboMarcas.valueProperty().addListener((obs, ov, nv) -> setValidationStyle(comboMarcas, nv != null, "Seleccione marca."));
+        comboUbicaciones.valueProperty().addListener((obs, ov, nv) -> setValidationStyle(comboUbicaciones, nv != null, "Seleccione ubicación."));
     }
 
-    /**
-     * Función genérica para ejecutar una validación y cambiar el estilo del control.
-     * @param control El control a validar.
-     * @param validator La lógica de validación (un Runnable que lanza IllegalArgumentException si falla).
-     */
     private void validarCampo(Control control, Runnable validator) {
-        try {
-            validator.run();
-            setValidationStyle(control, true, null); // Éxito
-        } catch (IllegalArgumentException e) {
-            setValidationStyle(control, false, e.getMessage()); // Error
-        }
+        try { validator.run(); setValidationStyle(control, true, null); }
+        catch (IllegalArgumentException e) { setValidationStyle(control, false, e.getMessage()); }
     }
 
-    /**
-     * Aplica el estilo de validación (borde rojo/normal) al control.
-     * @param control El control (TextField/ComboBox) a estilizar.
-     * @param isValid Si la validación fue exitosa.
-     * @param tooltipText El mensaje de error a mostrar en el tooltip (solo si es inválido).
-     */
     private void setValidationStyle(Control control, boolean isValid, String tooltipText) {
-        if (!isValid) {
-            // Estilo para indicar error (borde rojo)
-            control.setStyle("-fx-border-color: red; -fx-border-width: 1px;");
-            // Aquí podrías añadir un Tooltip con el tooltipText si lo deseas.
-        } else {
-            // Estilo normal (eliminar borde rojo)
-            control.setStyle("");
-        }
+        if (!isValid) control.setStyle("-fx-border-color: red; -fx-border-width: 1px;");
+        else control.setStyle("");
     }
 
     @Override
     public void receiveData(Repuesto data) {
-        if (data != null) {
-            viewModel.poblarParaModificacion(data);
-        }
+        if (data != null) viewModel.poblarParaModificacion(data);
     }
 
     @Override
@@ -178,47 +130,31 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
             String nombreMarca = SimpleDialogs.nombreMarcaRepuesto();
             if (nombreMarca == null) return;
             viewModel.crearNuevaMarca(nombreMarca);
-        } catch (IllegalArgumentException e) {
-            NotificationHelper.mostrarAdvertencia("Crear nueva marca de repuestos", e.getMessage());
-        } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Crear nueva marca de repuestos", e.getMessage());
-            e.printStackTrace();
+        } catch (Exception e) {
+            NotificationHelper.mostrarAdvertencia("Nueva Marca", e.getMessage());
         }
     }
 
     @FXML
-    private void cargarRepuesto(ActionEvent event) {
-        if (!SimpleDialogs.confirmacion("Guardar repuesto",
-                "¿Está seguro que desea guardar el repuesto?")) return;
-
-        //        resetearEstilosDeError();
-        try {
-            viewModel.guardarRepuesto().ifPresent(r -> this.resultado = r);
-            NotificationHelper.mostrarExito("Guardar repuesto", "Se a guardado con éxito el repuesto: " +
-                    viewModel.nombreProductoProperty().getValue());
-            cerrar(event);
-        } catch (IllegalArgumentException | DuplicateProductException e) {
-            NotificationHelper.mostrarAdvertencia("Error de validación", e.getMessage());
-        } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Error de Base de Datos", "Ocurrió un error al intentar guardar el repuesto.");
-            e.printStackTrace();
-        }
+    private void nuevaUbicacion() {
+        String nombreUbicacion = SimpleDialogs.nombreUbicacion();
+        if (nombreUbicacion == null) return;
+        viewModel.crearNuevaUbicacion(nombreUbicacion);
     }
 
-    /**
-     * Restablece los estilos de todos los campos que puedan tener error.
-     */
-    private void resetearEstilosDeError() {
-        setValidationStyle(tfCodBarra, true, null);
-        setValidationStyle(tfNombre, true, null);
-        setValidationStyle(tfPrecio, true, null);
-        setValidationStyle(tfCantidadStock, true, null);
-        setValidationStyle(tfCantidadStockMin, true, null);
-        setValidationStyle(tfLote, true, null);
-        setValidationStyle(tfObservaciones, true, null);
-        setValidationStyle(comboMarcas, true, null);
-        setValidationStyle(comboUniMedidas, true, null);
-        setValidationStyle(comboUbicaciones, true, null);
+    @FXML
+    private void cargarRepuesto(ActionEvent event) {
+        if (!SimpleDialogs.confirmacion("Guardar repuesto", "¿Está seguro que desea guardar el repuesto?")) return;
+        try {
+            viewModel.guardarRepuesto().ifPresent(r -> this.resultado = r);
+            NotificationHelper.mostrarExito("Guardar", "Repuesto guardado con éxito.");
+            cerrar(event);
+        } catch (IllegalArgumentException | DuplicateProductException e) {
+            NotificationHelper.mostrarAdvertencia("Validación", e.getMessage());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            NotificationHelper.mostrarError("Error BD", "Error al guardar repuesto.");
+        }
     }
 
     @FXML

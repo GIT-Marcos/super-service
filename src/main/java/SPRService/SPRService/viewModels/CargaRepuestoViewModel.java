@@ -3,9 +3,11 @@ package SPRService.SPRService.viewModels;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.entities.Stock;
+import SPRService.SPRService.entities.Ubicacion;
 import SPRService.SPRService.exceptions.DuplicateProductException;
 import SPRService.SPRService.services.MarcaRepuestoServ;
 import SPRService.SPRService.services.RepuestoServ;
+import SPRService.SPRService.services.UbicacionServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import com.google.inject.Inject;
 import javafx.beans.property.*;
@@ -13,101 +15,106 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 
 public class CargaRepuestoViewModel {
 
-    // --- DEPENDENCIAS ---
     private final RepuestoServ repuestoService;
     private final MarcaRepuestoServ marcaRepuestoService;
+    private final UbicacionServ ubicacionService;
 
-    // --- ESTADO INTERNO ---
-    private Repuesto repuestoOriginal; // Guarda el estado original para la modificación
+    private Repuesto repuestoOriginal;
 
-    // --- PROPIEDADES PARA BINDING CON LA VISTA (FXML) ---
-    // ¡CAMBIADAS A StringProperty!
+    // Propiedades
     private final StringProperty codBarras = new SimpleStringProperty();
     private final StringProperty nombreProducto = new SimpleStringProperty();
-    private final StringProperty precio = new SimpleStringProperty(); // Ahora String
+    private final StringProperty precio = new SimpleStringProperty();
     private final ObjectProperty<MarcaRepuesto> marcaSeleccionada = new SimpleObjectProperty<>();
 
-    // Propiedades del Stock
-    private final StringProperty cantidadExistente = new SimpleStringProperty(); // Ahora String
-    private final StringProperty cantidadMinima = new SimpleStringProperty(); // Ahora String
+    private final StringProperty cantidadExistente = new SimpleStringProperty();
+    private final StringProperty cantidadMinima = new SimpleStringProperty();
     private final StringProperty lote = new SimpleStringProperty();
     private final StringProperty observaciones = new SimpleStringProperty();
     private final StringProperty uniMedidaSeleccionada = new SimpleStringProperty();
-    private final StringProperty ubicacionSeleccionada = new SimpleStringProperty();
+    private final ObjectProperty<Ubicacion> ubicacionSeleccionada = new SimpleObjectProperty<>();
 
-
-    // --- LISTAS OBSERVABLES PARA POBLAR COMBOBOX ---
+    // Listas
     private final ObservableList<MarcaRepuesto> marcasDisponibles = FXCollections.observableArrayList();
     private final ObservableList<String> unidadesDeMedida = FXCollections.observableArrayList();
-    private final ObservableList<String> ubicacionesDisponibles = FXCollections.observableArrayList();
+    private final ObservableList<Ubicacion> ubicacionesDisponibles = FXCollections.observableArrayList();
 
     @Inject
-    public CargaRepuestoViewModel(RepuestoServ repuestoService, MarcaRepuestoServ marcaRepuestoService) {
+    public CargaRepuestoViewModel(RepuestoServ repuestoService,
+                                  MarcaRepuestoServ marcaRepuestoService,
+                                  UbicacionServ ubicacionService) {
         this.repuestoService = repuestoService;
         this.marcaRepuestoService = marcaRepuestoService;
+        this.ubicacionService = ubicacionService;
     }
 
-    /**
-     * Carga los datos iniciales necesarios para la vista.
-     */
     public void inicializar() {
         cargarListaMarcas();
         cargarUnidadesDeMedida();
         cargarUbicaciones();
-
-        if (!unidadesDeMedida.isEmpty()) {
-            uniMedidaSeleccionada.set(unidadesDeMedida.getFirst());
-        }
+        if (!unidadesDeMedida.isEmpty()) uniMedidaSeleccionada.set(unidadesDeMedida.getFirst());
     }
 
-    /**
-     * Rellena el ViewModel con los datos de un Repuesto existente para su modificación.
-     * @param repuesto El repuesto a modificar.
-     */
     public void poblarParaModificacion(Repuesto repuesto) {
         this.repuestoOriginal = repuesto;
 
         codBarras.set(repuesto.getCodBarra());
         nombreProducto.set(repuesto.getDetalle());
-        // Se convierten los valores numéricos a String
         precio.set(repuesto.getPrecio().toPlainString());
 
-        // Si la marca no está en la lista, la añade temporalmente para que se muestre
-        if (!marcasDisponibles.contains(repuesto.getMarcaRepuesto())) {
-            marcasDisponibles.add(repuesto.getMarcaRepuesto());
-        }
-        marcaSeleccionada.set(repuesto.getMarcaRepuesto());
+        // Lógica para Marcas (revisar si necesita la misma corrección que Ubicación)
+        MarcaRepuesto marcaDelRepuesto = repuesto.getMarcaRepuesto();
+        MarcaRepuesto marcaEnLista = marcasDisponibles.stream()
+                .filter(m -> m.getId() != null && m.getId().equals(marcaDelRepuesto.getId()))
+                .findFirst()
+                .orElse(null);
 
+        if (marcaEnLista != null) {
+            marcaSeleccionada.set(marcaEnLista);
+        } else {
+            marcasDisponibles.add(marcaDelRepuesto);
+            marcaSeleccionada.set(marcaDelRepuesto);
+        }
+
+        // --- STOCK ---
         Stock stock = repuesto.getStock();
-        // Se convierten los valores numéricos a String
         cantidadExistente.set(String.valueOf(stock.getCantidadExistente()));
         cantidadMinima.set(String.valueOf(stock.getCantMinima()));
         lote.set(stock.getLote());
         observaciones.set(stock.getObservaciones());
         uniMedidaSeleccionada.set(stock.getUnidadMedida());
 
-        // Si la ubicación no está en la lista, la añade temporalmente
-        if (!ubicacionesDisponibles.contains(stock.getUbicacion())) {
-            ubicacionesDisponibles.add(stock.getUbicacion());
+        // --- SOLUCIÓN AL PROBLEMA DEL CONTAINS DE UBICACIÓN ---
+        Ubicacion ubicacionDelStock = stock.getUbicacion();
+
+        if (ubicacionDelStock != null) {
+            // 1. Buscamos en la lista actual si hay alguna ubicación con el MISMO ID
+            Ubicacion ubicacionEnLista = ubicacionesDisponibles.stream()
+                    .filter(u -> u.getId() != null && u.getId().equals(ubicacionDelStock.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (ubicacionEnLista != null) {
+                // 2. Si existe, seleccionamos LA INSTANCIA DE LA LISTA.
+                // Esto asegura que el ComboBox la ilumine correctamente.
+                ubicacionSeleccionada.set(ubicacionEnLista);
+            } else {
+                // 3. Si no existe (ej: estaba archivada y no vino en el verTodas), la agregamos y seleccionamos.
+                ubicacionesDisponibles.add(ubicacionDelStock);
+                ubicacionSeleccionada.set(ubicacionDelStock);
+            }
         }
-        ubicacionSeleccionada.set(stock.getUbicacion());
     }
 
-    /**
-     * Valida los inputs y guarda el repuesto en la base de datos.
-     * @return El repuesto guardado.
-     * @throws IllegalArgumentException si la validación de algún campo falla.
-     * @throws DuplicateProductException si ya existe un producto con el mismo código de barras.
-     */
     public Optional<Repuesto> guardarRepuesto() throws IllegalArgumentException, DuplicateProductException {
         validarInputs();
         Repuesto repuestoParaGuardar = construirEntidadDesdeViewModel();
-
         if (repuestoOriginal == null) {
             return repuestoService.cargarRepuesto(repuestoParaGuardar);
         } else {
@@ -115,22 +122,24 @@ public class CargaRepuestoViewModel {
         }
     }
 
-    /**
-     * Crea una nueva marca, la persiste y la selecciona en el ComboBox.
-     */
     public void crearNuevaMarca(String nombreMarca) {
         MarcaRepuesto nuevaMarca = new MarcaRepuesto(null, nombreMarca, new HashSet<>());
         marcaRepuestoService.cargarMarca(nuevaMarca)
                 .ifPresent(m -> {
                     marcasDisponibles.addFirst(nuevaMarca);
                     marcaSeleccionada.set(nuevaMarca);
-
-        });
+                });
     }
 
-    /**
-     * Limpia todos los campos del ViewModel para prepararlo para una nueva carga.
-     */
+    public void crearNuevaUbicacion(String nombreUbicacion) {
+        Ubicacion nuevaUbicacion = new Ubicacion(null, nombreUbicacion, new ArrayList<>());
+        ubicacionService.cargarNueva(nuevaUbicacion)
+                .ifPresent(u -> {
+                    ubicacionesDisponibles.addFirst(u);
+                    ubicacionSeleccionada.set(u);
+                });
+    }
+
     public void limpiar() {
         repuestoOriginal = null;
         codBarras.set("");
@@ -142,43 +151,19 @@ public class CargaRepuestoViewModel {
         lote.set("");
         observaciones.set("");
         ubicacionSeleccionada.set(null);
-
-        if (!unidadesDeMedida.isEmpty()) {
-            uniMedidaSeleccionada.set(unidadesDeMedida.getFirst());
-        } else {
-            uniMedidaSeleccionada.set(null);
-        }
+        if (!unidadesDeMedida.isEmpty()) uniMedidaSeleccionada.set(unidadesDeMedida.getFirst());
+        else uniMedidaSeleccionada.set(null);
     }
 
-    // --- MÉTODOS PRIVADOS AUXILIARES ---
-
     private void validarInputs() throws IllegalArgumentException {
-        // En el ViewModel se asume que los valores vienen como String (de los TextField)
-        // y se validan con el ManejadorInputs.
-        // Las validaciones de campos numéricos (precio, stock) también manejan el formato.
-
-        if (marcaSeleccionada.get() == null) {
-            throw new IllegalArgumentException("Debe seleccionar una marca para el repuesto.");
-        }
-
-        // Uso de ManejadorInputs con los StringProperty
+        if (marcaSeleccionada.get() == null) throw new IllegalArgumentException("Debe seleccionar una marca.");
         ManejadorInputs.codBarras(codBarras.getValue(), true);
-        ManejadorInputs.textoGenerico(nombreProducto.getValue(), true, "Nombre de repuesto",
-                60);
-        // ManejadorInputs.dinero realiza validación de formato numérico de String a BigDecimal
+        ManejadorInputs.textoGenerico(nombreProducto.getValue(), true, "Nombre de repuesto", 60);
         ManejadorInputs.dinero(precio.getValue(), true, false);
-        // ManejadorInputs.cantidadStock realiza validación de formato numérico de String a Double
         ManejadorInputs.cantidadStock(cantidadExistente.getValue(), true);
         ManejadorInputs.cantidadStock(cantidadMinima.getValue(), true);
-
-        // Se reemplaza ManejadorInputs para combobox/selecciones por una verificación de nulidad simple si es requerido.
-        if (uniMedidaSeleccionada.getValue() == null || uniMedidaSeleccionada.getValue().trim().isEmpty()) {
-            throw new IllegalArgumentException("Debe seleccionar una unidad de medida.");
-        }
-        if (ubicacionSeleccionada.getValue() == null || ubicacionSeleccionada.getValue().trim().isEmpty()) {
-            throw new IllegalArgumentException("Debe seleccionar una ubicación.");
-        }
-
+        if (uniMedidaSeleccionada.getValue() == null) throw new IllegalArgumentException("Seleccione unidad de medida.");
+        if (ubicacionSeleccionada.get() == null) throw new IllegalArgumentException("Seleccione una ubicación.");
         ManejadorInputs.textoGenerico(lote.getValue(), false, null, 40);
         ManejadorInputs.textoGenerico(observaciones.getValue(), false, null, 100);
     }
@@ -196,23 +181,16 @@ public class CargaRepuestoViewModel {
             stock.setActivo(Boolean.TRUE);
             repuesto.setStock(stock);
         }
-
-        // Poblar Stock - Conversión de String a Double
-        // Los valores se parsean después de la validación
         stock.setCantidadExistente(Double.parseDouble(cantidadExistente.get()));
         stock.setCantMinima(Double.parseDouble(cantidadMinima.get()));
         stock.setUnidadMedida(uniMedidaSeleccionada.get());
         stock.setUbicacion(ubicacionSeleccionada.get());
         stock.setLote(lote.get());
         stock.setObservaciones(observaciones.get());
-
-        // Poblar Repuesto - Conversión de String a BigDecimal
-        // Los valores se parsean después de la validación
         repuesto.setCodBarra(codBarras.get());
         repuesto.setDetalle(nombreProducto.get());
         repuesto.setPrecio(new BigDecimal(precio.get()));
         repuesto.setMarcaRepuesto(marcaSeleccionada.get());
-
         return repuesto;
     }
 
@@ -225,12 +203,10 @@ public class CargaRepuestoViewModel {
     }
 
     private void cargarUbicaciones() {
-        ubicacionesDisponibles.setAll("Depósito A", "Depósito B", "Depósito C", "Depósito D", "Depósito E");
+        ubicacionesDisponibles.setAll(ubicacionService.verTodas());
     }
 
-    // --- GETTERS PARA LAS PROPIEDADES (para que la Vista pueda acceder a ellas) ---
-    // Ahora todas las propiedades enlazadas a TextField son StringProperty
-
+    // Getters
     public StringProperty codBarrasProperty() { return codBarras; }
     public StringProperty nombreProductoProperty() { return nombreProducto; }
     public StringProperty precioProperty() { return precio; }
@@ -240,9 +216,8 @@ public class CargaRepuestoViewModel {
     public StringProperty loteProperty() { return lote; }
     public StringProperty observacionesProperty() { return observaciones; }
     public StringProperty uniMedidaSeleccionadaProperty() { return uniMedidaSeleccionada; }
-    public StringProperty ubicacionSeleccionadaProperty() { return ubicacionSeleccionada; }
-
+    public ObjectProperty<Ubicacion> ubicacionSeleccionadaProperty() { return ubicacionSeleccionada; }
     public ObservableList<MarcaRepuesto> getMarcasDisponibles() { return marcasDisponibles; }
     public ObservableList<String> getUnidadesDeMedida() { return unidadesDeMedida; }
-    public ObservableList<String> getUbicacionesDisponibles() { return ubicacionesDisponibles; }
+    public ObservableList<Ubicacion> getUbicacionesDisponibles() { return ubicacionesDisponibles; }
 }
