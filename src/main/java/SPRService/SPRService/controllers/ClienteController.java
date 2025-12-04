@@ -71,7 +71,7 @@ public class ClienteController implements Initializable {
     @FXML
     private void nuevoCliente() {
         Optional<Cliente> optional = navigator.openModal(Views.CARGAR_CLIENTE, "Cargar nuevo cliente", null);
-        if (optional.isPresent()) obsListClientes.addFirst(new ClienteViewModelTabla(optional.get()));
+        optional.ifPresent(cliente -> obsListClientes.addFirst(new ClienteViewModelTabla(cliente)));
     }
 
     @FXML
@@ -83,10 +83,11 @@ public class ClienteController implements Initializable {
         }
         Optional<Cliente> optional = navigator.openModal(Views.CARGAR_CLIENTE, "Modificar cliente",
                 cvmt.getClienteEntity());
-        if (optional.isPresent()) {
-            if (!optional.get().equals(cvmt.getClienteEntity()))
-                obsListClientes.set(obsListClientes.indexOf(cvmt), new ClienteViewModelTabla(optional.get()));
-        }
+        optional.ifPresent(c -> obsListClientes.set(obsListClientes.indexOf(cvmt), new ClienteViewModelTabla(c)));
+//        if (optional.isPresent()) {
+//            if (!optional.get().equals(cvmt.getClienteEntity()))
+//                obsListClientes.set(obsListClientes.indexOf(cvmt), new ClienteViewModelTabla(optional.get()));
+//        }
     }
 
     @FXML
