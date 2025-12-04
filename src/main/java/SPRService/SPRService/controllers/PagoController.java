@@ -5,6 +5,7 @@ import SPRService.SPRService.entities.Transaccion;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import com.google.inject.Inject;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -23,8 +24,8 @@ import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.Operador;
-import SPRService.SPRService.util.alertas.Alertas;
 import org.hibernate.HibernateException;
+
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Optional;
@@ -120,7 +121,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
 
             // Validación de Monto vs Monto Faltante
             if (monto.compareTo(this.transaccion.getMontoFaltante()) == 1) {
-                Alertas.aviso("Pago", "El monto ingresado ($" + monto + ") es mayor al que se " +
+                NotificationHelper.mostrarAdvertencia("Pago", "El monto ingresado ($" + monto + ") es mayor al que se " +
                         "debe pagar ($" + this.transaccion.getMontoFaltante() + ").");
                 return;
             }
@@ -131,11 +132,11 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
             } else {
                 montoPagar = monto;
             }
-        } catch (NullPointerException | NumberFormatException npe) {
-            Alertas.aviso("Pago", npe.getMessage());
+        } catch (NullPointerException | NumberFormatException e) {
+            NotificationHelper.mostrarAdvertencia("Pago", e.getMessage());
             return;
-        } catch (IllegalArgumentException iae) {
-            Alertas.aviso("Pago", iae.getMessage());
+        } catch (IllegalArgumentException e) {
+            NotificationHelper.mostrarError("Pago", e.getMessage());
             return;
         }
 
@@ -148,8 +149,8 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
         Pago pagoParaCargar = new Pago(
                 null, null, montoPagar, marcaTarjeta, bancoTarjeta, nroReferencia,
                 porcentajeDescuento, ultimos4, metodosPago,
-                (this.transaccion instanceof VentaRepuesto ? (VentaRepuesto)this.transaccion : null), // Se asigna solo si es VentaRepuesto
-                (this.transaccion instanceof Service ? (Service)this.transaccion : null) // Se asigna solo si es Service
+                (this.transaccion instanceof VentaRepuesto ? (VentaRepuesto) this.transaccion : null), // Se asigna solo si es VentaRepuesto
+                (this.transaccion instanceof Service ? (Service) this.transaccion : null) // Se asigna solo si es Service
         );
 
         // Asocia el pago. El 'asociarPago' de la entidad se encargará de actualizar su montoFaltante.
@@ -164,10 +165,10 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
                 // Lógica para CARGAR una transacción NUEVA
                 if (this.transaccion instanceof VentaRepuesto) {
                     transaccionGuardada = ventaRepuestoServ.cargarVenta((VentaRepuesto) this.transaccion);
-                    Alertas.exito("Pago", nombreTransaccion + " y pago cargados con éxito.\nSe ha actualizado el stock.");
+                    NotificationHelper.mostrarExito("Pago", nombreTransaccion + " y pago cargados con éxito.\nSe ha actualizado el stock.");
                 } else if (this.transaccion instanceof Service) {
                     transaccionGuardada = serviceServ.cargarService((Service) this.transaccion);
-                    Alertas.exito("Pago", nombreTransaccion + " y pago cargados con éxito.");
+                    NotificationHelper.mostrarExito("Pago", nombreTransaccion + " y pago cargados con éxito.");
                 } else {
                     throw new IllegalArgumentException("Tipo de transacción no soportado para carga.");
                 }
@@ -175,10 +176,10 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
                 // Lógica para MODIFICAR una transacción EXISTENTE (solo agregando un pago)
                 if (this.transaccion instanceof VentaRepuesto) {
                     transaccionGuardada = ventaRepuestoServ.modificarVenta((VentaRepuesto) this.transaccion);
-                    Alertas.exito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
+                    NotificationHelper.mostrarExito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
                 } else if (this.transaccion instanceof Service) {
                     transaccionGuardada = serviceServ.modificarService((Service) this.transaccion);
-                    Alertas.exito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
+                    NotificationHelper.mostrarExito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
                 } else {
                     throw new IllegalArgumentException("Tipo de transacción no soportado para modificación.");
                 }
@@ -187,11 +188,9 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
             // Almacena la transacción actualizada/guardada para devolverla al modal
             this.transaccionParaDevolver = transaccionGuardada;
             volver(event);
-        } catch (HibernateException e) {
-            Alertas.error("Error de Persistencia", e.getMessage());
+        } catch (HibernateException | IllegalArgumentException e) {
+            NotificationHelper.mostrarError("Error de Persistencia", e.getMessage());
             e.printStackTrace();
-        } catch (IllegalArgumentException iae) {
-            Alertas.error("Error de Lógica", iae.getMessage());
         }
     }
 

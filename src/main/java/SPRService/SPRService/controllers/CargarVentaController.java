@@ -99,12 +99,6 @@ public class CargarVentaController implements Initializable {
         VentaRepuesto venta = new VentaRepuesto(null, nota, new HashSet<>());
         Optional<VentaRepuesto> result = navigator.openModal(Views.PAGO, "Pagar", venta);
         result.ifPresent(v -> {
-            Notifications.create()
-                    .title("Venta cargada")
-                    .text("Se ha cargado la venta con éxito.")
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.BOTTOM_RIGHT)
-                    .showInformation();
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
