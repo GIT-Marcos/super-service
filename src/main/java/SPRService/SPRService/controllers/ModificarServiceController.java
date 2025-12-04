@@ -8,7 +8,7 @@ import SPRService.SPRService.navigation.*;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemTrabajoViewModel;
@@ -165,7 +165,7 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
                     dpFechaEntrega.getValue().atStartOfDay();
             service.setFechaEntrega(fe);
 
-            if (!Alertas.confirmacion("Modificar service", "¿Está seguro que desea guardar el service?"))
+            if (!SimpleDialogs.confirmacion("Modificar service", "¿Está seguro que desea guardar el service?"))
                 return;
             this.paraDevolver = serviceServ.modificarService(service);
             Notifications.create()

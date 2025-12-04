@@ -199,11 +199,11 @@ public class VentasController implements Initializable {
         String motivo = SimpleDialogs.motivoBorrado();
         if (motivo == null) return;
 
-        boolean confirmacion = Alertas.confirmacion("Cancelación de venta", "Esta acción es " +
+        boolean confirmacion = SimpleDialogs.confirmacion("Cancelación de venta", "Esta acción es " +
                 "irreversible.\n ¿Confirmar el borrado de venta?");
         if (!confirmacion) return;
 
-        Boolean restablecerStock = Alertas.confirmacionRestablecerStocks();
+        Boolean restablecerStock = SimpleDialogs.confirmacionRestablecerStocks();
         if (restablecerStock == null) return;
 
         try {

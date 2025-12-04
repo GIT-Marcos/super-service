@@ -7,7 +7,8 @@ import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.ClienteServ;
 import SPRService.SPRService.util.ManejadorInputs;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import com.google.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import javafx.collections.FXCollections;
@@ -87,7 +88,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         try {
             eMail = ManejadorInputs.eMail(tfEmail.getText(), true);
         } catch (RuntimeException e) {
-            Alertas.aviso("Agregar eMail", e.getMessage());
+            NotificationHelper.mostrarAdvertencia("Agregar eMail", e.getMessage());
             return;
         }
         if (obsListEmails.contains(eMail)) {
@@ -105,7 +106,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         try {
             nro = ManejadorInputs.nroTel(tfNro.getText(), true);
         } catch (RuntimeException e) {
-            Alertas.aviso("Agregar número de teléfono.", e.getMessage());
+            NotificationHelper.mostrarAdvertencia("Agregar número de teléfono.", e.getMessage());
             return;
         }
         if (obsListNrosTelefono.contains(nro)) {
@@ -130,15 +131,15 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
             apellido = ManejadorInputs.textoGenerico(tfApellido.getText(), true,
                     "Apellido", 40);
         } catch (RuntimeException e) {
-            Alertas.aviso("Guardar cliente", e.getMessage());
+            NotificationHelper.mostrarError("Guardar cliente", e.getMessage());
             return;
         }
         if (obsListEmails.isEmpty() && obsListNrosTelefono.isEmpty()) {
-            Alertas.aviso("Datos de contacto", "Debe haber al menos un dato de contacto.");
+            NotificationHelper.mostrarAdvertencia("Datos de contacto", "Debe haber al menos un dato de contacto.");
             return;
         }
 
-        if (!Alertas.confirmacion("Guardar cliente", "¿Confirmar guardado de cliente?")) return;
+        if (!SimpleDialogs.confirmacion("Guardar cliente", "¿Confirmar guardado de cliente?")) return;
         if (!flagModifyMode) {
             DatosContacto datosContacto = new DatosContacto();
             datosContacto.setId(null);
@@ -158,6 +159,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
             } else {
                 try {
                     clienteParaCargar = clienteServ.editClient(clienteParaCargar);
+                    this.cliente = clienteParaCargar;
                 } catch (PersistenceException e) {
                     if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
                             e.getCause() instanceof org.postgresql.util.PSQLException) {
@@ -170,17 +172,14 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
                     throw new RuntimeException("Error inesperado al guardar el cliente.", e);
                 }
             }
-            Alertas.exito("Guardar cliente", "Se han guardado los datos del cliente con éxito.");
+            NotificationHelper.mostrarExito("Guardar cliente", "Se han guardado los datos del cliente con éxito.");
             cancelar(event);
         } catch (DuplicateClientDNI e) {
-            Alertas.aviso("Guardar cliente", e.getMessage());
-            return;
+            NotificationHelper.mostrarAdvertencia("Guardar cliente", e.getMessage());
         } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Guardar cliente", e.getMessage());
             e.printStackTrace();
-            Alertas.aviso("Guardar cliente", e.getMessage());
-            return;
         }
-        this.cliente = clienteParaCargar;
     }
 
     @FXML

@@ -8,7 +8,6 @@ import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.util.SimpleDialogs;
-import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
@@ -92,7 +91,7 @@ public class CargarVentaController implements Initializable {
             return;
         }
 
-        if (Alertas.confirmacion("Cargar venta", "¿Desea crear un archivo de texto de la nota de retiro?")) {
+        if (SimpleDialogs.confirmacion("Cargar venta", "¿Desea crear un archivo de texto de la nota de retiro?")) {
             guardarNota(event);
         }
 

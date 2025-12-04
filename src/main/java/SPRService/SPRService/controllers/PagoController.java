@@ -4,6 +4,7 @@ import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.entities.Transaccion;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.services.VentaRepuestoServ;
+import SPRService.SPRService.util.SimpleDialogs;
 import com.google.inject.Inject;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -139,7 +140,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
         }
 
         // 3. CONFIRMACIÓN DEL USUARIO
-        boolean confirmacion = Alertas.confirmacion("¿Confirmar Pago?",
+        boolean confirmacion = SimpleDialogs.confirmacion("¿Confirmar Pago?",
                 "El total a pagar con descuentos incluidos será: $ " + montoPagar);
         if (!confirmacion) return;
 

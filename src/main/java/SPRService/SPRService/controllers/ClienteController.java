@@ -5,7 +5,8 @@ import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ClienteServ;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.tablas.ClienteViewModelTabla;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -77,7 +78,7 @@ public class ClienteController implements Initializable {
     private void modificar() {
         ClienteViewModelTabla cvmt = tablaClientes.getSelectionModel().getSelectedItem();
         if (cvmt == null) {
-            Alertas.aviso("Modificar cliente", "Debe seleccionar un cliente para modificarlo.");
+            NotificationHelper.mostrarAdvertencia("Modificar cliente", "Debe seleccionar un cliente para modificarlo.");
             return;
         }
         Optional<Cliente> optional = navigator.openModal(Views.CARGAR_CLIENTE, "Modificar cliente",
@@ -92,17 +93,17 @@ public class ClienteController implements Initializable {
     private void darDeBaja() {
         ClienteViewModelTabla cvmt = tablaClientes.getSelectionModel().getSelectedItem();
         if (cvmt == null) {
-            Alertas.aviso("Dar de baja cliente", "Debe seleccionar un cliente para darlo de baja.");
+            NotificationHelper.mostrarAdvertencia("Dar de baja cliente", "Debe seleccionar un cliente para darlo de baja.");
             return;
         }
-        if (!Alertas.confirmacion("Dar de baja cliente", "¿Confirmar baja de cliente?")) return;
+        if (!SimpleDialogs.confirmacion("Dar de baja cliente", "¿Confirmar baja de cliente?")) return;
 
         try {
             clienteServ.softDeleteClient(cvmt.getClienteEntity());
-            Alertas.exito("Dar de baja cliente", "Se ha dado de baja el cliente con éxito.");
+            NotificationHelper.mostrarExito("Dar de baja cliente", "Se ha dado de baja el cliente con éxito.");
             obsListClientes.remove(cvmt);
         } catch (Exception e) {
-            Alertas.error("Dar de baja cliente", "Ha ocurrido un error inesperado.");
+            NotificationHelper.mostrarError("Dar de baja cliente", "Ha ocurrido un error inesperado.");
             throw new RuntimeException(e);
         }
     }

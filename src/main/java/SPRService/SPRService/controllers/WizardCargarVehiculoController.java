@@ -1,11 +1,12 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.exceptions.DuplicateVehicleException;
+import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.VehiculoVM;
 import SPRService.SPRService.entities.Vehiculo;
 import SPRService.SPRService.navigation.*;
 import SPRService.SPRService.services.VehiculoServ;
-import SPRService.SPRService.util.alertas.Alertas;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import jakarta.persistence.PersistenceException;
@@ -112,7 +113,7 @@ public class WizardCargarVehiculoController implements Initializable, ModalContr
     @FXML
     private void finalizar(ActionEvent event) {
         if (asistenteState.validarPasoActual()) {
-            boolean confir = Alertas.confirmacion("Cargar vehículo", "¿Confirmar carga de vehículo?");
+            boolean confir = SimpleDialogs.confirmacion("Cargar vehículo", "¿Confirmar carga de vehículo?");
             if (!confir) return;
             Vehiculo v = wsp.getViewModel().obtenerEntidadActualizada();
             try {
@@ -127,8 +128,7 @@ public class WizardCargarVehiculoController implements Initializable, ModalContr
                             throw new DuplicateVehicleException("Error: ya existe un vehículo con la patente: " +
                                     v.getPatente() + " en el sistema.");
                         }else {
-                            Alertas.error("Error de Base de Datos",
-                                    "No se pudo guardar el vehículo. Causa: " + e.getMessage());
+                            NotificationHelper.mostrarError("Error de Base de Datos", "No se pudo guardar el vehículo. Causa: " + e.getMessage());
                             e.printStackTrace();
                         }
                     }
@@ -136,11 +136,11 @@ public class WizardCargarVehiculoController implements Initializable, ModalContr
                 vehiculoVM.cargarDesdeEntidad(v);
                 this.result = Optional.of(this.vehiculoVM);
                 wsp.endWizard();
-                Alertas.exito("Guardar vehículo", "Se guardado el vehículo con éxito.");
+                NotificationHelper.mostrarExito("Guardar vehículo", "Se guardado el vehículo con éxito.");
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.close();
             } catch (DuplicateVehicleException e) {
-                Alertas.error("guardar vehículo", e.getMessage());
+                NotificationHelper.mostrarError("guardar vehículo", e.getMessage());
             }
         }
     }
@@ -179,7 +179,7 @@ public class WizardCargarVehiculoController implements Initializable, ModalContr
                     if (controller instanceof WizardStepController) {
                         ((WizardStepController) controller).mostrarErrores();
                     } else {
-                        Alertas.aviso("Error de validación",
+                        NotificationHelper.mostrarAdvertencia("Error de validación",
                                 "Por favor, complete los campos requeridos correctamente.");
                     }
                 });

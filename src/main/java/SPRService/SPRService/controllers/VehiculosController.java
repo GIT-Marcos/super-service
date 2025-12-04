@@ -4,7 +4,7 @@ import SPRService.SPRService.entities.Vehiculo;
 import SPRService.SPRService.navigation.WizardStateProvider;
 import SPRService.SPRService.services.VehiculoServ;
 import SPRService.SPRService.util.SimpleDialogs;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.ExportadorTabla;
 import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import SPRService.SPRService.viewModels.VehiculoVM;
@@ -92,7 +92,8 @@ public class VehiculosController implements Initializable {
     private void modificarVehiculo() {
         VehiculoRowViewModel vrvm = tablaVehiculos.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
-            Alertas.aviso("Modificar vehículo", "Debe seleccionar un vehículo para modificarlo.");
+            NotificationHelper.mostrarAdvertencia("Modificar vehículo",
+                    "Debe seleccionar un vehículo para modificarlo.");
             return;
         }
         wizardStateProvider.startEditVehicleWizard(vrvm.getVehiculo());
@@ -107,8 +108,8 @@ public class VehiculosController implements Initializable {
     private void verDetalles() {
         VehiculoRowViewModel vrvm = tablaVehiculos.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
-            Alertas.aviso("Detalles de vehículo", "Debe seleccionar un vehículo para ver " +
-                    "sus detalles.");
+            NotificationHelper.mostrarAdvertencia("Detalles de vehículo",
+                    "Debe seleccionar un vehículo para ver sus detalles.");
             return;
         }
         navigator.openModal(Views.DETALLE_VEHICULO, "Detalles de vehículo", vrvm.getVehiculo());
@@ -118,29 +119,29 @@ public class VehiculosController implements Initializable {
     private void eliminarVehiculo() {
         VehiculoRowViewModel vrvm = tablaVehiculos.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
-            Alertas.aviso("Eliminación de vehículo", "Debe seleccionar un vehículo para poder " +
+            NotificationHelper.mostrarAdvertencia("Eliminación de vehículo", "Debe seleccionar un vehículo para poder " +
                     "eliminarlo.");
             return;
         }
         Vehiculo v = vrvm.getVehiculo();
-        boolean r = Alertas.confirmacion("Eliminación de vehículo",
+        boolean r = SimpleDialogs.confirmacion("Eliminación de vehículo",
                 "¿Confirmar eliminación de vehículo?");
         if (!r) return;
         try {
             vehiculoServ.borradoLogico(v);
             obsListViewModel.remove(vrvm);
-            Alertas.exito("Eliminación de vehículo", "Se ha eliminado el vehículo con éxito.");
+            NotificationHelper.mostrarExito("Eliminación de vehículo", "Se ha eliminado el vehículo con éxito.");
         } catch (RuntimeException e) {
+            NotificationHelper.mostrarExito("Eliminación de vehículo", "Ha ocurrido un error al eliminar el vehículo.");
             e.printStackTrace();
-            Alertas.error("Eliminación de vehículo", "Ha ocurrido un error al eliminar el vehículo.");
-
         }
     }
 
     @FXML
     private void exportarTabla(ActionEvent event) {
         if (obsListViewModel.isEmpty()) {
-            Alertas.aviso("Exportar tabla actual", "No hay vehículos en la tabla catual para exportar.");
+            NotificationHelper.mostrarAdvertencia("Exportar tabla actual",
+                    "No hay vehículos en la tabla actual para exportar.");
             return;
         }
 
@@ -186,7 +187,7 @@ public class VehiculosController implements Initializable {
         if (file == null) {
             return;
         }
-        GeneradorImagenes.modelosMasRegistrados(file, vehiculoServ.generarReporteModelosMasRegistrados( cantidad,
+        GeneradorImagenes.modelosMasRegistrados(file, vehiculoServ.generarReporteModelosMasRegistrados(cantidad,
                 fechaMin, fechaMax
         ));
     }
