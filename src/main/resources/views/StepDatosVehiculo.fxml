@@ -2,55 +2,79 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox maxHeight="400.0" maxWidth="250.0" minHeight="360.0" minWidth="250.0" prefHeight="360.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.StepDatosVehiculoController">
-   <children>
-      <Label text="Patente sin espacios (*)">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <TextField fx:id="tfPatente" />
-      <Label text="Color (*)">
-         <font>
-            <Font size="14.0" />
-         </font>
-         <VBox.margin>
-            <Insets top="10.0" />
-         </VBox.margin>
-      </Label>
-      <TextField fx:id="tfColor" />
-      <Label text="Número de chasis">
-         <font>
-            <Font size="14.0" />
-         </font>
-         <VBox.margin>
-            <Insets top="10.0" />
-         </VBox.margin>
-      </Label>
-      <TextField fx:id="tfNroChasis" />
-      <Label text="Número de motor">
-         <font>
-            <Font size="14.0" />
-         </font>
-         <VBox.margin>
-            <Insets top="10.0" />
-         </VBox.margin>
-      </Label>
-      <TextField fx:id="tfNroMotor" />
-      <Label fx:id="lblAviso" prefHeight="50.0" prefWidth="240.0" text="Los campos marcados con (*) son obligatorios." underline="true" visible="false" wrapText="true">
-         <font>
-            <Font size="14.0" />
-         </font>
-         <VBox.margin>
-            <Insets top="15.0" />
-         </VBox.margin>
-      </Label>
-   </children>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
-   </padding>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="500.0" spacing="10.0" style="-fx-background-color: transparent;" stylesheets="@../styles/vehiculos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.StepDatosVehiculoController">
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <children>
+        <!-- Encabezado de la sección -->
+        <Label styleClass="section-label" text="IDENTIFICACIÓN Y CARACTERÍSTICAS" />
+        <Separator prefWidth="200.0" />
+
+        <!-- Grilla de campos (2 columnas) -->
+        <GridPane hgap="15.0" vgap="15.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+
+                <!-- Campo: Patente -->
+                <VBox spacing="5.0">
+                    <children>
+                        <Label styleClass="section-label" text="DOMINIO / PATENTE (*)" />
+                        <TextField fx:id="tfPatente" promptText="Sin espacios (Ej: AA123BB)" />
+                    </children>
+                </VBox>
+
+                <!-- Campo: Color -->
+                <VBox spacing="5.0" GridPane.columnIndex="1">
+                    <children>
+                        <Label styleClass="section-label" text="COLOR (*)" />
+                        <TextField fx:id="tfColor" promptText="Ej: Gris Plata" />
+                    </children>
+                </VBox>
+
+                <!-- Campo: Nro Chasis -->
+                <VBox spacing="5.0" GridPane.rowIndex="1">
+                    <children>
+                        <Label styleClass="section-label" text="NÚMERO DE CHASIS" />
+                        <TextField fx:id="tfNroChasis" promptText="Opcional" />
+                    </children>
+                </VBox>
+
+                <!-- Campo: Nro Motor -->
+                <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <children>
+                        <Label styleClass="section-label" text="NÚMERO DE MOTOR" />
+                        <TextField fx:id="tfNroMotor" promptText="Opcional" />
+                    </children>
+                </VBox>
+
+            </children>
+            <VBox.margin>
+                <Insets top="10.0" />
+            </VBox.margin>
+        </GridPane>
+
+        <!-- Label de Aviso / Error -->
+        <Label fx:id="lblAviso" maxWidth="1.7976931348623157E308" styleClass="alert-label-compact" text="Los campos marcados con (*) son obligatorios." visible="false" wrapText="true">
+            <VBox.margin>
+                <Insets top="15.0" />
+            </VBox.margin>
+        </Label>
+    </children>
 </VBox>

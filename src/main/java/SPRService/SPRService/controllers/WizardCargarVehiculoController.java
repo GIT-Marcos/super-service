@@ -125,7 +125,7 @@ public class WizardCargarVehiculoController implements Initializable, ModalContr
                     } catch (PersistenceException e) {
                         if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
                                 e.getCause() instanceof org.postgresql.util.PSQLException) {
-                            throw new DuplicateVehicleException("Error: ya existe un vehículo con la patente: " +
+                            throw new DuplicateVehicleException("ya existe un vehículo con la patente: " +
                                     v.getPatente() + " en el sistema.");
                         }else {
                             NotificationHelper.mostrarError("Error de Base de Datos", "No se pudo guardar el vehículo. Causa: " + e.getMessage());
@@ -140,7 +140,7 @@ public class WizardCargarVehiculoController implements Initializable, ModalContr
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.close();
             } catch (DuplicateVehicleException e) {
-                NotificationHelper.mostrarError("guardar vehículo", e.getMessage());
+                NotificationHelper.mostrarAdvertencia("guardar vehículo", e.getMessage());
             }
         }
     }
