@@ -39,6 +39,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+//todo: bug no cambia cliente y vehículo al guardar
 public class ModificarServiceController implements Initializable, DataReceiver<Service>, ModalController<Service> {
 
     private final Navigator navigator;
