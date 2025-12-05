@@ -48,6 +48,7 @@ public enum Views {
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
     CHART_VENTAS_RESPUESTOS_ANIO("/views/ChartTotalVentasAnio.fxml", ChartTotalVentasAnioController.class),
+    CHART_INGRESOS_REPUESTO("/views/ChartIngresosRepuesto.fxml", ChartIngresosRepuestoController.class),
     CHART_ANUAL_SERVICE("/views/ChartReportesAnulesService.fxml", ChartReportesAnualesServiceController.class),
     CHART_USO_REPUESTOS("/views/ChartUsoDeRepuestos.fxml", ChartUsoDeRepuestosController.class),
     CHART_COMPARACION_INGRESOS("/views/ChartComparacionIngresos.fxml", ChartComparacionIngresosController.class),

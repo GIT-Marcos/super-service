@@ -1,5 +1,6 @@
 package SPRService.SPRService.DAOs;
 
+import SPRService.SPRService.DTOs.ReporteIngresosRepuestoDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
@@ -7,6 +8,7 @@ import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
@@ -63,6 +65,13 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
      * @return promedio de ingresos sobre ventas de repuestos activas que se realizaron en el año argumentado.
      */
     Double ingresosPromedioPorVentaEnAnio(int anio);
+
+    /**
+     * Genera DTOs con datos para poblar chart de reportes con más ingresos.
+     * @param cantidad de elementos a buscar.
+     * @return lista con DTOs que representan un repuesto con datos de negocio.
+     */
+    List<ReporteIngresosRepuestoDTO> ingresosPorRepuesto(LocalDate fechaMin, LocalDate fechaMax, Integer cantidad);
 
     //ESCRITURA
 

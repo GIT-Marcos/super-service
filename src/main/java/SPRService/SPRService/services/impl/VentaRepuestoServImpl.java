@@ -2,6 +2,7 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.StockDAO;
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
+import SPRService.SPRService.DTOs.ReporteIngresosRepuestoDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
@@ -15,6 +16,7 @@ import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +96,15 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
     public Double ingresosPromedioPorVentaEnAnio(int anio) {
         Double result = daoVenta.ingresosPromedioPorVentaEnAnio(anio);
         return Math.round(result * 100.0) / 100.0;
+    }
+
+    @Transactional
+    @Override
+    public List<ReporteIngresosRepuestoDTO> ingresosPorRepuesto(LocalDate fechaMin, LocalDate fechaMax, Integer cantidad) {
+        if (fechaMin == null) fechaMin = LocalDate.of(2000, 1, 1);
+        if (fechaMax == null) fechaMax = LocalDate.now();
+        if (cantidad < 0 || cantidad > 20) cantidad = 1;
+        return daoVenta.ingresosPorRepuesto(fechaMin, fechaMax, cantidad);
     }
 
     @Transactional

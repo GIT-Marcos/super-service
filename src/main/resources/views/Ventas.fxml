@@ -138,6 +138,7 @@
                 <Label styleClass="section-label" text="REPORTES" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#reportesMensuales" styleClass="btn-report" text="📊 Mensuales" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#reportesAnuales" styleClass="btn-report" text="📈 Anuales" />
+            <Button layoutX="21.0" layoutY="181.0" maxWidth="Infinity" mnemonicParsing="false" onAction="#reporteMasIngresos" styleClass="btn-report" text="🏆 Repuestos con más ingresos" wrapText="true" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="5.0" right="5.0" top="5.0" />

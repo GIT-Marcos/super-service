@@ -1,9 +1,11 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.VentaRepuestoDAO;
+import SPRService.SPRService.DTOs.ReporteIngresosRepuestoDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
 import SPRService.SPRService.entities.*;
+import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -13,6 +15,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -175,6 +178,39 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
                         Double.class)
                 .setParameter("anio", anio)
                 .getSingleResult();
+    }
+
+    @Override
+    public List<ReporteIngresosRepuestoDTO> ingresosPorRepuesto(LocalDate fechaMin, LocalDate fechaMax, Integer cantidad) {
+        EntityManager em = emProvider.get();
+
+        if (fechaMin == null) fechaMin = LocalDate.of(2000, 1, 1);
+        if (fechaMax == null) fechaMax = LocalDate.now();
+
+        return em.createQuery("SELECT new SPRService.SPRService.DTOs.ReporteIngresosRepuestoDTO(" +
+                                "r.codBarra, " +
+                                "mr.nombreMarca, " +
+                                "r.detalle, " +
+                                "SUM(dr.cantidadRetirada), " +
+                                "SUM(dr.subTotal)) " +
+                                "FROM VentaRepuesto v " +
+                                "JOIN v.notaRetiro nr " +
+                                "JOIN nr.detalleRetiroList dr " +
+                                "JOIN dr.repuesto r " +
+                                "JOIN r.marcaRepuesto mr " +
+                                "WHERE v.estadoVenta = :estado " +
+                                "AND v.activo = true " +
+                                // SOLUCIÓN: Quitamos el OR ... IS NULL
+                                "AND v.fechaVenta >= :fechaMin " +
+                                "AND v.fechaVenta <= :fechaMax " +
+                                "GROUP BY r.codBarra, mr.nombreMarca, r.detalle " +
+                                "ORDER BY SUM(dr.subTotal) DESC",
+                        ReporteIngresosRepuestoDTO.class)
+                .setParameter("estado", EstadoVentaRepuesto.PAGADO)
+                .setParameter("fechaMin", fechaMin)
+                .setParameter("fechaMax", fechaMax)
+                .setMaxResults(cantidad)
+                .getResultList();
     }
 
     @Override
