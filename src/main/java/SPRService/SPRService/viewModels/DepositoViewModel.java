@@ -131,30 +131,8 @@ public class DepositoViewModel {
         verificarBajoStock();
     }
 
-    // TODO: REHACER REPORTE
-    public void generarReporteMasRetiradosParaVenta(ActionEvent event) {
-        LocalDate fechaMin;
-        LocalDate fechaMax;
-
-        Integer cantidad = SimpleDialogs.inputEntero();
-        if (cantidad == null) return;
-
-        Optional<LocalDate[]> result = navigator.openModal(Views.SELECTOR_FECHA_REPORTE,
-                "Generar reporte", null);
-        if (result.isPresent()) {
-            fechaMin = result.get()[0];
-            fechaMax = result.get()[1];
-        } else {
-            return;
-        }
-
-        File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta para la generación del reporte",
-                "reporte productos más retirados.jpg",
-                new FileChooser.ExtensionFilter("Imágenes JPG (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
-        if (file == null) return;
-        List<RepuestoRetiradoReporteDTO> reportesDTOs = repuestoServ.repuestosMasRetiradosParaVenta(cantidad,
-                fechaMin, fechaMax);
-        GeneradorImagenes.repuestosMasRetiradosEnMes(file, reportesDTOs, fechaMin, fechaMax);
+    public void generarReporteMasRetiradosParaVenta() {
+        navigator.openModal(Views.CHART_MAS_RETIRADOS, "Repuestos más retirados", null);
     }
 
     // TODO: el vm no debe conocer las clases de javaFX

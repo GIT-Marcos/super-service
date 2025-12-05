@@ -63,7 +63,7 @@ public class RepuestoServImpl implements RepuestoServ {
     @Override
     public List<RepuestoRetiradoReporteDTO> repuestosMasRetiradosParaVenta(Integer cantidad, LocalDate fechaMin,
                                                                            LocalDate fechaMax) {
-        if (cantidad == null || cantidad < 0 || cantidad > 13) {
+        if (cantidad == null || cantidad < 0 || cantidad > 30) {
             cantidad = 5;
         }
         if (fechaMin == null) {
