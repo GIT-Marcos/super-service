@@ -7,9 +7,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Singleton
 public class MarcaRepuestoDAOImpl extends GenericDAOImpl<MarcaRepuesto, Long> implements MarcaRepuestoDAO {
@@ -22,12 +20,11 @@ public class MarcaRepuestoDAOImpl extends GenericDAOImpl<MarcaRepuesto, Long> im
     }
 
     @Override
-    public Set<MarcaRepuesto> verTodas() {
+    public List<MarcaRepuesto> verTodas() {
         EntityManager em = emProvider.get();
-        List<MarcaRepuesto> l = em.createQuery("SELECT DISTINCT m FROM MarcaRepuesto m " +
+        return em.createQuery("SELECT DISTINCT m FROM MarcaRepuesto m " +
                         "LEFT JOIN FETCH m.repuestos ORDER BY m.nombreMarca ASC",
                 MarcaRepuesto.class).getResultList();
-        return new HashSet<>(l);
     }
 
     @Override

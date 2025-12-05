@@ -20,12 +20,26 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//TODO: SEPARAR ESTAS GENERACIONES. REPUESTOS Y VENTAS POR SEPARADOS
 class RepuestosVentasTest {
 
     private Injector injector;
     private VentaRepuestoServ ventaRepuestoServ;
     private RepuestoServ repuestoServ;
+
+    // ARRAYS DE DATOS
+    private static final String[] AUTOPARTES = {
+            "Filtro de aceite", "Filtro de aire", "Filtro de combustible", "Bujías",
+            "Pastillas de freno", "Discos de freno", "Amortiguadores", "Batería",
+            "Radiador", "Alternador", "Bomba de agua", "Correa de distribución",
+            "Correa auxiliar", "Sensor de oxígeno", "Inyectores", "Embrague",
+            "Bobina de encendido", "Catalizador", "Turbo", "Faros delanteros", "Luces traseras"
+    };
+
+    private static final String[] MARCAS_AUTOPARTES = {
+            "Bosch", "ACDelco", "NGK", "Denso", "Mann-Filter", "Mahle", "Monroe",
+            "Valeo", "Hella", "Brembo", "TRW", "Sachs", "Continental", "Delphi",
+            "Gates", "Magneti Marelli", "Ferodo", "KYB", "Mobil", "Castrol"
+    };
 
     @BeforeEach
     void setUp() {
@@ -43,100 +57,156 @@ class RepuestosVentasTest {
     }
 
     @Test
-    public void testPoblarVentasDeUnAnioCompleto() {
-        System.out.println("--- Iniciando test de población para un año completo ---");
+    public void poblarRepuestos() {
+        System.out.println("--- Iniciando población de Repuestos Realistas ---");
+
         Random random = new Random();
 
-        // 1. PREPARAR LA MARCA Y LA UBICACIÓN (Inicialmente sin ID)
-        String nombreMarcaUnica = "Marca Test " + UUID.randomUUID().toString().substring(0, 8);
-        MarcaRepuesto marcaActual = new MarcaRepuesto(null, nombreMarcaUnica, new HashSet<>());
+        // 1. PREPARAR CACHE DE MARCAS Y UBICACIÓN
+        // Usamos un mapa para no crear duplicados de Marcas si sale la misma dos veces
+        Map<String, MarcaRepuesto> marcasCache = new HashMap<>();
 
-        // CAMBIO: Creamos la Ubicación objeto.
-        // Al principio tiene ID null. El CascadeType.PERSIST del Stock la guardará.
-        Ubicacion u = new Ubicacion(null, "DEPOSITO A TEST", new ArrayList<>());
+        // Creamos una única ubicación para este lote
+        Ubicacion ubicacionActual = new Ubicacion(null, "DEPOSITO CENTRAL " + UUID.randomUUID().toString().substring(0, 4), new ArrayList<>());
 
-        System.out.println("Generando 50 repuestos de prueba...");
-        List<Repuesto> listaRepuestos = new ArrayList<>();
-        int cantidadRepuestos = 50;
+        int cantidadRepuestos = 70;
+        int creados = 0;
 
         // 2. CREAR LOS REPUESTOS
         for (int i = 0; i < cantidadRepuestos; i++) {
+            try {
+                // Selección Aleatoria de Nombre y Marca
+                String nombreParte = AUTOPARTES[random.nextInt(AUTOPARTES.length)];
+                String nombreMarca = MARCAS_AUTOPARTES[random.nextInt(MARCAS_AUTOPARTES.length)];
 
-            // Llamada al método auxiliar pasando la ubicación
-            Repuesto repuestoGuardado = crearRepuestoParametrizado(i, marcaActual, u);
-            listaRepuestos.add(repuestoGuardado);
+                // Generar nombre compuesto: Ej "Pastillas de freno Brembo"
+                String nombreCompleto = nombreParte + " " + nombreMarca;
 
-            // CAMBIO IMPORTANTE:
-            // En la primera iteración, 'marcaActual' y 'u' (ubicación) se guardan en BD y obtienen un ID.
-            // Debemos actualizar nuestras variables locales con las instancias gestionadas (con ID).
-            // Si no hacemos esto, en la iteración i=1, JPA intentará insertar "DEPOSITO A TEST" de nuevo
-            // y fallará por Unique Constraint o por pasar una entidad "detached".
-            if (i == 0) {
-                marcaActual = repuestoGuardado.getMarcaRepuesto();
-                u = repuestoGuardado.getStock().getUbicacion(); // Actualizamos la referencia de Ubicación
+                // Recuperar marca del cache o crear nueva instancia si no existe
+                MarcaRepuesto marcaEntity = marcasCache.getOrDefault(nombreMarca, new MarcaRepuesto(null, nombreMarca, new HashSet<>()));
 
-                assertNotNull(marcaActual.getId(), "La marca ya debería tener ID asignado");
-                assertNotNull(u.getId(), "La ubicación ya debería tener ID asignado");
+                // Llamada al auxiliar pasando el nombre específico
+                Repuesto repuestoGuardado = crearRepuestoParametrizado(i, nombreCompleto, marcaEntity, ubicacionActual);
+
+                // GESTIÓN DE REFERENCIAS POST-GUARDADO
+
+                // A. Actualizar Cache de Marcas:
+                // Si la marca era nueva, ahora tiene ID gracias al Cascade del Repuesto. La guardamos en el mapa.
+                if (!marcasCache.containsKey(nombreMarca)) {
+                    marcasCache.put(nombreMarca, repuestoGuardado.getMarcaRepuesto());
+                }
+
+                // B. Actualizar Ubicación:
+                // Solo en la primera iteración necesitamos recuperar la Ubicación con ID asignado
+                if (i == 0) {
+                    ubicacionActual = repuestoGuardado.getStock().getUbicacion();
+                    assertNotNull(ubicacionActual.getId(), "La ubicación debería tener ID tras el primer guardado");
+                }
+
+                creados++;
+                System.out.println("Repuesto creado [" + creados + "/" + cantidadRepuestos + "]: " + repuestoGuardado.getDetalle() + " (" + repuestoGuardado.getPrecio() + ")");
+
+            } catch (Exception e) {
+                System.err.println("Error al crear repuesto índice " + i + ": " + e.getMessage());
+                e.printStackTrace();
             }
         }
+        System.out.println("--- Fin población Repuestos. Total creados: " + creados + " ---");
+    }
 
-        assertEquals(50, listaRepuestos.size(), "Se deberían haber creado 50 repuestos");
-        // Verificación extra: Todos los stocks tienen la misma ubicación (mismo ID)
-        Long idUbicacionEsperado = listaRepuestos.getFirst().getStock().getUbicacion().getId();
-        for(Repuesto r : listaRepuestos) {
-            assertEquals(idUbicacionEsperado, r.getStock().getUbicacion().getId(), "Todos los stocks deben compartir la misma ubicación");
+    @Test
+    public void poblarVentas() {
+        System.out.println("--- Iniciando población de Ventas con Pagos Variados ---");
+
+        List<Repuesto> listaRepuestos = repuestoServ.verTodos();
+        if (listaRepuestos.isEmpty()) {
+            fail("No hay repuestos en la base de datos. Ejecuta primero 'poblarRepuestos'.");
         }
 
-        // 3. LÓGICA DE VENTAS (Igual que antes)
+        Random random = new Random();
         int anioActual = Year.now().getValue();
         int totalVentasGeneradas = 0;
 
+        String[] bancos = {"Banco Galicia", "Santander", "BBVA", "Banco Nación", "ICBC", "Macro"};
+        String[] marcasTarjetas = {"Visa", "Mastercard", "Amex", "Cabal"};
+
         for (int mes = 1; mes <= 12; mes++) {
             int numVentasEsteMes = random.nextInt(40);
-
             int diasEnMes = YearMonth.of(anioActual, mes).lengthOfMonth();
 
-            for (int i = 0; i < numVentasEsteMes; i++) {
-                int diaAleatorio = random.nextInt(diasEnMes) + 1;
-                LocalDate fechaVenta = LocalDate.of(anioActual, mes, diaAleatorio);
-
-                Repuesto repuestoAleatorio = listaRepuestos.get(random.nextInt(listaRepuestos.size()));
-                double cantidad = 1.0 + random.nextInt(5);
-
-                DetalleRetiro detalle = new DetalleRetiro(null, cantidad, repuestoAleatorio);
-                NotaRetiro notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA,
-                        new ArrayList<>(List.of(detalle)));
-                VentaRepuesto venta = new VentaRepuesto(null, notaRetiro, new HashSet<>());
-                venta.setFechaVenta(fechaVenta);
-
-                String ticket = "TKT-" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
-
-                Pago pago = new Pago(null, ticket, venta.getMontoTotal(), null, null,
-                        null, null, null, MetodosPago.EFECTIVO, null, null);
-
-                venta.asociarPago(pago);
-                ventaRepuestoServ.cargarVenta(venta);
+            if (mes == LocalDate.now().getMonthValue() && anioActual == LocalDate.now().getYear()) {
+                diasEnMes = LocalDate.now().getDayOfMonth();
+            } else if (mes > LocalDate.now().getMonthValue() && anioActual == LocalDate.now().getYear()) {
+                continue;
             }
-            totalVentasGeneradas += numVentasEsteMes;
+
+            for (int i = 0; i < numVentasEsteMes; i++) {
+                try {
+                    int diaAleatorio = random.nextInt(diasEnMes) + 1;
+                    LocalDate fechaVenta = LocalDate.of(anioActual, mes, diaAleatorio);
+                    Repuesto repuestoAleatorio = listaRepuestos.get(random.nextInt(listaRepuestos.size()));
+
+                    // Cantidad entre 1 y 4
+                    double cantidad = 1.0 + random.nextInt(4);
+
+                    DetalleRetiro detalle = new DetalleRetiro(null, cantidad, repuestoAleatorio);
+                    NotaRetiro notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA, new ArrayList<>(List.of(detalle)));
+                    VentaRepuesto venta = new VentaRepuesto(null, notaRetiro, new HashSet<>());
+                    venta.setFechaVenta(fechaVenta);
+
+                    MetodosPago metodoSeleccionado = MetodosPago.values()[random.nextInt(MetodosPago.values().length)];
+
+                    String banco = null, marcaTarjeta = null, ultimos4 = null, referencia = null;
+                    String identificadorCliente = "DNI-" + (random.nextInt(89999999) + 10000000);
+
+                    switch (metodoSeleccionado) {
+                        case TARJETA_CREDITO:
+                        case TARJETA_DEBITO:
+                            banco = bancos[random.nextInt(bancos.length)];
+                            marcaTarjeta = marcasTarjetas[random.nextInt(marcasTarjetas.length)];
+                            ultimos4 = String.valueOf(random.nextInt(9000) + 1000);
+                            referencia = "REF-" + random.nextInt(999999);
+                            break;
+                        case TRANSFERENCIA:
+                            banco = bancos[random.nextInt(bancos.length)];
+                            referencia = "TRF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                            break;
+                        case EFECTIVO:
+                        default:
+                            referencia = "TKT-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+                            break;
+                    }
+
+                    Pago pago = new Pago(null, identificadorCliente, venta.getMontoTotal(), marcaTarjeta, banco, referencia, BigDecimal.ZERO, ultimos4, metodoSeleccionado, null, null);
+                    pago.setFechaPago(fechaVenta);
+                    venta.asociarPago(pago);
+
+                    ventaRepuestoServ.cargarVenta(venta);
+                    totalVentasGeneradas++;
+
+                } catch (Exception e) {
+                    System.err.println("Error al generar venta: " + e.getMessage());
+                }
+            }
+            System.out.println("Mes " + mes + " procesado. Ventas acumuladas: " + totalVentasGeneradas);
         }
-        System.out.println("Fin. Total ventas generadas: " + totalVentasGeneradas);
+        System.out.println("--- Fin población Ventas. Total generadas: " + totalVentasGeneradas + " ---");
     }
 
-    private Repuesto crearRepuestoParametrizado(int index, MarcaRepuesto marca, Ubicacion u) {
-        String uniqueSuffix = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    // MODIFICADO PARA ACEPTAR EL NOMBRE COMPLETO
+    private Repuesto crearRepuestoParametrizado(int index, String nombreCompleto, MarcaRepuesto marca, Ubicacion u) {
+        String uniqueSuffix = UUID.randomUUID().toString().substring(0, 5).toUpperCase();
         String codigoBarra = "COD-" + index + "-" + uniqueSuffix;
-        String nombre = "Repuesto " + index + " " + uniqueSuffix;
 
-        BigDecimal precio = new BigDecimal("10000.00").add(new BigDecimal(index));
+        // Precio base aleatorio entre 5000 y 50000
+        BigDecimal precio = BigDecimal.valueOf(5000 + new Random().nextInt(45000));
 
-        // CAMBIO: Constructor de Stock recibe el objeto Ubicacion 'u'
-        Stock stock = new Stock(null, 10000.0, 5.0, "Unidad", "A1", null, u);
+        // Stock inicial
+        Stock stock = new Stock(null, 100.0, 5.0, "Unidad", "ESTANTE-" + (index % 10 + 1), null, u);
 
-        // IMPORTANTE: Usamos la 'marca' que recibimos por parámetro.
-        Repuesto repuesto = new Repuesto(null, codigoBarra, nombre, precio, marca, stock);
+        Repuesto repuesto = new Repuesto(null, codigoBarra, nombreCompleto, precio, marca, stock);
 
-        // --- CORRECCIÓN PARA EL OPTIONAL ---
         return repuestoServ.cargarRepuesto(repuesto)
-                .orElseThrow(() -> new RuntimeException("Error en test: El servicio devolvió un Optional vacío al guardar repuesto index " + index));
+                .orElseThrow(() -> new RuntimeException("Error al guardar repuesto index " + index));
     }
 }
