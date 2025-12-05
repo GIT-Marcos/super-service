@@ -41,6 +41,9 @@ public class Pago implements Serializable {
     @Column(name = "ultimos_4")
     private String ultimos4;
 
+    @Column()
+    private String rutaComprobante;
+
     @Column(nullable = false)
     private Boolean activo;
 
@@ -60,8 +63,8 @@ public class Pago implements Serializable {
     }
 
     public Pago(UUID id, String dni, BigDecimal montoPagado, String marcaTarjeta,
-                String banco, String referencia, BigDecimal descuento, String ultimos4, MetodosPago MetodoPago,
-                VentaRepuesto ventaRepuesto, Service service) {
+                String banco, String referencia, BigDecimal descuento, String ultimos4, String rutaComprobante,
+                MetodosPago MetodoPago, VentaRepuesto ventaRepuesto, Service service) {
         this.id = id;
         this.dni = dni;
         this.fechaPago = LocalDate.now();
@@ -71,6 +74,7 @@ public class Pago implements Serializable {
         this.referencia = referencia;
         this.descuento = descuento;
         this.ultimos4 = ultimos4;
+        this.rutaComprobante = rutaComprobante;
         this.activo = Boolean.TRUE;
         this.MetodoPago = MetodoPago;
         this.ventaRepuesto = ventaRepuesto;
@@ -167,6 +171,14 @@ public class Pago implements Serializable {
         this.ultimos4 = ultimos4;
     }
 
+    public String getRutaComprobante() {
+        return rutaComprobante;
+    }
+
+    public void setRutaComprobante(String rutaComprobante) {
+        this.rutaComprobante = rutaComprobante;
+    }
+
     public Boolean getActivo() {
         return activo;
     }
@@ -200,6 +212,24 @@ public class Pago implements Serializable {
     }
 
     @Override
+    public String toString() {
+        return "Pago{" +
+                "id=" + id +
+                ", dni='" + dni + '\'' +
+                ", fechaPago=" + fechaPago +
+                ", montoPagado=" + montoPagado +
+                ", marcaTarjeta='" + marcaTarjeta + '\'' +
+                ", banco='" + banco + '\'' +
+                ", referencia='" + referencia + '\'' +
+                ", descuento=" + descuento +
+                ", ultimos4='" + ultimos4 + '\'' +
+                ", rutaComprobante='" + rutaComprobante + '\'' +
+                ", activo=" + activo +
+                ", MetodoPago=" + MetodoPago +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Pago)) return false;
@@ -214,17 +244,5 @@ public class Pago implements Serializable {
     public int hashCode() {
         // Hash code constante para evitar problemas en Sets cuando el ID se genera después de insertar
         return getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "Pago{" +
-                "id=" + id +
-                ", dni='" + dni + '\'' +
-                ", fechaPago=" + fechaPago +
-                ", montoPagado=" + montoPagado +
-                ", activo=" + activo +
-                ", MetodoPago=" + MetodoPago +
-                '}';
     }
 }

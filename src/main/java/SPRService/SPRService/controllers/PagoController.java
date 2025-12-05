@@ -16,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import SPRService.SPRService.entities.Pago;
 import SPRService.SPRService.entities.VentaRepuesto;
@@ -26,6 +27,7 @@ import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.Operador;
 import org.hibernate.HibernateException;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Optional;
@@ -38,6 +40,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
     private Transaccion transaccionParaDevolver;
     private final VentaRepuestoServ ventaRepuestoServ;
     private final ServiceServ serviceServ;
+    private String rutaComprobante;
     //para indicar cuando se agrega un pago a una venta ya hecha o es una venta nueva.
     private boolean flagAgregarPago = false;
 
@@ -53,6 +56,8 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
     private TextField tfMonto, tfUltimos4, tfNroReferencia, tfDniCliente;
     @FXML
     private ComboBox<String> comboMarcaTarjeta, comboBancoTarjeta;
+    @FXML
+    private Button btnAdjuntar;
 
     @Inject
     public PagoController(VentaRepuestoServ ventaRepuestoServ, ServiceServ serviceServ) {
@@ -93,6 +98,15 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
 
         // Obtener el tipo de pago seleccionado
         MetodosPago metodosPago = tomaMetodoPago();
+        String rutaComprobante = null;
+        if (metodosPago == MetodosPago.TRANSFERENCIA) {
+            if (this.rutaComprobante == null) {
+                NotificationHelper.mostrarAdvertencia("Pago",
+                        "Si se paga por transferencia se debe adjuntar un comprobante.");
+                return;
+            }
+            rutaComprobante = this.rutaComprobante;
+        }
 
         // Capturar los valores de los controles
         String inputMonto = tfMonto.getText();
@@ -101,6 +115,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
         String bancoTarjeta = comboBancoTarjeta.getSelectionModel().getSelectedItem();
         String ultimos4 = tfUltimos4.getText();
         String nroReferencia = tfNroReferencia.getText();
+        String dniCliente = tfDniCliente.getText();
 
         BigDecimal monto;
         BigDecimal porcentajeDescuento;
@@ -110,6 +125,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
             // Validación de Monto y Descuento
             monto = ManejadorInputs.dinero(inputMonto, true, false);
             porcentajeDescuento = ManejadorInputs.porcentaje(inputDescuento.toString(), false);
+            ManejadorInputs.dni(dniCliente, false);
 
             // Validación de campos de Tarjeta/Transferencia si aplica
             if (metodosPago != MetodosPago.EFECTIVO) {
@@ -117,10 +133,11 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
                 ManejadorInputs.marcaTarjetaYBanco(bancoTarjeta, true, null, 30);
                 ManejadorInputs.ultimos4(ultimos4, true);
                 ManejadorInputs.referenciaTarjeta(nroReferencia, true);
+                ManejadorInputs.dni(dniCliente, true);
             }
 
             // Validación de Monto vs Monto Faltante
-            if (monto.compareTo(this.transaccion.getMontoFaltante()) == 1) {
+            if (monto.compareTo(this.transaccion.getMontoFaltante()) > 0) {
                 NotificationHelper.mostrarAdvertencia("Pago", "El monto ingresado ($" + monto + ") es mayor al que se " +
                         "debe pagar ($" + this.transaccion.getMontoFaltante() + ").");
                 return;
@@ -147,8 +164,8 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
 
         // 4. CREACIÓN DEL PAGO Y ASOCIACIÓN A LA TRANSACCIÓN
         Pago pagoParaCargar = new Pago(
-                null, null, montoPagar, marcaTarjeta, bancoTarjeta, nroReferencia,
-                porcentajeDescuento, ultimos4, metodosPago,
+                null, dniCliente, montoPagar, marcaTarjeta, bancoTarjeta, nroReferencia,
+                porcentajeDescuento, ultimos4, rutaComprobante, metodosPago,
                 (this.transaccion instanceof VentaRepuesto ? (VentaRepuesto) this.transaccion : null), // Se asigna solo si es VentaRepuesto
                 (this.transaccion instanceof Service ? (Service) this.transaccion : null) // Se asigna solo si es Service
         );
@@ -191,6 +208,39 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
         } catch (HibernateException | IllegalArgumentException e) {
             NotificationHelper.mostrarError("Error de Persistencia", e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void adjuntar(ActionEvent event) {
+        // 1. Crear el FileChooser
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Buscar Imagen");
+
+        // 2. Agregar filtros para facilitar la búsqueda
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg"),
+                new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
+        );
+
+        // 3. Obtener la ventana (Stage) actual para bloquearla mientras se abre el diálogo
+        // Obtenemos el Stage desde el evento del botón presionado
+        Node source = (Node) event.getSource();
+        Stage stage = (Stage) source.getScene().getWindow();
+
+        // 4. Mostrar el diálogo de abrir
+        File file = fileChooser.showOpenDialog(stage);
+
+        if (file != null) {
+            rutaComprobante = file.getAbsolutePath();
+            btnAdjuntar.setText("CAMBIAR COMPROBANTE");
+
+            // Limpias estilos anteriores si es necesario y agregas la clase nueva
+            btnAdjuntar.getStyleClass().clear();
+            // Ojo: al hacer clear() borras también estilos base como "button",
+            // a veces es mejor solo agregar la nueva o remover la vieja especifica.
+            btnAdjuntar.getStyleClass().add("button"); // Añadir estilo base de JavaFX
+            btnAdjuntar.getStyleClass().add("btn-primary"); // Añadir tu estilo verde
         }
     }
 
