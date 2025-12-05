@@ -57,20 +57,26 @@ public class ServiceTest {
         System.out.println("--- Iniciando población de Services ---");
 
         // 1. OBTENER ENTIDADES EXISTENTES
-        List<Cliente> clientes = clienteServ.getAllActive();
+        // Estos clientes TIENEN los services cargados (JOIN FETCH c.services en el DAO)
+        List<Cliente> clientesFull = clienteServ.getAllActive();
+
+        // Estos vehículos tienen un cliente, pero ese cliente NO tiene los services cargados
         List<Vehiculo> vehiculos = vehiculoServ.verTodosActivos();
+
         List<Repuesto> repuestos = repuestoServ.verTodos();
 
-        if (clientes.isEmpty() || vehiculos.isEmpty()) {
+        if (clientesFull.isEmpty() || vehiculos.isEmpty()) {
             fail("Faltan datos previos (Clientes o Vehículos). Ejecuta los tests de población anteriores.");
         }
 
+        // Map para búsqueda rápida de Cliente Full por ID
+        Map<Long, Cliente> mapaClientesFull = clientesFull.stream()
+                .collect(Collectors.toMap(Cliente::getId, c -> c));
+
         Random random = new Random();
-        // CAMBIO: Se generan 70 services
         int cantidadServices = 70;
         int creados = 0;
 
-        // Lista de estados excluyendo PAGADO
         List<EstadoService> estadosPosibles = Arrays.stream(EstadoService.values())
                 .filter(e -> e != EstadoService.PAGADO)
                 .collect(Collectors.toList());
@@ -82,11 +88,23 @@ public class ServiceTest {
             try {
                 // 2. SELECCIONAR VEHÍCULO Y CLIENTE
                 Vehiculo vehiculo = vehiculos.get(random.nextInt(vehiculos.size()));
-                Cliente cliente = vehiculo.getCliente();
 
-                if (cliente == null) {
-                    cliente = clientes.get(random.nextInt(clientes.size()));
-                    vehiculo.setCliente(cliente);
+                // CORRECCIÓN CRÍTICA:
+                // No usar vehiculo.getCliente() directamente porque es un objeto Lazy/Incompleto.
+                // Debemos buscar el objeto equivalente en nuestra lista 'clientesFull'.
+                Cliente clienteAsignado = null;
+
+                if (vehiculo.getCliente() != null) {
+                    clienteAsignado = mapaClientesFull.get(vehiculo.getCliente().getId());
+                }
+
+                // Si el vehículo no tenía cliente o no lo encontramos, asignamos uno random de la lista full
+                if (clienteAsignado == null) {
+                    clienteAsignado = clientesFull.get(random.nextInt(clientesFull.size()));
+
+                    // Opcional: actualizamos la relación en memoria para coherencia,
+                    // aunque no se persistirá el cambio en Vehículo aquí.
+                    vehiculo.setCliente(clienteAsignado);
                 }
 
                 // 3. CREAR ESTADO INGRESO
@@ -140,15 +158,13 @@ public class ServiceTest {
 
                 // 7. CONFIGURAR FECHAS Y PRIORIDAD
                 LocalDateTime fechaCarga = generarFechaAleatoriaEnElAnio();
-                // La fecha de entrega es unos días después de la carga
                 LocalDateTime fechaEntrega = fechaCarga.plusDays(random.nextInt(15));
                 PrioridadService prioridad = PrioridadService.values()[random.nextInt(PrioridadService.values().length)];
 
                 // 8. CREAR SERVICE
-                Service service = new Service(fechaEntrega, prioridad, cliente, orden);
+                // AQUI ESTA LA CLAVE: Pasamos 'clienteAsignado' (que tiene services inicializados)
+                Service service = new Service(fechaEntrega, prioridad, clienteAsignado, orden);
                 service.setFechaCarga(fechaCarga);
-
-                // Asignar estado (No pagado)
                 service.setEstadoService(estadosPosibles.get(random.nextInt(estadosPosibles.size())));
 
                 // 9. GUARDAR
@@ -157,6 +173,7 @@ public class ServiceTest {
                 System.out.println("Service guardado [" + creados + "/" + cantidadServices + "] | Fecha: " + fechaCarga.toLocalDate());
 
             } catch (Exception e) {
+                // e.printStackTrace(); // Descomenta para ver el stacktrace completo si vuelve a fallar
                 System.err.println("Error al guardar service: " + e.getMessage());
             }
         }
@@ -167,7 +184,7 @@ public class ServiceTest {
     void poblarPagos() {
         System.out.println("--- Iniciando población de Pagos para Services ---");
 
-        // 1. BUSCAR CANDIDATOS
+        // Tu DAO serviceServ.verTodos() ya tiene JOIN FETCH s.pagos, así que esto es seguro.
         List<Service> todosLosServices = serviceServ.verTodos();
 
         List<Service> candidatosAPagar = todosLosServices.stream()
@@ -182,10 +199,8 @@ public class ServiceTest {
         }
 
         Collections.shuffle(candidatosAPagar);
-
         Random random = new Random();
 
-        // CAMBIO: Intentar pagar 40 services (o el máximo disponible si hay menos de 40)
         int cantidadObjetivo = 40;
         int cantidadAPagar = Math.min(cantidadObjetivo, candidatosAPagar.size());
         int pagosRealizados = 0;
@@ -200,7 +215,7 @@ public class ServiceTest {
 
             try {
                 // 2. DEFINIR MONTO
-                boolean pagoTotal = random.nextDouble() > 0.2; // 80% Probabilidad de pago total
+                boolean pagoTotal = random.nextDouble() > 0.2;
                 BigDecimal montoAPagar;
 
                 if (pagoTotal) {
@@ -223,11 +238,16 @@ public class ServiceTest {
                 } else if (metodo == MetodosPago.TRANSFERENCIA) {
                     banco = bancos[random.nextInt(bancos.length)];
                     referencia = "TRF-" + random.nextInt(99999999);
+                } else {
+                    // Efectivo
+                    referencia = "TKT-" + random.nextInt(999999);
                 }
 
                 String dniCliente = service.getCliente().getDni();
 
                 // 4. CREAR PAGO
+                // Corregido: Ajuste de nulls para evitar ambigüedad según constructor de Pago si es necesario
+                // Asumimos constructor (UUID, DNI, Monto, Marca, Banco, Ref, Descuento, U4, Metodo, Venta, Service)
                 Pago nuevoPago = new Pago(
                         null,
                         dniCliente,
@@ -239,12 +259,10 @@ public class ServiceTest {
                         ultimos4,
                         null,
                         metodo,
-                        null,
-                        null
+                        null, // VentaRepuesto
+                        null  // Service se asigna luego con asociarService
                 );
 
-                // Ajustar fecha de pago para que coincida con la fecha del service o sea posterior
-                // Si la fecha de entrega es futura, usamos 'hoy' para el pago, si es pasada, usamos fecha entrega.
                 LocalDate fechaEntrega = service.getFechaEntrega().toLocalDate();
                 if (fechaEntrega.isBefore(LocalDate.now())) {
                     nuevoPago.setFechaPago(fechaEntrega);
@@ -267,21 +285,13 @@ public class ServiceTest {
         System.out.println("--- Fin de población de Pagos. Total procesados: " + pagosRealizados + " ---");
     }
 
-    /**
-     * Genera una fecha aleatoria dentro del AÑO ACTUAL completo.
-     * Desde el 1 de Enero hasta el 31 de Diciembre.
-     */
     private LocalDateTime generarFechaAleatoriaEnElAnio() {
         int currentYear = Year.now().getValue();
-
         long minDay = LocalDate.of(currentYear, 1, 1).toEpochDay();
         long maxDay = LocalDate.of(currentYear, 12, 31).toEpochDay();
-
         long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
-
         int hour = ThreadLocalRandom.current().nextInt(8, 18);
         int minute = ThreadLocalRandom.current().nextInt(0, 59);
-
         return LocalDate.ofEpochDay(randomDay).atTime(hour, minute);
     }
 }
