@@ -2,7 +2,7 @@ package SPRService.SPRService.util.generadores;
 
 import SPRService.SPRService.DTOs.TicketRetiroServiceDTO;
 import SPRService.SPRService.entities.DetalleRetiro;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,34 +11,62 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class GeneradorTXT {
 
     public static void generaNotaRetiro(List<DetalleRetiro> listaDetallesRetiro, File ruta) {
         StringBuilder sb = new StringBuilder();
-        sb.append("*** NOTA DE RETIRO ***\r\n");
-        sb.append("------------------------\r\n");
+        sb.append("*** NOTA DE RETIRO (AGRUPADA POR UBICACIÓN) ***\r\n");
+        sb.append("-------------------------------------------------\r\n\r\n");
 
-        for (DetalleRetiro dr : listaDetallesRetiro) {
-            sb.append(String.format(
-                    "CÓDIGO: %s\r\nDETALLE: %s\r\nMARCA: %s\r\nCANTIDAD: %s\r\nUBICACIÓN: %s\r\nLOTE: %s\r\n------------------------\r\n",
-                    dr.getRepuesto().getCodBarra(),
-                    dr.getRepuesto().getDetalle(),
-                    dr.getRepuesto().getMarcaRepuesto().getNombreMarca(),
-                    dr.getCantidadRetirada(),
-                    dr.getRepuesto().getStock().getUbicacion(),
-                    dr.getRepuesto().getStock().getLote()
-            ));
+        // 1. Agrupamos la lista por el nombre de la Ubicación.
+        // Usamos TreeMap para que las ubicaciones salgan ordenadas alfabéticamente.
+        Map<String, List<DetalleRetiro>> mapPorUbicacion = listaDetallesRetiro.stream()
+                .collect(Collectors.groupingBy(
+                        dr -> dr.getRepuesto().getStock().getUbicacion().getUbicacion(),
+                        TreeMap::new,
+                        Collectors.toList()
+                ));
+
+        // 2. Iteramos sobre cada ubicación (Depósito)
+        for (Map.Entry<String, List<DetalleRetiro>> entry : mapPorUbicacion.entrySet()) {
+            String ubicacion = entry.getKey();
+            List<DetalleRetiro> repuestosEnEstaUbicacion = entry.getValue();
+
+            // Encabezado del Depósito/Ubicación
+            sb.append(">>> UBICACIÓN: ").append(ubicacion).append("\r\n");
+            sb.append("========================================\r\n");
+
+            // 3. Listamos los repuestos que están en esa ubicación
+            for (DetalleRetiro dr : repuestosEnEstaUbicacion) {
+                sb.append(String.format(
+                        "   CÓD. BARRAS: %s\r\n" +
+                                "   DETALLE:     %s\r\n" +
+                                "   MARCA:       %s\r\n" +
+                                "   LOTE:        %s\r\n" +
+                                "   CANTIDAD:    %s\r\n" +
+                                "----------------------------------------\r\n",
+                        dr.getRepuesto().getCodBarra(),
+                        dr.getRepuesto().getDetalle(),
+                        dr.getRepuesto().getMarcaRepuesto().getNombreMarca(),
+                        dr.getRepuesto().getStock().getLote(),
+                        dr.getCantidadRetirada()
+                ));
+            }
+            sb.append("\r\n"); // Espacio entre ubicaciones para cortar el papel o separar visualmente
         }
 
-        sb.append("*** PARA RETIRAR DE DEPÓSITO ***\r\n");
+        sb.append("*** FIN DE LISTADO PARA RETIRAR ***\r\n");
 
         guardarArchivo(sb.toString(), ruta, "Nota de retiro");
     }
 
     public static void generarTicketRetiroService(TicketRetiroServiceDTO dto, File ruta) {
         if (dto == null || ruta == null) {
-            Alertas.error("Error", "Datos insuficientes para generar el ticket.");
+            NotificationHelper.mostrarError("Error", "Datos insuficientes para generar el ticket.");
             return;
         }
 
@@ -85,10 +113,10 @@ public class GeneradorTXT {
         try (BufferedWriter bw = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(ruta), StandardCharsets.ISO_8859_1))) {
             bw.write(contenido);
-            Alertas.exito("Emisión " + tipoDoc, "Se ha generado con éxito en:\n" + ruta);
+            NotificationHelper.mostrarExito("Emisión " + tipoDoc, "Se ha generado con éxito en:\n" + ruta);
         } catch (Exception e) {
+            NotificationHelper.mostrarError("Error al generar " + tipoDoc, e.getMessage());
             e.printStackTrace();
-            Alertas.error("Error al generar " + tipoDoc, e.getMessage());
         }
     }
 }
