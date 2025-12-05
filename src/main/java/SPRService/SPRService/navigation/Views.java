@@ -52,7 +52,8 @@ public enum Views {
     CHART_ANUAL_SERVICE("/views/ChartReportesAnulesService.fxml", ChartReportesAnualesServiceController.class),
     CHART_USO_REPUESTOS("/views/ChartUsoDeRepuestos.fxml", ChartUsoDeRepuestosController.class),
     CHART_COMPARACION_INGRESOS("/views/ChartComparacionIngresos.fxml", ChartComparacionIngresosController.class),
-    CHART_MAS_RETIRADOS("/views/ChartRepuestosMasRetirados.fxml", ChartMasRetiradosController.class);
+    CHART_MAS_RETIRADOS("/views/ChartRepuestosMasRetirados.fxml", ChartMasRetiradosController.class),
+    CHART_VEHICULOS("/views/ChartVehiculos.fxml", ChartVehiculosController.class);
 
     private final String fxmlPath;
     private final Class<?> controllerClass;
