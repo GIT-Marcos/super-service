@@ -1,5 +1,6 @@
 package SPRService.SPRService.services;
 
+import SPRService.SPRService.DTOs.ReporteIngresosRepuestoDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
@@ -9,6 +10,7 @@ import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface VentaRepuestoServ {
@@ -27,6 +29,9 @@ public interface VentaRepuestoServ {
     BigDecimal ingresosDeVentasEnAnio(int anio);
 
     Double ingresosPromedioPorVentaEnAnio(int anio);
+
+    List<ReporteIngresosRepuestoDTO> ingresosPorRepuesto(LocalDate fechaMin, LocalDate fechaMax, Integer cantidad);
+
     /* -- FIN REPORTES -- */
 
     VentaRepuesto cargarVenta(VentaRepuesto venta);

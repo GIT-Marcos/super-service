@@ -148,12 +148,8 @@ public class DepositoController implements Initializable {
     }
 
     @FXML
-    private void masRetiradosParaVenta(ActionEvent event) {
-        if (tablaRepuestos.getItems().isEmpty()) {
-            NotificationHelper.mostrarAdvertencia("Exportar tabla", "No hay repuestos para generar la tabla.");
-            return;
-        }
-        viewModel.generarReporteMasRetiradosParaVenta(event);
+    private void masRetiradosParaVenta() {
+        viewModel.generarReporteMasRetiradosParaVenta();
     }
 
     @FXML

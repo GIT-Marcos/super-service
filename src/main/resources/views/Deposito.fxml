@@ -109,7 +109,7 @@
                 <Separator />
 
                 <Label styleClass="section-label" text="REPORTES" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#masRetiradosParaVenta" styleClass="btn-report" text="📊 Más Vendidos" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#masRetiradosParaVenta" styleClass="btn-report" text="📊 Más Retirados" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#usoDeRepuestos" styleClass="btn-report" text="📉 Uso Repuestos" />
 
                 <Separator />

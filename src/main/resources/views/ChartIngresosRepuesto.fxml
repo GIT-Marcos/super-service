@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" styleClass="root" stylesheets="@../styles/ventas.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.charts.ChartIngresosRepuestoController">
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="901.0" spacing="15.0" styleClass="top-panel">
+                    <children>
+                        <Label styleClass="section-label" text="Configuración de Reporte:" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <VBox alignment="TOP_CENTER" spacing="5.0">
+                            <children>
+                                <Label text="Desde" />
+                                <DatePicker fx:id="dpFechaMin" prefHeight="29.0" prefWidth="125.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" spacing="5.0">
+                            <children>
+                                <Label text="Hasta" />
+                                <DatePicker fx:id="dpFechaMax" prefHeight="29.0" prefWidth="125.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Cantidad de repuestos" />
+                                <Spinner fx:id="spinner" prefHeight="29.0" prefWidth="120.0" />
+                                <Button mnemonicParsing="false" onAction="#generar" prefHeight="24.0" prefWidth="120.0" styleClass="btn-primary" text="📊 Generar" />
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Separator orientation="VERTICAL" />
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                            <children>
+                                <Button mnemonicParsing="false" onAction="#enviarMail" styleClass="btn-report" text="📧 Enviar por Mail">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#exportarJPG" styleClass="btn-report" text="📷 Exportar JPG">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets left="20.0" right="20.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <!-- CAMBIO: BarChart Horizontal (Number en X, Category en Y) -->
+        <BarChart fx:id="chart" animated="false" legendSide="TOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" title="Repuestos con más ingresos" BorderPane.alignment="CENTER">
+            <xAxis>
+                <!-- EJE X AHORA ES NUMERICO -->
+                <NumberAxis label="Ingresos ($)" side="BOTTOM" tickLabelFill="#2d3436" />
+            </xAxis>
+            <yAxis>
+                <!-- EJE Y AHORA ES CATEGORIA (TEXTO) -->
+                <CategoryAxis label="Repuesto" side="LEFT" tickLabelFill="#2d3436" />
+            </yAxis>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </BarChart>
+    </center>
+</BorderPane>

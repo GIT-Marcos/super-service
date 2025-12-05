@@ -179,6 +179,11 @@ public class VentasController implements Initializable {
     }
 
     @FXML
+    private void reporteMasIngresos() {
+        navigator.openModal(Views.CHART_INGRESOS_REPUESTO, "Reporte de ingresos por repuesto", null);
+    }
+
+    @FXML
     private void cancelarVenta() {
         VentaRepuesto ventaParaCancelar;
         VentaRepuestoVMtabla vrvm = tablaVentas.getSelectionModel().getSelectedItem();

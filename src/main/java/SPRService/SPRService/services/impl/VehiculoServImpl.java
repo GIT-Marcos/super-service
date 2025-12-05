@@ -63,15 +63,9 @@ public class VehiculoServImpl implements VehiculoServ {
     @Override
     public List<ModelosMasRegistradosDTO> generarReporteModelosMasRegistrados(Integer cantidad, LocalDate fechaMin,
                                                                               LocalDate fechaMax) {
-        if (cantidad == null || cantidad < 0 || cantidad > 13) {
-            cantidad = 5;
-        }
-        if (fechaMin == null) {
-            fechaMin = LocalDate.now().minusYears(20L);
-        }
-        if (fechaMax == null) {
-            fechaMax = LocalDate.now();
-        }
+        if (fechaMin == null) fechaMin = LocalDate.of(2000, 1, 1);
+        if (fechaMax == null) fechaMax = LocalDate.now();
+        if (cantidad < 0 || cantidad > 20) cantidad = 1;
         return daoVehiculo.reporteModelosMasRegistrados(cantidad, fechaMin, fechaMax);
     }
 

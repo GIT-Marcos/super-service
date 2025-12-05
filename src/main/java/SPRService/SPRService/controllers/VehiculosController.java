@@ -165,31 +165,8 @@ public class VehiculosController implements Initializable {
     }
 
     @FXML
-    private void generarReporteMasRegistrados(ActionEvent event) {
-        LocalDate fechaMin;
-        LocalDate fechaMax;
-
-        Integer cantidad = SimpleDialogs.inputEntero();
-        if (cantidad == null) return;
-
-        Optional<LocalDate[]> result = navigator.openModal(Views.SELECTOR_FECHA_REPORTE,
-                "Generar reporte", null);
-        if (result.isPresent()) {
-            fechaMin = result.get()[0];
-            fechaMax = result.get()[1];
-        } else {
-            return;
-        }
-
-        File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta para la generación del reporte",
-                "Reporte modelos más registrados.jpg",
-                new FileChooser.ExtensionFilter("Imágenes JPG (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"));
-        if (file == null) {
-            return;
-        }
-        GeneradorImagenes.modelosMasRegistrados(file, vehiculoServ.generarReporteModelosMasRegistrados(cantidad,
-                fechaMin, fechaMax
-        ));
+    private void generarReporteMasRegistrados() {
+        navigator.openModal(Views.CHART_VEHICULOS, "Reporte de modelos más registrados", null);
     }
 
     private void crearFilas(List<Vehiculo> vehiculos) {
