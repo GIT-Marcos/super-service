@@ -16,7 +16,9 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Duration;
 import org.apache.commons.mail.EmailException;
 
 import java.io.File;
@@ -33,8 +35,11 @@ public class ChartMasRetiradosController implements Initializable {
 
     @FXML
     private BorderPane rootPane;
+
+    // CAMBIO: Invertido a <Number, String> para grafico horizontal
     @FXML
-    private BarChart<String, Number> chart; // Cambiado a Number para ser mas flexible (Long/Integer)
+    private BarChart<Number, String> chart;
+
     @FXML
     private DatePicker dpFechaMin, dpFechaMax;
     @FXML
@@ -49,14 +54,14 @@ public class ChartMasRetiradosController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // 1. Configurar el Spinner (Min: 1, Max: 15, Valor Inicial: 5)
+        // 1. Configurar el Spinner
         SpinnerValueFactory<Integer> valueFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, 5);
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, 10);
         spinner.setValueFactory(valueFactory);
 
-        // 2. Configurar fechas por defecto (ej: Último mes o Año actual)
+        // 2. Configurar fechas
         dpFechaMax.setValue(LocalDate.now());
-        dpFechaMin.setValue(LocalDate.now().minusMonths(3)); // Últimos 3 meses por defecto
+        dpFechaMin.setValue(LocalDate.now().minusMonths(3));
 
         // 3. Cargar datos iniciales
         generar();
@@ -64,12 +69,12 @@ public class ChartMasRetiradosController implements Initializable {
 
     @FXML
     private void generar() {
-        // 1. Obtener parámetros de la vista
+        // 1. Obtener parámetros
         LocalDate fechaMin = dpFechaMin.getValue();
         LocalDate fechaMax = dpFechaMax.getValue();
         Integer cantidad = spinner.getValue();
 
-        // 2. Validar fechas básicas
+        // 2. Validar
         if (fechaMin != null && fechaMax != null && fechaMin.isAfter(fechaMax)) {
             NotificationHelper.mostrarAdvertencia("Rango de Fechas",
                     "La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.");
@@ -80,21 +85,41 @@ public class ChartMasRetiradosController implements Initializable {
             // 3. Llamar al servicio
             List<RepuestoRetiradoReporteDTO> datos = repuestoServ.repuestosMasRetiradosParaVenta(cantidad, fechaMin, fechaMax);
 
-            // 4. Limpiar el gráfico anterior
+            // 4. Limpiar gráfico
             chart.getData().clear();
-            chart.layout(); // Forzar refresco del layout
+            chart.layout();
 
-            // 5. Crear la serie de datos
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            // 5. Crear la serie <Number, String>
+            XYChart.Series<Number, String> series = new XYChart.Series<>();
             series.setName("Cantidad de Retiros");
 
-            for (RepuestoRetiradoReporteDTO dto : datos) {
-                // Construimos una etiqueta legible para el eje X
-                // Ej: "Fram - Filtro Aceite" o solo el detalle si prefieres
-                String etiqueta = dto.detalle();
+            // CAMBIO: Iterar al revés para que el Top 1 quede arriba visualmente
+            for (int i = datos.size() - 1; i >= 0; i--) {
+                RepuestoRetiradoReporteDTO dto = datos.get(i);
 
-                // Agregamos el dato (Etiqueta, Cantidad)
-                series.getData().add(new XYChart.Data<>(etiqueta, dto.cantidad()));
+                // Formato etiqueta: "Fram Filtro (x15)"
+                String etiqueta = String.format("%s %s (x%d)",
+                        dto.marca(), dto.detalle(), dto.cantidad());
+
+                // XYChart.Data(ValorX, ValorY) -> (Cantidad, Nombre)
+                XYChart.Data<Number, String> data = new XYChart.Data<>(dto.cantidad(), etiqueta);
+
+                // Opcional: Agregar Tooltip para detalles
+                data.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                    if (newNode != null) {
+                        Tooltip t = new Tooltip(
+                                "Repuesto: " + dto.detalle() +
+                                        "\nMarca: " + dto.marca() +
+                                        "\nRetirado: " + dto.cantidad() + " veces"
+                        );
+                        t.setStyle("-fx-font-size: 13px;");
+                        t.setShowDelay(Duration.millis(100));
+                        Tooltip.install(newNode, t);
+                        newNode.setStyle("-fx-cursor: hand;");
+                    }
+                });
+
+                series.getData().add(data);
             }
 
             // 6. Agregar la serie al gráfico
@@ -115,7 +140,6 @@ public class ChartMasRetiradosController implements Initializable {
     @FXML
     private void enviarMail() {
         String destinatario = SimpleDialogs.pedirMailParaEnviarReporte();
-        // Si el usuario cancela el dialogo, destinatario suele ser null o vacío
         if (destinatario == null || destinatario.isBlank()) return;
 
         try {
@@ -128,10 +152,8 @@ public class ChartMasRetiradosController implements Initializable {
 
     private void enviarSnapshotPorCorreo(String destinatario) {
         try {
-            // --- PASO A: TOMAR CAPTURA DEL CHART ---
             File tempFile = GeneradorImagenes.tomarScreenshotTemporalDeVista(rootPane);
 
-            // --- PASO B: ENVIAR MAIL ---
             String asunto = "Reporte de repuestos más retirados";
             String cuerpo = "Estimado,\n\nAdjunto encontrará el gráfico de los repuestos más retirados " +
                     "para venta en el periodo seleccionado.\n\n" +
@@ -139,7 +161,6 @@ public class ChartMasRetiradosController implements Initializable {
 
             eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
-            // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
             NotificationHelper.mostrarExito("Reporte enviado",
                     "El reporte se envió correctamente a " + destinatario);
 
@@ -150,7 +171,7 @@ public class ChartMasRetiradosController implements Initializable {
             e.printStackTrace();
         } catch (EmailException e) {
             NotificationHelper.mostrarError("Error Mail",
-                    "Fallo al enviar el correo. Verifique su conexión o configuración: " + e.getMessage());
+                    "Fallo al enviar el correo: " + e.getMessage());
             e.printStackTrace();
         }
     }
