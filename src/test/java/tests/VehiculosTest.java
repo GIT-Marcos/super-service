@@ -1,7 +1,7 @@
 package tests;
 
-import SPRService.SPRService.entities.ModeloVehiculo;
-import SPRService.SPRService.entities.Vehiculo;
+import SPRService.SPRService.entities.*;
+import SPRService.SPRService.services.ClienteServ;
 import SPRService.SPRService.services.ModeloVehiculoServ;
 import SPRService.SPRService.services.VehiculoServ;
 import SPRService.SPRService.util.persistence.PersistenceModule;
@@ -12,18 +12,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class VehiculosTest {
 
     private Injector injector;
     private VehiculoServ vehiculoServ;
+    private ClienteServ clienteServ;
     private ModeloVehiculoServ modeloVehiculoServ;
 
     @BeforeEach
@@ -31,8 +28,8 @@ public class VehiculosTest {
         injector = Guice.createInjector(new PersistenceModule());
         injector.getInstance(PersistService.class).start();
 
-        // Inyectamos los servicios necesarios
         this.vehiculoServ = injector.getInstance(VehiculoServ.class);
+        this.clienteServ = injector.getInstance(ClienteServ.class);
         this.modeloVehiculoServ = injector.getInstance(ModeloVehiculoServ.class);
     }
 
@@ -45,81 +42,131 @@ public class VehiculosTest {
 
     @Test
     void poblarVehiculos() {
-        System.out.println("--- Iniciando población de vehículos ---");
+        System.out.println("--- Iniciando población de Vehículos (Basado en Modelos de import.sql) ---");
 
-        // 1. RECUPERAR MODELOS EXISTENTES USANDO EL SERVICIO DE MODELOS
-        // Esto trae los datos cargados por el import.sql (Fiat Cronos, Argo, etc.)
+        // 1. OBTENER DATOS EXISTENTES
+        // Se asume que los modelos ya se cargaron via import.sql al levantar el PersistenceModule
         List<ModeloVehiculo> modelosDisponibles = modeloVehiculoServ.verTodos();
+        List<Cliente> clientes = clienteServ.getAllActive();
 
         if (modelosDisponibles.isEmpty()) {
-            fail("No se encontraron modelos en la base de datos. Verifique que el import.sql se haya ejecutado o que la base de datos tenga datos.");
+            fail("No se encontraron Modelos. Verifica que 'import.sql' se esté ejecutando correctamente.");
         }
-        System.out.println("Se encontraron " + modelosDisponibles.size() + " modelos base para generar vehículos.");
+        if (clientes.isEmpty()) {
+            fail("No hay clientes cargados. Ejecuta primero el test de Clientes.");
+        }
+
+        System.out.println("Modelos disponibles: " + modelosDisponibles.size());
+        System.out.println("Clientes disponibles: " + clientes.size());
 
         Random random = new Random();
-        int cantidadVehiculos = 50; // Cantidad de vehículos a generar
-        int creadosExitosamente = 0;
+        int totalObjetivo = 70;
+        int totalCreados = 0;
 
-        String[] colores = {"Blanco Banchisa", "Negro Vulcano", "Gris Silverstone", "Rojo Montecarlo", "Azul Jazz", "Gris Bari"};
+        // Set para asegurar unicidad de patentes en esta ejecución
+        Set<String> patentesGeneradas = new HashSet<>();
 
-        // 2. GENERACIÓN DE VEHÍCULOS
-        for (int i = 0; i < cantidadVehiculos; i++) {
+        // 2. BUCLE DE GENERACIÓN
+        while (totalCreados < totalObjetivo) {
 
-            // A. Seleccionar un modelo aleatorio de la lista recuperada
+            // A. Seleccionar un Modelo al azar de la lista cargada desde la BD
             ModeloVehiculo modeloSeleccionado = modelosDisponibles.get(random.nextInt(modelosDisponibles.size()));
 
-            // B. Generar datos aleatorios únicos
-            // Patente formato: AE 123 CD (Simulado)
-            String letrasIni = UUID.randomUUID().toString().substring(0, 2).toUpperCase();
-            String numeros = String.format("%03d", random.nextInt(999));
-            String letrasFin = UUID.randomUUID().toString().substring(2, 4).toUpperCase();
-            String patenteGenerada = letrasIni + numeros + letrasFin;
+            // B. Determinar tamaño del lote (batch) para este modelo (Entre 1 y 20)
+            int cantidadLote = random.nextInt(20) + 1;
 
-            String chasis = "8AP" + UUID.randomUUID().toString().substring(0, 14).toUpperCase().replace("-", "");
-            String motor = "MOTOR-" + random.nextInt(100000);
-            String color = colores[random.nextInt(colores.length)];
+            // Ajustar si el lote excede lo que falta para llegar a 70
+            if (totalCreados + cantidadLote > totalObjetivo) {
+                cantidadLote = totalObjetivo - totalCreados;
+            }
 
-            // C. Crear la entidad
-            // El Cliente va en null, el servicio lo admite.
-            Vehiculo nuevoVehiculo = new Vehiculo(
-                    null,
-                    patenteGenerada,
-                    chasis,
-                    motor,
-                    color,
-                    true, // estado
-                    modeloSeleccionado,
-                    null // cliente
-            );
+            System.out.println("-> Generando lote de " + cantidadLote + " vehículos del modelo: "
+                    + modeloSeleccionado.getNombreModelo() + " (" + modeloSeleccionado.getAnio() + ")");
 
-            // D. Variar la fecha de registro para pruebas de reportes históricos
-            nuevoVehiculo.setFechaRegistro(generarFechaAleatoria());
+            // C. Crear los vehículos del lote
+            for (int i = 0; i < cantidadLote; i++) {
+                try {
+                    Cliente clienteAsignado = clientes.get(random.nextInt(clientes.size()));
 
-            try {
-                // E. Persistir usando el servicio de Vehículos
-                // El servicio se encarga de hacer merge del modelo detached
-                vehiculoServ.cargarVehiculo(nuevoVehiculo);
-                creadosExitosamente++;
+                    // Generar datos aleatorios únicos
+                    String patente = generarPatenteUnica(random, patentesGeneradas);
+                    String chasis = generarAlfanumerico(17);
+                    String motor = generarAlfanumerico(12);
+                    String color = obtenerColorAleatorio(random);
 
-                System.out.println("Vehículo guardado: " + patenteGenerada + " (" + modeloSeleccionado.getNombreModelo() + ")");
+                    // Instanciar Vehículo según el constructor de tu Entidad
+                    Vehiculo vehiculo = new Vehiculo(
+                            null,               // ID
+                            patente,            // Patente
+                            chasis,             // Nro Chasis
+                            motor,              // Nro Motor
+                            color,              // Color
+                            true,               // Estado (Boolean)
+                            modeloSeleccionado, // Entidad ModeloVehiculo
+                            clienteAsignado     // Entidad Cliente
+                    );
+                    // Nota: fechaRegistro se asigna automáticamente a LocalDate.now() en el constructor
 
-            } catch (Exception e) {
-                System.err.println("Error guardando vehículo " + patenteGenerada + ": " + e.getMessage());
-                // No fallamos el test entero si uno falla, pero lo logueamos
+                    // Guardar en BD
+                    vehiculoServ.cargarVehiculo(vehiculo);
+
+                    patentesGeneradas.add(patente);
+                    totalCreados++;
+
+                } catch (Exception e) {
+                    System.err.println("Error al guardar vehículo lote: " + e.getMessage());
+                    // e.printStackTrace(); // Descomentar si necesitas ver el error completo
+                }
             }
         }
 
-        assertEquals(cantidadVehiculos, creadosExitosamente, "Se deberían haber guardado todos los vehículos generados.");
-        System.out.println("--- Fin de la población: " + creadosExitosamente + " vehículos creados. ---");
+        System.out.println("--- Fin población Vehículos. Total creados: " + totalCreados + " ---");
     }
 
+    // --- MÉTODOS AUXILIARES ---
+
     /**
-     * Genera una fecha aleatoria en los últimos 4 años
+     * Genera patentes con formato "AA 123 BB" (Nuevo) o "AAA 123" (Viejo)
      */
-    private LocalDate generarFechaAleatoria() {
-        long minDay = LocalDate.now().minusYears(4).toEpochDay();
-        long maxDay = LocalDate.now().toEpochDay();
-        long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
-        return LocalDate.ofEpochDay(randomDay);
+    private String generarPatenteUnica(Random random, Set<String> existentes) {
+        String patente;
+        do {
+            boolean esFormatoNuevo = random.nextBoolean();
+            if (esFormatoNuevo) {
+                // AA 123 BB
+                char l1 = (char) (random.nextInt(26) + 'A');
+                char l2 = (char) (random.nextInt(26) + 'A');
+                int num = random.nextInt(1000);
+                char l3 = (char) (random.nextInt(26) + 'A');
+                char l4 = (char) (random.nextInt(26) + 'A');
+                patente = String.format("%c%c %03d %c%c", l1, l2, num, l3, l4);
+            } else {
+                // AAA 123
+                char l1 = (char) (random.nextInt(26) + 'A');
+                char l2 = (char) (random.nextInt(26) + 'A');
+                char l3 = (char) (random.nextInt(26) + 'A');
+                int num = random.nextInt(1000);
+                patente = String.format("%c%c%c %03d", l1, l2, l3, num);
+            }
+        } while (existentes.contains(patente));
+        return patente;
+    }
+
+    private String generarAlfanumerico(int longitud) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder();
+        Random rnd = new Random();
+        for (int i = 0; i < longitud; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    private String obtenerColorAleatorio(Random random) {
+        String[] colores = {
+                "Blanco Banchisa", "Negro Vulcano", "Rojo Montecarlo",
+                "Gris Silverstone", "Gris Scandium", "Azul Jazz", "Bordó"
+        };
+        return colores[random.nextInt(colores.length)];
     }
 }
