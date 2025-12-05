@@ -237,6 +237,7 @@ public class ServiceTest {
                         referencia,
                         BigDecimal.ZERO,
                         ultimos4,
+                        null,
                         metodo,
                         null,
                         null

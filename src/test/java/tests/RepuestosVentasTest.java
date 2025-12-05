@@ -177,7 +177,8 @@ class RepuestosVentasTest {
                             break;
                     }
 
-                    Pago pago = new Pago(null, identificadorCliente, venta.getMontoTotal(), marcaTarjeta, banco, referencia, BigDecimal.ZERO, ultimos4, metodoSeleccionado, null, null);
+                    Pago pago = new Pago(null, identificadorCliente, venta.getMontoTotal(), marcaTarjeta, banco,
+                            referencia, BigDecimal.ZERO, ultimos4, null, metodoSeleccionado, null, null);
                     pago.setFechaPago(fechaVenta);
                     venta.asociarPago(pago);
 

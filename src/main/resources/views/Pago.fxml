@@ -135,7 +135,7 @@
                                         <Label text="N° Referencia:" GridPane.rowIndex="4" />
                                         <TextField fx:id="tfNroReferencia" promptText="Ref. operación" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                                        <Button fx:id="btnAdjuntar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-secondary-outline" text="📎 Adjuntar comprobante" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                        <Button fx:id="btnAdjuntar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#adjuntar" styleClass="btn-secondary-outline" text="📎 Adjuntar comprobante" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                                     </children>
                                 </GridPane>
                             </children>
