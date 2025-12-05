@@ -16,70 +16,73 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane fx:id="rootPane" minHeight="500.0" minWidth="900.0" prefHeight="600.0" prefWidth="900.0" styleClass="root" stylesheets="@../styles/deposito.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.charts.ChartMasRetiradosController">
-   <top>
-      <VBox BorderPane.alignment="CENTER">
-         <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="901.0" spacing="15.0" styleClass="top-panel">
-               <children>
-                  <Label styleClass="section-label" text="Configuración de Reporte:" textFill="WHITE">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Label>
-                  <VBox alignment="TOP_CENTER" spacing="5.0">
-                     <children>
-                        <Label text="Desde" />
-                        <DatePicker fx:id="dpFechaMin" prefHeight="29.0" prefWidth="125.0" promptText="dd/MM/yyyy" styleClass="text-field" />
-                     </children>
-                  </VBox>
-                  <VBox alignment="TOP_CENTER" spacing="5.0">
-                     <children>
-                        <Label text="Hasta" />
-                        <DatePicker fx:id="dpFechaMax" prefHeight="29.0" prefWidth="125.0" promptText="dd/MM/yyyy" styleClass="text-field" />
-                     </children>
-                  </VBox>
-                  <VBox spacing="5.0">
-                     <children>
-                        <Label text="Cantidad de repuestos" />
-                        <Spinner fx:id="spinner" prefHeight="29.0" prefWidth="120.0" />
-                        <Button mnemonicParsing="false" onAction="#generar" prefHeight="24.0" prefWidth="120.0" styleClass="btn-primary" text="📊 Generar" />
-                     </children>
-                  </VBox>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Separator orientation="VERTICAL" />
-                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
-                     <children>
-                        <Button mnemonicParsing="false" onAction="#enviarMail" styleClass="btn-report" text="📧 Enviar por Mail">
-                           <font>
-                              <Font size="12.0" />
-                           </font>
-                        </Button>
-                        <Button mnemonicParsing="false" onAction="#exportarJPG" styleClass="btn-report" text="📷 Exportar JPG">
-                           <font>
-                              <Font size="12.0" />
-                           </font>
-                        </Button>
-                     </children>
-                  </HBox>
-               </children>
-               <padding>
-                  <Insets left="20.0" right="20.0" />
-               </padding>
-            </HBox>
-         </children>
-      </VBox>
-   </top>
-   <center>
-      <BarChart fx:id="chart" animated="false" legendSide="TOP" title="Repuestos más retirados" BorderPane.alignment="CENTER">
-         <xAxis>
-            <CategoryAxis label="Repuesto" side="BOTTOM" tickLabelFill="#2d3436" />
-         </xAxis>
-         <yAxis>
-            <NumberAxis label="Veces retirado" side="LEFT" tickLabelFill="#2d3436" />
-         </yAxis>
-         <BorderPane.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </BorderPane.margin>
-      </BarChart>
-   </center>
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="901.0" spacing="15.0" styleClass="top-panel">
+                    <children>
+                        <Label styleClass="section-label" text="Configuración de Reporte:" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <VBox alignment="TOP_CENTER" spacing="5.0">
+                            <children>
+                                <Label text="Desde" />
+                                <DatePicker fx:id="dpFechaMin" prefHeight="29.0" prefWidth="125.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="TOP_CENTER" spacing="5.0">
+                            <children>
+                                <Label text="Hasta" />
+                                <DatePicker fx:id="dpFechaMax" prefHeight="29.0" prefWidth="125.0" promptText="dd/MM/yyyy" styleClass="text-field" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Cantidad de repuestos" />
+                                <Spinner fx:id="spinner" prefHeight="29.0" prefWidth="120.0" />
+                                <Button mnemonicParsing="false" onAction="#generar" prefHeight="24.0" prefWidth="120.0" styleClass="btn-primary" text="📊 Generar" />
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Separator orientation="VERTICAL" />
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                            <children>
+                                <Button mnemonicParsing="false" onAction="#enviarMail" styleClass="btn-report" text="📧 Enviar por Mail">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#exportarJPG" styleClass="btn-report" text="📷 Exportar JPG">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets left="20.0" right="20.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <!-- CAMBIO: BarChart Horizontal (Number en X, Category en Y) -->
+        <BarChart fx:id="chart" animated="false" legendSide="TOP" title="Repuestos más retirados" BorderPane.alignment="CENTER">
+            <xAxis>
+                <!-- Eje X: Cantidad (Number) -->
+                <NumberAxis label="Veces retirado" side="BOTTOM" tickLabelFill="#2d3436" />
+            </xAxis>
+            <yAxis>
+                <!-- Eje Y: Nombres (Category) -->
+                <CategoryAxis label="Repuesto" side="LEFT" tickLabelFill="#2d3436" />
+            </yAxis>
+            <BorderPane.margin>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </BorderPane.margin>
+        </BarChart>
+    </center>
 </BorderPane>
