@@ -2,7 +2,7 @@
   <configuration default="false" name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="SPRService.SPRService.Main" />
     <module name="SPRService" />
-    <option name="VM_PARAMETERS" value="--add-opens javafx.graphics/javafx.scene=org.controlsfx.controls" />
+    <option name="VM_PARAMETERS" value="--add-opens javafx.graphics/javafx.scene=org.controlsfx.controls --add-opens javafx.controls/javafx.scene.control.skin=org.controlsfx.controls --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="SPRService.SPRService.*" />
