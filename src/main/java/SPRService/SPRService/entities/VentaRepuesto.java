@@ -42,10 +42,14 @@ public class VentaRepuesto implements Serializable, Transaccion {
     @OneToMany(mappedBy = "ventaRepuesto", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private Set<Pago> pagos = new HashSet<>();
 
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @JoinColumn(name = "fk_cliente")
+    private Cliente cliente;
+
     public VentaRepuesto() {
     }
 
-    public VentaRepuesto(Long id, NotaRetiro notaRetiro, Set<Pago> pagos) {
+    public VentaRepuesto(Long id, NotaRetiro notaRetiro, Set<Pago> pagos, Cliente cliente) {
         this.id = id;
         this.fechaVenta = LocalDate.now();
         this.activo = true;
@@ -54,6 +58,12 @@ public class VentaRepuesto implements Serializable, Transaccion {
         this.pagos = pagos;
         this.montoFaltante = this.montoTotal;
         calcularEstadoVenta();
+        asociarCliente(cliente);
+    }
+
+    public void asociarCliente(Cliente c) {
+        this.cliente = c;
+        c.getVentas().add(this);
     }
 
     public void cancelarVenta() {
@@ -158,6 +168,14 @@ public class VentaRepuesto implements Serializable, Transaccion {
 
     public void setPagos(Set<Pago> pagosList) {
         this.pagos = pagosList;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
     @Override
