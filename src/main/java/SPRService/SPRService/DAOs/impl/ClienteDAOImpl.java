@@ -30,6 +30,8 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT c FROM Cliente c " +
                                 "LEFT JOIN FETCH c.services " +
+                                "LEFT JOIN FETCH c.vehiculos " +
+                                "LEFT JOIN FETCH c.ventas " +
                                 "WHERE c.activo = TRUE",
                         Cliente.class)
                 .getResultList();
