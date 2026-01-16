@@ -25,6 +25,7 @@ import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.util.generadores.GeneradorFacturasPDF;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
@@ -46,7 +47,11 @@ public class VentasController implements Initializable {
     @FXML
     private TableView<VentaRepuestoVMtabla> tablaVentas;
     @FXML
-    private TableColumn<VentaRepuestoVMtabla, Long> colCodVenta, colEstadoVenta, colFechaVenta, colMontoVenta;
+    private TableColumn<VentaRepuestoVMtabla, Long> colCodVenta;
+    @FXML
+    private TableColumn<VentaRepuestoVMtabla, String> colEstadoVenta, colFechaVenta;
+    @FXML
+    private TableColumn<VentaRepuestoVMtabla, BigDecimal> colMontoVenta;
     @FXML
     private DatePicker dateFechaMin, dateFechaMax;
     @FXML
@@ -134,7 +139,7 @@ public class VentasController implements Initializable {
         ventaParaDetalles = vrvm.getVentaRepuesto();
 
         Optional<VentaRepuesto> result = navigator.openModal(Views.DETALLE_VENTA, "Detalles de venta",
-                        ventaParaDetalles);
+                ventaParaDetalles);
         result.ifPresent(venta ->
                 obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(venta)));
     }

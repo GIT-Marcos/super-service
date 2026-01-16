@@ -1,26 +1,28 @@
 package SPRService.SPRService.viewModels.tablas;
 
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import SPRService.SPRService.entities.VentaRepuesto;
+
+import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 
 public class VentaRepuestoVMtabla {
 
     private final VentaRepuesto ventaRepuesto;
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     private final LongProperty codVenta;
     private final StringProperty estadoVenta;
     private final StringProperty fechaVenta;
-    private final StringProperty montoVenta;
+    private final ObjectProperty<BigDecimal> montoVenta;
 
     public VentaRepuestoVMtabla(VentaRepuesto v) {
         this.ventaRepuesto = v;
         this.codVenta = new SimpleLongProperty(v.getId());
         this.estadoVenta = new SimpleStringProperty(v.getEstadoVenta().toString());
-        this.fechaVenta = new SimpleStringProperty(v.getFechaVenta().toString());
-        this.montoVenta = new SimpleStringProperty("$ "+ v.getMontoTotal());
+        this.fechaVenta = new SimpleStringProperty(v.getFechaVenta().format(DATE_FORMATTER));
+        this.montoVenta = new SimpleObjectProperty<>(v.getMontoTotal());
     }
 
     public VentaRepuesto getVentaRepuesto() {
@@ -51,12 +53,11 @@ public class VentaRepuestoVMtabla {
         return fechaVenta;
     }
 
-    public String getMontoVenta() {
+    public BigDecimal getMontoVenta() {
         return montoVenta.get();
     }
 
-    public StringProperty montoVentaProperty() {
+    public ObjectProperty<BigDecimal> montoVentaProperty() {
         return montoVenta;
     }
-
 }
