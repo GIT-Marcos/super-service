@@ -5,7 +5,7 @@ import SPRService.SPRService.enums.EstadoVentaRepuesto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +20,7 @@ public class VentaRepuesto implements Serializable, Transaccion {
     private Long id;
 
     @Column(name = "fecha", nullable = false)
-    private LocalDate fechaVenta;
+    private LocalDateTime fechaVenta;
 
     @Column(name = "monto_total", precision = 16, scale = 2, nullable = false)
     private BigDecimal montoTotal;
@@ -42,7 +42,7 @@ public class VentaRepuesto implements Serializable, Transaccion {
     @OneToMany(mappedBy = "ventaRepuesto", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private Set<Pago> pagos = new HashSet<>();
 
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
 
@@ -51,7 +51,7 @@ public class VentaRepuesto implements Serializable, Transaccion {
 
     public VentaRepuesto(Long id, NotaRetiro notaRetiro, Set<Pago> pagos, Cliente cliente) {
         this.id = id;
-        this.fechaVenta = LocalDate.now();
+        this.fechaVenta = LocalDateTime.now();
         this.activo = true;
         this.notaRetiro = notaRetiro;
         calculaMontoTotal();
@@ -62,8 +62,10 @@ public class VentaRepuesto implements Serializable, Transaccion {
     }
 
     public void asociarCliente(Cliente c) {
-        this.cliente = c;
-        c.getVentas().add(this);
+        if (c != null) {
+            this.cliente = c;
+            c.getVentas().add(this);
+        }
     }
 
     public void cancelarVenta() {
@@ -114,11 +116,11 @@ public class VentaRepuesto implements Serializable, Transaccion {
         this.id = id;
     }
 
-    public LocalDate getFechaVenta() {
+    public LocalDateTime getFechaVenta() {
         return fechaVenta;
     }
 
-    public void setFechaVenta(LocalDate fechaVenta) {
+    public void setFechaVenta(LocalDateTime fechaVenta) {
         this.fechaVenta = fechaVenta;
     }
 

@@ -1,6 +1,7 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.components.ItemCellFactory;
+import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.NotaRetiro;
 import SPRService.SPRService.entities.VentaRepuesto;
@@ -8,6 +9,7 @@ import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
@@ -18,15 +20,12 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -38,15 +37,14 @@ public class CargarVentaController implements Initializable {
     private final Navigator navigator;
     private List<DetalleRetiro> detallesCargados = new ArrayList<>();
     private ObservableList<ItemDetalleViewModel> items = FXCollections.observableArrayList();
+    private Cliente cliente;
 
     @FXML
     private ListView<ItemDetalleViewModel> lista;
     @FXML
-    private Label lblTotal;
+    private Label lblTotal, lblDniCliente, lblNombreCliente;
     @FXML
-    private CheckBox chkGuardarRuta;
-    @FXML
-    private CheckBox chkImprimir;
+    private CheckBox chkGuardarRuta, chkImprimir, chConsumidorFinal;
 
     @Inject
     public CargarVentaController(AppCoordinator coordinator) {
@@ -69,6 +67,25 @@ public class CargarVentaController implements Initializable {
     }
 
     @FXML
+    private void seleccionarCliente() {
+        Optional<Cliente> result = navigator.openModal(Views.AGREGAR_CLIENTE_SERVICE,
+                "Agregar cliente", null);
+        result.ifPresent(r -> {
+            this.cliente = r;
+            lblDniCliente.setText(r.getDni());
+            lblNombreCliente.setText(r.getNombre() + " " + r.getApellido());
+            chConsumidorFinal.setSelected(false);
+        });
+    }
+
+    @FXML
+    private void checkConsumidorFinal() {
+        this.cliente = null;
+        lblNombreCliente.setText("---");
+        lblDniCliente.setText("---");
+    }
+
+    @FXML
     public void abrirModalAgregarProducto() {
         Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO, "Agregar repuesto a venta",
                 detallesCargados);
@@ -82,12 +99,13 @@ public class CargarVentaController implements Initializable {
     @FXML
     public void abrirModalPago(ActionEvent event) {
         if (detallesCargados.isEmpty()) {
-            Notifications.create()
-                    .title("Cargar venta")
-                    .text("Debe agregar productos a la venta para poder seguir con el pago.")
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Cargar venta",
+                    "Debe agregar productos a la venta para poder seguir con el pago.");
+            return;
+        }
+        if (!chConsumidorFinal.isSelected() && this.cliente == null) {
+            NotificationHelper.mostrarAdvertencia("Sin cliente",
+                    "Si no es consumidor final se debe agregar un cliente.");
             return;
         }
 
@@ -96,7 +114,7 @@ public class CargarVentaController implements Initializable {
         }
 
         NotaRetiro nota = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA, detallesCargados);
-        VentaRepuesto venta = new VentaRepuesto(null, nota, new HashSet<>());
+        VentaRepuesto venta = new VentaRepuesto(null, nota, new HashSet<>(), this.cliente);
         Optional<VentaRepuesto> result = navigator.openModal(Views.PAGO, "Pagar", venta);
         result.ifPresent(v -> {
             Node n = ((Node) event.getSource());

@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="600.0" prefWidth="900.0" styleClass="root" stylesheets="@../styles/ventas.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarVentaController">
+<BorderPane prefHeight="650.0" prefWidth="950.0" styleClass="root" stylesheets="@../styles/ventas.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarVentaController">
 
     <!-- 1. HEADER -->
     <top>
@@ -36,20 +36,49 @@
         </HBox>
     </top>
 
-    <!-- 2. BARRA LATERAL (DERECHA) -->
+    <!-- 2. BARRA LATERAL (DERECHA) - MODIFICADA -->
     <right>
-        <VBox prefWidth="200.0" spacing="10.0" styleClass="sidebar" BorderPane.alignment="CENTER">
+        <VBox prefWidth="230.0" spacing="10.0" styleClass="sidebar" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
             </padding>
             <children>
-                <Label styleClass="section-label" text="ACCIONES RÁPIDAS" />
+
+                <!-- NUEVA SECCIÓN: GESTIÓN DE CLIENTE -->
+                <Label styleClass="section-label" text="DATOS DEL CLIENTE" />
                 <Separator />
 
-                <Button fx:id="btnAgregarProducto" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#abrirModalAgregarProducto" prefHeight="40.0" styleClass="btn-primary" text="➕ Agregar Producto" />
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#seleccionarCliente" prefHeight="35.0" styleClass="btn-primary" text="👤 Seleccionar Cliente" />
+
+                <!-- Tarjeta de Información del Cliente -->
+                <VBox spacing="5.0" style="-fx-background-color: #f1f2f6; -fx-border-color: #dcdcdc; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 10;">
+                    <children>
+                        <Label style="-fx-font-size: 10px; -fx-text-fill: #7f8fa6;" text="Nombre y Apellido:" />
+                          <Label fx:id="lblNombreCliente" style="-fx-font-weight: bold; -fx-text-fill: #2d3436;" text="---" wrapText="true" />
+
+                        <Separator style="-fx-opacity: 0.5;" />
+
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                            <children>
+                                <Label style="-fx-font-size: 10px; -fx-text-fill: #7f8fa6;" text="DNI/CUIT:" />
+                                <Label fx:id="lblDniCliente" style="-fx-font-size: 11px; -fx-font-weight: bold;" text="---" />
+                            </children>
+                        </HBox>
+                  <CheckBox fx:id="chConsumidorFinal" mnemonicParsing="false" onAction="#checkConsumidorFinal" selected="true" text="Es consumidor final" underline="true" />
+                    </children>
+                </VBox>
+
+                <Region prefHeight="10.0" />
+
+                <!-- SECCIÓN EXISTENTE: ACCIONES -->
+                <Label styleClass="section-label" text="ACCIONES DE PRODUCTO" />
+                <Separator />
+
+                <Button fx:id="btnAgregarProducto" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#abrirModalAgregarProducto" prefHeight="40.0" styleClass="btn-action" text="➕ Agregar Producto" />
 
                 <Region VBox.vgrow="ALWAYS" />
 
+                <!-- SECCIÓN EXISTENTE: GESTIÓN DE LISTA -->
                 <Label styleClass="section-label" text="GESTIÓN DE LISTA" />
                 <Separator />
                 <Button fx:id="btnLimpiarLista" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#limpiarLista" styleClass="btn-danger" text="🗑 Limpiar Todo" />
