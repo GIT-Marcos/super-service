@@ -12,6 +12,7 @@ import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
@@ -192,15 +193,11 @@ public class CargarServiceController implements Initializable, ModalController<S
             //todo: hacer que tome la fecha del control datepicker
             Service service = new Service(LocalDateTime.now().plusDays(1), cbPrioridad.getValue(), this.cliente,
                     orden);
+            service.asignarCliente(this.cliente);
+            service.asignarOrden(this.orden);
 
-            if (!SimpleDialogs.confirmacion("Cargar service", "¿Está seguro que desea cargar?")) return;
+            if (!SimpleDialogs.confirmacion("Cargar service", "¿Está seguro que desea crear el service?")) return;
             this.service = serviceServ.cargarService(service);
-            Notifications.create()
-                    .title("Cargar service")
-                    .text("Se ha cargado el service al sistema con éxito.")
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.BOTTOM_RIGHT)
-                    .showInformation();
 
             if (SimpleDialogs.confirmacion("Generar ticket de service", "¿Quiere generar un ticket?")) {
                 gestionarTicket(event, this.service);
@@ -209,6 +206,7 @@ public class CargarServiceController implements Initializable, ModalController<S
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
+            NotificationHelper.mostrarExito("Cargar service", "Se guardado el service con éxito.");
         } catch (IllegalArgumentException e) {
             Notifications.create()
                     .hideAfter(Duration.seconds(5))

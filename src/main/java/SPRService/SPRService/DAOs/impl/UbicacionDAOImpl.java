@@ -1,6 +1,6 @@
-package SPRService.SPRService.DAOs;
+package SPRService.SPRService.DAOs.impl;
 
-import SPRService.SPRService.DAOs.impl.GenericDAOImpl;
+import SPRService.SPRService.DAOs.UbicacionDAO;
 import SPRService.SPRService.entities.Ubicacion;
 import com.google.inject.Inject;
 import com.google.inject.Provider;

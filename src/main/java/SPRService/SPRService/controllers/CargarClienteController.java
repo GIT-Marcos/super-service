@@ -165,12 +165,13 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         // 4. Construcción del objeto Cliente
         Cliente clienteParaCargar;
         if (!flagModifyMode) {
-            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new HashSet<>(), new HashSet<>());
+            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new HashSet<>(),
+                    new HashSet<>(), new HashSet<>());
         } else {
-            // Preservamos el ID y las relaciones existentes (ventas, etc) si es necesario,
+            // Preservamos el ID y las relaciones existentes (ventas, etc.) si es necesario,
             // aunque aquí pasamos HashSets vacíos asumiendo que el Servicio hace un 'merge' o ignora esos campos.
             clienteParaCargar = new Cliente(this.cliente.getId(), dni, nombre, apellido,
-                    datosContacto, this.cliente.getVehiculos(), this.cliente.getServices());
+                    datosContacto, this.cliente.getVehiculos(), this.cliente.getVentas(), this.cliente.getServices());
             // Nota: He cambiado 'new HashSet<>()' por los getters originales del cliente
             // para no perder referencias si tu servicio usa este objeto directamente.
         }

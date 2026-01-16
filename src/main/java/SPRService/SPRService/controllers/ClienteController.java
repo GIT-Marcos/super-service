@@ -91,6 +91,18 @@ public class ClienteController implements Initializable {
     }
 
     @FXML
+    private void verOperaciones() {
+        ClienteViewModelTabla vm = tablaClientes.getSelectionModel().getSelectedItem();
+        if (vm == null) {
+            NotificationHelper.mostrarAdvertencia("Operaciones de cliente",
+                    "Debe seleccionar un cliente para ver sus operaciones.");
+            return;
+        }
+        navigator.openModal(Views.OPERACIONES_CLIENTE, "Operaciones de cliente", vm);
+
+    }
+
+    @FXML
     private void darDeBaja() {
         ClienteViewModelTabla cvmt = tablaClientes.getSelectionModel().getSelectedItem();
         if (cvmt == null) {
