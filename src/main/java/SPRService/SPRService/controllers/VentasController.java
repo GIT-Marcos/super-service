@@ -39,7 +39,7 @@ public class VentasController implements Initializable {
     private static final int ITEMS_POR_PAGINA = 30;
 
     @FXML
-    private TextField tfBuscar, tfMontoMin, tfMontoMax;
+    private TextField tfBuscar, tfMontoMin, tfMontoMax, tfBuscarDni;
     @FXML
     private CheckBox checkPagado, checkPendiente, checkCancelado;
     @FXML
@@ -49,7 +49,7 @@ public class VentasController implements Initializable {
     @FXML
     private TableColumn<VentaRepuestoVMtabla, Long> colCodVenta;
     @FXML
-    private TableColumn<VentaRepuestoVMtabla, String> colEstadoVenta, colFechaVenta;
+    private TableColumn<VentaRepuestoVMtabla, String> colEstadoVenta, colFechaVenta, colCliente;
     @FXML
     private TableColumn<VentaRepuestoVMtabla, BigDecimal> colMontoVenta;
     @FXML
@@ -232,6 +232,7 @@ public class VentasController implements Initializable {
         try {
             return new FiltroVentaRepuestoDTO(
                     ManejadorInputs.codigoVenta(tfBuscar.getText(), false),
+                    ManejadorInputs.textoGenerico(tfBuscarDni.getText(), false, "DNI/CUIL", null),
                     ManejadorInputs.dinero(tfMontoMin.getText(), false, false),
                     ManejadorInputs.dinero(tfMontoMax.getText(), false, false),
                     dateFechaMin.getValue(),
@@ -291,6 +292,7 @@ public class VentasController implements Initializable {
         colEstadoVenta.setCellValueFactory(new PropertyValueFactory<>("estadoVenta"));
         colFechaVenta.setCellValueFactory(new PropertyValueFactory<>("fechaVenta"));
         colMontoVenta.setCellValueFactory(new PropertyValueFactory<>("montoVenta"));
+        colCliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
     }
 
     private void llenarCombos() {

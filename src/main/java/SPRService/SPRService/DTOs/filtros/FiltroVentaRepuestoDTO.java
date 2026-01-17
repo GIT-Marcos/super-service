@@ -11,6 +11,7 @@ import java.util.Objects;
 
 public record FiltroVentaRepuestoDTO(
         Long codVenta,
+        String dni,
         BigDecimal montoMin,
         BigDecimal montoMax,
         LocalDateTime fechaMin,
@@ -20,10 +21,11 @@ public record FiltroVentaRepuestoDTO(
         Integer tipoOrden
 ) {
 
-    public FiltroVentaRepuestoDTO(Long codVenta, BigDecimal montoMin, BigDecimal montoMax, LocalDate fechaMin,
+    public FiltroVentaRepuestoDTO(Long codVenta, String dni, BigDecimal montoMin, BigDecimal montoMax, LocalDate fechaMin,
                                   LocalDate fechaMax, List<EstadoVentaRepuesto> estados, String colOrden,
                                   Integer tipoOrden) {
         this(codVenta,
+                dni.strip(),
                 tomarBigDecimal(montoMin),
                 tomarBigDecimal(montoMax),
                 (fechaMin != null) ? fechaMin.atStartOfDay() : null,
@@ -34,7 +36,7 @@ public record FiltroVentaRepuestoDTO(
     }
 
     public FiltroVentaRepuestoDTO() {
-        this(null, null, null, LocalDateTime.of(1990, 1, 1, 0, 0),
+        this(null, null, null, null, LocalDateTime.of(1990, 1, 1, 0, 0),
                 LocalDateTime.now(), null, "fechaVenta", 0);
     }
 

@@ -70,6 +70,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         CriteriaQuery<VentaRepuesto> dataQuery = cb.createQuery(VentaRepuesto.class);
         Root<VentaRepuesto> dataRoot = dataQuery.from(VentaRepuesto.class);
         dataRoot.fetch("pagos", JoinType.LEFT);
+        dataRoot.fetch("cliente", JoinType.LEFT);
         dataQuery.select(dataRoot);
         // Volvemos a aplicar los mismos filtros, pero ahora a la consulta de datos
         aplicarFiltros(filtro, cb, dataQuery, dataRoot);
@@ -226,6 +227,10 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
 
         if (filtro.codVenta() != null && filtro.codVenta() > 0) {
             predicados.add(cb.equal(root.get("id"), filtro.codVenta()));
+        }
+        if (filtro.dni() != null && !filtro.dni().isBlank()) {
+            predicados.add(cb.like(cb.lower(root.get("cliente").get("dni")),
+                    "%" + filtro.dni().toLowerCase() + "%"));
         }
         if (filtro.estados() != null && !filtro.estados().isEmpty()) {
             predicados.add(root.get("estadoVenta").in(filtro.estados()));
