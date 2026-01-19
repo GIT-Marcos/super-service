@@ -93,8 +93,8 @@ public class AgregarClienteServiceController implements Initializable, ModalCont
                     return true;
                 }
                 String dni = u.getDni().toLowerCase(Locale.ROOT);
-                String nombre = u.getNombre();
-                String apellido = u.getApellido();
+                String nombre = u.getNombre().toLowerCase(Locale.ROOT);
+                String apellido = u.getApellido().toLowerCase(Locale.ROOT);
                 return dni.contains(q) || nombre.contains(q) || apellido.contains(q);
             });
         });
