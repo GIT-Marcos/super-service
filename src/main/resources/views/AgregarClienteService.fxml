@@ -4,55 +4,76 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="460.0" styleClass="root" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarClienteServiceController">
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="455.0" prefWidth="516.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarClienteServiceController">
-   <children>
-      <BorderPane maxHeight="450.0" maxWidth="510.0" minHeight="450.0" minWidth="510.0" prefHeight="450.0" prefWidth="510.0">
-         <top>
-            <VBox prefHeight="80.0" prefWidth="500.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Label text="Busque un cliente para asignarle el service o creelo si no lo encuentra:" wrapText="true">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets bottom="10.0" />
-                     </VBox.margin>
-                  </Label>
-                  <TextField fx:id="tfDni" promptText="DNI cliente, nombre o apellido..." />
-               </children>
-            </VBox>
-         </top>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
-         <center>
-            <ListView fx:id="lvClientes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-         </center>
-         <bottom>
-            <GridPane prefHeight="40.0" prefWidth="500.0" BorderPane.alignment="CENTER">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="251.73136593552476" minWidth="10.0" prefWidth="251.73136593552476" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="248.86564327927476" minWidth="10.0" prefWidth="248.86564327927476" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <children>
-                  <Button mnemonicParsing="false" onAction="#cargarNuevo" text="Cargar nuevo cliente..." GridPane.halignment="LEFT" />
-                  <Button mnemonicParsing="false" onAction="#asignarCliente" text="ASIGNAR CLIENTE" GridPane.columnIndex="1" GridPane.halignment="RIGHT" />
-               </children>
-            </GridPane>
-         </bottom>
-      </BorderPane>
-   </children>
-</AnchorPane>
+    <!-- 1. ENCABEZADO (Estilo .top-panel) -->
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="550.0" styleClass="top-panel" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="ASIGNAR CLIENTE A OPERACIÓN">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+            </children>
+            <padding>
+                <Insets left="20.0" />
+            </padding>
+        </HBox>
+    </top>
+
+    <!-- 2. CENTRO (Búsqueda y Lista) -->
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+            </padding>
+            <children>
+
+                <!-- Sección de Búsqueda -->
+                <Label styleClass="section-label" text="BUSCAR CLIENTE EXISTENTE. SI NO ENCUENTRA PUEDE CREARLO." />
+                <TextField fx:id="tfDni" promptText="Ingrese DNI, Nombre o Apellido..." />
+
+                <Separator prefWidth="200.0">
+                    <VBox.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                    </VBox.margin>
+                </Separator>
+
+                <!-- Sección de Resultados -->
+                <Label styleClass="section-label" text="RESULTADOS DE LA BÚSQUEDA" />
+
+                <!-- ListView ocupa el espacio restante -->
+                <ListView fx:id="lvClientes" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: #b2bec3;" VBox.vgrow="ALWAYS" />
+            </children>
+        </VBox>
+    </center>
+
+    <!-- 3. PIE DE PÁGINA (Acciones) -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <!-- Botón Crear (Verde/Success) -->
+                <Button mnemonicParsing="false" onAction="#cargarNuevo" styleClass="btn-success" text="➕ Crear Nuevo Cliente" />
+
+                <!-- Espaciador flexible -->
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- Botón Principal (Azul/Primary) -->
+                <Button defaultButton="true" mnemonicParsing="false" onAction="#asignarCliente" prefHeight="35.0" prefWidth="150.0" styleClass="btn-primary" text="ASIGNAR CLIENTE" />
+            </children>
+            <padding>
+                <Insets left="10.0" right="10.0" />
+            </padding>
+        </HBox>
+    </bottom>
+
+</BorderPane>

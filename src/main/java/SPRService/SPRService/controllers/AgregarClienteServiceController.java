@@ -7,7 +7,7 @@ import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ClienteServ;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -77,8 +77,8 @@ public class AgregarClienteServiceController implements Initializable, ModalCont
     private void asignarCliente() {
         this.clienteSeleccionado = lvClientes.getSelectionModel().getSelectedItem();
         if (this.clienteSeleccionado == null) {
-            Alertas.aviso("Asignar cliente",
-                    "Debe seleccionar un cliente de la lista para asignalo al service.");
+            NotificationHelper.mostrarAdvertencia("Asignar cliente",
+                    "Debe seleccionar un cliente para continuar.");
             return;
         }
         Stage s = (Stage) lvClientes.getScene().getWindow();
