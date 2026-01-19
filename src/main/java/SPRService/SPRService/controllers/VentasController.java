@@ -292,7 +292,7 @@ public class VentasController implements Initializable {
         colEstadoVenta.setCellValueFactory(new PropertyValueFactory<>("estadoVenta"));
         colFechaVenta.setCellValueFactory(new PropertyValueFactory<>("fechaVenta"));
         colMontoVenta.setCellValueFactory(new PropertyValueFactory<>("montoVenta"));
-        colCliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
+        colCliente.setCellValueFactory(new PropertyValueFactory<>("clienteDNI"));
     }
 
     private void llenarCombos() {

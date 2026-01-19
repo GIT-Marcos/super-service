@@ -61,6 +61,9 @@ public class VentaRepuesto implements Serializable, Transaccion {
         asociarCliente(cliente);
     }
 
+    /**
+     * En caso de ser consumidor final pasar null.
+     */
     public void asociarCliente(Cliente c) {
         if (c != null) {
             this.cliente = c;

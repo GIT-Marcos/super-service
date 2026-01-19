@@ -16,6 +16,8 @@ import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
 
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -27,6 +29,7 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     private VentaRepuesto ventaParaDevolver;
     private ObservableList<ItemDetalleViewModel> itemsDetalles = FXCollections.observableArrayList();
     private ObservableList<ItemPagoViewModel> itemsPagos = FXCollections.observableArrayList();
+    private ObservableList<String> itemsContacto = FXCollections.observableArrayList();
     private final Navigator navigator;
 
     @Inject
@@ -39,7 +42,10 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     @FXML
     private ListView<ItemPagoViewModel> listaPagos;
     @FXML
-    private Label labelCodVenta, labelFechaVenta, labelMontoTotal, labelEstadoVenta, labelMontoFaltante;
+    private ListView<String> listaContactosCliente;
+    @FXML
+    private Label labelCodVenta, labelFechaVenta, labelMontoTotal, labelEstadoVenta, labelMontoFaltante,
+            labelClienteDni, labelClienteNombre;
     @FXML
     private Button butAgregarPago;
 
@@ -66,6 +72,8 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
             itemsPagos.clear();
             itemsPagos.addAll(pagos);
 
+            cargarDatosCliente();
+
             butAgregarPago.setDisable(!data.getEstadoVenta().equals(EstadoVentaRepuesto.PENDIENTE_PAGO));
             cargarLabels();
         }
@@ -89,6 +97,7 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     private void configurarListas() {
         listaPagos.setItems(itemsPagos);
         listaDetalles.setItems(itemsDetalles);
+        listaContactosCliente.setItems(itemsContacto);
 
         listaPagos.setCellFactory(c -> new CeldaPago());
         listaDetalles.setCellFactory(new ItemCellFactory().setMostrarBotonEliminar(false));
@@ -101,9 +110,19 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
 
     private void cargarLabels() {
         labelCodVenta.setText(String.valueOf(this.ventaRepuesto.getId()));
-        labelFechaVenta.setText(String.valueOf(this.ventaRepuesto.getFechaVenta()));
+        labelFechaVenta.setText(this.ventaRepuesto.getFechaVenta().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
         labelMontoTotal.setText("$ " + this.ventaRepuesto.getMontoTotal());
         labelEstadoVenta.setText(this.ventaRepuesto.getEstadoVenta().toString());
         labelMontoFaltante.setText("$ " + this.ventaRepuesto.getMontoFaltante());
+    }
+
+    private void cargarDatosCliente() {
+        itemsContacto.clear();
+        if (this.ventaRepuesto.getCliente() != null) {
+            itemsContacto.addAll(this.ventaRepuesto.getCliente().getContactosCliente().getEmailSet());
+            itemsContacto.addAll(this.ventaRepuesto.getCliente().getContactosCliente().getNroTelefonoSet());
+            labelClienteDni.setText(this.ventaRepuesto.getCliente().getDni());
+            labelClienteNombre.setText(this.ventaRepuesto.getCliente().getNombre() + " " + this.ventaRepuesto.getCliente().getApellido());
+        }
     }
 }
