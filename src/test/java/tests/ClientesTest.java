@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -135,6 +136,7 @@ public class ClientesTest {
                         apellido,
                         datosContacto,
                         new HashSet<>(), // Vehículos
+                        new HashSet<>(), // Ventas
                         new HashSet<>()  // Services
                 );
 

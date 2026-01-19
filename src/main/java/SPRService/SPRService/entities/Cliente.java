@@ -36,13 +36,16 @@ public class Cliente implements Serializable {
     private Set<Vehiculo> vehiculos = new HashSet<>();
 
     @OneToMany(mappedBy = "cliente")
+    private Set<VentaRepuesto> ventas = new HashSet<>();
+
+    @OneToMany(mappedBy = "cliente")
     private Set<Service> services = new HashSet<>();
 
     public Cliente() {
     }
 
     public Cliente(Long id, String dni, String nombre, String apellido, DatosContacto contactosCliente,
-                   Set<Vehiculo> vehiculos, Set<Service> services) {
+                   Set<Vehiculo> vehiculos, Set<VentaRepuesto> ventas, Set<Service> services) {
         this.id = id;
         this.dni = dni;
         this.nombre = nombre;
@@ -50,6 +53,7 @@ public class Cliente implements Serializable {
         this.activo = Boolean.TRUE;
         this.contactosCliente = contactosCliente;
         this.vehiculos = vehiculos;
+        this.ventas = ventas;
         this.services = services;
     }
 
@@ -107,6 +111,14 @@ public class Cliente implements Serializable {
 
     public void setVehiculos(Set<Vehiculo> vehiculos) {
         this.vehiculos = vehiculos;
+    }
+
+    public Set<VentaRepuesto> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(Set<VentaRepuesto> ventas) {
+        this.ventas = ventas;
     }
 
     public Set<Service> getServices() {

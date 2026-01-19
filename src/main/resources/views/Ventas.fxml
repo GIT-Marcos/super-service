@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../styles/ventas.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.VentasController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../styles/ventas.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.VentasController">
 
     <!-- PANEL SUPERIOR COMPACTO -->
     <top>
@@ -27,31 +27,37 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
             <children>
-                <!-- FILA 1: Búsquedas Principales (Código, Fechas, Montos) -->
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <!-- FILA 1: Búsquedas Principales -->
+                <HBox alignment="CENTER_LEFT" spacing="5.0">
                     <children>
                         <Label text="🔍" textFill="WHITE">
                             <font><Font size="16.0" /></font>
                         </Label>
 
                         <!-- Búsqueda Código -->
-                        <TextField fx:id="tfBuscar" prefWidth="120.0" promptText="Cód. Venta" />
+                        <TextField fx:id="tfBuscar" prefWidth="115.0" promptText="Cód. Venta" />
+
+                        <Separator orientation="VERTICAL" />
+
+                        <!-- NUEVO: Búsqueda por Cliente (DNI) -->
+                        <Label text="DNI/CUIL:" />
+                        <TextField fx:id="tfBuscarDni" prefWidth="115.0" promptText="Buscar Cliente" />
 
                         <Separator orientation="VERTICAL" />
 
                         <!-- Rango Fechas -->
                         <Label text="Fecha:" />
-                        <DatePicker fx:id="dateFechaMin" prefHeight="29.0" prefWidth="120.0" promptText="Desde" />
+                        <DatePicker fx:id="dateFechaMin" prefHeight="29.0" prefWidth="115.0" promptText="Desde" />
                         <Label text="-" />
-                        <DatePicker fx:id="dateFechaMax" prefHeight="29.0" prefWidth="120.0" promptText="Hasta" />
+                        <DatePicker fx:id="dateFechaMax" prefHeight="29.0" prefWidth="115.0" promptText="Hasta" />
 
                         <Separator orientation="VERTICAL" />
 
                         <!-- Rango Montos -->
                         <Label text="Monto:" />
-                        <TextField fx:id="tfMontoMin" prefHeight="29.0" prefWidth="120.0" promptText="Min $" />
+                        <TextField fx:id="tfMontoMin" prefHeight="29.0" prefWidth="90.0" promptText="Min $" />
                         <Label text="-" />
-                        <TextField fx:id="tfMontoMax" prefHeight="29.0" prefWidth="120.0" promptText="Max $" />
+                        <TextField fx:id="tfMontoMax" prefHeight="29.0" prefWidth="90.0" promptText="Max $" />
 
                         <Region HBox.hgrow="ALWAYS" />
 
@@ -94,7 +100,8 @@
                         <TableColumn fx:id="colCodVenta" prefWidth="120.0" text="Código" />
                         <TableColumn fx:id="colEstadoVenta" prefWidth="120.0" style="-fx-alignment: CENTER;" text="Estado" />
                         <TableColumn fx:id="colFechaVenta" prefWidth="140.0" style="-fx-alignment: CENTER;" text="Fecha" />
-                        <TableColumn fx:id="colMontoVenta" prefWidth="120.0" style="-fx-alignment: CENTER-RIGHT;" text="Monto Total" />
+                        <TableColumn fx:id="colMontoVenta" prefWidth="120.0" style="-fx-alignment: CENTER-RIGHT;" text="Monto Total $" />
+                        <TableColumn fx:id="colCliente" prefWidth="120.0" style="-fx-alignment: CENTER-RIGHT;" text="DNI/CUIL Cliente" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -138,7 +145,7 @@
                 <Label styleClass="section-label" text="REPORTES" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#reportesMensuales" styleClass="btn-report" text="📊 Mensuales" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#reportesAnuales" styleClass="btn-report" text="📈 Anuales" />
-            <Button layoutX="21.0" layoutY="181.0" maxWidth="Infinity" mnemonicParsing="false" onAction="#reporteMasIngresos" styleClass="btn-report" text="🏆 Repuestos con más ingresos" wrapText="true" />
+                <Button layoutX="21.0" layoutY="181.0" maxWidth="Infinity" mnemonicParsing="false" onAction="#reporteMasIngresos" styleClass="btn-report" text="🏆 Repuestos con más ingresos" wrapText="true" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="5.0" right="5.0" top="5.0" />

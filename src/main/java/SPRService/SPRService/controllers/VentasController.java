@@ -25,6 +25,7 @@ import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.util.generadores.GeneradorFacturasPDF;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
@@ -38,7 +39,7 @@ public class VentasController implements Initializable {
     private static final int ITEMS_POR_PAGINA = 30;
 
     @FXML
-    private TextField tfBuscar, tfMontoMin, tfMontoMax;
+    private TextField tfBuscar, tfMontoMin, tfMontoMax, tfBuscarDni;
     @FXML
     private CheckBox checkPagado, checkPendiente, checkCancelado;
     @FXML
@@ -46,7 +47,11 @@ public class VentasController implements Initializable {
     @FXML
     private TableView<VentaRepuestoVMtabla> tablaVentas;
     @FXML
-    private TableColumn<VentaRepuestoVMtabla, Long> colCodVenta, colEstadoVenta, colFechaVenta, colMontoVenta;
+    private TableColumn<VentaRepuestoVMtabla, Long> colCodVenta;
+    @FXML
+    private TableColumn<VentaRepuestoVMtabla, String> colEstadoVenta, colFechaVenta, colCliente;
+    @FXML
+    private TableColumn<VentaRepuestoVMtabla, BigDecimal> colMontoVenta;
     @FXML
     private DatePicker dateFechaMin, dateFechaMax;
     @FXML
@@ -134,7 +139,7 @@ public class VentasController implements Initializable {
         ventaParaDetalles = vrvm.getVentaRepuesto();
 
         Optional<VentaRepuesto> result = navigator.openModal(Views.DETALLE_VENTA, "Detalles de venta",
-                        ventaParaDetalles);
+                ventaParaDetalles);
         result.ifPresent(venta ->
                 obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(venta)));
     }
@@ -227,6 +232,7 @@ public class VentasController implements Initializable {
         try {
             return new FiltroVentaRepuestoDTO(
                     ManejadorInputs.codigoVenta(tfBuscar.getText(), false),
+                    ManejadorInputs.textoGenerico(tfBuscarDni.getText(), false, "DNI/CUIL", null),
                     ManejadorInputs.dinero(tfMontoMin.getText(), false, false),
                     ManejadorInputs.dinero(tfMontoMax.getText(), false, false),
                     dateFechaMin.getValue(),
@@ -286,6 +292,7 @@ public class VentasController implements Initializable {
         colEstadoVenta.setCellValueFactory(new PropertyValueFactory<>("estadoVenta"));
         colFechaVenta.setCellValueFactory(new PropertyValueFactory<>("fechaVenta"));
         colMontoVenta.setCellValueFactory(new PropertyValueFactory<>("montoVenta"));
+        colCliente.setCellValueFactory(new PropertyValueFactory<>("clienteDNI"));
     }
 
     private void llenarCombos() {

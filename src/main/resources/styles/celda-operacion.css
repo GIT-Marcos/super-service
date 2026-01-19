@@ -1,0 +1,106 @@
+/* Contenedor principal de la celda */
+.celda-operacion-container {
+    -fx-background-color: transparent;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0; /* Solo línea inferior */
+}
+
+/* Efecto hover opcional */
+.list-cell:filled:hover .celda-operacion-container {
+    -fx-background-color: #f5f5f5;
+}
+
+.list-cell:filled:selected .celda-operacion-container {
+    -fx-background-color: #e3f2fd; /* Azul muy claro al seleccionar */
+}
+
+/* Estilo para el Título (Tipo + Código) */
+.celda-op-titulo {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* Estilo para la Fecha */
+.celda-op-fecha {
+    -fx-font-size: 11px;
+    -fx-text-fill: #757575; /* Gris */
+    -fx-font-style: italic;
+}
+
+/* Estilo para el Monto Total */
+.celda-op-total {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2e7d32; /* Verde oscuro */
+}
+
+/* Estilo para el Monto Faltante */
+.celda-op-faltante {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #d32f2f; /* Rojo alerta */
+}
+
+
+/* --- Estilos Específicos para Service y Venta --- */
+
+/* Patente del vehículo */
+.celda-label-patente {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #555555;
+    -fx-padding: 2 0 0 0;
+}
+
+/* Estado base (compartido por service y venta) */
+.celda-estado-base {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2px 6px;
+    -fx-background-radius: 4px;
+    -fx-text-fill: white;
+}
+/* --- Colores de Estados --- */
+
+/* Base compartida */
+.celda-estado-base {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2px 6px;
+    -fx-background-radius: 4px;
+    -fx-text-fill: white;
+}
+
+/* 1. Finalizado / Pagado (Éxito) */
+.estado-finalizado {
+    -fx-background-color: #2e7d32; /* Verde oscuro */
+}
+
+/* 2. Pendiente / En Espera / Pausado (Advertencia suave) */
+.estado-pendiente {
+    -fx-background-color: #ff9800; /* Naranja */
+}
+
+/* 3. Trabajando / Presupuestando (Info / Proceso) */
+.estado-proceso {
+    -fx-background-color: #1976d2; /* Azul */
+}
+
+/* 4. Pago Pendiente (Alerta fuerte) */
+.estado-alerta {
+    -fx-background-color: #d32f2f; /* Rojo */
+}
+
+/* 5. Cancelado (Deshabilitado) */
+.estado-cancelado {
+    -fx-background-color: #757575; /* Gris */
+}
+
+/* Estilo Patente */
+.celda-label-patente {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #555;
+    -fx-padding: 2 0 0 0;
+}

@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ClienteController">
+<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ClienteController">
 
     <top>
         <VBox BorderPane.alignment="CENTER">
@@ -93,6 +93,7 @@
 
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#nuevoCliente" styleClass="btn-success" text="➕ Nuevo cliente" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#modificar" text="✏ Detalles/Modificar" />
+            <Button layoutX="21.0" layoutY="73.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#verOperaciones" text="💵 Ver operaciones" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#darDeBaja" styleClass="btn-danger" text="🗑 Dar de baja" />
 
                 <Separator prefWidth="200.0" />

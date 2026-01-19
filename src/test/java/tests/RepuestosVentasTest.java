@@ -2,6 +2,7 @@ package tests;
 
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.MetodosPago;
+import SPRService.SPRService.services.ClienteServ;
 import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.persistence.PersistenceModule;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.*;
@@ -25,6 +27,7 @@ class RepuestosVentasTest {
     private Injector injector;
     private VentaRepuestoServ ventaRepuestoServ;
     private RepuestoServ repuestoServ;
+    private ClienteServ clienteServ;
 
     // ARRAYS DE DATOS
     private static final String[] AUTOPARTES = {
@@ -47,6 +50,7 @@ class RepuestosVentasTest {
         injector.getInstance(PersistService.class).start();
         this.ventaRepuestoServ = injector.getInstance(VentaRepuestoServ.class);
         this.repuestoServ = injector.getInstance(RepuestoServ.class);
+        this.clienteServ = injector.getInstance(ClienteServ.class);
     }
 
     @AfterEach
@@ -123,6 +127,12 @@ class RepuestosVentasTest {
             fail("No hay repuestos en la base de datos. Ejecuta primero 'poblarRepuestos'.");
         }
 
+        // Clientes cargados en BD (puede estar vacío: en ese caso todas las ventas serán consumidor final)
+        List<Cliente> listaClientes = clienteServ.getAllActive();
+        if (listaClientes.isEmpty()) {
+            fail("No hay clientes en la base de datos. Ejecuta el test para poblar clientes.");
+        }
+
         Random random = new Random();
         int anioActual = Year.now().getValue();
         int totalVentasGeneradas = 0;
@@ -143,21 +153,44 @@ class RepuestosVentasTest {
             for (int i = 0; i < numVentasEsteMes; i++) {
                 try {
                     int diaAleatorio = random.nextInt(diasEnMes) + 1;
-                    LocalDate fechaVenta = LocalDate.of(anioActual, mes, diaAleatorio);
+                    int horaAleatoria = random.nextInt(24);
+                    int minutoAleatorio = random.nextInt(60);
+
+                    LocalDateTime fechaVenta = LocalDateTime.of(
+                            anioActual, mes, diaAleatorio, horaAleatoria, minutoAleatorio
+                    );
+
                     Repuesto repuestoAleatorio = listaRepuestos.get(random.nextInt(listaRepuestos.size()));
 
                     // Cantidad entre 1 y 4
                     double cantidad = 1.0 + random.nextInt(4);
 
                     DetalleRetiro detalle = new DetalleRetiro(null, cantidad, repuestoAleatorio);
-                    NotaRetiro notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA, new ArrayList<>(List.of(detalle)));
-                    VentaRepuesto venta = new VentaRepuesto(null, notaRetiro, new HashSet<>());
+                    NotaRetiro notaRetiro = new NotaRetiro(
+                            null,
+                            NotaRetiro.TipoUsoRetiro.VENTA,
+                            new ArrayList<>(List.of(detalle))
+                    );
+
+                    // Cliente aleatorio o consumidor final (null)
+                    // Aproximadamente 50% de ventas con cliente y 50% consumidor final
+                    Cliente cliente = null;
+                    if (!listaClientes.isEmpty() && random.nextBoolean()) {
+                        cliente = listaClientes.get(random.nextInt(listaClientes.size()));
+                    }
+
+                    // Constructor nuevo de VentaRepuesto: calcula montoTotal, montoFaltante, estado, etc.
+                    VentaRepuesto venta = new VentaRepuesto(null, notaRetiro, new HashSet<>(), cliente);
                     venta.setFechaVenta(fechaVenta);
 
                     MetodosPago metodoSeleccionado = MetodosPago.values()[random.nextInt(MetodosPago.values().length)];
 
                     String banco = null, marcaTarjeta = null, ultimos4 = null, referencia = null;
-                    String identificadorCliente = "DNI-" + (random.nextInt(89999999) + 10000000);
+
+                    // Si hay cliente, usamos su DNI; si no, marcamos como consumidor final
+                    String identificadorCliente = (cliente != null)
+                            ? cliente.getDni()
+                            : "CONSUMIDOR_FINAL";
 
                     switch (metodoSeleccionado) {
                         case TARJETA_CREDITO:
@@ -177,9 +210,24 @@ class RepuestosVentasTest {
                             break;
                     }
 
-                    Pago pago = new Pago(null, identificadorCliente, venta.getMontoTotal(), marcaTarjeta, banco,
-                            referencia, BigDecimal.ZERO, ultimos4, null, metodoSeleccionado, null, null);
-                    pago.setFechaPago(fechaVenta);
+                    // Pago por el monto total de la venta (queda como PAGADO)
+                    Pago pago = new Pago(
+                            null,
+                            identificadorCliente,
+                            venta.getMontoTotal(),
+                            marcaTarjeta,
+                            banco,
+                            referencia,
+                            BigDecimal.ZERO,   // descuentos u otros importes, si los hubiera
+                            ultimos4,
+                            null,
+                            metodoSeleccionado,
+                            null,
+                            null
+                    );
+                    pago.setFechaPago(fechaVenta.toLocalDate());
+
+                    // Actualiza montoFaltante y estadoVenta internamente
                     venta.asociarPago(pago);
 
                     ventaRepuestoServ.cargarVenta(venta);
