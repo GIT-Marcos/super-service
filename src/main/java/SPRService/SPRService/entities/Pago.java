@@ -5,7 +5,7 @@ import SPRService.SPRService.enums.MetodosPago;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -21,7 +21,7 @@ public class Pago implements Serializable {
     private String dni;
 
     @Column(name = "fecha", nullable = false)
-    private LocalDate fechaPago;
+    private LocalDateTime fechaPago;
 
     @Column(name = "monto_pagado", nullable = false)
     private BigDecimal montoPagado;
@@ -67,7 +67,7 @@ public class Pago implements Serializable {
                 MetodosPago MetodoPago, VentaRepuesto ventaRepuesto, Service service) {
         this.id = id;
         this.dni = dni;
-        this.fechaPago = LocalDate.now();
+        this.fechaPago = LocalDateTime.now();
         this.montoPagado = montoPagado;
         this.marcaTarjeta = marcaTarjeta;
         this.banco = banco;
@@ -115,11 +115,11 @@ public class Pago implements Serializable {
         this.dni = dni;
     }
 
-    public LocalDate getFechaPago() {
+    public LocalDateTime getFechaPago() {
         return fechaPago;
     }
 
-    public void setFechaPago(LocalDate fechaPago) {
+    public void setFechaPago(LocalDateTime fechaPago) {
         this.fechaPago = fechaPago;
     }
 
