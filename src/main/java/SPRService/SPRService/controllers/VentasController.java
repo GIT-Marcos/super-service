@@ -251,6 +251,7 @@ public class VentasController implements Initializable {
 
     private void limpiarFiltros() {
         tfBuscar.clear();
+        tfBuscarDni.clear();
         tfMontoMin.clear();
         tfMontoMax.clear();
         dateFechaMin.setValue(null);

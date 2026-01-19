@@ -225,7 +225,7 @@ class RepuestosVentasTest {
                             null,
                             null
                     );
-                    pago.setFechaPago(fechaVenta.toLocalDate());
+                    pago.setFechaPago(fechaVenta);
 
                     // Actualiza montoFaltante y estadoVenta internamente
                     venta.asociarPago(pago);

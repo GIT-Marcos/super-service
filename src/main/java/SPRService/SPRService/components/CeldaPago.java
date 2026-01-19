@@ -7,12 +7,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -173,9 +172,9 @@ public class CeldaPago extends ListCell<ItemPagoViewModel> {
         return formato.format(monto);
     }
 
-    private String formatearFecha(LocalDate fecha) {
+    private String formatearFecha(LocalDateTime fecha) {
         if (fecha == null) return "";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         return fecha.format(formatter);
     }
 

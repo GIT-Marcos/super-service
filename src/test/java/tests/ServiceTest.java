@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Year;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -265,9 +266,9 @@ public class ServiceTest {
 
                 LocalDate fechaEntrega = service.getFechaEntrega().toLocalDate();
                 if (fechaEntrega.isBefore(LocalDate.now())) {
-                    nuevoPago.setFechaPago(fechaEntrega);
+                    nuevoPago.setFechaPago(fechaEntrega.atTime(LocalTime.NOON));
                 } else {
-                    nuevoPago.setFechaPago(LocalDate.now());
+                    nuevoPago.setFechaPago(LocalDateTime.now());
                 }
 
                 // 5. VINCULAR Y PERSISTIR
