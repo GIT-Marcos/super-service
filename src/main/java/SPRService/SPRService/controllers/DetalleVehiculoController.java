@@ -1,9 +1,11 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.components.CeldaOperacionUniversal;
+import SPRService.SPRService.entities.Orden;
 import SPRService.SPRService.entities.Vehiculo;
 import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.viewModels.celdas.ItemOperacionViewModel;
+import SPRService.SPRService.viewModels.celdas.ItemServiceViewModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -87,6 +89,8 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
     }
 
     private void cargarLista(Vehiculo data) {
-
+        items.setAll(
+                data.getOrdenes().stream().map(Orden::getService).map(ItemServiceViewModel::new).toList()
+        );
     }
 }
