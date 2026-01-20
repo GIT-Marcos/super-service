@@ -59,11 +59,18 @@ public class Orden implements Serializable {
         this.informeTecnico = informeTecnico;
         this.totalTrabajos = totalTrabajos;
         this.totalRepuestos = totalRepuestos;
-        this.vehiculo = vehiculo;
+        asociarVehiculo(vehiculo);
         this.estadoIngreso = estadoIngreso;
         this.notaRetiro = notaRetiro;
         this.trabajos = trabajos;
         this.service = service;
+    }
+
+    public void asociarVehiculo(Vehiculo v) {
+        if (v != null) {
+            this.setVehiculo(v);
+            v.asociarOrden(this);
+        }
     }
 
     public void agregarTrabajos(Set<Trabajo> trabajos) {

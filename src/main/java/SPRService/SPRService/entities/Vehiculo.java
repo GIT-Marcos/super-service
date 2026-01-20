@@ -1,15 +1,11 @@
 package SPRService.SPRService.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -47,13 +43,14 @@ public class Vehiculo implements Serializable {
     @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
 
-    //todo: hacer bidireccional con service
+    @OneToMany(mappedBy = "vehiculo")
+    private List<Orden> ordenes = new ArrayList<>();
 
     public Vehiculo() {
     }
 
     public Vehiculo(Long id, String patente, String nroChasis, String nroMotor, String color, Boolean estado,
-                    ModeloVehiculo modeloVehiculo, Cliente cliente) {
+                    ModeloVehiculo modeloVehiculo, Cliente cliente, List<Orden> ordenes) {
         this.id = id;
         this.patente = patente;
         this.nroChasis = nroChasis;
@@ -63,6 +60,23 @@ public class Vehiculo implements Serializable {
         this.estado = estado;
         this.modeloVehiculo = modeloVehiculo;
         this.cliente = cliente;
+        asociarOrden(ordenes);
+    }
+
+    protected void asociarOrden(Orden o) {
+        if (o != null) {
+            this.ordenes.add(o);
+            o.setVehiculo(this);
+        }
+    }
+
+    protected void asociarOrden(List<Orden> oList) {
+        if (oList == null)
+            oList = new ArrayList<>();
+
+        for (Orden o : oList) {
+            asociarOrden(o);
+        }
     }
 
     public Long getId() {
@@ -135,6 +149,14 @@ public class Vehiculo implements Serializable {
 
     public void setEstado(Boolean estado) {
         this.estado = estado;
+    }
+
+    public List<Orden> getOrdenes() {
+        return ordenes;
+    }
+
+    public void setOrdenes(List<Orden> ordenes) {
+        this.ordenes = ordenes;
     }
 
     @Override
