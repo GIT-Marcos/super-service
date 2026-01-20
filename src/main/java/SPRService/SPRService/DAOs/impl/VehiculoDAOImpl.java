@@ -31,6 +31,7 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
     public List<Vehiculo> getAllActive() {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT DISTINCT v FROM Vehiculo v " +
+                        "LEFT JOIN FETCH v.ordenes " +
                         "WHERE v.estado = TRUE",
                 Vehiculo.class).getResultList();
     }
@@ -43,6 +44,8 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
         Root<Vehiculo> root = query.from(Vehiculo.class);
         Join<Vehiculo, ModeloVehiculo> joinModelo = root.join("modeloVehiculo", JoinType.LEFT);
         Join<ModeloVehiculo, MarcaVehiculo> joinMarca = joinModelo.join("marcaVehiculo", JoinType.LEFT);
+        root.fetch("ordenes", JoinType.LEFT);
+
         List<Predicate> filtros = new ArrayList<>();
         filtros.add(cb.equal(root.get("estado"), Boolean.TRUE));
 
@@ -56,17 +59,6 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
         query.where(cb.and(filtros.toArray(filtros.toArray(new Predicate[0]))));
         query.orderBy(cb.asc(joinModelo.get("nombreModelo")));
         return em.createQuery(query).getResultList();
-    }
-
-    @Override
-    public List<Boolean> consultarEstado(String patente) {
-        EntityManager em = emProvider.get();
-        return em.createQuery("SELECT DISTINCT v.estado FROM Vehiculo v " +
-                                "WHERE v.patente = :patente",
-                        Boolean.class)
-                .setParameter("patente", patente)
-                .setMaxResults(1)
-                .getResultList();
     }
 
     @Override
