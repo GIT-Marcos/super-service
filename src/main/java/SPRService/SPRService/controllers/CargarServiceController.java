@@ -4,10 +4,7 @@ import SPRService.SPRService.DTOs.TicketRetiroServiceDTO;
 import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.entities.*;
 import SPRService.SPRService.enums.PrioridadService;
-import SPRService.SPRService.navigation.AppCoordinator;
-import SPRService.SPRService.navigation.ModalController;
-import SPRService.SPRService.navigation.Navigator;
-import SPRService.SPRService.navigation.Views;
+import SPRService.SPRService.navigation.*;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
@@ -24,7 +21,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -32,8 +28,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import org.controlsfx.control.Notifications;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
@@ -48,7 +42,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CargarServiceController implements Initializable, ModalController<Service> {
+public class CargarServiceController implements Initializable, ModalController<Service>, DataReceiver<Vehiculo> {
 
     private final Navigator navigator;
     private final ServiceServ serviceServ;
@@ -79,6 +73,8 @@ public class CargarServiceController implements Initializable, ModalController<S
     private ComboBox<PrioridadService> cbPrioridad;
     @FXML
     private CheckBox cbRutaPredeterminada, cbImprimir;
+    @FXML
+    private Button btnCliente, btnVehiculo;
 
     @Inject
     public CargarServiceController(AppCoordinator coordinator, ServiceServ serviceServ) {
@@ -94,6 +90,15 @@ public class CargarServiceController implements Initializable, ModalController<S
     @Override
     public Optional<Service> getResult() {
         return Optional.ofNullable(this.service);
+    }
+
+
+    @Override
+    public void receiveData(Vehiculo data) {
+        if (data != null) {
+            cargarVehiculo(data);
+            btnVehiculo.setDisable(true);
+        }
     }
 
     @FXML
@@ -117,12 +122,7 @@ public class CargarServiceController implements Initializable, ModalController<S
             tfTrabajo.setText("");
             tfPrecioTrabajo.setText("");
         } catch (RuntimeException e) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Agregar trabajo")
-                    .text(e.getMessage())
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Agregar trabajo", e.getMessage());
         }
     }
 
@@ -130,40 +130,24 @@ public class CargarServiceController implements Initializable, ModalController<S
     private void irAgregarRepuesto() {
         Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO,
                 "Agregar repuesto", obtenerDetalles());
-        if (result.isPresent()) {
+        result.ifPresent(r -> {
             items.addFirst(new ItemDetalleRetiroViewModel(result.get()));
             agregarTotal(result.get().getSubTotal());
-        }
+        });
     }
 
     @FXML
     private void asignarCliente() {
         Optional<Cliente> result = navigator.openModal(Views.AGREGAR_CLIENTE_SERVICE,
                 "Asignar cliente a service", null);
-        if (result.isPresent()) {
-            cliente = result.get();
-            lblCliente.setText(result.get().getNombre() + " " + result.get().getApellido() +
-                    " DNI: " + result.get().getDni());
-            lblCliente.setTextFill(Color.BLACK);
-        }
+        result.ifPresent(this::cargarCliente);
     }
 
     @FXML
     private void asignarVehiculo() {
         Optional<Vehiculo> result = navigator.openModal(Views.AGREGAR_VEHICULO_SERVICE,
                 "Agregar vehículo al service", null);
-        if (result.isPresent()) {
-            vehiculo = result.get();
-            InputStream stream = getClass().getResourceAsStream(
-                    result.get().getModeloVehiculo().getMarcaVehiculo().getRutaLogo());
-            if (stream != null) {
-                Image img = new Image(stream);
-                imgLogo.setImage(img);
-            }
-            lblVehiculo.setText(result.get().getModeloVehiculo().getMarcaVehiculo().getNombreMarca() + " "
-                    + result.get().getModeloVehiculo().getNombreModelo());
-            lblVehiculo.setTextFill(Color.BLACK);
-        }
+        result.ifPresent(this::cargarVehiculo);
     }
 
     @FXML
@@ -180,6 +164,8 @@ public class CargarServiceController implements Initializable, ModalController<S
                     "Observaciones del vehículo", 500);
             EstadoIngreso estadoIngreso = new EstadoIngreso(null, observaciones, inventario, kilometraje,
                     combustible);
+
+            this.cliente.asociarVehiculo(this.vehiculo);
 
             orden = new Orden();
             orden.setId(null);
@@ -206,23 +192,33 @@ public class CargarServiceController implements Initializable, ModalController<S
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
-            NotificationHelper.mostrarExito("Cargar service", "Se guardado el service con éxito.");
+            NotificationHelper.mostrarExito("Nuevo service", "Se guardado el service con éxito.");
         } catch (IllegalArgumentException e) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Cargar service")
-                    .text(e.getMessage())
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Nuevo service", e.getMessage());
         } catch (RuntimeException e) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Cargar service")
-                    .text(e.getMessage())
-                    .showError();
+            NotificationHelper.mostrarError("Nuevo service", e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void cargarVehiculo(Vehiculo v) {
+        this.vehiculo = v;
+        InputStream stream = getClass().getResourceAsStream(
+                v.getModeloVehiculo().getMarcaVehiculo().getRutaLogo());
+        if (stream != null) {
+            Image img = new Image(stream);
+            imgLogo.setImage(img);
+        }
+        lblVehiculo.setText(v.getModeloVehiculo().getMarcaVehiculo().getNombreMarca() + " "
+                + v.getModeloVehiculo().getNombreModelo());
+        lblVehiculo.setTextFill(Color.BLACK);
+    }
+
+    private void cargarCliente(Cliente c) {
+        this.cliente = c;
+        lblCliente.setText(c.getNombre() + " " + c.getApellido() +
+                " DNI: " + c.getDni());
+        lblCliente.setTextFill(Color.BLACK);
     }
 
     private void gestionarTicket(ActionEvent event, Service s) {
@@ -243,39 +239,19 @@ public class CargarServiceController implements Initializable, ModalController<S
 
     private boolean validar() {
         if (this.cliente == null) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Cargar service")
-                    .text("Se debe asociar un cliente para el service.")
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Nuevo service", "Se debe asignar un cliente para el service.");
             return false;
         }
         if (this.vehiculo == null) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Cargar service")
-                    .text("Se debe asociar un vehículo para el service.")
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Nuevo service", "Se debe asignar un vehículo para el service.");
             return false;
         }
         if (obtenerTrabajos().isEmpty()) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Cargar service")
-                    .text("Deben haber al menos 1 trabajo asignado para poder cargar el service.")
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Nuevo service", "Deben haber al menos 1 trabajo asignado para poder crear el service.");
             return false;
         }
         if (dpFechaEntrega.getValue() != null && dpFechaEntrega.getValue().isBefore(LocalDate.now())) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Cargar service")
-                    .text("La fecha de entrega ya ha pasado.")
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Nuevo service", "La fecha de entrega ya ha pasado.");
             return false;
         }
         return true;
