@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "vehiculos")
@@ -33,49 +31,36 @@ public class Vehiculo implements Serializable {
     private LocalDate fechaRegistro;
 
     @Column(nullable = false)
-    private Boolean estado;
+    private Boolean estado = true;
 
     @ManyToOne()
     @JoinColumn(nullable = false, name = "fk_modelo")
     private ModeloVehiculo modeloVehiculo;
 
-    @ManyToOne()
-    @JoinColumn(name = "fk_cliente")
-    private Cliente cliente;
+    @ManyToMany(mappedBy = "vehiculos")
+    private Set<Cliente> clientes = new HashSet<>();
 
     @OneToMany(mappedBy = "vehiculo")
-    private List<Orden> ordenes = new ArrayList<>();
+    private Set<Orden> ordenes = new HashSet<>();
 
     public Vehiculo() {
     }
 
-    public Vehiculo(Long id, String patente, String nroChasis, String nroMotor, String color, Boolean estado,
-                    ModeloVehiculo modeloVehiculo, Cliente cliente, List<Orden> ordenes) {
+    public Vehiculo(Long id, String patente, String nroChasis, String nroMotor, String color,
+                    ModeloVehiculo modeloVehiculo) {
         this.id = id;
         this.patente = patente;
         this.nroChasis = nroChasis;
         this.nroMotor = nroMotor;
         this.color = color;
         this.fechaRegistro = LocalDate.now();
-        this.estado = estado;
-        this.modeloVehiculo = modeloVehiculo;
-        this.cliente = cliente;
-        asociarOrden(ordenes);
+        asociarModelo(modeloVehiculo);
     }
 
-    protected void asociarOrden(Orden o) {
-        if (o != null) {
-            this.ordenes.add(o);
-            o.setVehiculo(this);
-        }
-    }
-
-    protected void asociarOrden(List<Orden> oList) {
-        if (oList == null)
-            oList = new ArrayList<>();
-
-        for (Orden o : oList) {
-            asociarOrden(o);
+    public void asociarModelo(ModeloVehiculo m) {
+        if (m != null) {
+            this.modeloVehiculo = m;
+            m.getVehiculos().add(this);
         }
     }
 
@@ -135,12 +120,12 @@ public class Vehiculo implements Serializable {
         this.modeloVehiculo = modeloVehiculo;
     }
 
-    public Cliente getCliente() {
-        return cliente;
+    public Set<Cliente> getClientes() {
+        return clientes;
     }
 
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
+    public void setClientes(Set<Cliente> clientes) {
+        this.clientes = clientes;
     }
 
     public Boolean getEstado() {
@@ -151,11 +136,11 @@ public class Vehiculo implements Serializable {
         this.estado = estado;
     }
 
-    public List<Orden> getOrdenes() {
+    public Set<Orden> getOrdenes() {
         return ordenes;
     }
 
-    public void setOrdenes(List<Orden> ordenes) {
+    public void setOrdenes(Set<Orden> ordenes) {
         this.ordenes = ordenes;
     }
 

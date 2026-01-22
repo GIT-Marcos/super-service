@@ -26,13 +26,16 @@ public class Cliente implements Serializable {
     private String apellido;
 
     @Column(nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "fk_contacto_cliente", nullable = false)
     private DatosContacto contactosCliente;
 
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "cliente")
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "cliente_vehiculo",
+            joinColumns = @JoinColumn(name = "pk_cliente"),
+            inverseJoinColumns = @JoinColumn(name = "pk_vehiculo"))
     private Set<Vehiculo> vehiculos = new HashSet<>();
 
     @OneToMany(mappedBy = "cliente")
@@ -44,17 +47,29 @@ public class Cliente implements Serializable {
     public Cliente() {
     }
 
-    public Cliente(Long id, String dni, String nombre, String apellido, DatosContacto contactosCliente,
-                   Set<Vehiculo> vehiculos, Set<VentaRepuesto> ventas, Set<Service> services) {
+    //TODO: como en este caso, quitar relaciones de los constructores; conviene dejar las 1-1 obligatorias
+    // usando un helper en el dueño SI ES BI-DIRECCIONAL.
+    // Que el dueño o padre asocie al otro con helper. Inicializar los atributos booleanos de estado en su declaración.
+    public Cliente(Long id, String dni, String nombre, String apellido, DatosContacto contactosCliente) {
         this.id = id;
         this.dni = dni;
         this.nombre = nombre;
         this.apellido = apellido;
-        this.activo = Boolean.TRUE;
         this.contactosCliente = contactosCliente;
-        this.vehiculos = vehiculos;
-        this.ventas = ventas;
-        this.services = services;
+    }
+
+    public void asociarVehiculo(Vehiculo v) {
+        if (v != null) {
+            this.vehiculos.add(v);
+            v.getClientes().add(this);
+        }
+    }
+
+    public void asociarVehiculo(Set<Vehiculo> vSet) {
+        if (vSet == null)
+            vSet = new HashSet<>();
+
+        vSet.forEach(this::asociarVehiculo);
     }
 
     public Long getId() {
