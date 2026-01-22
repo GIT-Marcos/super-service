@@ -31,7 +31,9 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
     public List<Vehiculo> getAllActive() {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT DISTINCT v FROM Vehiculo v " +
-                        "LEFT JOIN FETCH v.ordenes " +
+                        "LEFT JOIN FETCH v.ordenes o " +
+                        "LEFT JOIN FETCH o.service " +
+                        "LEFT JOIN FETCH v.clientes " +
                         "WHERE v.estado = TRUE",
                 Vehiculo.class).getResultList();
     }
@@ -45,6 +47,8 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
         Join<Vehiculo, ModeloVehiculo> joinModelo = root.join("modeloVehiculo", JoinType.LEFT);
         Join<ModeloVehiculo, MarcaVehiculo> joinMarca = joinModelo.join("marcaVehiculo", JoinType.LEFT);
         root.fetch("ordenes", JoinType.LEFT);
+        //todo: cambiar porque genera producto cartesiano. Funciona por los Set<>
+        root.fetch("clientes", JoinType.LEFT).fetch("services", JoinType.LEFT);
 
         List<Predicate> filtros = new ArrayList<>();
         filtros.add(cb.equal(root.get("estado"), Boolean.TRUE));
