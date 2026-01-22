@@ -43,14 +43,18 @@ public class ModeloVehiculo implements Serializable{
     public ModeloVehiculo() {
     }
 
-    public ModeloVehiculo(Long id, String nombreModelo, Year anio, Double cilindrada,
-            MarcaVehiculo marcaVehiculo, List<Vehiculo> vehiculos) {
+    public ModeloVehiculo(Long id, String nombreModelo, Year anio, Double cilindrada) {
         this.id = id;
         this.nombreModelo = nombreModelo;
         this.anio = anio;
         this.cilindrada = cilindrada;
-        this.marcaVehiculo = marcaVehiculo;
-        this.vehiculos = vehiculos;
+    }
+
+    public void asociarMarca(MarcaVehiculo m) {
+        if (m != null) {
+            this.marcaVehiculo = m;
+            m.getModelosVehiculos().add(this);
+        }
     }
 
     public Long getId() {
