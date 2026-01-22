@@ -9,6 +9,7 @@ import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemTrabajoViewModel;
@@ -18,15 +19,12 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import org.controlsfx.control.Notifications;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationSupport;
@@ -91,6 +89,7 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
         if (data != null) {
             this.service = data;
             this.orden = data.getOrden();
+            this.service.asignarOrden(this.orden);
             this.cliente = data.getCliente();
             this.vehiculo = data.getOrden().getVehiculo();
             if (orden.getNotaRetiro() != null) {
@@ -169,29 +168,14 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
             if (!SimpleDialogs.confirmacion("Modificar service", "¿Está seguro que desea guardar el service?"))
                 return;
             this.paraDevolver = serviceServ.modificarService(service);
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.BOTTOM_RIGHT)
-                    .title("Modificar service")
-                    .text("Se ha guardado el service con éxito.")
-                    .showInformation();
             Node n = ((Node) event.getSource());
             Stage s = (Stage) n.getScene().getWindow();
             s.close();
+            NotificationHelper.mostrarExito("Modificar service", "Se ha guardado el service con éxito.");
         } catch (IllegalArgumentException e) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Modificar service")
-                    .text(e.getMessage())
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Modificar service", e.getMessage());
         } catch (RuntimeException e) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Modificar service")
-                    .text(e.getMessage())
-                    .showError();
+            NotificationHelper.mostrarError("Modificar service", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -200,29 +184,31 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
     private void cambiarCliente() {
         Optional<Cliente> result = navigator.openModal(Views.AGREGAR_CLIENTE_SERVICE,
                 "Asignar cliente a service", null);
-        if (result.isPresent()) {
-            cliente = result.get();
-            lblCliente.setText(result.get().getNombre() + " " + result.get().getApellido() +
-                    " DNI: " + result.get().getDni());
+        result.ifPresent(c -> {
+            this.cliente = c;
+            this.service.asignarCliente(this.cliente);
+            lblCliente.setText(c.getNombre() + " " + c.getApellido() +
+                    " DNI: " + c.getDni());
             lblCliente.setTextFill(Color.BLACK);
-        }
+        });
     }
 
     @FXML
     private void cambiarVehiculo() {
         Optional<Vehiculo> result = navigator.openModal(Views.AGREGAR_VEHICULO_SERVICE,
                 "Agregar vehículo al service", null);
-        if (result.isPresent()) {
-            vehiculo = result.get();
+        result.ifPresent(v -> {
+            this.vehiculo = v;
+            this.orden.asociarVehiculo(this.vehiculo);
             InputStream stream = getClass().getResourceAsStream(
-                    result.get().getModeloVehiculo().getMarcaVehiculo().getRutaLogo());
+                    v.getModeloVehiculo().getMarcaVehiculo().getRutaLogo());
             if (stream != null) {
                 Image img = new Image(stream);
                 imgMarca.setImage(img);
             }
-            lblAuto.setText(result.get().getModeloVehiculo().getMarcaVehiculo().getNombreMarca() + " "
-                    + result.get().getModeloVehiculo().getNombreModelo());
-        }
+            lblAuto.setText(v.getModeloVehiculo().getMarcaVehiculo().getNombreMarca() + " "
+                    + v.getModeloVehiculo().getNombreModelo());
+        });
     }
 
     @FXML
@@ -234,21 +220,14 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
                     "Agregar trabajo", 100);
             precio = ManejadorInputs.dinero(ctfPrecio.getText(), true, false);
             Trabajo t = new Trabajo(null, detalle, precio);
-            if (!trabajos.contains(t)) {
-                orden.agregarTrabajos(t);
-                ItemTrabajoViewModel itvm = new ItemTrabajoViewModel(t);
-                items.addFirst(itvm);
-            }
+            orden.agregarTrabajos(t);
+            ItemTrabajoViewModel itvm = new ItemTrabajoViewModel(t);
+            items.addFirst(itvm);
             agregarTotal(precio);
-            ctfDesc.setText("");
-            ctfPrecio.setText("");
+            ctfDesc.clear();
+            ctfPrecio.clear();
         } catch (RuntimeException e) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Agregar trabajo")
-                    .text(e.getMessage())
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Agregar trabajo", e.getMessage());
         }
     }
 
@@ -302,39 +281,20 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
 
     private boolean validar() {
         if (this.cliente == null) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Modificar service")
-                    .text("Se debe asociar un cliente para el service.")
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Modificar service", "Se debe asignar un cliente para el service.");
             return false;
         }
         if (this.vehiculo == null) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Modificar service")
-                    .text("Se debe asociar un vehículo para el service.")
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Modificar service", "Se debe asignar un vehículo para el service.");
             return false;
         }
         if (dpFechaEntrega.getValue() != null && dpFechaEntrega.getValue().isBefore(LocalDate.now())) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Modificar service")
-                    .text("La fecha de entrega ya ha pasado.")
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Modificar service", "La fecha de entrega ya ha pasado.");
             return false;
         }
         if (trabajos.isEmpty()) {
-            Notifications.create()
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .title("Modificar service")
-                    .text("Debe agregar al menos 1 trabajo para modificar el service.")
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Modificar service",
+                    "Debe agregar al menos 1 trabajo para guardar el service.");
             return false;
         }
         return true;

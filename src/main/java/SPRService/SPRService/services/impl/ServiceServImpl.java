@@ -63,7 +63,6 @@ public class ServiceServImpl implements ServiceServ {
     @Override
     public Service cargarService(Service s) {
         validarNota(s);
-
         daoService.save(s);
         return s;
     }
@@ -72,7 +71,6 @@ public class ServiceServImpl implements ServiceServ {
     @Override
     public Service modificarService(Service s) {
         validarNota(s);
-
         return daoService.update(s);
     }
 
