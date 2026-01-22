@@ -23,6 +23,8 @@ public class ModeloVehiculoDAOImpl extends GenericDAOImpl<ModeloVehiculo, Long> 
     public List<ModeloVehiculo> getAllModels() {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT DISTINCT m FROM ModeloVehiculo m " +
+                        "LEFT JOIN FETCH m.marcaVehiculo " +
+                        "LEFT JOIN FETCH m.vehiculos " +
                         "ORDER BY m.nombreModelo ASC",
                 ModeloVehiculo.class).getResultList();
     }

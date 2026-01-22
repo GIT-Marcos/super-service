@@ -19,7 +19,6 @@ public class ModeloVehiculoServImpl implements ModeloVehiculoServ {
         this.dao = dao;
     }
 
-    //todo: nose usa esto, las trae con el fetch.EAGER por la marca
     @Transactional
     @Override
     public List<ModeloVehiculo> verTodos() {
