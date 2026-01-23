@@ -120,10 +120,8 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
 
     @FXML
     private void guardar(ActionEvent event) {
-        // 1. Validaciones de campos de texto
-        String dni;
-        String nombre;
-        String apellido;
+        // 1. Validar campos de texto
+        String dni, nombre, apellido;
         try {
             dni = ManejadorInputs.dni(tfDNI.getText(), true);
             nombre = ManejadorInputs.textoGenerico(tfNombre.getText(), true, "Nombre", 40);
@@ -133,70 +131,53 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
             return;
         }
 
-        // 2. Validación de listas de contacto
+        // 2. Validar contactos
         if (obsListEmails.isEmpty() && obsListNrosTelefono.isEmpty()) {
             NotificationHelper.mostrarAdvertencia("Datos de contacto", "Debe haber al menos un dato de contacto.");
             return;
         }
 
+        // 3. Confirmación de guardado
         if (!SimpleDialogs.confirmacion("Guardar cliente", "¿Confirmar guardado de cliente?")) return;
 
-        // 3. PREPARACIÓN DE DATOS CONTACTO (Aquí estaba el error)
-        DatosContacto datosContacto;
-
-        if (!flagModifyMode) {
-            // MODO NUEVO: Creamos uno nuevo
-            datosContacto = new DatosContacto();
-            datosContacto.setId(null); // Aseguramos que sea null para que se cree
-        } else {
-            // MODO EDICIÓN: Usamos el existente
-            datosContacto = this.cliente.getContactosCliente();
+        // 4. Construir DatosContacto
+        DatosContacto contactos = new DatosContacto();
+        if (flagModifyMode && cliente.getContactosCliente() != null) {
+            contactos.setId(cliente.getContactosCliente().getId()); // ⚠ Reusar ID existente
         }
+        contactos.setEmailSet(new HashSet<>(obsListEmails));
+        contactos.setNroTelefonoSet(new HashSet<>(obsListNrosTelefono));
 
-        // --- PASO CRUCIAL: ACTUALIZAR EL CONTENIDO DEL OBJETO ---
-        // Limpiamos los sets actuales y agregamos lo que hay en la vista
-        datosContacto.getEmailSet().clear();
-        datosContacto.getEmailSet().addAll(obsListEmails);
+        // 5. Construir Cliente
+        Cliente clienteParaCargar = new Cliente(
+                flagModifyMode ? cliente.getId() : null,
+                dni,
+                nombre,
+                apellido,
+                contactos
+        );
 
-        datosContacto.getNroTelefonoSet().clear();
-        datosContacto.getNroTelefonoSet().addAll(obsListNrosTelefono);
-        // --------------------------------------------------------
-
-        // 4. Construcción del objeto Cliente
-        Cliente clienteParaCargar;
-        if (!flagModifyMode) {
-            clienteParaCargar = new Cliente(null, dni, nombre, apellido, datosContacto, new HashSet<>(),
-                    new HashSet<>(), new HashSet<>());
-        } else {
-            // Preservamos el ID y las relaciones existentes (ventas, etc.) si es necesario,
-            // aunque aquí pasamos HashSets vacíos asumiendo que el Servicio hace un 'merge' o ignora esos campos.
-            clienteParaCargar = new Cliente(this.cliente.getId(), dni, nombre, apellido,
-                    datosContacto, this.cliente.getVehiculos(), this.cliente.getVentas(), this.cliente.getServices());
-            // Nota: He cambiado 'new HashSet<>()' por los getters originales del cliente
-            // para no perder referencias si tu servicio usa este objeto directamente.
-        }
-
-        // 5. Llamada al Servicio
+        // 6. Guardar o editar
         try {
             if (!flagModifyMode) {
                 this.clienteParaDevolver = clienteServ.saveClient(clienteParaCargar);
             } else {
-                try {
-                    this.clienteParaDevolver = clienteServ.editClient(clienteParaCargar);
-                } catch (PersistenceException e) {
-                    if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
-                            e.getCause() instanceof org.postgresql.util.PSQLException) {
-                        throw new DuplicateClientDNI("Ya existe un cliente con el DNI: " + clienteParaCargar.getDni()
-                                + " en el sistema.");
-                    } else {
-                        throw e;
-                    }
-                }
+                this.clienteParaDevolver = clienteServ.editClient(clienteParaCargar).orElse(null);
             }
+
             NotificationHelper.mostrarExito("Guardar cliente", "Se han guardado los datos del cliente con éxito.");
             cancelar(event);
         } catch (DuplicateClientDNI e) {
             NotificationHelper.mostrarAdvertencia("Guardar cliente", e.getMessage());
+        } catch (PersistenceException e) {
+            if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
+                    e.getCause() instanceof org.postgresql.util.PSQLException) {
+                NotificationHelper.mostrarAdvertencia("Guardar cliente", "Ya existe un cliente con el DNI: " + dni);
+            } else {
+                NotificationHelper.mostrarError("Guardar cliente", e.getMessage());
+                e.printStackTrace();
+            }
+
         } catch (RuntimeException e) {
             NotificationHelper.mostrarError("Guardar cliente", e.getMessage());
             e.printStackTrace();

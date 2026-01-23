@@ -1,10 +1,8 @@
 package SPRService.SPRService.viewModels;
 
-import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.entities.MarcaVehiculo;
 import SPRService.SPRService.entities.ModeloVehiculo;
 import SPRService.SPRService.entities.Vehiculo;
-import SPRService.SPRService.services.ClienteServ;
 import SPRService.SPRService.services.impl.VehiculoServImpl;
 import com.google.inject.Inject;
 import javafx.beans.property.*;
@@ -21,7 +19,6 @@ public class VehiculoVM {
     // Referencia al modelo original. Útil para saber si estamos creando o editando.
     private Vehiculo vehiculoModelo;
     private final VehiculoServImpl vehiculoServImpl;
-    private final ClienteServ clienteServ;
 
     // --- Propiedades para los campos de la entidad Vehículo ---
     private final ObjectProperty<Long> id = new SimpleObjectProperty<>();
@@ -31,10 +28,6 @@ public class VehiculoVM {
     private final StringProperty color = new SimpleStringProperty("");
 
     // --- Propiedades para manejar las relaciones ---
-
-    // Para el ListView de clientes:
-    private final ObservableList<Cliente> clientesDisponibles = FXCollections.observableArrayList();
-    private final ObjectProperty<Cliente> clienteSeleccionado = new SimpleObjectProperty<>();
 
     // Para el ListView de Marcas:
     private final ObservableList<MarcaVehiculo> marcasDisponibles = FXCollections.observableArrayList();
@@ -50,9 +43,8 @@ public class VehiculoVM {
     private final ObjectProperty<Double> cilindradaModeloSeleccionado = new SimpleObjectProperty<>();
 
     @Inject
-    public VehiculoVM(VehiculoServImpl vehiculoServImpl, ClienteServ clienteServ) {
+    public VehiculoVM(VehiculoServImpl vehiculoServImpl) {
         this.vehiculoServImpl = vehiculoServImpl;
-        this.clienteServ = clienteServ;
         setupListeners();
     }
 
@@ -112,7 +104,6 @@ public class VehiculoVM {
         this.nroChasis.set(vehiculo.getNroChasis());
         this.nroMotor.set(vehiculo.getNroMotor());
         this.color.set(vehiculo.getColor());
-        this.clienteSeleccionado.set(vehiculo.getCliente());
 
         if (vehiculo.getModeloVehiculo() != null) {
             // Esto activará los listeners para poblar las propiedades derivadas
@@ -135,7 +126,6 @@ public class VehiculoVM {
         this.nroChasis.set(vehiculo.getNroChasis());
         this.nroMotor.set(vehiculo.getNroMotor());
         this.color.set(vehiculo.getColor());
-        this.clienteSeleccionado.set(vehiculo.getCliente());
 
         // --- ¡AQUÍ ESTÁ LA LÓGICA CORREGIDA! ---
         if (vehiculo.getModeloVehiculo() != null && vehiculo.getModeloVehiculo().getMarcaVehiculo() != null) {
@@ -203,7 +193,6 @@ public class VehiculoVM {
         vehiculoParaGuardar.setColor(color.get());
         vehiculoParaGuardar.setFechaRegistro(LocalDate.now());
         vehiculoParaGuardar.setEstado(Boolean.TRUE);
-        vehiculoParaGuardar.setCliente(clienteSeleccionado.get());
         vehiculoParaGuardar.setModeloVehiculo(modeloSeleccionado.get());
 
         // NO establezcas el ID a null aquí. Si es una entidad nueva, ya es null.
@@ -217,7 +206,6 @@ public class VehiculoVM {
      * Esto debería ser llamado por el Controller al inicializar.
      */
     public void cargarListasOpciones() {
-        clientesDisponibles.setAll(clienteServ.getAllActive());
         List<MarcaVehiculo> todasLasMarcas = vehiculoServImpl.getAllBrands();
         marcasDisponibles.setAll(todasLasMarcas);
     }
@@ -234,10 +222,6 @@ public class VehiculoVM {
         nroMotor.set("");
         color.set("");
 
-        // Limpiar selecciones y listas
-        // No limpies 'marcasDisponibles' si es una lista global,
-        // pero sí las selecciones y la lista dependiente de modelos.
-        clienteSeleccionado.set(null);
         marcaSeleccionada.set(null);
         modeloSeleccionado.set(null);
         modelosDisponibles.clear();
@@ -252,9 +236,6 @@ public class VehiculoVM {
     public StringProperty nroChasisProperty() { return nroChasis; }
     public StringProperty nroMotorProperty() { return nroMotor; }
     public StringProperty colorProperty() { return color; }
-
-    public ObservableList<Cliente> getClientesDisponibles() { return clientesDisponibles; }
-    public ObjectProperty<Cliente> clienteSeleccionadoProperty() { return clienteSeleccionado; }
 
     public ObservableList<MarcaVehiculo> getMarcasDisponibles() { return marcasDisponibles; }
     public ObjectProperty<MarcaVehiculo> marcaSeleccionadaProperty() { return marcaSeleccionada; }

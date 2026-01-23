@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ServicesController">
+<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.ServicesController">
 
     <top>
         <VBox spacing="8.0" styleClass="top-panel" BorderPane.alignment="CENTER">
@@ -125,14 +125,14 @@
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#nuevoService" styleClass="btn-success" text="➕ Nuevo service" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modificarService" text="✏ Modificar/Detalles" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#agregarPago" styleClass="btn-primary" text="💰 Agregar pago" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#verPagos" styleClass="button" text="📄 Ver pagos" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#verPagos" styleClass="button" text="🏧 Ver pagos" />
+                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generarTicket" styleClass="button" text="📄 Generar ticket retiro" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#darDeBaja" styleClass="btn-danger" text="🚫 Cancelar service" />
 
                 <Separator />
 
                 <Label styleClass="section-label" text="DOCUMENTACIÓN" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generarFactura" styleClass="btn-primary" text="🖨 Generar factura" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generarTicket" styleClass="button" text="📄 Generar ticket" />
 
                 <Separator />
 

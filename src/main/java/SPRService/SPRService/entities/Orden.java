@@ -51,19 +51,20 @@ public class Orden implements Serializable {
     public Orden() {
     }
 
-    public Orden(Long id, String motivoIngreso, String informeTecnico, BigDecimal totalTrabajos,
-                 BigDecimal totalRepuestos, Vehiculo vehiculo, EstadoIngreso estadoIngreso,
-                 NotaRetiro notaRetiro, Set<Trabajo> trabajos, Service service) {
+    public Orden(Long id, String motivoIngreso, String informeTecnico, EstadoIngreso estadoIngreso,
+                 NotaRetiro notaRetiro) {
         this.id = id;
         this.motivoIngreso = motivoIngreso;
         this.informeTecnico = informeTecnico;
-        this.totalTrabajos = totalTrabajos;
-        this.totalRepuestos = totalRepuestos;
-        this.vehiculo = vehiculo;
         this.estadoIngreso = estadoIngreso;
         this.notaRetiro = notaRetiro;
-        this.trabajos = trabajos;
-        this.service = service;
+    }
+
+    public void asociarVehiculo(Vehiculo v) {
+        if (v != null) {
+            this.setVehiculo(v);
+            v.getOrdenes().add(this);
+        }
     }
 
     public void agregarTrabajos(Set<Trabajo> trabajos) {
@@ -237,4 +238,18 @@ public class Orden implements Serializable {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Orden orden = (Orden) o;
+
+        return id != null && id.equals(orden.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

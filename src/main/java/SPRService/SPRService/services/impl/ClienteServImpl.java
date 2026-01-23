@@ -2,14 +2,18 @@ package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.ClienteDAO;
 import SPRService.SPRService.entities.Cliente;
+import SPRService.SPRService.entities.DatosContacto;
 import SPRService.SPRService.exceptions.DuplicateClientDNI;
 import SPRService.SPRService.services.ClienteServ;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
+import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.Hibernate;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Singleton
 public class ClienteServImpl implements ClienteServ {
@@ -53,22 +57,50 @@ public class ClienteServImpl implements ClienteServ {
         return c;
     }
 
+    //todo: reemplazar todas las ediciones de entidades por este formato usando escritura manual de datos y dejando que
+    // Hibernate edite al terminar la transacción.
     @Transactional
     @Override
-    public Cliente editClient(Cliente c) {
-        if (c == null) throw new IllegalArgumentException("Cliente nulo en servicio.");
-        poneMayus(c);
+    public Optional<Cliente> editClient(Cliente clienteDTO) {
+        if (clienteDTO == null)
+            throw new IllegalArgumentException("Cliente nulo en servicio.");
 
-        return dao.update(c);
+        // Cargar cliente existente (managed)
+        Cliente existente = dao.getById(clienteDTO.getId());
+        if (existente == null)
+            throw new EntityNotFoundException("Cliente no encontrado");
+
+        // Actualizar campos
+        poneMayus(clienteDTO);
+        existente.setDni(clienteDTO.getDni());
+        existente.setNombre(clienteDTO.getNombre());
+        existente.setApellido(clienteDTO.getApellido());
+
+        // Actualizar contactos
+        DatosContacto contactosExistentes = existente.getContactosCliente();
+        DatosContacto contactosNuevos = clienteDTO.getContactosCliente();
+
+        contactosExistentes.getEmailSet().clear();
+        contactosExistentes.getEmailSet().addAll(contactosNuevos.getEmailSet());
+
+        contactosExistentes.getNroTelefonoSet().clear();
+        contactosExistentes.getNroTelefonoSet().addAll(contactosNuevos.getNroTelefonoSet());
+
+        // Cargar relaciones lazy para devolver
+        Hibernate.initialize(existente.getVehiculos());
+        Hibernate.initialize(existente.getVentas());
+        Hibernate.initialize(existente.getServices());
+
+        return Optional.of(existente);
     }
 
     @Transactional
     @Override
     public void softDeleteClient(Cliente c) {
         if (c == null) throw new IllegalArgumentException("Cliente nulo en servicio.");
-        c.setDni(c.getDni() + ".DEL" + c.getId());
-        c.setActivo(Boolean.FALSE);
-        dao.update(c);
+        Cliente managedClient = dao.getById(c.getId());
+        managedClient.setDni(managedClient.getDni() + ".DEL" + managedClient.getId());
+        managedClient.setActivo(Boolean.FALSE);
     }
 
     private void poneMayus(Cliente c) {

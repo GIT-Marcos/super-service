@@ -6,10 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +27,8 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT c FROM Cliente c " +
                                 "LEFT JOIN FETCH c.services " +
-                                "LEFT JOIN FETCH c.vehiculos " +
+                                "LEFT JOIN FETCH c.vehiculos v " +
+                                "LEFT JOIN FETCH v.ordenes " +
                                 "LEFT JOIN FETCH c.ventas " +
                                 "WHERE c.activo = TRUE",
                         Cliente.class)
@@ -43,7 +41,10 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Cliente> query = cb.createQuery(Cliente.class);
         Root<Cliente> root = query.from(Cliente.class);
-        // poner joins de vehículo y service
+        root.fetch("services", JoinType.LEFT);
+        root.fetch("vehiculos", JoinType.LEFT);
+        root.fetch("ventas", JoinType.LEFT);
+
         List<Predicate> filtros = new ArrayList<>();
         filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
         if (!dni.isBlank())

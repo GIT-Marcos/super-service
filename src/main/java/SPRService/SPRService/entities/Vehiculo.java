@@ -1,16 +1,10 @@
 package SPRService.SPRService.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "vehiculos")
@@ -37,32 +31,37 @@ public class Vehiculo implements Serializable {
     private LocalDate fechaRegistro;
 
     @Column(nullable = false)
-    private Boolean estado;
+    private Boolean estado = true;
 
     @ManyToOne()
     @JoinColumn(nullable = false, name = "fk_modelo")
     private ModeloVehiculo modeloVehiculo;
 
-    @ManyToOne()
-    @JoinColumn(name = "fk_cliente")
-    private Cliente cliente;
+    @ManyToMany(mappedBy = "vehiculos")
+    private Set<Cliente> clientes = new HashSet<>();
 
-    //todo: hacer bidireccional con service
+    @OneToMany(mappedBy = "vehiculo")
+    private Set<Orden> ordenes = new HashSet<>();
 
     public Vehiculo() {
     }
 
-    public Vehiculo(Long id, String patente, String nroChasis, String nroMotor, String color, Boolean estado,
-                    ModeloVehiculo modeloVehiculo, Cliente cliente) {
+    public Vehiculo(Long id, String patente, String nroChasis, String nroMotor, String color,
+                    ModeloVehiculo modeloVehiculo) {
         this.id = id;
         this.patente = patente;
         this.nroChasis = nroChasis;
         this.nroMotor = nroMotor;
         this.color = color;
         this.fechaRegistro = LocalDate.now();
-        this.estado = estado;
-        this.modeloVehiculo = modeloVehiculo;
-        this.cliente = cliente;
+        asociarModelo(modeloVehiculo);
+    }
+
+    public void asociarModelo(ModeloVehiculo m) {
+        if (m != null) {
+            this.modeloVehiculo = m;
+            m.getVehiculos().add(this);
+        }
     }
 
     public Long getId() {
@@ -121,12 +120,12 @@ public class Vehiculo implements Serializable {
         this.modeloVehiculo = modeloVehiculo;
     }
 
-    public Cliente getCliente() {
-        return cliente;
+    public Set<Cliente> getClientes() {
+        return clientes;
     }
 
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
+    public void setClientes(Set<Cliente> clientes) {
+        this.clientes = clientes;
     }
 
     public Boolean getEstado() {
@@ -135,6 +134,14 @@ public class Vehiculo implements Serializable {
 
     public void setEstado(Boolean estado) {
         this.estado = estado;
+    }
+
+    public Set<Orden> getOrdenes() {
+        return ordenes;
+    }
+
+    public void setOrdenes(Set<Orden> ordenes) {
+        this.ordenes = ordenes;
     }
 
     @Override
