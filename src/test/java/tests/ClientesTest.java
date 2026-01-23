@@ -97,7 +97,7 @@ public class ClientesTest {
         System.out.println("--- Iniciando población de Clientes ---");
 
         Random random = new Random();
-        int cantidadClientes = 50;
+        int cantidadClientes = 70;
         int guardadosExitosamente = 0;
 
         String[] dominios = {"gmail.com", "hotmail.com", "outlook.com", "yahoo.com"};
@@ -127,18 +127,7 @@ public class ClientesTest {
 
                 DatosContacto datosContacto = new DatosContacto(null, telefonos, emails);
 
-                // 3. Crear Cliente
-                // Pasamos Sets vacíos (o null según tu indicación, pero HashSet vacío es más seguro) para vehículos y services
-                Cliente nuevoCliente = new Cliente(
-                        null,
-                        dni,
-                        nombre, // El servicio lo capitalizará (poneMayus)
-                        apellido,
-                        datosContacto,
-                        new HashSet<>(), // Vehículos
-                        new HashSet<>(), // Ventas
-                        new HashSet<>()  // Services
-                );
+                Cliente nuevoCliente = new Cliente(null, dni, nombre, apellido,datosContacto);
 
                 // 4. Guardar mediante el servicio
                 // El servicio se encarga de la lógica de negocio (Mayúsculas) y DAO guarda en cascada los contactos
@@ -158,7 +147,5 @@ public class ClientesTest {
         assertEquals(cantidadClientes, guardadosExitosamente, "Se deberían haber guardado todos los clientes generados.");
         System.out.println("--- Población finalizada. Total: " + guardadosExitosamente + " ---");
     }
-
-
 
 }

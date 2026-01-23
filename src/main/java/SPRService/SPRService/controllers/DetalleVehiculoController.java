@@ -2,10 +2,15 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.components.CeldaOperacionUniversal;
 import SPRService.SPRService.entities.Orden;
+import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.entities.Vehiculo;
+import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.DataReceiver;
+import SPRService.SPRService.navigation.Navigator;
+import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.viewModels.celdas.ItemOperacionViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemServiceViewModel;
+import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,10 +25,13 @@ import javafx.stage.Stage;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class DetalleVehiculoController implements Initializable, DataReceiver<Vehiculo> {
 
+    private final Navigator navigator;
+    private Vehiculo vehiculo;
     private ObservableList<ItemOperacionViewModel> items = FXCollections.observableArrayList();
 
     @FXML
@@ -34,6 +42,11 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
     @FXML
     private ListView<ItemOperacionViewModel> lvServices;
 
+    @Inject
+    public DetalleVehiculoController(AppCoordinator coordinator) {
+        this.navigator = coordinator.getMainNavigator();
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configurarLista();
@@ -42,6 +55,7 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
     @Override
     public void receiveData(Vehiculo data) {
         if (data != null) {
+            this.vehiculo = data;
             cargarLabels(data);
             cargarLista(data);
         }
@@ -54,7 +68,12 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
 
     @FXML
     private void nuevoService() {
-
+        Optional<Service> result = navigator.openModal(Views.CARGAR_SERVICE, "Nuevo service para este vehículo",
+                this.vehiculo);
+        result.ifPresent(s -> {
+            s.getOrden().asociarVehiculo(this.vehiculo);
+            items.add(new ItemServiceViewModel(s));
+        });
     }
 
     @FXML

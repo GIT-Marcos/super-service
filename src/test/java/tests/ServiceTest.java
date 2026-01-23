@@ -58,57 +58,104 @@ public class ServiceTest {
         System.out.println("--- Iniciando población de Services ---");
 
         // 1. OBTENER ENTIDADES EXISTENTES
-        // Estos clientes TIENEN los services cargados (JOIN FETCH c.services en el DAO)
         List<Cliente> clientesFull = clienteServ.getAllActive();
-
-        // Estos vehículos tienen un cliente, pero ese cliente NO tiene los services cargados
         List<Vehiculo> vehiculos = vehiculoServ.verTodosActivos();
-
         List<Repuesto> repuestos = repuestoServ.verTodos();
 
         if (clientesFull.isEmpty() || vehiculos.isEmpty()) {
             fail("Faltan datos previos (Clientes o Vehículos). Ejecuta los tests de población anteriores.");
         }
 
-        // Map para búsqueda rápida de Cliente Full por ID
+        // 2. ASIGNAR VEHÍCULOS A CLIENTES (ManyToMany)
+        System.out.println("--- Asignando vehículos a clientes ---");
+        Random random = new Random();
+
+        // Crear map de vehículos por ID para acceso rápido
+        Map<Long, Vehiculo> mapaVehiculos = vehiculos.stream()
+                .collect(Collectors.toMap(Vehiculo::getId, v -> v));
+
+        // Asignar vehículos a cada cliente
+        for (Cliente cliente : clientesFull) {
+            try {
+                // Determinar cuántos vehículos asignar a este cliente (1-3)
+                int cantVehiculos = random.nextInt(3) + 1;
+                Set<Long> vehiculosAsignados = new HashSet<>();
+
+                for (int i = 0; i < cantVehiculos && !vehiculos.isEmpty(); i++) {
+                    // Intentar asignar un vehículo que no tenga ya este cliente
+                    Vehiculo vehiculoSeleccionado = null;
+                    int intentos = 0;
+
+                    while (intentos < 10 && vehiculoSeleccionado == null) {
+                        Vehiculo candidato = vehiculos.get(random.nextInt(vehiculos.size()));
+
+                        // Verificar que no se repita para este cliente
+                        if (!vehiculosAsignados.contains(candidato.getId())) {
+                            vehiculoSeleccionado = candidato;
+                            vehiculosAsignados.add(candidato.getId());
+                        }
+                        intentos++;
+                    }
+
+                    if (vehiculoSeleccionado != null) {
+                        cliente.asociarVehiculo(vehiculoSeleccionado);
+                        System.out.println("Asociado vehículo " + vehiculoSeleccionado.getPatente() +
+                                " al cliente " + cliente.getNombre() + " " + cliente.getApellido());
+                    }
+                }
+
+                // Persistir la asociación actualizando el cliente
+                //clienteServ.editClient(cliente);
+
+            } catch (Exception e) {
+                System.err.println("Error al asociar vehículos al cliente " + cliente.getId() + ": " + e.getMessage());
+            }
+        }
+
+        System.out.println("--- Asociaciones completadas ---");
+
+        // 3. RECARGAR CLIENTES CON VEHÍCULOS ACTUALIZADOS
+        clientesFull = clienteServ.getAllActive();
+
+        // Map para búsqueda rápida de Cliente por ID
         Map<Long, Cliente> mapaClientesFull = clientesFull.stream()
                 .collect(Collectors.toMap(Cliente::getId, c -> c));
 
-        Random random = new Random();
+        // 4. CREAR SERVICES
         int cantidadServices = 70;
         int creados = 0;
 
         List<EstadoService> estadosPosibles = Arrays.stream(EstadoService.values())
                 .filter(e -> e != EstadoService.PAGADO)
-                .collect(Collectors.toList());
+                .toList();
 
-        String[] motivos = {"Falla en arranque", "Service 10.000km", "Ruido tren delantero", "Cambio pastillas freno", "Revisión aire acondicionado", "Pérdida de aceite", "Control de fluidos", "Cambio de correa"};
-        String[] trabajosLista = {"Mano de obra mecánica", "Diagnóstico computarizado", "Alineación", "Balanceo", "Limpieza de inyectores", "Cambio de filtros", "Regulación de frenos"};
+        String[] motivos = {"Falla en arranque", "Service 10.000km", "Ruido tren delantero",
+                "Cambio pastillas freno", "Revisión aire acondicionado",
+                "Pérdida de aceite", "Control de fluidos", "Cambio de correa"};
+
+        String[] trabajosLista = {"Mano de obra mecánica", "Diagnóstico computarizado",
+                "Alineación", "Balanceo", "Limpieza de inyectores",
+                "Cambio de filtros", "Regulación de frenos"};
 
         for (int i = 0; i < cantidadServices; i++) {
             try {
-                // 2. SELECCIONAR VEHÍCULO Y CLIENTE
-                Vehiculo vehiculo = vehiculos.get(random.nextInt(vehiculos.size()));
+                // 5. SELECCIONAR CLIENTE Y VEHÍCULO
+                Cliente clienteAsignado = clientesFull.get(random.nextInt(clientesFull.size()));
 
-                // CORRECCIÓN CRÍTICA:
-                // No usar vehiculo.getCliente() directamente porque es un objeto Lazy/Incompleto.
-                // Debemos buscar el objeto equivalente en nuestra lista 'clientesFull'.
-                Cliente clienteAsignado = null;
+                // Seleccionar un vehículo de los que tiene asignados este cliente
+                Vehiculo vehiculoAsignado = null;
 
-                if (vehiculo.getCliente() != null) {
-                    clienteAsignado = mapaClientesFull.get(vehiculo.getCliente().getId());
+                if (!clienteAsignado.getVehiculos().isEmpty()) {
+                    // Convertir Set a List para acceder por índice
+                    List<Vehiculo> vehiculosCliente = new ArrayList<>(clienteAsignado.getVehiculos());
+                    vehiculoAsignado = vehiculosCliente.get(random.nextInt(vehiculosCliente.size()));
+                } else {
+                    // Si el cliente no tiene vehículos (no debería pasar), usar uno aleatorio
+                    System.out.println("ADVERTENCIA: Cliente " + clienteAsignado.getId() + " sin vehículos asignados");
+                    vehiculoAsignado = vehiculos.get(random.nextInt(vehiculos.size()));
                 }
 
-                // Si el vehículo no tenía cliente o no lo encontramos, asignamos uno random de la lista full
-                if (clienteAsignado == null) {
-                    clienteAsignado = clientesFull.get(random.nextInt(clientesFull.size()));
-
-                    // Opcional: actualizamos la relación en memoria para coherencia,
-                    // aunque no se persistirá el cambio en Vehículo aquí.
-                    vehiculo.setCliente(clienteAsignado);
-                }
-
-                // 3. CREAR ESTADO INGRESO
+                // 6. CREAR ESTADO INGRESO
                 EstadoIngreso estadoIngreso = new EstadoIngreso(
                         null,
                         "Sin observaciones",
@@ -117,31 +164,29 @@ public class ServiceTest {
                         random.nextInt(100)
                 );
 
-                // 4. CREAR ORDEN
+                // 7. CREAR ORDEN
                 Orden orden = new Orden(
                         null,
                         motivos[random.nextInt(motivos.length)],
-                        "Informe técnico generado automáticamente.",
-                        BigDecimal.ZERO,
-                        BigDecimal.ZERO,
-                        vehiculo,
+                        "Informe técnico generado automáticamente",
                         estadoIngreso,
-                        null,
-                        new HashSet<>(),
                         null
                 );
+                orden.asociarVehiculo(vehiculoAsignado);
 
-                // 5. AGREGAR TRABAJOS
+                // 8. AGREGAR TRABAJOS
                 int cantTrabajos = random.nextInt(3) + 1;
                 Set<Trabajo> trabajos = new HashSet<>();
                 for (int j = 0; j < cantTrabajos; j++) {
-                    trabajos.add(new Trabajo(null,
+                    trabajos.add(new Trabajo(
+                            null,
                             trabajosLista[random.nextInt(trabajosLista.length)],
-                            BigDecimal.valueOf(random.nextInt(45000) + 4000)));
+                            BigDecimal.valueOf(random.nextInt(45000) + 4000)
+                    ));
                 }
                 orden.agregarTrabajos(trabajos);
 
-                // 6. AGREGAR REPUESTOS
+                // 9. AGREGAR REPUESTOS
                 NotaRetiro notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, new ArrayList<>());
 
                 if (!repuestos.isEmpty() && random.nextDouble() > 0.4) {
@@ -157,27 +202,30 @@ public class ServiceTest {
 
                 orden.setNotaRetiro(notaRetiro);
 
-                // 7. CONFIGURAR FECHAS Y PRIORIDAD
+                // 10. CONFIGURAR FECHAS Y PRIORIDAD
                 LocalDateTime fechaCarga = generarFechaAleatoriaEnElAnio();
                 LocalDateTime fechaEntrega = fechaCarga.plusDays(random.nextInt(15));
                 PrioridadService prioridad = PrioridadService.values()[random.nextInt(PrioridadService.values().length)];
 
-                // 8. CREAR SERVICE
-                // AQUI ESTA LA CLAVE: Pasamos 'clienteAsignado' (que tiene services inicializados)
+                // 11. CREAR SERVICE
                 Service service = new Service(fechaEntrega, prioridad, clienteAsignado, orden);
                 service.setFechaCarga(fechaCarga);
                 service.setEstadoService(estadosPosibles.get(random.nextInt(estadosPosibles.size())));
 
-                // 9. GUARDAR
+                // 12. GUARDAR
                 serviceServ.cargarService(service);
                 creados++;
-                System.out.println("Service guardado [" + creados + "/" + cantidadServices + "] | Fecha: " + fechaCarga.toLocalDate());
+                System.out.println("Service guardado [" + creados + "/" + cantidadServices +
+                        "] | Cliente: " + clienteAsignado.getApellido() +
+                        " | Vehículo: " + vehiculoAsignado.getPatente() +
+                        " | Fecha: " + fechaCarga.toLocalDate());
 
             } catch (Exception e) {
-                // e.printStackTrace(); // Descomenta para ver el stacktrace completo si vuelve a fallar
-                System.err.println("Error al guardar service: " + e.getMessage());
+                fail("Error al guardar service " + (i+1) + ": " + e.getMessage());
+                e.printStackTrace();
             }
         }
+
         System.out.println("--- Fin población Services. Total creados: " + creados + " ---");
     }
 

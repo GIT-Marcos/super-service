@@ -47,17 +47,17 @@ public class VehiculosTest {
         // 1. OBTENER DATOS EXISTENTES
         // Se asume que los modelos ya se cargaron via import.sql al levantar el PersistenceModule
         List<ModeloVehiculo> modelosDisponibles = modeloVehiculoServ.verTodos();
-        List<Cliente> clientes = clienteServ.getAllActive();
+        //List<Cliente> clientes = clienteServ.getAllActive();
 
         if (modelosDisponibles.isEmpty()) {
             fail("No se encontraron Modelos. Verifica que 'import.sql' se esté ejecutando correctamente.");
         }
-        if (clientes.isEmpty()) {
-            fail("No hay clientes cargados. Ejecuta primero el test de Clientes.");
-        }
+//        if (clientes.isEmpty()) {
+//            fail("No hay clientes cargados. Ejecuta primero el test de Clientes.");
+//        }
 
         System.out.println("Modelos disponibles: " + modelosDisponibles.size());
-        System.out.println("Clientes disponibles: " + clientes.size());
+        //System.out.println("Clientes disponibles: " + clientes.size());
 
         Random random = new Random();
         int totalObjetivo = 70;
@@ -86,7 +86,7 @@ public class VehiculosTest {
             // C. Crear los vehículos del lote
             for (int i = 0; i < cantidadLote; i++) {
                 try {
-                    Cliente clienteAsignado = clientes.get(random.nextInt(clientes.size()));
+                    //Cliente clienteAsignado = clientes.get(random.nextInt(clientes.size()));
 
                     // Generar datos aleatorios únicos
                     String patente = generarPatenteUnica(random, patentesGeneradas);
@@ -95,16 +95,18 @@ public class VehiculosTest {
                     String color = obtenerColorAleatorio(random);
 
                     // Instanciar Vehículo según el constructor de tu Entidad
-                    Vehiculo vehiculo = new Vehiculo(
-                            null,               // ID
-                            patente,            // Patente
-                            chasis,             // Nro Chasis
-                            motor,              // Nro Motor
-                            color,              // Color
-                            true,               // Estado (Boolean)
-                            modeloSeleccionado, // Entidad ModeloVehiculo
-                            clienteAsignado     // Entidad Cliente
-                    );
+//                    Vehiculo vehiculo = new Vehiculo(
+//                            null,               // ID
+//                            patente,            // Patente
+//                            chasis,             // Nro Chasis
+//                            motor,              // Nro Motor
+//                            color,              // Color
+//                            true,               // Estado (Boolean)
+//                            modeloSeleccionado, // Entidad ModeloVehiculo
+//                            clienteAsignado,     // Entidad Cliente
+//                            null                // Ordenes
+//                    );
+                    Vehiculo vehiculo = new Vehiculo(null, patente, chasis, motor, color, modeloSeleccionado);
                     // Nota: fechaRegistro se asigna automáticamente a LocalDate.now() en el constructor
 
                     // Guardar en BD
@@ -114,8 +116,8 @@ public class VehiculosTest {
                     totalCreados++;
 
                 } catch (Exception e) {
-                    System.err.println("Error al guardar vehículo lote: " + e.getMessage());
-                    // e.printStackTrace(); // Descomentar si necesitas ver el error completo
+                    fail("Error al guardar vehículo lote: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }
