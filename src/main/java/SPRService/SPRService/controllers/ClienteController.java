@@ -54,12 +54,12 @@ public class ClienteController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         obsListClientes.setAll();
         configColumnas();
-        llenarFilas(clienteServ.getAllActive());
+        llenarFilas(clienteServ.verTodosActivos());
     }
 
     @FXML
     private void todosLosClientes() {
-        llenarFilas(clienteServ.getAllActive());
+        llenarFilas(clienteServ.verTodosActivos());
     }
 
     @FXML
@@ -98,7 +98,8 @@ public class ClienteController implements Initializable {
                     "Debe seleccionar un cliente para ver sus operaciones.");
             return;
         }
-        navigator.openModal(Views.OPERACIONES_CLIENTE, "Operaciones de cliente", vm);
+        Optional<Cliente> result = clienteServ.verDetalle(vm.getClienteEntity().getId());
+        result.ifPresent(c -> navigator.openModal(Views.OPERACIONES_CLIENTE, "Operaciones de cliente", c));
 
     }
 

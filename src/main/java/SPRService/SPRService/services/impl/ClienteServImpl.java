@@ -27,8 +27,14 @@ public class ClienteServImpl implements ClienteServ {
 
     @Transactional
     @Override
-    public List<Cliente> getAllActive() {
-        return dao.getAllActive();
+    public List<Cliente> verTodosActivos() {
+        return dao.filteredSearch("", "", "");
+    }
+
+    @Transactional
+    @Override
+    public Optional<Cliente> verDetalle(Long id) {
+        return dao.verDetalle(id);
     }
 
     @Transactional

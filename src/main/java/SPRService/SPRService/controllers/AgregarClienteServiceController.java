@@ -52,7 +52,7 @@ public class AgregarClienteServiceController implements Initializable, ModalCont
         filteredList = new FilteredList<>(obsListCliente, p -> true);
         lvClientes.setItems(filteredList);
         lvClientes.setCellFactory(cell -> new CeldaCliente());
-        obsListCliente.setAll(clienteServ.getAllActive());
+        obsListCliente.setAll(clienteServ.verTodosActivos());
 
         String css = getClass().getResource("/styles/celdaCliente.css").toExternalForm();
         lvClientes.getStylesheets().add(css);

@@ -28,7 +28,7 @@ public class Cliente implements Serializable {
     @Column(nullable = false)
     private Boolean activo = true;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_contacto_cliente", nullable = false)
     private DatosContacto contactosCliente;
 
