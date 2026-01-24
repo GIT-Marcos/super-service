@@ -17,6 +17,7 @@ import jakarta.persistence.PersistenceException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Singleton
 public class VehiculoServImpl implements VehiculoServ {
@@ -42,7 +43,13 @@ public class VehiculoServImpl implements VehiculoServ {
     @Transactional
     @Override
     public List<Vehiculo> verTodosActivos() {
-        return daoVehiculo.getAllActive();
+        return daoVehiculo.verTodos();
+    }
+
+    @Transactional
+    @Override
+    public Optional<Vehiculo> verDetalle(Long id) {
+        return daoVehiculo.verDetalle(id);
     }
 
     @Transactional

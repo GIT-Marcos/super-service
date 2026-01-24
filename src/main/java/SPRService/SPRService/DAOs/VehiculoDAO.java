@@ -5,10 +5,12 @@ import SPRService.SPRService.entities.Vehiculo;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface VehiculoDAO extends GenericDAO<Vehiculo, Long>{
 
-    List<Vehiculo> getAllActive();
+    List<Vehiculo> verTodos();
+    Optional<Vehiculo> verDetalle(Long id);
 
     List<Vehiculo> buscarPor(String patente, String modelo, String marca);
 

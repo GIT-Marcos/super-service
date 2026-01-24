@@ -112,7 +112,9 @@ public class VehiculosController implements Initializable {
                     "Debe seleccionar un vehículo para ver sus detalles.");
             return;
         }
-        navigator.openModal(Views.DETALLE_VEHICULO, "Detalles de vehículo", vrvm.getVehiculo());
+        Optional<Vehiculo> result = vehiculoServ.verDetalle(vrvm.getVehiculo().getId());
+        result.ifPresent(v ->
+                navigator.openModal(Views.DETALLE_VEHICULO, "Detalles de vehículo", v));
     }
 
     @FXML
