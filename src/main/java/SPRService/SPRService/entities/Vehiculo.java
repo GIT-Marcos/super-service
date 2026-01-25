@@ -33,7 +33,7 @@ public class Vehiculo implements Serializable {
     @Column(nullable = false)
     private Boolean estado = true;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "fk_modelo")
     private ModeloVehiculo modeloVehiculo;
 

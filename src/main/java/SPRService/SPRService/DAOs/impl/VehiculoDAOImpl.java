@@ -38,6 +38,7 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
                 .getResultList();
     }
 
+    //todo: exceso de queries por n+1 causado desde repuesto.
     @Override
     public Optional<Vehiculo> verDetalle(Long id) {
         EntityManager em = emProvider.get();
@@ -84,11 +85,11 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Vehiculo> query = cb.createQuery(Vehiculo.class);
         Root<Vehiculo> root = query.from(Vehiculo.class);
+        Fetch<Vehiculo, ModeloVehiculo> fetchModelo = root.fetch("modeloVehiculo", JoinType.LEFT);
+        fetchModelo.fetch("marcaVehiculo", JoinType.LEFT);
+
         Join<Vehiculo, ModeloVehiculo> joinModelo = root.join("modeloVehiculo", JoinType.LEFT);
         Join<ModeloVehiculo, MarcaVehiculo> joinMarca = joinModelo.join("marcaVehiculo", JoinType.LEFT);
-        root.fetch("ordenes", JoinType.LEFT);
-        //todo: cambiar porque genera producto cartesiano. Funciona por los Set<>
-        root.fetch("clientes", JoinType.LEFT).fetch("services", JoinType.LEFT);
 
         List<Predicate> filtros = new ArrayList<>();
         filtros.add(cb.equal(root.get("estado"), Boolean.TRUE));
