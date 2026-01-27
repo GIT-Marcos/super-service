@@ -17,6 +17,7 @@ import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implements NotaRetiroDAO {
@@ -77,6 +78,21 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
 
         // --- 3. DEVOLVER EL RESULTADO COMPLETO ---
         return new ResultadoPaginado<>(notas, totalResultados);
+    }
+
+    @Override
+    public Optional<NotaRetiro> verDetalles(Long id) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("select n from NotaRetiro n " +
+                                "left join fetch n.detalleRetiroList d " +
+                                "left join fetch d.repuesto r " +
+                                "left join fetch r.marcaRepuesto " +
+                                "left join fetch r.stock s " +
+                                "left join fetch s.ubicacion " +
+                                "where n.id = :id",
+                        NotaRetiro.class)
+                .setParameter("id", id)
+                .getResultStream().findFirst();
     }
 
     /**

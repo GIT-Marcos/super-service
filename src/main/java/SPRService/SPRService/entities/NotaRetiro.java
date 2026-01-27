@@ -27,7 +27,7 @@ public class NotaRetiro implements Serializable {
     private Boolean activo;
 
     //todo: hacer esto un Set
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "fk_nota_retiro")
     private List<DetalleRetiro> detalleRetiroList = new ArrayList<>();
 

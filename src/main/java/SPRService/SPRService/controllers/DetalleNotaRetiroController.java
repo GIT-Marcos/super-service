@@ -40,8 +40,7 @@ public class DetalleNotaRetiroController implements Initializable, DataReceiver<
     public void receiveData(NotaRetiroViewModel data) {
         java.util.List<ItemDetalleRetiroViewModel> retiros = data.getNotaOriginal().getDetallesRetiroList().stream()
                 .map(ItemDetalleRetiroViewModel::new).toList();
-        this.items.clear();
-        this.items.addAll(retiros);
+        this.items.setAll(retiros);
 
         // TODO: usar de esta forma las propiedades de los view models para desacoplar un poco
         labNroNota.setText(String.valueOf(data.idNotaProperty().getValue()));
