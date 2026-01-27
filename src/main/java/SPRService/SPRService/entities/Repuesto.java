@@ -31,7 +31,7 @@ public class Repuesto implements Serializable{
     @JoinColumn(name = "fk_marca_repuesto", nullable = false)
     private MarcaRepuesto marcaRepuesto;
     
-    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_stock", nullable = false)
     private Stock stock;
     

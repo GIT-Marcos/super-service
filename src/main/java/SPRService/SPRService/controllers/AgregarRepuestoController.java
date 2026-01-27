@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.components.CeldaRepuesto;
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.Repuesto;
@@ -7,19 +8,17 @@ import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.RepuestoServ;
 import SPRService.SPRService.util.ManejadorInputs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.celdas.ItemRepuestoViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import org.controlsfx.control.Notifications;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -80,9 +79,10 @@ public class AgregarRepuestoController implements Initializable, ModalController
 
     @FXML
     private void buscar() {
-        cargarItems(repuestoServ.buscarConCriteria(tfCodBarras.getText().strip(), tfNombre.getText().strip(),
+        FiltroRepuestoDTO filtro = new FiltroRepuestoDTO(tfCodBarras.getText().strip(), tfNombre.getText().strip(),
                 tfMarca.getText().strip(), cbStockNormal.isSelected(), cbStockBajo.isSelected(),
-                "detalle", 0));
+                "detalle", 0);
+        cargarItems(repuestoServ.buscarRepuestos(filtro));
     }
 
     @FXML
@@ -91,23 +91,15 @@ public class AgregarRepuestoController implements Initializable, ModalController
         SPRService.SPRService.viewModels.celdas.ItemRepuestoViewModel vm =
                 lvRepuestos.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            Notifications.create()
-                    .title("Agregar repuesto")
-                    .text("Debe seleccionar un repuesto para agregarlo.")
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Agregar repuesto", "Debe seleccionar un repuesto para " +
+                    "agregarlo.");
             return;
         }
 
         Repuesto r = vm.getRepuesto();
         if (verificarDuplicado(r)) {
-            Notifications.create()
-                    .title("Agregar repuesto")
-                    .text("El repuesto seleccionado ya ha sido agregado al detalle.")
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Agregar repuesto",
+                    "El repuesto seleccionado ya ha sido agregado al detalle.");
             return;
         }
 
@@ -117,12 +109,7 @@ public class AgregarRepuestoController implements Initializable, ModalController
             detalleRetiro = new DetalleRetiro(null, cantidad, r);
             cerrarVentana();
         } catch (RuntimeException e) {
-            Notifications.create()
-                    .title("Agregar repuesto")
-                    .text(e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Agregar repuesto", e.getMessage());
         }
     }
 

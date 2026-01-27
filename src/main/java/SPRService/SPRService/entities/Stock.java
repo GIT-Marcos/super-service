@@ -32,7 +32,7 @@ public class Stock implements Serializable {
     @Column(nullable = false)
     private Boolean activo;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_ubicacion", nullable = false)
     private Ubicacion ubicacion;
 
