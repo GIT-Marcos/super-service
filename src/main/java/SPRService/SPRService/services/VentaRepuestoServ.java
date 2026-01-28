@@ -5,6 +5,7 @@ import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
 import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
 import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.DTOs.VentaRepuestosEnMesDTO;
+import SPRService.SPRService.entities.Pago;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.entities.VentaRepuesto;
 import SPRService.SPRService.util.ResultadoPaginado;
@@ -12,8 +13,11 @@ import SPRService.SPRService.util.ResultadoPaginado;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface VentaRepuestoServ {
+
+    Optional<VentaRepuesto> verDetalle(Long id);
 
     ResultadoPaginado<VentaRepuesto> buscarVentasPaginado(FiltroVentaRepuestoDTO filtro, int pagina, int tamanioPagina);
 
@@ -34,9 +38,12 @@ public interface VentaRepuestoServ {
 
     /* -- FIN REPORTES -- */
 
-    VentaRepuesto cargarVenta(VentaRepuesto venta);
+    VentaRepuesto cargarVenta(VentaRepuesto venta, Pago primerPago);
 
-    VentaRepuesto modificarVenta(VentaRepuesto venta);
+    /**
+     * Usado para agregar pagos a una venta, solo hace eso.
+     */
+    Optional<VentaRepuesto> modificarVenta(VentaRepuesto ventaDTO);
 
-    VentaRepuesto cancelarVenta(VentaRepuesto ventaRepuesto, boolean restablecerStocks, String motivo, Usuario usuario);
+    void cancelarVenta(Long id, boolean restablecerStocks, String motivo, Usuario usuario);
 }

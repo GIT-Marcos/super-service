@@ -10,12 +10,20 @@ import SPRService.SPRService.util.ResultadoPaginado;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
 
     //LECTURA
 
-    ResultadoPaginado<VentaRepuesto> verTodosPaginado(int pagina, int tamanioPagina);
+    Optional<VentaRepuesto> verDetalle(Long id);
+
+    /**
+     * Usado para modificación de venta.
+     * Trae venta con todos sus pagos.
+     * Trae venta con su cliente y todas las ventas de este.
+     */
+    Optional<VentaRepuesto> fetchParaEdicion(Long id);
 
     ResultadoPaginado<VentaRepuesto> buscarPaginadoConFiltros(FiltroVentaRepuestoDTO filtro,
                                                               int pagina, int tamanioPagina);
@@ -75,5 +83,9 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
 
     //ESCRITURA
 
-    VentaRepuesto borradoLogico(VentaRepuesto ventaRepuesto, AuditoriaVenta auditoriaVenta);
+    /**
+     * Guarda un registro de auditoría al cancelarse una venta.
+     */
+    // todo: crear dao específico para manejar todas las auditorías.
+    void auditoriaCancelacion(AuditoriaVenta auditoriaVenta);
 }

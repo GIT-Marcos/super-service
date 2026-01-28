@@ -69,8 +69,7 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
 
             List<ItemPagoViewModel> pagos = data.getPagos().stream()
                     .map(ItemPagoViewModel::new).toList();
-            itemsPagos.clear();
-            itemsPagos.addAll(pagos);
+            itemsPagos.setAll(pagos);
 
             cargarDatosCliente();
 
@@ -88,8 +87,8 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     private void irPago() {
         Optional<VentaRepuesto> result = navigator.openModal(Views.PAGO,
                 "Agregar pago", this.ventaRepuesto);
-        result.ifPresent(repuesto -> {
-            receiveData(repuesto);
+        result.ifPresent(venta -> {
+            receiveData(venta);
             this.ventaParaDevolver = this.ventaRepuesto;
         });
     }

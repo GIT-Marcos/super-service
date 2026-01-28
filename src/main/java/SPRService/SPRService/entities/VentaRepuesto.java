@@ -23,19 +23,19 @@ public class VentaRepuesto implements Serializable, Transaccion {
     private LocalDateTime fechaVenta;
 
     @Column(name = "monto_total", precision = 16, scale = 2, nullable = false)
-    private BigDecimal montoTotal;
+    private BigDecimal montoTotal = BigDecimal.ZERO;
 
     @Column(name = "monto_faltante", precision = 16, scale = 2, nullable = false)
-    private BigDecimal montoFaltante;
+    private BigDecimal montoFaltante = BigDecimal.ZERO;
 
     @Column(nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false, name = "estado_venta")
-    private EstadoVentaRepuesto estadoVenta;
+    private EstadoVentaRepuesto estadoVenta = EstadoVentaRepuesto.PRESUPUESTANDO;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_nota_retiro")
     private NotaRetiro notaRetiro;
 
@@ -46,19 +46,14 @@ public class VentaRepuesto implements Serializable, Transaccion {
     @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
 
-    public VentaRepuesto() {
+    protected VentaRepuesto() {
     }
 
-    public VentaRepuesto(Long id, NotaRetiro notaRetiro, Set<Pago> pagos, Cliente cliente) {
-        this.id = id;
-        this.fechaVenta = LocalDateTime.now();
-        this.activo = true;
+    public VentaRepuesto(NotaRetiro notaRetiro) {
         this.notaRetiro = notaRetiro;
         calculaMontoTotal();
-        this.pagos = pagos;
         this.montoFaltante = this.montoTotal;
         calcularEstadoVenta();
-        asociarCliente(cliente);
     }
 
     /**
@@ -195,4 +190,10 @@ public class VentaRepuesto implements Serializable, Transaccion {
                 '}';
     }
 
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        this.activo = true;
+        this.fechaVenta = LocalDateTime.now();
+    }
 }

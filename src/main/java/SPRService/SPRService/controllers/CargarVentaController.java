@@ -114,7 +114,8 @@ public class CargarVentaController implements Initializable {
         }
 
         NotaRetiro nota = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA, detallesCargados);
-        VentaRepuesto venta = new VentaRepuesto(null, nota, new HashSet<>(), this.cliente);
+        VentaRepuesto venta = new VentaRepuesto(nota);
+        venta.asociarCliente(this.cliente);
         Optional<VentaRepuesto> result = navigator.openModal(Views.PAGO, "Pagar", venta);
         result.ifPresent(v -> {
             Node n = ((Node) event.getSource());

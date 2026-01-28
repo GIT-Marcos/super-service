@@ -15,12 +15,12 @@ public class DatosContacto implements Serializable {
     @Column(name = "pk_cliente")
     private Long id;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection()
     @CollectionTable(name = "tel_contact", joinColumns = @JoinColumn(name = "tel_pk"))
     @Column(name = "tel_number")
     private Set<String> nroTelefonoSet = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection()
     @CollectionTable(name = "emails_contact", joinColumns = @JoinColumn(name = "contact_pk"))
     @Column(name = "email")
     private Set<String> emailSet = new HashSet<>();

@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> implements VentaRepuestoDAO {
@@ -30,20 +31,73 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
     }
 
     @Override
-    public ResultadoPaginado<VentaRepuesto> verTodosPaginado(int pagina, int tamanioPagina) {
+    public Optional<VentaRepuesto> verDetalle(Long id) {
         EntityManager em = emProvider.get();
-        Long totalResultados = em.createQuery("SELECT COUNT(v) FROM VentaRepuesto v",
-                Long.class).getSingleResult();
-
-        List<VentaRepuesto> ventas = em.createQuery("SELECT v FROM VentaRepuesto v " +
-                                "LEFT JOIN FETCH v.pagos " +
-                                "ORDER BY v.fechaVenta DESC",
+        // detalles de nota
+        Optional<VentaRepuesto> result = em.createQuery("select v from VentaRepuesto v " +
+                                "left join fetch v.notaRetiro n " +
+                                "left join fetch n.detalleRetiroList d " +
+                                "left join fetch d.repuesto r " +
+                                "left join fetch r.marcaRepuesto " +
+                                "left join fetch v.cliente c " +
+                                "left join fetch c.contactosCliente " +
+                                "where v.id = :id",
                         VentaRepuesto.class)
-                .setFirstResult(pagina * tamanioPagina)
-                .setMaxResults(tamanioPagina)
-                .getResultList();
+                .setParameter("id", id)
+                .getResultStream().findFirst();
 
-        return new ResultadoPaginado<>(ventas, totalResultados);
+        if (result.isPresent()) {
+            // pagos de venta
+            em.createQuery("select v from VentaRepuesto v " +
+                                    "left join fetch v.pagos " +
+                                    "where v.id = :id",
+                            VentaRepuesto.class)
+                    .setParameter("id", id)
+                    .getResultList();
+
+            if (result.get().getCliente() != null) {
+                // emails cliente
+                em.createQuery("select v from VentaRepuesto v " +
+                                        "left join fetch v.cliente c " +
+                                        "left join fetch c.contactosCliente co " +
+                                        "left join fetch co.emailSet " +
+                                        "where v.id = :id",
+                                VentaRepuesto.class)
+                        .setParameter("id", id)
+                        .getResultList();
+                // tels cliente
+                em.createQuery("select v from VentaRepuesto v " +
+                                        "left join fetch v.cliente c " +
+                                        "left join fetch c.contactosCliente co " +
+                                        "left join fetch co.nroTelefonoSet " +
+                                        "where v.id = :id",
+                                VentaRepuesto.class)
+                        .setParameter("id", id)
+                        .getResultList();
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public Optional<VentaRepuesto> fetchParaEdicion(Long id) {
+        EntityManager em = emProvider.get();
+        // ventas de cliente
+//        Optional<VentaRepuesto> result = em.createQuery("select v from VentaRepuesto v " +
+//                                "left join fetch v.cliente c " +
+//                                "left join fetch c.ventas " +
+//                                "where v.id = :id",
+//                VentaRepuesto.class)
+//                .setParameter("id", id)
+//                .getResultStream().findFirst();
+        // pagos de la venta
+        return em.createQuery("select v from VentaRepuesto v " +
+                                "left join fetch v.pagos " +
+                                "where v.id = :id",
+                        VentaRepuesto.class)
+                .setParameter("id", id)
+                .getResultStream().findFirst();
     }
 
     @Override
@@ -69,9 +123,10 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         // --- 2. CONSULTA PARA OBTENER LOS DATOS DE LA PÁGINA ACTUAL ---
         CriteriaQuery<VentaRepuesto> dataQuery = cb.createQuery(VentaRepuesto.class);
         Root<VentaRepuesto> dataRoot = dataQuery.from(VentaRepuesto.class);
-        dataRoot.fetch("pagos", JoinType.LEFT);
+
         dataRoot.fetch("cliente", JoinType.LEFT);
-        dataQuery.select(dataRoot);
+
+        dataQuery.select(dataRoot).distinct(true);
         // Volvemos a aplicar los mismos filtros, pero ahora a la consulta de datos
         aplicarFiltros(filtro, cb, dataQuery, dataRoot);
 
@@ -215,10 +270,9 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
     }
 
     @Override
-    public VentaRepuesto borradoLogico(VentaRepuesto ventaRepuesto, AuditoriaVenta auditoriaVenta) {
+    public void auditoriaCancelacion(AuditoriaVenta auditoriaVenta) {
         EntityManager em = emProvider.get();
         em.persist(auditoriaVenta);
-        return em.merge(ventaRepuesto);
     }
 
     private void aplicarFiltros(FiltroVentaRepuestoDTO filtro, CriteriaBuilder cb, CriteriaQuery<?> query,
