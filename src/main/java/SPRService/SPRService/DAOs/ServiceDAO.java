@@ -8,16 +8,35 @@ import SPRService.SPRService.entities.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ServiceDAO extends GenericDAO<Service, Long> {
 
+    /**
+     * Trae datos básicos de entidad service para tabla principal. No trae ninguna de sus relaciones.
+     */
     List<Service> verTodos();
+
+    /**
+     * Relaciones de service necesarios para modificación.
+     */
+    Optional<Service> traerDatosParaModificar(Long id);
+
+    /**
+     * Service solo con relación pago.
+     */
+    Optional<Service> datosPagos(Long id);
+
+    /**
+     * Auto y cliente de un service para la impresión de tickets.
+     */
+    Optional<Service> traerDatosParaTicket(Long id);
 
     List<Service> buscarConFiltros(FiltroServiceDTO filtros);
 
     //--- ESCRITURA ---
 
-    Service cancelarService(Service s, AuditoriaVenta a);
+    void cargarAuditoriaCancelacion(AuditoriaVenta a);
 
     //--- REPORTES ---
 

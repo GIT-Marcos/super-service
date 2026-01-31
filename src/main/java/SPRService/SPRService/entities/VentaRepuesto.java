@@ -51,9 +51,7 @@ public class VentaRepuesto implements Serializable, Transaccion {
 
     public VentaRepuesto(NotaRetiro notaRetiro) {
         this.notaRetiro = notaRetiro;
-        calculaMontoTotal();
-        this.montoFaltante = this.montoTotal;
-        calcularEstadoVenta();
+        recalcularMontos();
     }
 
     /**
@@ -73,25 +71,34 @@ public class VentaRepuesto implements Serializable, Transaccion {
 
     @Override
     public void asociarPago(Pago pago) {
-        this.getPagos().add(pago);
+        this.pagos.add(pago);
         pago.setVentaRepuesto(this);
-        this.montoFaltante = this.montoFaltante.subtract(pago.getMontoPagado());
-        if (this.montoFaltante.compareTo(BigDecimal.ZERO) < 0) {
-            this.montoFaltante = BigDecimal.ZERO;
+    }
+
+    @Override
+    public void recalcularMontos() {
+        // calcular total
+        if (this.notaRetiro != null && this.notaRetiro.getDetallesRetiroList() != null) {
+            this.montoTotal = this.notaRetiro.getDetallesRetiroList().stream()
+                    .map(DetalleRetiro::getSubTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            this.montoFaltante = this.montoTotal;
         }
+
+        BigDecimal pagado = this.pagos.stream().filter(Pago::getActivo)
+                .map(Pago::getMontoPagado)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        this.montoFaltante = this.montoFaltante.subtract(pagado);
+        if (this.montoFaltante.signum() < 0)
+            this.montoFaltante = BigDecimal.ZERO;
+
         calcularEstadoVenta();
     }
 
-    private void calculaMontoTotal() {
-        this.montoTotal = BigDecimal.ZERO;
-        if (this.notaRetiro != null && this.notaRetiro.getDetallesRetiroList() != null) {
-            for (DetalleRetiro d : this.notaRetiro.getDetallesRetiroList()) {
-                BigDecimal subTotal = d.getSubTotal();
-                this.montoTotal = this.montoTotal.add(subTotal);
-            }
-        } else {
-            throw new NullPointerException("no hay nota de retiro en esta venta.");
-        }
+    @Override
+    public Set<Pago> traerPagos() {
+        return this.getPagos();
     }
 
     private void calcularEstadoVenta() {

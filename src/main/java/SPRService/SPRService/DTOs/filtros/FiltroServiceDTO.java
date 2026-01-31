@@ -46,6 +46,12 @@ public record FiltroServiceDTO(
      * un filtro sin restricciones de fecha.
      */
     public FiltroServiceDTO() {
-        this(null, LocalDateTime.MIN, LocalDateTime.MAX, LocalDateTime.MIN, LocalDateTime.MAX, null, null);
+        this(null,
+                (LocalDate) null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

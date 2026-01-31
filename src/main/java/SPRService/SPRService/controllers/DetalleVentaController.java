@@ -17,7 +17,6 @@ import SPRService.SPRService.enums.EstadoVentaRepuesto;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -58,22 +57,9 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     public void receiveData(VentaRepuesto data) {
         if (data != null) {
             this.ventaRepuesto = data;
-            List<ItemDetalleRetiroViewModel> detalles = data.getNotaRetiro().getDetallesRetiroList().stream()
-                    .map(ItemDetalleRetiroViewModel::new).toList();
-            itemsDetalles.clear();
-            itemsDetalles.addAll(detalles);
-            //todo: remplazar la carga de listas observables grandes.
-            // Esto notifica por cada iteración. Usar .clear() y .addAll()
-//            data.getNotaRetiro().getDetallesRetiroList().forEach(d ->
-//                    itemsDetalles.add(new ItemDetalleRetiroViewModel(d)));
-
-            List<ItemPagoViewModel> pagos = data.getPagos().stream()
-                    .map(ItemPagoViewModel::new).toList();
-            itemsPagos.setAll(pagos);
-
+            cargarProductosLista();
+            cargarPagosLista();
             cargarDatosCliente();
-
-            butAgregarPago.setDisable(!data.getEstadoVenta().equals(EstadoVentaRepuesto.PENDIENTE_PAGO));
             cargarLabels();
         }
     }
@@ -88,8 +74,10 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
         Optional<VentaRepuesto> result = navigator.openModal(Views.PAGO,
                 "Agregar pago", this.ventaRepuesto);
         result.ifPresent(venta -> {
-            receiveData(venta);
+            this.ventaRepuesto = venta;
             this.ventaParaDevolver = this.ventaRepuesto;
+            cargarPagosLista();
+            cargarLabels();
         });
     }
 
@@ -107,12 +95,26 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
         listaPagos.getStylesheets().add(css2);
     }
 
+    private void cargarProductosLista() {
+        List<ItemDetalleRetiroViewModel> detalles = this.ventaRepuesto.getNotaRetiro().getDetallesRetiroList()
+                .stream().map(ItemDetalleRetiroViewModel::new).toList();
+        itemsDetalles.setAll(detalles);
+    }
+
+    private void cargarPagosLista() {
+        List<ItemPagoViewModel> pagos = this.ventaRepuesto.getPagos().stream()
+                .map(ItemPagoViewModel::new).toList();
+        itemsPagos.setAll(pagos);
+    }
+
     private void cargarLabels() {
         labelCodVenta.setText(String.valueOf(this.ventaRepuesto.getId()));
         labelFechaVenta.setText(this.ventaRepuesto.getFechaVenta().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
         labelMontoTotal.setText("$ " + this.ventaRepuesto.getMontoTotal());
         labelEstadoVenta.setText(this.ventaRepuesto.getEstadoVenta().toString());
         labelMontoFaltante.setText("$ " + this.ventaRepuesto.getMontoFaltante());
+
+        butAgregarPago.setDisable(!this.ventaRepuesto.getEstadoVenta().equals(EstadoVentaRepuesto.PENDIENTE_PAGO));
     }
 
     private void cargarDatosCliente() {

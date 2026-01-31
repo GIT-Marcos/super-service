@@ -190,15 +190,8 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
                 }
             } else {
                 // Lógica para MODIFICAR una transacción EXISTENTE (solo agregando un pago)
-                if (this.transaccion instanceof VentaRepuesto) {
-                    transaccionGuardada = pagoServ.agregarPagoTransaccion(pagoParaCargar, this.transaccion);
-                    NotificationHelper.mostrarExito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
-                } else if (this.transaccion instanceof Service) {
-                    transaccionGuardada = serviceServ.modificarService((Service) this.transaccion);
-                    NotificationHelper.mostrarExito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
-                } else {
-                    throw new IllegalArgumentException("Tipo de transacción no soportado para modificación.");
-                }
+                transaccionGuardada = pagoServ.agregarPagoTransaccion(pagoParaCargar, this.transaccion);
+                NotificationHelper.mostrarExito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
             }
 
             // Almacena la transacción actualizada/guardada para devolverla al modal

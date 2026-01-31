@@ -18,25 +18,28 @@ public class AuditoriaVenta implements Serializable{
     private String tipoRegistro;
     
     @Column(length = 250, nullable = false)
-    private String moitivo;
+    private String motivo;
     
     @Column(name = "fecha_registro")
-    private LocalDateTime fechaRegistro;
+    private LocalDateTime fechaRegistro = LocalDateTime.now();
     
-    //RELACIÓN CON USUARIO
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_usuario")
     private Usuario usuario;
 
-    public AuditoriaVenta() {
+    protected AuditoriaVenta() {
     }
 
-    public AuditoriaVenta(Long id, String tipoRegistro, String moitivo, LocalDateTime fechaRegistro, Usuario usuario) {
-        this.id = id;
+    public AuditoriaVenta(String tipoRegistro, String motivo, Usuario usuario) {
         this.tipoRegistro = tipoRegistro;
-        this.moitivo = moitivo;
-        this.fechaRegistro = fechaRegistro;
+        this.motivo = motivo;
         this.usuario = usuario;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        this.fechaRegistro = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -55,12 +58,12 @@ public class AuditoriaVenta implements Serializable{
         this.tipoRegistro = tipoRegistro;
     }
 
-    public String getMoitivo() {
-        return moitivo;
+    public String getMotivo() {
+        return motivo;
     }
 
-    public void setMoitivo(String moitivo) {
-        this.moitivo = moitivo;
+    public void setMotivo(String moitivo) {
+        this.motivo = moitivo;
     }
 
     public LocalDateTime getFechaRegistro() {
@@ -81,7 +84,7 @@ public class AuditoriaVenta implements Serializable{
 
     @Override
     public String toString() {
-        return "AuditoriaVenta{" + "id=" + id + ", tipoRegistro=" + tipoRegistro + ", moitivo=" + moitivo + ", fechaRegistro=" + fechaRegistro + '}';
+        return "AuditoriaVenta{" + "id=" + id + ", tipoRegistro=" + tipoRegistro + ", moitivo=" + motivo + ", fechaRegistro=" + fechaRegistro + '}';
     }
     
 }

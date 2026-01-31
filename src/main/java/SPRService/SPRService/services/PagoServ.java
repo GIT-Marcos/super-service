@@ -5,6 +5,6 @@ import SPRService.SPRService.entities.Transaccion;
 
 public interface PagoServ {
 
-    Transaccion agregarPagoTransaccion(Pago p, Transaccion t);
+    Transaccion agregarPagoTransaccion(Pago p, Transaccion tDTO);
 
 }

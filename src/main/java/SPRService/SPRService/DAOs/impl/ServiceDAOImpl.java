@@ -5,6 +5,7 @@ import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
+import SPRService.SPRService.entities.Orden;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements ServiceDAO {
 
@@ -31,14 +33,70 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
 
     @Override
     public List<Service> verTodos() {
+        return buscarConFiltros(new FiltroServiceDTO());
+    }
+
+    @Override
+    public Optional<Service> traerDatosParaModificar(Long id) {
         EntityManager em = emProvider.get();
-        return em.createQuery("SELECT DISTINCT s FROM Service s " +
-                                "JOIN FETCH s.orden o " +
-                                "JOIN FETCH o.trabajos " +
-                                "LEFT JOIN FETCH s.pagos " +
-                                "ORDER BY s.fechaCarga ASC",
+        // trabajos
+        Optional<Service> result = em.createQuery("select s from Service s " +
+                                "left join fetch s.orden o " +
+                                "left join fetch o.vehiculo v " +
+                                "left join fetch v.modeloVehiculo mo " +
+                                "left join fetch mo.marcaVehiculo " +
+                                "left join fetch o.estadoIngreso " +
+                                "left join fetch s.cliente " +
+                                "left join fetch o.trabajos " +
+                                "where s.id = :id",
                         Service.class)
+                .setParameter("id", id)
+                .getResultStream().findFirst();
+        // detalles retiro
+        em.createQuery("select o from Orden o " +
+                                "left join fetch o.notaRetiro n " +
+                                "left join fetch n.detalleRetiroList d " +
+                                "left join fetch d.repuesto r " +
+                                "left join fetch r.marcaRepuesto " +
+                                "left join fetch r.stock " +
+                                "where o.service.id = :id",
+                        Orden.class)
+                .setParameter("id", id)
                 .getResultList();
+        // pagos
+        em.createQuery("select s from Service s " +
+                                "left join fetch s.pagos " +
+                                "where s.id = :id",
+                        Service.class)
+                .setParameter("id", id)
+                .getResultList();
+        return result;
+    }
+
+    @Override
+    public Optional<Service> datosPagos(Long id) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("select s from Service s " +
+                                "left join fetch s.pagos " +
+                                "where s.id = :id",
+                        Service.class)
+                .setParameter("id", id)
+                .getResultStream().findFirst();
+    }
+
+    @Override
+    public Optional<Service> traerDatosParaTicket(Long id) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("select s from Service s " +
+                                "left join fetch s.cliente " +
+                                "left join fetch s.orden o " +
+                                "left join fetch o.vehiculo v " +
+                                "left join fetch v.modeloVehiculo mo " +
+                                "left join fetch mo.marcaVehiculo " +
+                                "where s.id = :id",
+                Service.class)
+                .setParameter("id", id)
+                .getResultStream().findFirst();
     }
 
     @Override
@@ -49,10 +107,6 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
         CriteriaQuery<Service> query = cb.createQuery(Service.class);
         Root<Service> root = query.from(Service.class);
         query.distinct(true);
-        //todo: usar este formato en los otros
-        root.fetch("cliente", JoinType.LEFT);
-        root.fetch("orden", JoinType.LEFT).fetch("trabajos", JoinType.LEFT);
-        root.fetch("pagos", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
 
@@ -88,10 +142,9 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
     }
 
     @Override
-    public Service cancelarService(Service s, AuditoriaVenta a) {
+    public void cargarAuditoriaCancelacion(AuditoriaVenta a) {
         EntityManager em = emProvider.get();
         em.persist(a);
-        return em.merge(s);
     }
 
     @Override

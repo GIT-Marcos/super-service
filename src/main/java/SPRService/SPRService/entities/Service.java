@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-//todo: agregarle usuario que la registra
 @Entity
 @Table(name = "services")
 public class Service implements Serializable, Transaccion {
@@ -21,13 +20,13 @@ public class Service implements Serializable, Transaccion {
     private Long id;
 
     @Column(name = "monto_total", precision = 16, scale = 2, nullable = false)
-    private BigDecimal montoTotal;
+    private BigDecimal montoTotal = BigDecimal.ZERO;
 
     @Column(name = "monto_faltante", precision = 16, scale = 2, nullable = false)
-    private BigDecimal montoFaltante;
+    private BigDecimal montoFaltante = BigDecimal.ZERO;
 
     @Column(nullable = false)
-    private LocalDateTime fechaCarga;
+    private LocalDateTime fechaCarga = LocalDateTime.now();
 
     @Column(nullable = false)
     private LocalDateTime fechaEntrega;
@@ -40,30 +39,33 @@ public class Service implements Serializable, Transaccion {
     @Column(nullable = false)
     private PrioridadService prioridad;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "fk_cliente")
     private Cliente cliente;
 
-    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "fk_orden")
     private Orden orden;
 
     @OneToMany(mappedBy = "service", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private Set<Pago> pagos = new HashSet<>();
 
-    public Service() {
-        this.fechaCarga = LocalDateTime.now();
+    protected Service() {
     }
 
-    public Service(LocalDateTime fechaEntrega, PrioridadService prioridad,
-                   Cliente cliente, Orden orden) {
-        this.fechaCarga = LocalDateTime.now();
+    public Service(LocalDateTime fechaEntrega, PrioridadService prioridad) {
         this.fechaEntrega = fechaEntrega;
-        this.estadoService = EstadoService.PENDIENTE;
         this.prioridad = prioridad;
-        asignarCliente(cliente);
-        asignarOrden(orden);
-        actualizarMontos();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        this.fechaCarga = LocalDateTime.now();
+        this.estadoService = EstadoService.PENDIENTE;
+        if (this.pagos == null) {
+            this.pagos = new HashSet<>();
+        }
     }
 
     public void asignarCliente(Cliente c) {
@@ -74,22 +76,41 @@ public class Service implements Serializable, Transaccion {
     public void asignarOrden(Orden o) {
         this.orden = o;
         o.setService(this);
+        recalcularMontos();
     }
 
     @Override
     public void asociarPago(Pago p) {
         this.pagos.add(p);
         p.setService(this);
-        if (this.montoFaltante != null) {
-            this.montoFaltante = this.montoFaltante.subtract(p.getMontoPagado());
-            if (this.montoFaltante.compareTo(BigDecimal.ZERO) < 0) {
-                this.montoFaltante = BigDecimal.ZERO;
-            }
-        }
-        calcularEstadoSaldo();
     }
 
-    private void calcularEstadoSaldo() {
+    @Override
+    public void recalcularMontos() {
+        // calcular total
+        if (this.orden != null) {
+            this.montoTotal = this.orden.getTotalTrabajos().add(this.orden.getTotalRepuestos());
+            this.montoFaltante = this.montoTotal;
+        }
+
+        // calcular pagado
+        BigDecimal pagado = this.pagos.stream().filter(Pago::getActivo)
+                .map(Pago::getMontoPagado)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        this.montoFaltante = this.montoFaltante.subtract(pagado);
+        if (this.montoFaltante.signum() < 0)
+            this.montoFaltante = BigDecimal.ZERO;
+
+        calcularEstadoService();
+    }
+
+    @Override
+    public Set<Pago> traerPagos() {
+        return this.getPagos();
+    }
+
+    private void calcularEstadoService() {
         if (pagos != null && !pagos.isEmpty()) {
             if (this.montoFaltante.compareTo(BigDecimal.ZERO) <= 0) {
                 estadoService = EstadoService.PAGADO;
@@ -97,27 +118,6 @@ public class Service implements Serializable, Transaccion {
                 estadoService = EstadoService.PAGO_PENDIENTE;
             }
         }
-    }
-
-    public void actualizarMontos() {
-        if (this.orden != null) {
-            // 1. Actualizar el Monto Total sumando trabajos y repuestos de la orden
-            this.montoTotal = this.orden.getTotalTrabajos().add(this.orden.getTotalRepuestos());
-        }
-
-        BigDecimal totalPagado = BigDecimal.ZERO;
-        if (this.pagos != null) {
-            for (Pago p : this.pagos) {
-                totalPagado = totalPagado.add(p.getMontoPagado());
-            }
-        }
-        this.montoFaltante = this.montoTotal.subtract(totalPagado);
-
-        if (this.montoFaltante.compareTo(BigDecimal.ZERO) < 0) {
-            this.montoFaltante = BigDecimal.ZERO;
-        }
-
-        calcularEstadoSaldo();
     }
 
     public Long getId() {

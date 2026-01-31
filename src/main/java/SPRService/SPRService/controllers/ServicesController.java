@@ -105,23 +105,25 @@ public class ServicesController implements Initializable {
 
     @FXML
     private void modificarService() {
-        SPRService.SPRService.viewModels.tablas.ServiceRowViewModel dto =
-                tablaServices.getSelectionModel().getSelectedItem();
+        ServiceRowViewModel dto = tablaServices.getSelectionModel().getSelectedItem();
         if (dto == null) {
             NotificationHelper.mostrarAdvertencia("Detalles de service", "Debes seleccionar un service se la tabla para " +
                     "ver sus detalles.");
             return;
         }
-        Optional<Service> result = navigator.openModal(Views.MODIFICAR_SERVICE,
-                "Detalles del service", dto.getService());
-        if (result.isPresent()) {
-            obsListServiceVM.set(obsListServiceVM.indexOf(dto), new ServiceRowViewModel(result.get()));
-        }
+
+        serviceServ.datosParaModificar(dto.getCodigo())
+                .ifPresent(s -> {
+                    Optional<Service> mod = navigator.openModal(Views.MODIFICAR_SERVICE, "Detalles del service", s);
+                    // todo: que refresque la página
+
+//                    mod.ifPresent(dto::updateFromService);
+                });
     }
 
     @FXML
     private void agregarPago() {
-        SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
+        ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
             NotificationHelper.mostrarAdvertencia("Agregar pago", "Debe seleccionar un service para agregarle el pago.");
             return;
@@ -132,23 +134,38 @@ public class ServicesController implements Initializable {
                     " o pagadas");
             return;
         }
-        Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", vm.getService());
-        result.ifPresent(service -> obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(service)));
+
+        serviceServ.datosPagos(vm.getCodigo()).ifPresent(s -> {
+            Optional<Service> conPago = navigator.openModal(Views.PAGO, "Agregar pago", s);
+            // todo: que refresque la página
+//            conPago.ifPresent(vm::updateFromService);
+        });
+
+
+//        Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", vm.getService());
+//        result.ifPresent(service -> obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(service)));
     }
 
     @FXML
     private void verPagos() {
-        SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm =
-                tablaServices.getSelectionModel().getSelectedItem();
+        ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
             NotificationHelper.mostrarAdvertencia("Agregar pago", "Debe seleccionar un service para ver sus pagos.");
             return;
         }
-        Optional<ServiceRowViewModel> result = navigator.openModal(Views.VER_PAGOS, "Ver pagos", vm);
-        if (result.isPresent()) {
-            obsListServiceVM.set(obsListServiceVM.indexOf(vm), result.get());
-            tablaServices.getSelectionModel().select(result.get());
-        }
+
+        serviceServ.datosPagos(vm.getCodigo()).ifPresent(s -> {
+            Optional<Service> conPago = navigator.openModal(Views.VER_PAGOS, "Agregar pago", s);
+            // todo: que refresque la página
+
+//            conPago.ifPresent(vm::updateFromService);
+        });
+
+//        Optional<ServiceRowViewModel> result = navigator.openModal(Views.VER_PAGOS, "Ver pagos", vm);
+//        if (result.isPresent()) {
+//            obsListServiceVM.set(obsListServiceVM.indexOf(vm), result.get());
+//            tablaServices.getSelectionModel().select(result.get());
+//        }
     }
 
     @FXML
@@ -163,36 +180,29 @@ public class ServicesController implements Initializable {
             return;
         }
 
-        Service seleccion = vm.getService();
         File file = SimpleDialogs.selectorRuta(event, "Seleccione donde guardar la factura",
-                "Factura service nro. " + seleccion.getId(),
+                "Factura service nro. " + vm.getCodigo(),
                 new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
         if (file == null) return;
 
-        FacturaServiceDTO dtoDatosFactura = new FacturaServiceDTO(seleccion);
-        GeneradorFacturasPDF.generaPDFService(dtoDatosFactura, file);
+        serviceServ.datosParaModificar(vm.getCodigo())
+                .ifPresent(s -> {
+                    GeneradorFacturasPDF.generaPDFService(new FacturaServiceDTO(s), file);
+                });
     }
 
     @FXML
     private void generarTicket(ActionEvent event) {
         ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            Notifications.create()
-                    .title("Generar ticket")
-                    .text("Debe seleccionar un service para poder generar su ticket.")
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.BOTTOM_RIGHT)
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Generar ticket",
+                    "Debe seleccionar un service para poder generar su ticket.");
             return;
         }
         if (vm.getService().getEstadoService() == EstadoService.CANCELADO ||
                 vm.getService().getEstadoService() == EstadoService.PAGADO) {
-            Notifications.create()
-                    .title("Generar ticket")
-                    .text("No es posible generar el ticket de una factura en estado 'Pagado' o 'Cancelado'.")
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.BOTTOM_RIGHT)
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("generar ticket",
+                    "No es posible generar el ticket de una factura en estado 'Pagado' o 'Cancelado'.");
             return;
         }
 
@@ -200,10 +210,13 @@ public class ServicesController implements Initializable {
                 "ticket-service.txt",
                 new FileChooser.ExtensionFilter("Archivos de texto (*.txt)", "*.txt"));
         if (file == null) return;
-        GeneradorTXT.generarTicketRetiroService(new TicketRetiroServiceDTO(vm.getService()), file);
 
-        if (SimpleDialogs.confirmacion("Generar ticket", "¿Desea imprimir el ticket?"))
-            Impresor.imprimirConSistema(file);
+        serviceServ.datosTicket(vm.getCodigo())
+                .ifPresent(s -> {
+                    GeneradorTXT.generarTicketRetiroService(new TicketRetiroServiceDTO(s), file);
+                    if (SimpleDialogs.confirmacion("Generar ticket", "¿Desea imprimir el ticket?"))
+                        Impresor.imprimirConSistema(file);
+                });
     }
 
     @FXML
@@ -241,8 +254,8 @@ public class ServicesController implements Initializable {
         if (restablecerStock == null) return;
 
         try {
-            Service cancelado = serviceServ.cancelarService(vm.getService(), restablecerStock, motivo, usuarioCancelador);
-            obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(cancelado));
+            serviceServ.cancelarService(vm.getCodigo(), restablecerStock, motivo, usuarioCancelador);
+            // todo refrescar página
             NotificationHelper.mostrarExito("Cancelar service", "Se ha cancelado el service con éxito.");
         } catch (RuntimeException e) {
             NotificationHelper.mostrarError("Cancelar service", e.getMessage());
