@@ -28,17 +28,9 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
 
     @Override
     public List<Vehiculo> verTodos() {
-        EntityManager em = emProvider.get();
-        return em.createQuery("select distinct v from Vehiculo v " +
-                                "join fetch v.modeloVehiculo m " +
-                                "join fetch m.marcaVehiculo " +
-                                "where v.estado = TRUE " +
-                                "order by v.fechaRegistro desc",
-                        Vehiculo.class)
-                .getResultList();
+        return buscarPor("", "", "");
     }
 
-    //todo: exceso de queries por n+1 causado desde repuesto.
     @Override
     public Optional<Vehiculo> verDetalle(Long id) {
         EntityManager em = emProvider.get();
@@ -76,6 +68,14 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
                     .setParameter("id", id)
                     .getResultList();
         }
+
+        // CLIENTES DE VEHÍCULO
+        // todo: no funciona
+//        em.createQuery("select v from Vehiculo v " +
+//                                "left join fetch v.clientes " +
+//                                "where v.id = :id",
+//                        Vehiculo.class)
+//                .setParameter("id", id);
         return result;
     }
 
@@ -85,6 +85,7 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Vehiculo> query = cb.createQuery(Vehiculo.class);
         Root<Vehiculo> root = query.from(Vehiculo.class);
+
         Fetch<Vehiculo, ModeloVehiculo> fetchModelo = root.fetch("modeloVehiculo", JoinType.LEFT);
         fetchModelo.fetch("marcaVehiculo", JoinType.LEFT);
 
@@ -130,11 +131,5 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
                 .setParameter("fechaMax", fechaMax)
                 .setMaxResults(cantidad);
         return query.getResultList();
-    }
-
-    @Override
-    public void borradoLogico(Vehiculo vehiculo) {
-        EntityManager em = emProvider.get();
-        em.merge(vehiculo);
     }
 }

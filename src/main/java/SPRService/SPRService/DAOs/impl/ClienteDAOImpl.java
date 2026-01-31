@@ -2,7 +2,6 @@ package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.ClienteDAO;
 import SPRService.SPRService.entities.Cliente;
-import SPRService.SPRService.entities.DatosContacto;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -25,7 +24,12 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
     }
 
     @Override
-    public Optional<Cliente> verDetalle(Long id) {
+    public List<Cliente> verTodos() {
+        return filteredSearch("", "", "");
+    }
+
+    @Override
+    public Optional<Cliente> verOperacionesConVehiculos(Long id) {
         EntityManager em = emProvider.get();
         // Ventas
         Optional<Cliente> result = em.createQuery("select c from Cliente c " +
@@ -49,6 +53,40 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
                 .setParameter("id", id)
                 .getResultList();
 
+        // vehículos
+        em.createQuery("select c from Cliente c " +
+                                "left join fetch c.vehiculos v " +
+                                "left join fetch v.modeloVehiculo mo " +
+                                "left join fetch mo.marcaVehiculo " +
+                                "where c.id = :id",
+                        Cliente.class)
+                .setParameter("id", id)
+                .getResultList();
+
+        return result;
+    }
+
+    @Override
+    public Optional<Cliente> verDatosContacto(Long id) {
+        EntityManager em = emProvider.get();
+        // eMails
+        Optional<Cliente> result = em.createQuery("select c from Cliente c " +
+                                "left join fetch c.contactosCliente co " +
+                                "left join fetch co.emailSet " +
+                                "where c.id = :id",
+                Cliente.class)
+                .setParameter("id", id)
+                .getResultStream().findFirst();
+
+        // teléfonos
+        em.createQuery("select c from Cliente c " +
+                                "left join fetch c.contactosCliente co " +
+                                "left join fetch co.nroTelefonoSet " +
+                                "where c.id = :id",
+                        Cliente.class)
+                .setParameter("id", id)
+                .getResultList();
+
         return result;
     }
 
@@ -58,12 +96,6 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Cliente> query = cb.createQuery(Cliente.class);
         Root<Cliente> root = query.from(Cliente.class);
-        // services y ventas se traen para ser usadas al asignar cliente a services o ventas
-        root.fetch("services", JoinType.LEFT);
-        root.fetch("ventas", JoinType.LEFT);
-        Fetch<Cliente, DatosContacto> contactosFetch = root.fetch("contactosCliente", JoinType.LEFT);
-        contactosFetch.fetch("nroTelefonoSet", JoinType.LEFT);
-        contactosFetch.fetch("emailSet", JoinType.LEFT);
 
         List<Predicate> filtros = new ArrayList<>();
         filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));

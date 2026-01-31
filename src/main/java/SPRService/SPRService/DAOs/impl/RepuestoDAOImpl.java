@@ -30,6 +30,11 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
     }
 
     @Override
+    public List<Repuesto> verTodos() {
+        return buscarRepuestos(new FiltroRepuestoDTO());
+    }
+
+    @Override
     public List<Repuesto> validarUnicidadCodBarras(Repuesto r) {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT r FROM Repuesto r " +

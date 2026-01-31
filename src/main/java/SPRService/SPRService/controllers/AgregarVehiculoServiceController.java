@@ -7,7 +7,7 @@ import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.VehiculoServ;
-import SPRService.SPRService.util.alertas.Alertas;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.VehiculoVM;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -69,12 +69,17 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
     private void asignarVehiculo() {
         this.vehiculoSeleccionado = lvVehiculos.getSelectionModel().getSelectedItem();
         if (this.vehiculoSeleccionado == null) {
-            Alertas.aviso("Asignar vehículo",
+            NotificationHelper.mostrarAdvertencia("Asignar vehículo",
                     "Debe seleccionar un vehículo de la lista para asignalo al service.");
             return;
         }
-        Stage s = (Stage) lvVehiculos.getScene().getWindow();
-        s.close();
+
+        Optional<Vehiculo> result = vehiculoServ.verDetalle(vehiculoSeleccionado.getId());
+        result.ifPresent(v -> {
+            this.vehiculoSeleccionado = v;
+            Stage s = (Stage) lvVehiculos.getScene().getWindow();
+            s.close();
+        });
     }
 
     @FXML

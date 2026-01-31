@@ -118,6 +118,7 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
     @Override
     public VentaRepuesto cargarVenta(VentaRepuesto venta, Pago primerPago) {
         venta.asociarPago(primerPago);
+        venta.recalcularMontos();
 
         //quita cantidades stocks
         for (DetalleRetiro d : venta.getNotaRetiro().getDetallesRetiroList()) {
@@ -133,10 +134,8 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
     public Optional<VentaRepuesto> modificarVenta(VentaRepuesto ventaDTO) {
         Optional<VentaRepuesto> result = daoVenta.fetchParaEdicion(ventaDTO.getId());
         result.ifPresent(managedVenta -> {
-            for (Pago p : ventaDTO.getPagos()) {
-                // Fé total en el Set<>
-                managedVenta.asociarPago(p);
-            }
+            ventaDTO.getPagos().forEach(managedVenta::asociarPago);
+            managedVenta.recalcularMontos();
         });
         return result;
     }
@@ -157,9 +156,8 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
                 notaRetiroServ.cancelarNota(managedVenta.getNotaRetiro().getId());
             }
 
-            AuditoriaVenta auditoriaVenta = new AuditoriaVenta(null, "Cancelación",
-                    motivo, LocalDateTime.now(), usuario);
-            daoVenta.auditoriaCancelacion(auditoriaVenta);
+            daoVenta.auditoriaCancelacion(new AuditoriaVenta("Cancelación de venta",
+                    motivo, usuario));
         });
     }
 

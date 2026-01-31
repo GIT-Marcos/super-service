@@ -14,6 +14,11 @@ public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
     // ||    ||==  ((      ||   || || ||_// ||=||
     // ||__| ||___  \\__   ||   \\_// || \\ || ||
 
+    /**
+     * Trae todos los repuestos con sus datos básicos para la tabla principal.
+     */
+    List<Repuesto> verTodos();
+
     List<Repuesto> validarUnicidadCodBarras(Repuesto r);
 
     /**
@@ -24,6 +29,9 @@ public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
      */
     Long cuentaRespBajoStock();
 
+    /**
+     * Busca por filtros y trae repuestos con datos simples para tabla principal.
+     */
     //todo: paginar
     List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro);
 

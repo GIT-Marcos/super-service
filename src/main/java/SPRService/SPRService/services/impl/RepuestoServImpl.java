@@ -38,7 +38,7 @@ public class RepuestoServImpl implements RepuestoServ {
     @Transactional
     @Override
     public List<Repuesto> verTodos() {
-        return daoRepuesto.buscarRepuestos(new FiltroRepuestoDTO());
+        return daoRepuesto.verTodos();
     }
 
     @Transactional

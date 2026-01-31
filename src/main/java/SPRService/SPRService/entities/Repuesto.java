@@ -22,10 +22,10 @@ public class Repuesto implements Serializable{
     private String detalle;
 
     @Column(precision = 16, scale = 2, nullable = false)
-    private BigDecimal precio;
+    private BigDecimal precio = BigDecimal.ZERO;
     
     @Column(nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fk_marca_repuesto", nullable = false)

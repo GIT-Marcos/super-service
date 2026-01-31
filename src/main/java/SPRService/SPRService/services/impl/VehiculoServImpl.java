@@ -45,7 +45,7 @@ public class VehiculoServImpl implements VehiculoServ {
     @Transactional
     @Override
     public List<Vehiculo> verTodosActivos() {
-        return daoVehiculo.buscarPor("", "", "");
+        return daoVehiculo.verTodos();
     }
 
     @Transactional

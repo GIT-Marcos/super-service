@@ -167,18 +167,13 @@ public class CargarServiceController implements Initializable, ModalController<S
 
             this.cliente.asociarVehiculo(this.vehiculo);
 
-            orden = new Orden();
-            orden.setId(null);
-            orden.setMotivoIngreso(motivo);
-            orden.setInformeTecnico(null);
-            orden.setEstadoIngreso(estadoIngreso);
-            orden.setVehiculo(vehiculo);
-            orden.setNotaRetiro(new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, obtenerDetalles()));
-            orden.agregarTrabajos(obtenerTrabajos());
+            this.orden = new Orden(motivo, null, estadoIngreso);
+            this.orden.asignarNota(new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, obtenerDetalles()));
+            this.orden.setVehiculo(vehiculo);
+            this.orden.agregarTrabajos(obtenerTrabajos());
 
             //todo: hacer que tome la fecha del control datepicker
-            Service service = new Service(LocalDateTime.now().plusDays(1), cbPrioridad.getValue(), this.cliente,
-                    orden);
+            Service service = new Service(LocalDateTime.now().plusDays(1), cbPrioridad.getValue());
             service.asignarCliente(this.cliente);
             service.asignarOrden(this.orden);
 

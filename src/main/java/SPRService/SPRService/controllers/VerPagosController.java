@@ -5,7 +5,6 @@ import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.navigation.*;
 import SPRService.SPRService.viewModels.celdas.ItemPagoViewModel;
-import SPRService.SPRService.viewModels.tablas.ServiceRowViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,12 +17,12 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class VerPagosController implements Initializable, DataReceiver<ServiceRowViewModel>,
-        ModalController<ServiceRowViewModel> {
+public class VerPagosController implements Initializable, DataReceiver<Service>,
+        ModalController<Service> {
 
     private final Navigator navigator;
-    private ServiceRowViewModel serviceRVM;
-    private ServiceRowViewModel paraDevolver;
+    private Service service;
+    private Service paraDevolver;
     private ObservableList<ItemPagoViewModel> items = FXCollections.observableArrayList();
 
     @FXML
@@ -45,11 +44,11 @@ public class VerPagosController implements Initializable, DataReceiver<ServiceRo
     }
 
     @Override
-    public void receiveData(ServiceRowViewModel data) {
+    public void receiveData(Service data) {
         if (data != null) {
-            this.serviceRVM = data;
-            if (data.getService().getEstadoService().equals(EstadoService.CANCELADO) ||
-                    data.getService().getEstadoService().equals(EstadoService.PAGADO)) {
+            this.service = data;
+            if (data.getEstadoService().equals(EstadoService.CANCELADO) ||
+                    data.getEstadoService().equals(EstadoService.PAGADO)) {
                 btnAgregarPago.setDisable(true);
             }
             cargarPagos();
@@ -57,21 +56,21 @@ public class VerPagosController implements Initializable, DataReceiver<ServiceRo
     }
 
     @Override
-    public Optional<ServiceRowViewModel> getResult() {
+    public Optional<Service> getResult() {
         return Optional.ofNullable(this.paraDevolver);
     }
 
     @FXML
     private void agregarPago() {
-        Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", this.serviceRVM.getService());
+        Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", this.service);
         result.ifPresent(service -> {
-            receiveData(new ServiceRowViewModel(service));
-            this.paraDevolver = this.serviceRVM;
+            receiveData(service);
+            this.paraDevolver = this.service;
         });
     }
 
     private void cargarPagos() {
         items.clear();
-        this.serviceRVM.getService().getPagos().forEach(p -> items.add(new ItemPagoViewModel(p)));
+        this.service.getPagos().forEach(p -> items.add(new ItemPagoViewModel(p)));
     }
 }

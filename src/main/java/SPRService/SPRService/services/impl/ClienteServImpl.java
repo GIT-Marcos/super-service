@@ -28,13 +28,19 @@ public class ClienteServImpl implements ClienteServ {
     @Transactional
     @Override
     public List<Cliente> verTodosActivos() {
-        return dao.filteredSearch("", "", "");
+        return dao.verTodos();
     }
 
     @Transactional
     @Override
-    public Optional<Cliente> verDetalle(Long id) {
-        return dao.verDetalle(id);
+    public Optional<Cliente> verOperacionesConVehiculos(Long id) {
+        return dao.verOperacionesConVehiculos(id);
+    }
+
+    @Transactional
+    @Override
+    public Optional<Cliente> verDatosContacto(Long id) {
+        return dao.verDatosContacto(id);
     }
 
     @Transactional

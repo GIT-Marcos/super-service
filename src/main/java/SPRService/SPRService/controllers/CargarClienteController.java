@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-//todo: bug no carga datos al modificar
 public class CargarClienteController implements Initializable, DataReceiver<Cliente>, ModalController<Cliente> {
 
     private Cliente cliente;
@@ -150,12 +149,13 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
 
         // 5. Construir Cliente
         Cliente clienteParaCargar = new Cliente(
-                flagModifyMode ? cliente.getId() : null,
+                //flagModifyMode ? cliente.getId() : null,
                 dni,
                 nombre,
                 apellido,
                 contactos
         );
+        clienteParaCargar.setId(flagModifyMode ? cliente.getId() : null);
 
         // 6. Guardar o editar
         try {
