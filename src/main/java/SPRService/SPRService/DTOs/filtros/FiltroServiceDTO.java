@@ -14,6 +14,7 @@ import java.util.List;
  */
 public record FiltroServiceDTO(
         Long codigo,
+        String dniCliente,
         LocalDateTime fchMinCarga,
         LocalDateTime fchMaxCarga,
         LocalDateTime fchMinRetiro,
@@ -26,11 +27,12 @@ public record FiltroServiceDTO(
      * Constructor principal que recibe los valores de los controles de la UI.
      * Se encarga de la conversión segura de LocalDate a LocalDateTime y maneja los valores nulos.
      */
-    public FiltroServiceDTO(Long codigo, LocalDate fchMinCarga, LocalDate fchMaxCarga, LocalDate fchMinRetiro,
+    public FiltroServiceDTO(Long codigo, String dniCliente, LocalDate fchMinCarga, LocalDate fchMaxCarga, LocalDate fchMinRetiro,
                             LocalDate fchMaxRetiro, List<EstadoService> estados,
                             List<PrioridadService> prioridadServices) {
         this(
                 codigo,
+                dniCliente,
                 (fchMinCarga != null) ? fchMinCarga.atStartOfDay() : null,
                 (fchMaxCarga != null) ? fchMaxCarga.atTime(LocalTime.MAX) : null,
                 (fchMinRetiro != null) ? fchMinRetiro.atStartOfDay() : null,
@@ -47,6 +49,7 @@ public record FiltroServiceDTO(
      */
     public FiltroServiceDTO() {
         this(null,
+                null,
                 (LocalDate) null,
                 null,
                 null,

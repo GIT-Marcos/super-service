@@ -6,7 +6,6 @@ import javafx.beans.property.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 public class ServiceRowViewModel {
 
@@ -21,6 +20,7 @@ public class ServiceRowViewModel {
     private final StringProperty prioridad;
     private final ObjectProperty<BigDecimal> montoFaltante;
     private final ObjectProperty<BigDecimal> montoTotal;
+    private final StringProperty dniCliente;
 
     public ServiceRowViewModel(Service s) {
         this.service = s;
@@ -31,6 +31,7 @@ public class ServiceRowViewModel {
         this.prioridad = new SimpleStringProperty(s.getPrioridad().toString());
         this.montoFaltante = new SimpleObjectProperty<>(s.getMontoFaltante());
         this.montoTotal = new SimpleObjectProperty<>(s.getMontoTotal());
+        this.dniCliente = new SimpleStringProperty(s.getCliente().getDni());
     }
 
     /**
@@ -104,5 +105,13 @@ public class ServiceRowViewModel {
 
     public ObjectProperty<BigDecimal> montoTotalProperty() {
         return montoTotal;
+    }
+
+    public String getDniCliente() {
+        return dniCliente.get();
+    }
+
+    public StringProperty dniClienteProperty() {
+        return dniCliente;
     }
 }
