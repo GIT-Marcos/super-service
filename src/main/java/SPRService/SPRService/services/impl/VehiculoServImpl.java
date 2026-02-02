@@ -8,6 +8,7 @@ import SPRService.SPRService.entities.MarcaVehiculo;
 import SPRService.SPRService.entities.ModeloVehiculo;
 import SPRService.SPRService.entities.Vehiculo;
 import SPRService.SPRService.exceptions.DuplicateVehicleException;
+import SPRService.SPRService.services.ModeloVehiculoServ;
 import SPRService.SPRService.services.VehiculoServ;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -27,13 +28,15 @@ public class VehiculoServImpl implements VehiculoServ {
     private final VehiculoDAO daoVehiculo;
     private final MarcaVehiculoDAO daoMarca;
     private final ModeloVehiculoDAO daoModelo;
+    private final ModeloVehiculoServ modeloVehiculoServ;
 
     @Inject
     public VehiculoServImpl(VehiculoDAO daoVehiculo, MarcaVehiculoDAO daoMarca,
-                            ModeloVehiculoDAO daoModelo) {
+                            ModeloVehiculoDAO daoModelo, ModeloVehiculoServ modeloVehiculoServ) {
         this.daoVehiculo = daoVehiculo;
         this.daoMarca = daoMarca;
         this.daoModelo = daoModelo;
+        this.modeloVehiculoServ = modeloVehiculoServ;
     }
 
     @Transactional
@@ -76,24 +79,25 @@ public class VehiculoServImpl implements VehiculoServ {
 
     @Transactional
     @Override
-    public Vehiculo cargarVehiculo(Vehiculo vehiculo) {
-        if (vehiculo == null) throw new NullPointerException("vehiculo nulo en servicio.");
-        vehiculo.setPatente(vehiculo.getPatente().toUpperCase(Locale.ROOT));
-        try {
-            ModeloVehiculo modeloDetached = vehiculo.getModeloVehiculo();
-            ModeloVehiculo modeloGestionado = daoModelo.update(modeloDetached);
-            vehiculo.setModeloVehiculo(modeloGestionado);
-
-            daoVehiculo.save(vehiculo);
-        } catch (PersistenceException e) {
-            if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
-                    e.getCause() instanceof org.postgresql.util.PSQLException) {
-                throw new DuplicateVehicleException("Ya existe un vehículo con la patente: " +
-                        vehiculo.getPatente() + " en el sistema.");
+    public Vehiculo cargarVehiculo(Vehiculo vehiculoDTO) {
+        ModeloVehiculo managedModelo;
+        Optional<ModeloVehiculo> result = modeloVehiculoServ.verVehiculosDeModelo(vehiculoDTO.getModeloVehiculo().getId());
+        if (result.isPresent()) {
+            managedModelo = result.get();
+            vehiculoDTO.setPatente(vehiculoDTO.getPatente().toUpperCase(Locale.ROOT));
+            vehiculoDTO.asociarModelo(managedModelo);
+            try {
+                daoVehiculo.save(vehiculoDTO);
+            } catch (PersistenceException e) {
+                if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException ||
+                        e.getCause() instanceof org.postgresql.util.PSQLException) {
+                    throw new DuplicateVehicleException("Ya existe un vehículo con la patente: " +
+                            vehiculoDTO.getPatente() + " en el sistema.");
+                }
+                throw e;
             }
-            throw e;
         }
-        return vehiculo;
+        return vehiculoDTO;
     }
 
     @Transactional

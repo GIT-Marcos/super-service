@@ -15,7 +15,7 @@ public interface VehiculoServ {
     List<ModelosMasRegistradosDTO> generarReporteModelosMasRegistrados(Integer cantidad, LocalDate fechaMin,
                                                                        LocalDate fechaMax);
 
-    Vehiculo cargarVehiculo(Vehiculo vehiculo);
+    Vehiculo cargarVehiculo(Vehiculo vehiculoDTO);
     Vehiculo modificarVehiculo(Vehiculo vehiculo);
     void borradoLogico(Vehiculo vehiculo);
 

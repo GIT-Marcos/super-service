@@ -8,6 +8,7 @@ import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class ModeloVehiculoServImpl implements ModeloVehiculoServ {
@@ -22,7 +23,13 @@ public class ModeloVehiculoServImpl implements ModeloVehiculoServ {
     @Transactional
     @Override
     public List<ModeloVehiculo> verTodos() {
-        return dao.getAllModels();
+        return dao.traerModelosConVehiculos();
+    }
+
+    @Transactional
+    @Override
+    public Optional<ModeloVehiculo> verVehiculosDeModelo(Long id) {
+        return dao.traerVehiculosDeModelo(id);
     }
 
     @Transactional
