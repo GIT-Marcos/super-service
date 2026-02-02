@@ -8,6 +8,7 @@ import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class ModeloVehiculoDAOImpl extends GenericDAOImpl<ModeloVehiculo, Long> implements ModeloVehiculoDAO {
@@ -20,12 +21,24 @@ public class ModeloVehiculoDAOImpl extends GenericDAOImpl<ModeloVehiculo, Long> 
     }
 
     @Override
-    public List<ModeloVehiculo> getAllModels() {
+    public List<ModeloVehiculo> traerModelosConVehiculos() {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT DISTINCT m FROM ModeloVehiculo m " +
                         "LEFT JOIN FETCH m.marcaVehiculo " +
                         "LEFT JOIN FETCH m.vehiculos " +
                         "ORDER BY m.nombreModelo ASC",
                 ModeloVehiculo.class).getResultList();
+    }
+
+    @Override
+    public Optional<ModeloVehiculo> traerVehiculosDeModelo(Long id) {
+        EntityManager em = emProvider.get();
+        return em.createQuery("select m from ModeloVehiculo m " +
+                                "left join fetch m.marcaVehiculo " +
+                                "left join fetch m.vehiculos " +
+                                "where m.id = :id",
+                ModeloVehiculo.class)
+                .setParameter("id", id)
+                .getResultStream().findFirst();
     }
 }
