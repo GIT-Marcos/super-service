@@ -3,7 +3,7 @@ package SPRService.SPRService.entities;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -28,7 +28,7 @@ public class Vehiculo implements Serializable {
     private String color;
 
     @Column(nullable = false, name = "fecha_registro")
-    private LocalDate fechaRegistro;
+    private LocalDateTime fechaRegistro = LocalDateTime.now();
 
     @Column(nullable = false)
     private Boolean estado = true;
@@ -46,15 +46,20 @@ public class Vehiculo implements Serializable {
     public Vehiculo() {
     }
 
-    public Vehiculo(Long id, String patente, String nroChasis, String nroMotor, String color,
-                    ModeloVehiculo modeloVehiculo) {
-        this.id = id;
+    public Vehiculo(String patente, String nroChasis, String nroMotor, String color) {
         this.patente = patente;
         this.nroChasis = nroChasis;
         this.nroMotor = nroMotor;
         this.color = color;
-        this.fechaRegistro = LocalDate.now();
-        asociarModelo(modeloVehiculo);
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        this.estado = true;
+        this.fechaRegistro = LocalDateTime.now();
+        if (this.clientes == null) this.clientes = new HashSet<>();
+        if (this.ordenes == null) this.ordenes = new HashSet<>();
     }
 
     public void asociarModelo(ModeloVehiculo m) {
@@ -100,11 +105,11 @@ public class Vehiculo implements Serializable {
         return color;
     }
 
-    public LocalDate getFechaRegistro() {
+    public LocalDateTime getFechaRegistro() {
         return fechaRegistro;
     }
 
-    public void setFechaRegistro(LocalDate fechaRegistro) {
+    public void setFechaRegistro(LocalDateTime fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     }
 

@@ -3,11 +3,14 @@ package SPRService.SPRService.viewModels.tablas;
 import SPRService.SPRService.entities.Vehiculo;
 import javafx.beans.property.*;
 
+import java.time.format.DateTimeFormatter;
+
 public class VehiculoRowViewModel {
 
     private final Vehiculo vehiculo;
 
     private final StringProperty patente;
+    private final StringProperty fechaRegistro;
     private final StringProperty marca;
     private final StringProperty modelo;
     private final DoubleProperty cilindrada;
@@ -17,6 +20,7 @@ public class VehiculoRowViewModel {
     public VehiculoRowViewModel(Vehiculo v) {
         this.vehiculo = v;
         this.patente = new SimpleStringProperty(v.getPatente());
+        this.fechaRegistro = new SimpleStringProperty(v.getFechaRegistro().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
         this.marca = new SimpleStringProperty(v.getModeloVehiculo().getMarcaVehiculo().getNombreMarca());
         this.modelo = new SimpleStringProperty(v.getModeloVehiculo().getNombreModelo());
         this.cilindrada = new SimpleDoubleProperty(v.getModeloVehiculo().getCilindrada());
@@ -34,6 +38,14 @@ public class VehiculoRowViewModel {
 
     public StringProperty patenteProperty() {
         return patente;
+    }
+
+    public String getFechaRegistro() {
+        return fechaRegistro.get();
+    }
+
+    public StringProperty fechaRegistroProperty() {
+        return fechaRegistro;
     }
 
     public String getMarca() {

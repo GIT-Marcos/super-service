@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/vehiculos.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.VehiculosController">
+<BorderPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/vehiculos.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.VehiculosController">
 
     <top>
         <VBox BorderPane.alignment="CENTER">
@@ -71,6 +71,7 @@
         <TableView fx:id="tablaVehiculos" styleClass="table-view" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn fx:id="colPatente" prefWidth="100.0" text="Patente" />
+            <TableColumn fx:id="colFechaReg" prefWidth="120.0" text="Fecha registro" />
                 <TableColumn fx:id="colMarca" prefWidth="150.0" text="Marca" />
                 <TableColumn fx:id="colModelo" prefWidth="200.0" text="Modelo" />
                 <TableColumn fx:id="colCil" prefWidth="80.0" text="Cil. cc." />
