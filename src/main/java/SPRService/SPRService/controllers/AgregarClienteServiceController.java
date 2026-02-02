@@ -52,7 +52,7 @@ public class AgregarClienteServiceController implements Initializable, ModalCont
         filteredList = new FilteredList<>(obsListCliente, p -> true);
         lvClientes.setItems(filteredList);
         lvClientes.setCellFactory(cell -> new CeldaCliente());
-        obsListCliente.setAll(clienteServ.getAllActive());
+        obsListCliente.setAll(clienteServ.verTodosActivos());
 
         String css = getClass().getResource("/styles/celdaCliente.css").toExternalForm();
         lvClientes.getStylesheets().add(css);
@@ -75,14 +75,18 @@ public class AgregarClienteServiceController implements Initializable, ModalCont
 
     @FXML
     private void asignarCliente() {
-        this.clienteSeleccionado = lvClientes.getSelectionModel().getSelectedItem();
-        if (this.clienteSeleccionado == null) {
+        if (lvClientes.getSelectionModel().getSelectedItem() == null) {
             NotificationHelper.mostrarAdvertencia("Asignar cliente",
                     "Debe seleccionar un cliente para continuar.");
             return;
         }
-        Stage s = (Stage) lvClientes.getScene().getWindow();
-        s.close();
+
+        clienteServ.verOperacionesConVehiculos(lvClientes.getSelectionModel().getSelectedItem().getId())
+                .ifPresent(cliente -> {
+                    this.clienteSeleccionado = cliente;
+                    Stage s = (Stage) lvClientes.getScene().getWindow();
+                    s.close();
+                });
     }
 
     private void textFieldListener() {

@@ -2,9 +2,7 @@ package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.VehiculoDAO;
 import SPRService.SPRService.DTOs.ModelosMasRegistradosDTO;
-import SPRService.SPRService.entities.MarcaVehiculo;
-import SPRService.SPRService.entities.ModeloVehiculo;
-import SPRService.SPRService.entities.Vehiculo;
+import SPRService.SPRService.entities.*;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -16,6 +14,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Singleton
 public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements VehiculoDAO {
@@ -28,14 +27,56 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
     }
 
     @Override
-    public List<Vehiculo> getAllActive() {
+    public List<Vehiculo> verTodos() {
+        return buscarPor("", "", "");
+    }
+
+    @Override
+    public Optional<Vehiculo> verDetalle(Long id) {
         EntityManager em = emProvider.get();
-        return em.createQuery("SELECT DISTINCT v FROM Vehiculo v " +
-                        "LEFT JOIN FETCH v.ordenes o " +
-                        "LEFT JOIN FETCH o.service " +
-                        "LEFT JOIN FETCH v.clientes " +
-                        "WHERE v.estado = TRUE",
-                Vehiculo.class).getResultList();
+
+        // ORDENES
+        Optional<Vehiculo> result = em.createQuery("select v from Vehiculo v " +
+                                "left join fetch v.ordenes o " +
+                                "left join fetch o.estadoIngreso " +
+                                "left join fetch o.service s " +
+                                "left join fetch s.cliente c " +
+                                "left join fetch c.contactosCliente " +
+                                "join fetch v.modeloVehiculo m " +
+                                "join fetch m.marcaVehiculo " +
+                                "where v.id = :id",
+                        Vehiculo.class)
+                .setParameter("id", id)
+                .getResultStream().findAny();
+
+        if (result.isPresent()) {
+            // TRABAJOS
+            em.createQuery("select o from Orden o " +
+                                    "left join fetch o.trabajos " +
+                                    "where o.vehiculo.id = :id",
+                            Orden.class)
+                    .setParameter("id", id)
+                    .getResultList();
+
+            // DETALLES NOTA
+            em.createQuery("select o from Orden o " +
+                                    "left join fetch o.notaRetiro n " +
+                                    "left join fetch n.detalleRetiroList d " +
+                                    "left join fetch d.repuesto " +
+                                    "where o.vehiculo.id = :id",
+                            Orden.class)
+                    .setParameter("id", id)
+                    .getResultList();
+        }
+
+        // CLIENTES DE VEHÍCULO
+        // todo: no funciona
+//        em.createQuery("select v from Vehiculo v " +
+//                                "left join fetch v.clientes " +
+//                                "where v.id = :id",
+//                        Vehiculo.class)
+//                .setParameter("id", id);
+        return result;
     }
 
     @Override
@@ -44,11 +85,12 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Vehiculo> query = cb.createQuery(Vehiculo.class);
         Root<Vehiculo> root = query.from(Vehiculo.class);
+
+        Fetch<Vehiculo, ModeloVehiculo> fetchModelo = root.fetch("modeloVehiculo", JoinType.LEFT);
+        fetchModelo.fetch("marcaVehiculo", JoinType.LEFT);
+
         Join<Vehiculo, ModeloVehiculo> joinModelo = root.join("modeloVehiculo", JoinType.LEFT);
         Join<ModeloVehiculo, MarcaVehiculo> joinMarca = joinModelo.join("marcaVehiculo", JoinType.LEFT);
-        root.fetch("ordenes", JoinType.LEFT);
-        //todo: cambiar porque genera producto cartesiano. Funciona por los Set<>
-        root.fetch("clientes", JoinType.LEFT).fetch("services", JoinType.LEFT);
 
         List<Predicate> filtros = new ArrayList<>();
         filtros.add(cb.equal(root.get("estado"), Boolean.TRUE));
@@ -89,11 +131,5 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
                 .setParameter("fechaMax", fechaMax)
                 .setMaxResults(cantidad);
         return query.getResultList();
-    }
-
-    @Override
-    public void borradoLogico(Vehiculo vehiculo) {
-        EntityManager em = emProvider.get();
-        em.merge(vehiculo);
     }
 }

@@ -97,7 +97,6 @@ public class VentasController implements Initializable {
                 .collect(Collectors.toList());
 
         // 5. ACTUALIZAR el contenido de la lista observable.
-        // setAll es más eficiente que clear() y addAll().
         obsListVentasVM.setAll(viewModels);
 
         return new VBox(); // Devolver un nodo vacío porque la tabla ya está en la escena.
@@ -130,18 +129,15 @@ public class VentasController implements Initializable {
 
     @FXML
     private void verDetalles() {
-        VentaRepuesto ventaParaDetalles;
         VentaRepuestoVMtabla vrvm = tablaVentas.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
             NotificationHelper.mostrarAdvertencia("Detalles de venta", "Debe seleccionar una venta para ver sus detalles.");
             return;
         }
-        ventaParaDetalles = vrvm.getVentaRepuesto();
 
-        Optional<VentaRepuesto> result = navigator.openModal(Views.DETALLE_VENTA, "Detalles de venta",
-                ventaParaDetalles);
-        result.ifPresent(venta ->
-                obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(venta)));
+        Optional<VentaRepuesto> result = ventaRepuestoServ.verDetalle(vrvm.getVentaRepuesto().getId());
+        result.flatMap(v -> navigator.openModal(Views.DETALLE_VENTA, "Detalles de venta", v))
+                .ifPresent(r -> cargarPagina(paginacion.getCurrentPageIndex()));
     }
 
     @FXML
@@ -190,7 +186,6 @@ public class VentasController implements Initializable {
 
     @FXML
     private void cancelarVenta() {
-        VentaRepuesto ventaParaCancelar;
         VentaRepuestoVMtabla vrvm = tablaVentas.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
             NotificationHelper.mostrarAdvertencia("Cancelación de venta", "Debe seleccionar una venta para cancelarla.");
@@ -199,7 +194,6 @@ public class VentasController implements Initializable {
             NotificationHelper.mostrarAdvertencia("Cancelación de venta", "Esta venta ya está cancelada.");
             return;
         }
-        ventaParaCancelar = vrvm.getVentaRepuesto();
 
         Usuario usuarioCancelador = SessionManager.getUsuarioSesion();
         if (usuarioCancelador == null) {
@@ -218,9 +212,8 @@ public class VentasController implements Initializable {
         if (restablecerStock == null) return;
 
         try {
-            ventaParaCancelar = ventaRepuestoServ.cancelarVenta(ventaParaCancelar, restablecerStock, motivo,
-                    usuarioCancelador);
-            obsListVentasVM.set(obsListVentasVM.indexOf(vrvm), new VentaRepuestoVMtabla(ventaParaCancelar));
+            ventaRepuestoServ.cancelarVenta(vrvm.getVentaRepuesto().getId(), restablecerStock, motivo, usuarioCancelador);
+            cargarPagina(paginacion.getCurrentPageIndex());
             NotificationHelper.mostrarExito("Cancelación de venta", "Se ha cancelado la venta con éxito.");
         } catch (RuntimeException e) {
             NotificationHelper.mostrarError("Cancelación de venta", e.getMessage());

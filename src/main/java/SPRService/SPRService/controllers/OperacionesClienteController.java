@@ -1,11 +1,11 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.components.CeldaOperacionUniversal;
+import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.viewModels.celdas.ItemOperacionViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemServiceViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemVentaViewModel;
-import SPRService.SPRService.viewModels.tablas.ClienteViewModelTabla;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,9 +20,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class OperacionesClienteController implements Initializable, DataReceiver<ClienteViewModelTabla> {
+public class OperacionesClienteController implements Initializable, DataReceiver<Cliente> {
 
-    private ClienteViewModelTabla vm;
+    private Cliente cliente;
     private ObservableList<ItemOperacionViewModel> obsList = FXCollections.observableArrayList();
 
     @FXML
@@ -43,9 +43,9 @@ public class OperacionesClienteController implements Initializable, DataReceiver
     }
 
     @Override
-    public void receiveData(ClienteViewModelTabla data) {
+    public void receiveData(Cliente data) {
         if (data != null) {
-            this.vm = data;
+            this.cliente = data;
             lblTituloCliente.setText(data.getDni() + " | " + data.getNombre() + " " + data.getApellido());
 
             llenarCampos();
@@ -61,9 +61,9 @@ public class OperacionesClienteController implements Initializable, DataReceiver
 
     private void llenarCampos() {
         obsList.clear();
-        List<ItemServiceViewModel> servVMs = this.vm.getClienteEntity().getServices().stream()
+        List<ItemServiceViewModel> servVMs = this.cliente.getServices().stream()
                 .map(ItemServiceViewModel::new).toList();
-        List<ItemVentaViewModel> venVMs = this.vm.getClienteEntity().getVentas().stream()
+        List<ItemVentaViewModel> venVMs = this.cliente.getVentas().stream()
                 .map(ItemVentaViewModel::new).toList();
         obsList.addAll(servVMs);
         obsList.addAll(venVMs);

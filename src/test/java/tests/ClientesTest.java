@@ -11,10 +11,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -127,7 +126,7 @@ public class ClientesTest {
 
                 DatosContacto datosContacto = new DatosContacto(null, telefonos, emails);
 
-                Cliente nuevoCliente = new Cliente(null, dni, nombre, apellido,datosContacto);
+                Cliente nuevoCliente = new Cliente(dni, nombre, apellido, datosContacto);
 
                 // 4. Guardar mediante el servicio
                 // El servicio se encarga de la lógica de negocio (Mayúsculas) y DAO guarda en cascada los contactos
@@ -148,4 +147,9 @@ public class ClientesTest {
         System.out.println("--- Población finalizada. Total: " + guardadosExitosamente + " ---");
     }
 
+    @Test
+    void test() {
+        List<Cliente> l = clienteServ.verTodosActivos();
+        System.out.println(l);
+    }
 }

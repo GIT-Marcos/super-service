@@ -21,7 +21,7 @@ public class DetalleRetiro implements Serializable {
     @Column(name = "sub_total", precision = 16, scale = 2, nullable = false)
     private BigDecimal subTotal;
 
-    @ManyToOne(optional = false, cascade = CascadeType.MERGE)
+    @ManyToOne(optional = false, cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_repuesto", nullable = false)
     private Repuesto repuesto;
 

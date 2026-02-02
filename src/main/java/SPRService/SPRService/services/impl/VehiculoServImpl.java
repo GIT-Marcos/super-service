@@ -12,11 +12,14 @@ import SPRService.SPRService.services.VehiculoServ;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceException;
+import org.hibernate.Hibernate;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Singleton
 public class VehiculoServImpl implements VehiculoServ {
@@ -42,7 +45,13 @@ public class VehiculoServImpl implements VehiculoServ {
     @Transactional
     @Override
     public List<Vehiculo> verTodosActivos() {
-        return daoVehiculo.getAllActive();
+        return daoVehiculo.verTodos();
+    }
+
+    @Transactional
+    @Override
+    public Optional<Vehiculo> verDetalle(Long id) {
+        return daoVehiculo.verDetalle(id);
     }
 
     @Transactional
@@ -89,10 +98,25 @@ public class VehiculoServImpl implements VehiculoServ {
 
     @Transactional
     @Override
-    public Vehiculo modificarVehiculo(Vehiculo vehiculo) {
-        if (vehiculo == null) throw new NullPointerException("vehiculo nulo en servicio.");
-        // La gestión de la excepción de hace 1 capa más arriba por el .merge().
-        return daoVehiculo.update(vehiculo);
+    public Vehiculo modificarVehiculo(Vehiculo veh) {
+        if (veh == null) throw new NullPointerException("vehiculo nulo en servicio.");
+
+        Vehiculo managedVeh = daoVehiculo.getById(veh.getId());
+        ModeloVehiculo managedMod = daoModelo.getById(veh.getModeloVehiculo().getId());
+        if (managedVeh == null) throw new EntityNotFoundException("No existe ese vehículo.");
+        if (managedMod == null) throw new EntityNotFoundException("No existe ese modelo.");
+
+        managedVeh.setPatente(veh.getPatente());
+        managedVeh.setNroChasis(veh.getNroChasis());
+        managedVeh.setNroMotor(veh.getNroMotor());
+        managedVeh.setColor(veh.getColor());
+
+        Hibernate.initialize(managedMod.getVehiculos());
+        Hibernate.initialize(managedMod.getMarcaVehiculo());
+        Hibernate.initialize(managedVeh.getModeloVehiculo());
+
+        managedVeh.asociarModelo(managedMod);
+        return managedVeh;
     }
 
     @Transactional

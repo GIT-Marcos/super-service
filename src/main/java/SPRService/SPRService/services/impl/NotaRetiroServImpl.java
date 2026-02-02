@@ -10,6 +10,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
+import java.util.Optional;
+
 @Singleton
 public class NotaRetiroServImpl implements NotaRetiroServ {
 
@@ -28,6 +30,12 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
 
     @Transactional
     @Override
+    public Optional<NotaRetiro> verDetalle(Long id) {
+        return daoNota.verDetalles(id);
+    }
+
+    @Transactional
+    @Override
     public NotaRetiro guardarNota(NotaRetiro notaRetiro) {
         for (DetalleRetiro d : notaRetiro.getDetallesRetiroList()) {
             d.getRepuesto().getStock().salidaDeStock(d.getCantidadRetirada());
@@ -38,12 +46,13 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
 
     @Transactional
     @Override
-    public void cancelarNota(NotaRetiro notaRetiro) {
-        notaRetiro.cancelarNota();
-        for (DetalleRetiro d : notaRetiro.getDetallesRetiroList()) {
-            d.getRepuesto().getStock().entradaStock(d.getCantidadRetirada());
-        }
-
-        daoNota.update(notaRetiro);
+    public void cancelarNota(Long id) {
+        Optional<NotaRetiro> result = verDetalle(id);
+        result.ifPresent(managedNota -> {
+            managedNota.cancelarNota();
+            for (DetalleRetiro d : managedNota.getDetallesRetiroList()) {
+                d.getRepuesto().getStock().entradaStock(d.getCantidadRetirada());
+            }
+        });
     }
 }

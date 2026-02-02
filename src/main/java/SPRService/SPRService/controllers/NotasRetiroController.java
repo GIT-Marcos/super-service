@@ -3,6 +3,7 @@ package SPRService.SPRService.controllers;
 import SPRService.SPRService.DTOs.filtros.FiltroNotaRetiro;
 import SPRService.SPRService.util.ResultadoPaginado;
 import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.GeneradorTXT;
 import SPRService.SPRService.util.generadores.Impresor;
 import SPRService.SPRService.viewModels.tablas.NotaRetiroViewModel;
@@ -18,13 +19,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.util.Duration;
-import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.net.URL;
@@ -204,28 +202,32 @@ public class NotasRetiroController implements Initializable {
     @FXML
     private void nuevaNota() {
         Optional<NotaRetiro> result = navigator.openModal(Views.CARGAR_NOTA, "Nueva Nota de Retiro", null);
-        result.ifPresent(nota -> notasObsList.addFirst(new NotaRetiroViewModel(nota)));
+        result.ifPresent(nota -> cargarPagina(paginacion.getCurrentPageIndex()));
     }
 
     @FXML
     private void verDetalles() {
         NotaRetiroViewModel vm = tablaNotas.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            mostrarNotificacion("Ver detalles", "Seleccione una nota para ver detalles.", true);
+            NotificationHelper.mostrarAdvertencia("Ver detalles", "Debe seleccionar una nota para ver sus detalles.");
             return;
         }
-        navigator.openModal(Views.DETALLE_NOTA_RETIRO, "Detalles de Nota #" + vm.idNotaProperty().getValue(), vm);
+
+        Optional<NotaRetiro> result = notaRetiroServ.verDetalle(vm.idNotaProperty().get());
+        result.ifPresent(n ->
+                navigator.openModal(Views.DETALLE_NOTA_RETIRO, "Detalles de Nota #" + vm.idNotaProperty().getValue(),
+                        new NotaRetiroViewModel(n)));
     }
 
     @FXML
     private void cancelarNota() {
         NotaRetiroViewModel vm = tablaNotas.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            mostrarNotificacion("Cancelar Nota", "Seleccione una nota para cancelarla.", true);
+            NotificationHelper.mostrarAdvertencia("Cancelar nota", "Debe seleccionar una nota para cancelarla.");
             return;
         }
         if (vm.esAnuladaProperty().get()) {
-            mostrarNotificacion("Cancelar Nota", "La nota seleccionada ya está anulada.", true);
+            NotificationHelper.mostrarAdvertencia("Cancelar nota", "No se puede cancelar una nota ya cancelada.");
             return;
         }
         if (!SimpleDialogs.confirmacion("Cancelar nota de retiro",
@@ -233,16 +235,11 @@ public class NotasRetiroController implements Initializable {
             return;
         }
         try {
-            notaRetiroServ.cancelarNota(vm.getNotaOriginal());
-            mostrarNotificacion("Éxito", "Nota cancelada correctamente.", false);
+            notaRetiroServ.cancelarNota(vm.idNotaProperty().get());
+            NotificationHelper.mostrarExito("Nota cancelada", "Se ha cancelado la nota con éxito.");
             cargarPagina(paginacion.getCurrentPageIndex());
         } catch (RuntimeException e) {
-            Notifications.create()
-                    .title("Error al cancelar")
-                    .text(e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showError();
+            NotificationHelper.mostrarError("Error al cancelar", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -251,9 +248,15 @@ public class NotasRetiroController implements Initializable {
     private void generarTicket(ActionEvent event) {
         NotaRetiroViewModel vm = tablaNotas.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            mostrarNotificacion("Generar ticket", "Seleccione una nota para generar el ticket.", true);
+            NotificationHelper.mostrarAdvertencia("Generar ticket", "Debe seleccionar una nota para generar el ticket.");
             return;
         }
+        Optional<NotaRetiro> result = notaRetiroServ.verDetalle(vm.idNotaProperty().get());
+        if (result.isEmpty()) {
+            NotificationHelper.mostrarAdvertencia("Generar ticket", "No se encontrado la nota.");
+            return;
+        }
+
         File file;
         if (SimpleDialogs.confirmacion("Generar ticket", "¿Quiere generar el ticket en la ruta predeterminada?")) {
             file = new File("C:\\Users\\Usuario\\Desktop\\nota retiro.txt");
@@ -263,20 +266,10 @@ public class NotasRetiroController implements Initializable {
                     new FileChooser.ExtensionFilter("Archivos de texto (*.txt)", "*.txt"));
         }
         if (file == null) return;
-        GeneradorTXT.generaNotaRetiro(vm.getNotaOriginal().getDetallesRetiroList(), file);
+        GeneradorTXT.generaNotaRetiro(result.get().getDetallesRetiroList(), file);
 
         if (SimpleDialogs.confirmacion("Imprimir ticket", "¿Desea imprimir el ticket generado?"))
             Impresor.imprimirConSistema(file);
     }
 
-    private void mostrarNotificacion(String titulo, String texto, boolean esAdvertencia) {
-        Notifications n = Notifications.create()
-                .title(titulo)
-                .text(texto)
-                .hideAfter(Duration.seconds(3))
-                .position(Pos.CENTER);
-
-        if (esAdvertencia) n.showWarning();
-        else n.showInformation();
-    }
 }

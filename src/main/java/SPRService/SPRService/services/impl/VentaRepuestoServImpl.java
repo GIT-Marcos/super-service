@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class VentaRepuestoServImpl implements VentaRepuestoServ {
@@ -33,6 +34,12 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
         this.daoVenta = daoVenta;
         this.daoStock = daoStock;
         this.notaRetiroServ = notaRetiroServ;
+    }
+
+    @Transactional
+    @Override
+    public Optional<VentaRepuesto> verDetalle(Long id) {
+        return daoVenta.verDetalle(id);
     }
 
     @Transactional
@@ -109,11 +116,11 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     @Transactional
     @Override
-    public VentaRepuesto cargarVenta(VentaRepuesto venta) {
-        if (venta == null) {
-            throw new NullPointerException("venta nula recibida en el servicio");
-        }
+    public VentaRepuesto cargarVenta(VentaRepuesto venta, Pago primerPago) {
+        venta.asociarPago(primerPago);
+        venta.recalcularMontos();
 
+        //quita cantidades stocks
         for (DetalleRetiro d : venta.getNotaRetiro().getDetallesRetiroList()) {
             d.getRepuesto().getStock().salidaDeStock(d.getCantidadRetirada());
         }
@@ -124,31 +131,34 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     @Transactional
     @Override
-    public VentaRepuesto modificarVenta(VentaRepuesto venta) {
-        if (venta == null) {
-            throw new NullPointerException("venta nula recibida en el servicio");
-        }
-        return daoVenta.update(venta);
+    public Optional<VentaRepuesto> modificarVenta(VentaRepuesto ventaDTO) {
+        Optional<VentaRepuesto> result = daoVenta.fetchParaEdicion(ventaDTO.getId());
+        result.ifPresent(managedVenta -> {
+            ventaDTO.getPagos().forEach(managedVenta::asociarPago);
+            managedVenta.recalcularMontos();
+        });
+        return result;
     }
 
     @Transactional
     @Override
-    public VentaRepuesto cancelarVenta(VentaRepuesto ventaRepuesto, boolean restablecerStocks, String motivo,
-                                       Usuario usuario) {
-        if (ventaRepuesto == null || usuario == null) {
-            throw new NullPointerException("error: venta o usuario nulo en servicio.");
-        }
+    public void cancelarVenta(Long id, boolean restablecerStocks, String motivo,
+                              Usuario usuario) {
+        Optional<VentaRepuesto> result = daoVenta.verDetalle(id);
+        result.ifPresent(managedVenta -> {
+            managedVenta.cancelarVenta();
 
-        ventaRepuesto.cancelarVenta();
-        for (Pago p : ventaRepuesto.getPagos()) {
-            p.cancelarPago();
-        }
-        if (restablecerStocks) {
-            notaRetiroServ.cancelarNota(ventaRepuesto.getNotaRetiro());
-        }
-        AuditoriaVenta auditoriaVenta = new AuditoriaVenta(null, "Cancelación",
-                motivo, LocalDateTime.now(), usuario);
-        return daoVenta.borradoLogico(ventaRepuesto, auditoriaVenta);
+            if (managedVenta.getPagos() != null) {
+                managedVenta.getPagos().forEach(Pago::cancelarPago);
+            }
+
+            if (restablecerStocks) {
+                notaRetiroServ.cancelarNota(managedVenta.getNotaRetiro().getId());
+            }
+
+            daoVenta.auditoriaCancelacion(new AuditoriaVenta("Cancelación de venta",
+                    motivo, usuario));
+        });
     }
 
     private List<Stock> obtenerStocksDeVenta(VentaRepuesto v) {

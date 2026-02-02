@@ -2,6 +2,7 @@ package SPRService.SPRService.services;
 
 import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.entities.Repuesto;
 
 import java.time.LocalDate;
@@ -14,9 +15,7 @@ public interface RepuestoServ {
 
     Long contarStockBajo();
 
-    List<Repuesto> buscarConCriteria(String codBarras, String nombreProd, String marcaProd,
-                                     Boolean verStockNormal, Boolean verStockBajo,
-                                     String colParaOrdenar, Integer tipoOrden);
+    List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro);
 
     Optional<Repuesto> cargarRepuesto(Repuesto repuesto);
 

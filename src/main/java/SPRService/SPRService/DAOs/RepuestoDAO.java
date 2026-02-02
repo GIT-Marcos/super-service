@@ -1,6 +1,7 @@
 package SPRService.SPRService.DAOs;
 
 import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.entities.Repuesto;
 
 import java.time.LocalDate;
@@ -13,9 +14,12 @@ public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
     // ||    ||==  ((      ||   || || ||_// ||=||
     // ||__| ||___  \\__   ||   \\_// || \\ || ||
 
-    List<Repuesto> validarUnicidadCodBarras(Repuesto r);
+    /**
+     * Trae todos los repuestos con sus datos básicos para la tabla principal.
+     */
+    List<Repuesto> verTodos();
 
-    List<Repuesto> todosProductosActivos();
+    List<Repuesto> validarUnicidadCodBarras(Repuesto r);
 
     /**
      * Cuenta los repuestos que tienen menor stock existente que stock mínimo
@@ -25,10 +29,11 @@ public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
      */
     Long cuentaRespBajoStock();
 
-    //todo: usar dto filtro y paginar
-    List<Repuesto> buscarConCriteria(String codBarras, String nombreProd, String marcaProd,
-                                     Boolean verStockNormal, Boolean verStockBajo, String colParaOrdenar,
-                                     Integer tipoOrden);
+    /**
+     * Busca por filtros y trae repuestos con datos simples para tabla principal.
+     */
+    //todo: paginar
+    List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro);
 
     // ____   ____ ____    ___   ____  ______  ____  __
     // || \\ ||    || \\  // \\  || \\ | || | ||    (( \

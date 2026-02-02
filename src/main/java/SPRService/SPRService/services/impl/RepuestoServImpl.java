@@ -5,6 +5,7 @@ import SPRService.SPRService.DAOs.RepuestoDAO;
 import SPRService.SPRService.DAOs.UbicacionDAO;
 import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.entities.Ubicacion;
@@ -37,7 +38,7 @@ public class RepuestoServImpl implements RepuestoServ {
     @Transactional
     @Override
     public List<Repuesto> verTodos() {
-        return daoRepuesto.todosProductosActivos();
+        return daoRepuesto.verTodos();
     }
 
     @Transactional
@@ -48,15 +49,8 @@ public class RepuestoServImpl implements RepuestoServ {
 
     @Transactional
     @Override
-    public List<Repuesto> buscarConCriteria(String codBarras, String nombreProd, String marcaProd,
-                                            Boolean verStockNormal, Boolean verStockBajo,
-                                            String colParaOrdenar, Integer tipoOrden) {
-        if (codBarras == null) codBarras = "";
-        if (nombreProd == null) nombreProd = "";
-        if (marcaProd == null) marcaProd = "";
-
-        return daoRepuesto.buscarConCriteria(codBarras, nombreProd, marcaProd, verStockNormal, verStockBajo,
-                colParaOrdenar, tipoOrden);
+    public List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro) {
+        return daoRepuesto.buscarRepuestos(filtro);
     }
 
     @Transactional

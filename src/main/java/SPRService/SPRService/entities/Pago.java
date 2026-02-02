@@ -24,7 +24,7 @@ public class Pago implements Serializable {
     private LocalDateTime fechaPago;
 
     @Column(name = "monto_pagado", nullable = false)
-    private BigDecimal montoPagado;
+    private BigDecimal montoPagado = BigDecimal.ZERO;
 
     @Column(name = "marca_tarjeta")
     private String marcaTarjeta;
@@ -36,7 +36,7 @@ public class Pago implements Serializable {
     private String referencia;
 
     @Column()
-    private BigDecimal descuento;
+    private BigDecimal descuento = BigDecimal.ZERO;
 
     @Column(name = "ultimos_4")
     private String ultimos4;
@@ -45,7 +45,7 @@ public class Pago implements Serializable {
     private String rutaComprobante;
 
     @Column(nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false, name = "metodo_pago")
@@ -59,13 +59,12 @@ public class Pago implements Serializable {
     @JoinColumn(name = "fk_service")
     private Service service;
 
-    public Pago() {
+    protected Pago() {
     }
 
-    public Pago(UUID id, String dni, BigDecimal montoPagado, String marcaTarjeta,
+    public Pago(String dni, BigDecimal montoPagado, String marcaTarjeta,
                 String banco, String referencia, BigDecimal descuento, String ultimos4, String rutaComprobante,
-                MetodosPago MetodoPago, VentaRepuesto ventaRepuesto, Service service) {
-        this.id = id;
+                MetodosPago MetodoPago) {
         this.dni = dni;
         this.fechaPago = LocalDateTime.now();
         this.montoPagado = montoPagado;
@@ -77,22 +76,6 @@ public class Pago implements Serializable {
         this.rutaComprobante = rutaComprobante;
         this.activo = Boolean.TRUE;
         this.MetodoPago = MetodoPago;
-        this.ventaRepuesto = ventaRepuesto;
-        this.service = service;
-    }
-
-    public void asociarVenta(VentaRepuesto v) {
-        if (this.service == null) {
-            this.ventaRepuesto = v;
-            this.ventaRepuesto.getPagos().add(this);
-        }
-    }
-
-    public void asociarService(Service s) {
-        if (this.ventaRepuesto == null) {
-            this.service = s;
-            this.service.getPagos().add(this);
-        }
     }
 
     public void cancelarPago() {
@@ -244,5 +227,11 @@ public class Pago implements Serializable {
     public int hashCode() {
         // Hash code constante para evitar problemas en Sets cuando el ID se genera después de insertar
         return getClass().hashCode();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.activo = true;
+        this.fechaPago = LocalDateTime.now();
     }
 }

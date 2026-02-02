@@ -2,6 +2,7 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.entities.Transaccion;
+import SPRService.SPRService.services.PagoServ;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.SimpleDialogs;
@@ -40,6 +41,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
     private Transaccion transaccionParaDevolver;
     private final VentaRepuestoServ ventaRepuestoServ;
     private final ServiceServ serviceServ;
+    private final PagoServ pagoServ;
     private String rutaComprobante;
     //para indicar cuando se agrega un pago a una venta ya hecha o es una venta nueva.
     private boolean flagAgregarPago = false;
@@ -60,9 +62,10 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
     private Button btnAdjuntar;
 
     @Inject
-    public PagoController(VentaRepuestoServ ventaRepuestoServ, ServiceServ serviceServ) {
+    public PagoController(VentaRepuestoServ ventaRepuestoServ, ServiceServ serviceServ, PagoServ pagoServ) {
         this.ventaRepuestoServ = ventaRepuestoServ;
         this.serviceServ = serviceServ;
+        this.pagoServ = pagoServ;
     }
 
     @Override
@@ -163,25 +166,21 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
         if (!confirmacion) return;
 
         // 4. CREACIÓN DEL PAGO Y ASOCIACIÓN A LA TRANSACCIÓN
-        Pago pagoParaCargar = new Pago(
-                null, dniCliente, montoPagar, marcaTarjeta, bancoTarjeta, nroReferencia,
-                porcentajeDescuento, ultimos4, rutaComprobante, metodosPago,
-                (this.transaccion instanceof VentaRepuesto ? (VentaRepuesto) this.transaccion : null), // Se asigna solo si es VentaRepuesto
-                (this.transaccion instanceof Service ? (Service) this.transaccion : null) // Se asigna solo si es Service
-        );
+        Pago pagoParaCargar = new Pago(dniCliente, montoPagar, marcaTarjeta, bancoTarjeta, nroReferencia,
+                porcentajeDescuento, ultimos4, rutaComprobante, metodosPago);
 
         // Asocia el pago. El 'asociarPago' de la entidad se encargará de actualizar su montoFaltante.
-        this.transaccion.asociarPago(pagoParaCargar);
+//        this.transaccion.asociarPago(pagoParaCargar);
 
         // 5. PERSISTENCIA DE LA TRANSACCIÓN (DELEGACIÓN)
         try {
-            Transaccion transaccionGuardada;
+            Transaccion transaccionGuardada = null;
             String nombreTransaccion = (this.transaccion instanceof VentaRepuesto) ? "Venta" : "Service";
 
             if (!this.flagAgregarPago) {
                 // Lógica para CARGAR una transacción NUEVA
                 if (this.transaccion instanceof VentaRepuesto) {
-                    transaccionGuardada = ventaRepuestoServ.cargarVenta((VentaRepuesto) this.transaccion);
+                    transaccionGuardada = ventaRepuestoServ.cargarVenta((VentaRepuesto) this.transaccion, pagoParaCargar);
                     NotificationHelper.mostrarExito("Pago", nombreTransaccion + " y pago cargados con éxito.\nSe ha actualizado el stock.");
                 } else if (this.transaccion instanceof Service) {
                     transaccionGuardada = serviceServ.cargarService((Service) this.transaccion);
@@ -191,15 +190,8 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
                 }
             } else {
                 // Lógica para MODIFICAR una transacción EXISTENTE (solo agregando un pago)
-                if (this.transaccion instanceof VentaRepuesto) {
-                    transaccionGuardada = ventaRepuestoServ.modificarVenta((VentaRepuesto) this.transaccion);
-                    NotificationHelper.mostrarExito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
-                } else if (this.transaccion instanceof Service) {
-                    transaccionGuardada = serviceServ.modificarService((Service) this.transaccion);
-                    NotificationHelper.mostrarExito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
-                } else {
-                    throw new IllegalArgumentException("Tipo de transacción no soportado para modificación.");
-                }
+                transaccionGuardada = pagoServ.agregarPagoTransaccion(pagoParaCargar, this.transaccion);
+                NotificationHelper.mostrarExito("Pago", "Pago cargado a " + nombreTransaccion + " correctamente.");
             }
 
             // Almacena la transacción actualizada/guardada para devolverla al modal

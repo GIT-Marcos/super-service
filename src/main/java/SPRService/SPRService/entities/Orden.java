@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-//todo: agregar tiempo estimado
 @Entity
 @Table(name = "ordenes")
 public class Orden implements Serializable {
@@ -38,7 +37,7 @@ public class Orden implements Serializable {
     @JoinColumn(nullable = false, name = "fk_estado_ingreso")
     private EstadoIngreso estadoIngreso;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_nota_retiro")
     private NotaRetiro notaRetiro;
 
@@ -48,16 +47,29 @@ public class Orden implements Serializable {
     @OneToOne(mappedBy = "orden")
     private Service service;
 
-    public Orden() {
+    protected Orden() {
     }
 
-    public Orden(Long id, String motivoIngreso, String informeTecnico, EstadoIngreso estadoIngreso,
-                 NotaRetiro notaRetiro) {
-        this.id = id;
+    public Orden(String motivoIngreso, String informeTecnico, EstadoIngreso estadoIngreso) {
         this.motivoIngreso = motivoIngreso;
         this.informeTecnico = informeTecnico;
         this.estadoIngreso = estadoIngreso;
-        this.notaRetiro = notaRetiro;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        if (this.trabajos == null) {
+            this.trabajos = new HashSet<>();
+        }
+    }
+
+    public void asignarNota(NotaRetiro nota) {
+        this.notaRetiro = nota;
+        actualizarTotalRepuestos();
+        if (this.service != null) {
+            this.service.recalcularMontos();
+        }
     }
 
     public void asociarVehiculo(Vehiculo v) {
@@ -79,7 +91,7 @@ public class Orden implements Serializable {
                 }
             }
             if (huboCambios && this.service != null) {
-                this.service.actualizarMontos();
+                this.service.recalcularMontos();
             }
         }
     }
@@ -100,7 +112,7 @@ public class Orden implements Serializable {
             }
 
             if (this.service != null) {
-                this.service.actualizarMontos();
+                this.service.recalcularMontos();
             }
         }
     }
@@ -110,7 +122,7 @@ public class Orden implements Serializable {
             this.notaRetiro.agregarDetalle(detalles);
             actualizarTotalRepuestos();
             if (this.service != null) {
-                this.service.actualizarMontos();
+                this.service.recalcularMontos();
             }
         }
     }
@@ -123,7 +135,7 @@ public class Orden implements Serializable {
                 actualizarTotalRepuestos();
 
                 if (this.service != null) {
-                    this.service.actualizarMontos();
+                    this.service.recalcularMontos();
                 }
             }
         }
@@ -204,7 +216,7 @@ public class Orden implements Serializable {
         this.notaRetiro = notaRetiro;
         actualizarTotalRepuestos();
         if (this.service != null) {
-            this.service.actualizarMontos();
+            this.service.recalcularMontos();
         }
     }
 

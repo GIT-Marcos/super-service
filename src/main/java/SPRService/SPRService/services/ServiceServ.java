@@ -10,12 +10,19 @@ import SPRService.SPRService.entities.Usuario;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ServiceServ {
 
     List<Service> verTodos();
 
     List<Service> buscarConFiltros(FiltroServiceDTO filtros);
+
+    Optional<Service> datosParaModificar(Long id);
+
+    Optional<Service> datosPagos(Long id);
+
+    Optional<Service> datosTicket(Long id);
 
     //--- REPORTES ---
 
@@ -46,5 +53,5 @@ public interface ServiceServ {
 
     Service modificarService(Service s);
 
-    Service cancelarService(Service s, boolean restablecerStocks, String motivo, Usuario u);
+    void cancelarService(Long id, boolean restablecerStocks, String motivo, Usuario u);
 }

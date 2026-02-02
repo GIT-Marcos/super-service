@@ -54,12 +54,12 @@ public class ClienteController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         obsListClientes.setAll();
         configColumnas();
-        llenarFilas(clienteServ.getAllActive());
+        llenarFilas(clienteServ.verTodosActivos());
     }
 
     @FXML
     private void todosLosClientes() {
-        llenarFilas(clienteServ.getAllActive());
+        llenarFilas(clienteServ.verTodosActivos());
     }
 
     @FXML
@@ -81,13 +81,12 @@ public class ClienteController implements Initializable {
             NotificationHelper.mostrarAdvertencia("Modificar cliente", "Debe seleccionar un cliente para modificarlo.");
             return;
         }
-        Optional<Cliente> optional = navigator.openModal(Views.CARGAR_CLIENTE, "Modificar cliente",
-                cvmt.getClienteEntity());
-        optional.ifPresent(c -> obsListClientes.set(obsListClientes.indexOf(cvmt), new ClienteViewModelTabla(c)));
-//        if (optional.isPresent()) {
-//            if (!optional.get().equals(cvmt.getClienteEntity()))
-//                obsListClientes.set(obsListClientes.indexOf(cvmt), new ClienteViewModelTabla(optional.get()));
-//        }
+
+        Optional<Cliente> result = clienteServ.verDatosContacto(cvmt.getClienteEntity().getId());
+        result.ifPresent(c -> {
+            navigator.openModal(Views.CARGAR_CLIENTE, "Modificar cliente",
+                    c);
+        });
     }
 
     @FXML
@@ -98,7 +97,8 @@ public class ClienteController implements Initializable {
                     "Debe seleccionar un cliente para ver sus operaciones.");
             return;
         }
-        navigator.openModal(Views.OPERACIONES_CLIENTE, "Operaciones de cliente", vm);
+        Optional<Cliente> result = clienteServ.verOperacionesConVehiculos(vm.getClienteEntity().getId());
+        result.ifPresent(c -> navigator.openModal(Views.OPERACIONES_CLIENTE, "Operaciones de cliente", c));
 
     }
 

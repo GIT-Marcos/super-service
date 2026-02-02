@@ -8,7 +8,10 @@ import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.persistence.PersistenceModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.persist.PersistService;
+import com.google.inject.persist.UnitOfWork;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +31,7 @@ class RepuestosVentasTest {
     private VentaRepuestoServ ventaRepuestoServ;
     private RepuestoServ repuestoServ;
     private ClienteServ clienteServ;
+    private Provider<EntityManager> emProvider;
 
     // ARRAYS DE DATOS
     private static final String[] AUTOPARTES = {
@@ -51,6 +55,7 @@ class RepuestosVentasTest {
         this.ventaRepuestoServ = injector.getInstance(VentaRepuestoServ.class);
         this.repuestoServ = injector.getInstance(RepuestoServ.class);
         this.clienteServ = injector.getInstance(ClienteServ.class);
+        this.emProvider = injector.getProvider(EntityManager.class);
     }
 
     @AfterEach
@@ -120,126 +125,134 @@ class RepuestosVentasTest {
 
     @Test
     public void poblarVentas() {
-        System.out.println("--- Iniciando población de Ventas con Pagos Variados ---");
+        UnitOfWork uow = injector.getInstance(UnitOfWork.class);
+        uow.begin();   // 👈 abrir contexto de trabajo
 
-        List<Repuesto> listaRepuestos = repuestoServ.verTodos();
-        if (listaRepuestos.isEmpty()) {
-            fail("No hay repuestos en la base de datos. Ejecuta primero 'poblarRepuestos'.");
-        }
+        try {
+            System.out.println("--- Iniciando población de Ventas con Pagos Variados ---");
 
-        // Clientes cargados en BD (puede estar vacío: en ese caso todas las ventas serán consumidor final)
-        List<Cliente> listaClientes = clienteServ.getAllActive();
-        if (listaClientes.isEmpty()) {
-            fail("No hay clientes en la base de datos. Ejecuta el test para poblar clientes.");
-        }
-
-        Random random = new Random();
-        int anioActual = Year.now().getValue();
-        int totalVentasGeneradas = 0;
-
-        String[] bancos = {"Banco Galicia", "Santander", "BBVA", "Banco Nación", "ICBC", "Macro"};
-        String[] marcasTarjetas = {"Visa", "Mastercard", "Amex", "Cabal"};
-
-        for (int mes = 1; mes <= 12; mes++) {
-            int numVentasEsteMes = random.nextInt(40);
-            int diasEnMes = YearMonth.of(anioActual, mes).lengthOfMonth();
-
-            if (mes == LocalDate.now().getMonthValue() && anioActual == LocalDate.now().getYear()) {
-                diasEnMes = LocalDate.now().getDayOfMonth();
-            } else if (mes > LocalDate.now().getMonthValue() && anioActual == LocalDate.now().getYear()) {
-                continue;
+            List<Repuesto> listaRepuestos = repuestoServ.verTodos();
+            if (listaRepuestos.isEmpty()) {
+                fail("No hay repuestos en la base de datos. Ejecuta primero 'poblarRepuestos'.");
             }
 
-            for (int i = 0; i < numVentasEsteMes; i++) {
-                try {
-                    int diaAleatorio = random.nextInt(diasEnMes) + 1;
-                    int horaAleatoria = random.nextInt(24);
-                    int minutoAleatorio = random.nextInt(60);
+            EntityManager em = injector.getProvider(EntityManager.class).get();
+            List<Cliente> listaClientes = em.createQuery(
+                    "select distinct c from Cliente c left join fetch c.ventas",
+                    Cliente.class
+            ).getResultList();
 
-                    LocalDateTime fechaVenta = LocalDateTime.of(
-                            anioActual, mes, diaAleatorio, horaAleatoria, minutoAleatorio
-                    );
+            if (listaClientes.isEmpty()) {
+                fail("No hay clientes en la base de datos. Ejecuta el test para poblar clientes.");
+            }
 
-                    Repuesto repuestoAleatorio = listaRepuestos.get(random.nextInt(listaRepuestos.size()));
+            Random random = new Random();
+            int anioActual = Year.now().getValue();
+            int totalVentasGeneradas = 0;
 
-                    // Cantidad entre 1 y 4
-                    double cantidad = 1.0 + random.nextInt(4);
+            String[] bancos = {"Banco Galicia", "Santander", "BBVA", "Banco Nación", "ICBC", "Macro"};
+            String[] marcasTarjetas = {"Visa", "Mastercard", "Amex", "Cabal"};
 
-                    DetalleRetiro detalle = new DetalleRetiro(null, cantidad, repuestoAleatorio);
-                    NotaRetiro notaRetiro = new NotaRetiro(
-                            null,
-                            NotaRetiro.TipoUsoRetiro.VENTA,
-                            new ArrayList<>(List.of(detalle))
-                    );
+            for (int mes = 1; mes <= 12; mes++) {
+                int numVentasEsteMes = random.nextInt(40);
+                int diasEnMes = YearMonth.of(anioActual, mes).lengthOfMonth();
 
-                    // Cliente aleatorio o consumidor final (null)
-                    // Aproximadamente 50% de ventas con cliente y 50% consumidor final
-                    Cliente cliente = null;
-                    if (!listaClientes.isEmpty() && random.nextBoolean()) {
-                        cliente = listaClientes.get(random.nextInt(listaClientes.size()));
-                    }
-
-                    // Constructor nuevo de VentaRepuesto: calcula montoTotal, montoFaltante, estado, etc.
-                    VentaRepuesto venta = new VentaRepuesto(null, notaRetiro, new HashSet<>(), cliente);
-                    venta.setFechaVenta(fechaVenta);
-
-                    MetodosPago metodoSeleccionado = MetodosPago.values()[random.nextInt(MetodosPago.values().length)];
-
-                    String banco = null, marcaTarjeta = null, ultimos4 = null, referencia = null;
-
-                    // Si hay cliente, usamos su DNI; si no, marcamos como consumidor final
-                    String identificadorCliente = (cliente != null)
-                            ? cliente.getDni()
-                            : "CONSUMIDOR_FINAL";
-
-                    switch (metodoSeleccionado) {
-                        case TARJETA_CREDITO:
-                        case TARJETA_DEBITO:
-                            banco = bancos[random.nextInt(bancos.length)];
-                            marcaTarjeta = marcasTarjetas[random.nextInt(marcasTarjetas.length)];
-                            ultimos4 = String.valueOf(random.nextInt(9000) + 1000);
-                            referencia = "REF-" + random.nextInt(999999);
-                            break;
-                        case TRANSFERENCIA:
-                            banco = bancos[random.nextInt(bancos.length)];
-                            referencia = "TRF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-                            break;
-                        case EFECTIVO:
-                        default:
-                            referencia = "TKT-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-                            break;
-                    }
-
-                    // Pago por el monto total de la venta (queda como PAGADO)
-                    Pago pago = new Pago(
-                            null,
-                            identificadorCliente,
-                            venta.getMontoTotal(),
-                            marcaTarjeta,
-                            banco,
-                            referencia,
-                            BigDecimal.ZERO,   // descuentos u otros importes, si los hubiera
-                            ultimos4,
-                            null,
-                            metodoSeleccionado,
-                            null,
-                            null
-                    );
-                    pago.setFechaPago(fechaVenta);
-
-                    // Actualiza montoFaltante y estadoVenta internamente
-                    venta.asociarPago(pago);
-
-                    ventaRepuestoServ.cargarVenta(venta);
-                    totalVentasGeneradas++;
-
-                } catch (Exception e) {
-                    System.err.println("Error al generar venta: " + e.getMessage());
+                if (mes == LocalDate.now().getMonthValue() && anioActual == LocalDate.now().getYear()) {
+                    diasEnMes = LocalDate.now().getDayOfMonth();
+                } else if (mes > LocalDate.now().getMonthValue() && anioActual == LocalDate.now().getYear()) {
+                    continue;
                 }
+
+                for (int i = 0; i < numVentasEsteMes; i++) {
+                    try {
+                        int diaAleatorio = random.nextInt(diasEnMes) + 1;
+                        int horaAleatoria = random.nextInt(24);
+                        int minutoAleatorio = random.nextInt(60);
+
+                        LocalDateTime fechaVenta = LocalDateTime.of(
+                                anioActual, mes, diaAleatorio, horaAleatoria, minutoAleatorio
+                        );
+
+                        Repuesto repuestoAleatorio = listaRepuestos.get(random.nextInt(listaRepuestos.size()));
+
+                        // Cantidad entre 1 y 4
+                        double cantidad = 1.0 + random.nextInt(4);
+
+                        DetalleRetiro detalle = new DetalleRetiro(null, cantidad, repuestoAleatorio);
+                        NotaRetiro notaRetiro = new NotaRetiro(
+                                null,
+                                NotaRetiro.TipoUsoRetiro.VENTA,
+                                new ArrayList<>(List.of(detalle))
+                        );
+
+                        // Cliente aleatorio o consumidor final (null)
+                        // Aproximadamente 50% de ventas con cliente y 50% consumidor final
+                        Cliente cliente = null;
+                        if (!listaClientes.isEmpty() && random.nextBoolean()) {
+                            cliente = listaClientes.get(random.nextInt(listaClientes.size()));
+                        }
+
+                        // Constructor nuevo de VentaRepuesto: calcula montoTotal, montoFaltante, estado, etc.
+                        VentaRepuesto venta = new VentaRepuesto(notaRetiro);
+                        venta.asociarCliente(cliente);
+                        venta.setFechaVenta(fechaVenta);
+
+                        MetodosPago metodoSeleccionado = MetodosPago.values()[random.nextInt(MetodosPago.values().length)];
+
+                        String banco = null, marcaTarjeta = null, ultimos4 = null, referencia = null;
+
+                        // Si hay cliente, usamos su DNI; si no, marcamos como consumidor final
+                        String identificadorCliente = (cliente != null)
+                                ? cliente.getDni()
+                                : "CONSUMIDOR_FINAL";
+
+                        switch (metodoSeleccionado) {
+                            case TARJETA_CREDITO:
+                            case TARJETA_DEBITO:
+                                banco = bancos[random.nextInt(bancos.length)];
+                                marcaTarjeta = marcasTarjetas[random.nextInt(marcasTarjetas.length)];
+                                ultimos4 = String.valueOf(random.nextInt(9000) + 1000);
+                                referencia = "REF-" + random.nextInt(999999);
+                                break;
+                            case TRANSFERENCIA:
+                                banco = bancos[random.nextInt(bancos.length)];
+                                referencia = "TRF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                                break;
+                            case EFECTIVO:
+                            default:
+                                referencia = "TKT-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+                                break;
+                        }
+
+                        Pago pago = new Pago(identificadorCliente,
+                                venta.getMontoTotal(),
+                                marcaTarjeta,
+                                banco,
+                                referencia,
+                                BigDecimal.ZERO,
+                                ultimos4,
+                                null,
+                                metodoSeleccionado);
+
+                        pago.setFechaPago(fechaVenta);
+
+                        // Actualiza montoFaltante y estadoVenta internamente
+                        venta.asociarPago(pago);
+
+                        ventaRepuestoServ.cargarVenta(venta, pago);
+                        totalVentasGeneradas++;
+
+                    } catch (Exception e) {
+                        System.err.println("Error al generar venta: " + e.getMessage());
+                    }
+                }
+                System.out.println("Mes " + mes + " procesado. Ventas acumuladas: " + totalVentasGeneradas);
             }
-            System.out.println("Mes " + mes + " procesado. Ventas acumuladas: " + totalVentasGeneradas);
+            System.out.println("--- Fin población Ventas. Total generadas: " + totalVentasGeneradas + " ---");
+
+        } finally {
+            uow.end();  // 👈 cerrar contexto
         }
-        System.out.println("--- Fin población Ventas. Total generadas: " + totalVentasGeneradas + " ---");
     }
 
     // MODIFICADO PARA ACEPTAR EL NOMBRE COMPLETO
@@ -257,5 +270,11 @@ class RepuestosVentasTest {
 
         return repuestoServ.cargarRepuesto(repuesto)
                 .orElseThrow(() -> new RuntimeException("Error al guardar repuesto index " + index));
+    }
+
+    @Test
+    void test() {
+        List<Repuesto> rs = repuestoServ.verTodos();
+        System.out.println(rs.getFirst().getMarcaRepuesto().getNombreMarca());
     }
 }

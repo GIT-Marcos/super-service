@@ -1,8 +1,7 @@
 package SPRService.SPRService.viewModels;
 
-import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.util.SimpleDialogs;
-import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
 import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.entities.Stock;
@@ -20,7 +19,6 @@ import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -87,18 +85,17 @@ public class DepositoViewModel {
         }
 
         String colOrden = switch (selectedOrdenarPor.get()) {
-            case "Marca" -> "marca";
+            case "Marca" -> "marcaRepuesto";
             case "Cod Barra" -> "codBarra";
             case "Precio" -> "precio";
             default -> "detalle";
         };
         int tipoOrden = tipoOrdenOptions.indexOf(selectedTipoOrden.get());
 
-        List<Repuesto> resultado = repuestoServ.buscarConCriteria(
-                codigoFiltro.get(), nombreFiltro.get(), marcaFiltro.get(),
-                mostrarNormal.get(), mostrarBajo.get(), colOrden, tipoOrden
-        );
-        actualizarTabla(resultado);
+        FiltroRepuestoDTO filtro = new FiltroRepuestoDTO(codigoFiltro.get(), nombreFiltro.get(), marcaFiltro.get(),
+                mostrarNormal.get(), mostrarBajo.get(), colOrden, tipoOrden);
+
+        actualizarTabla(repuestoServ.buscarRepuestos(filtro));
     }
 
     public void crearNuevoRepuesto() {

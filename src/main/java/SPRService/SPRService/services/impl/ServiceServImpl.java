@@ -16,9 +16,9 @@ import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ServiceServImpl implements ServiceServ {
 
@@ -36,6 +36,7 @@ public class ServiceServImpl implements ServiceServ {
     /**
      * Para que no se guarden notas de retiro vacías
      */
+    // todo: al modificar quita stock de los repuestos de nuevo
     private void validarNota(Service s) {
         if (s.getOrden().getNotaRetiro() == null || s.getOrden().getNotaRetiro().getDetallesRetiroList().isEmpty()) {
             //todo: ver si cancelar nota
@@ -61,8 +62,27 @@ public class ServiceServImpl implements ServiceServ {
 
     @Transactional
     @Override
+    public Optional<Service> datosParaModificar(Long id) {
+        return daoService.traerDatosParaModificar(id);
+    }
+
+    @Transactional
+    @Override
+    public Optional<Service> datosPagos(Long id) {
+        return daoService.datosPagos(id);
+    }
+
+    @Transactional
+    @Override
+    public Optional<Service> datosTicket(Long id) {
+        return daoService.traerDatosParaTicket(id);
+    }
+
+    @Transactional
+    @Override
     public Service cargarService(Service s) {
         validarNota(s);
+        s.recalcularMontos();
         daoService.save(s);
         return s;
     }
@@ -71,25 +91,28 @@ public class ServiceServImpl implements ServiceServ {
     @Override
     public Service modificarService(Service s) {
         validarNota(s);
+        s.recalcularMontos();
         return daoService.update(s);
     }
 
     @Transactional
     @Override
-    public Service cancelarService(Service s, boolean restablecerStocks, String motivo, Usuario u) {
-        s.setEstadoService(EstadoService.CANCELADO);
-        if (s.getPagos() != null) {
-            for (Pago p : s.getPagos()) {
-                p.cancelarPago();
-            }
-        }
-        if (s.getOrden().getNotaRetiro() != null) {
-            notaRetiroServ.cancelarNota(s.getOrden().getNotaRetiro());
-        }
+    public void cancelarService(Long id, boolean restablecerStocks, String motivo, Usuario u) {
+        daoService.traerDatosParaModificar(id)
+                .ifPresent(managedService -> {
+                    managedService.setEstadoService(EstadoService.CANCELADO);
 
-        AuditoriaVenta auditoria = new AuditoriaVenta(null, "Cancelación de service",
-                motivo, LocalDateTime.now(), u);
-        return daoService.cancelarService(s, auditoria);
+                    managedService.getPagos().forEach(Pago::cancelarPago);
+
+                    if (restablecerStocks) {
+                        if (managedService.getOrden().getNotaRetiro() != null) {
+                            notaRetiroServ.cancelarNota(managedService.getOrden().getNotaRetiro().getId());
+                        }
+                    }
+
+                    daoService.cargarAuditoriaCancelacion(new AuditoriaVenta("Cancelación de service",
+                            motivo, u));
+                });
     }
 
     //===================================================================

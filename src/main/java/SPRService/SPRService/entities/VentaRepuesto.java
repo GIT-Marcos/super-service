@@ -23,19 +23,19 @@ public class VentaRepuesto implements Serializable, Transaccion {
     private LocalDateTime fechaVenta;
 
     @Column(name = "monto_total", precision = 16, scale = 2, nullable = false)
-    private BigDecimal montoTotal;
+    private BigDecimal montoTotal = BigDecimal.ZERO;
 
     @Column(name = "monto_faltante", precision = 16, scale = 2, nullable = false)
-    private BigDecimal montoFaltante;
+    private BigDecimal montoFaltante = BigDecimal.ZERO;
 
     @Column(nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false, name = "estado_venta")
-    private EstadoVentaRepuesto estadoVenta;
+    private EstadoVentaRepuesto estadoVenta = EstadoVentaRepuesto.PRESUPUESTANDO;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_nota_retiro")
     private NotaRetiro notaRetiro;
 
@@ -46,19 +46,12 @@ public class VentaRepuesto implements Serializable, Transaccion {
     @JoinColumn(name = "fk_cliente")
     private Cliente cliente;
 
-    public VentaRepuesto() {
+    protected VentaRepuesto() {
     }
 
-    public VentaRepuesto(Long id, NotaRetiro notaRetiro, Set<Pago> pagos, Cliente cliente) {
-        this.id = id;
-        this.fechaVenta = LocalDateTime.now();
-        this.activo = true;
+    public VentaRepuesto(NotaRetiro notaRetiro) {
         this.notaRetiro = notaRetiro;
-        calculaMontoTotal();
-        this.pagos = pagos;
-        this.montoFaltante = this.montoTotal;
-        calcularEstadoVenta();
-        asociarCliente(cliente);
+        recalcularMontos();
     }
 
     /**
@@ -78,25 +71,34 @@ public class VentaRepuesto implements Serializable, Transaccion {
 
     @Override
     public void asociarPago(Pago pago) {
-        this.getPagos().add(pago);
+        this.pagos.add(pago);
         pago.setVentaRepuesto(this);
-        this.montoFaltante = this.montoFaltante.subtract(pago.getMontoPagado());
-        if (this.montoFaltante.compareTo(BigDecimal.ZERO) < 0) {
-            this.montoFaltante = BigDecimal.ZERO;
+    }
+
+    @Override
+    public void recalcularMontos() {
+        // calcular total
+        if (this.notaRetiro != null && this.notaRetiro.getDetallesRetiroList() != null) {
+            this.montoTotal = this.notaRetiro.getDetallesRetiroList().stream()
+                    .map(DetalleRetiro::getSubTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            this.montoFaltante = this.montoTotal;
         }
+
+        BigDecimal pagado = this.pagos.stream().filter(Pago::getActivo)
+                .map(Pago::getMontoPagado)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        this.montoFaltante = this.montoFaltante.subtract(pagado);
+        if (this.montoFaltante.signum() < 0)
+            this.montoFaltante = BigDecimal.ZERO;
+
         calcularEstadoVenta();
     }
 
-    private void calculaMontoTotal() {
-        this.montoTotal = BigDecimal.ZERO;
-        if (this.notaRetiro != null && this.notaRetiro.getDetallesRetiroList() != null) {
-            for (DetalleRetiro d : this.notaRetiro.getDetallesRetiroList()) {
-                BigDecimal subTotal = d.getSubTotal();
-                this.montoTotal = this.montoTotal.add(subTotal);
-            }
-        } else {
-            throw new NullPointerException("no hay nota de retiro en esta venta.");
-        }
+    @Override
+    public Set<Pago> traerPagos() {
+        return this.getPagos();
     }
 
     private void calcularEstadoVenta() {
@@ -195,4 +197,10 @@ public class VentaRepuesto implements Serializable, Transaccion {
                 '}';
     }
 
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        this.activo = true;
+        this.fechaVenta = LocalDateTime.now();
+    }
 }

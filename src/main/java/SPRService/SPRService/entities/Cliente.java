@@ -1,6 +1,7 @@
 package SPRService.SPRService.entities;
 
 import jakarta.persistence.*;
+import org.hibernate.Hibernate;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ public class Cliente implements Serializable {
     @Column(nullable = false)
     private Boolean activo = true;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_contacto_cliente", nullable = false)
     private DatosContacto contactosCliente;
 
@@ -44,24 +45,40 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "cliente")
     private Set<Service> services = new HashSet<>();
 
-    public Cliente() {
+    protected Cliente() {
     }
 
     //TODO: como en este caso, quitar relaciones de los constructores; conviene dejar las 1-1 obligatorias
-    // usando un helper en el dueño SI ES BI-DIRECCIONAL.
+    // usando un helper en el dueño SOLO SI ES BI-DIRECCIONAL.
     // Que el dueño o padre asocie al otro con helper. Inicializar los atributos booleanos de estado en su declaración.
-    public Cliente(Long id, String dni, String nombre, String apellido, DatosContacto contactosCliente) {
-        this.id = id;
+    public Cliente(String dni, String nombre, String apellido, DatosContacto contactosCliente) {
         this.dni = dni;
         this.nombre = nombre;
         this.apellido = apellido;
         this.contactosCliente = contactosCliente;
     }
 
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        this.activo = true;
+        if (this.vehiculos == null)
+            this.vehiculos = new HashSet<>();
+
+        if (this.ventas == null)
+            this.ventas = new HashSet<>();
+
+        if (this.services == null) {
+            this.services = new HashSet<>();
+        }
+    }
+
     public void asociarVehiculo(Vehiculo v) {
         if (v != null) {
             this.vehiculos.add(v);
-            v.getClientes().add(this);
+            if (Hibernate.isInitialized(v.getClientes())) {
+                v.getClientes().add(this);
+            }
         }
     }
 

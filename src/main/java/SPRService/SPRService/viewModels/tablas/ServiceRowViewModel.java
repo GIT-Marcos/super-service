@@ -6,12 +6,13 @@ import javafx.beans.property.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class ServiceRowViewModel {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    private final Service service;
+    private Service service;
 
     private final LongProperty codigo;
     private final StringProperty fechaCarga;
@@ -31,26 +32,6 @@ public class ServiceRowViewModel {
         this.montoFaltante = new SimpleObjectProperty<>(s.getMontoFaltante());
         this.montoTotal = new SimpleObjectProperty<>(s.getMontoTotal());
     }
-
-//    public void updateEntity(Service s) {
-//        this.service.setId(s.getId());
-//        this.service.setFechaCarga(s.getFechaCarga());
-//        this.service.setFechaEntrega(s.getFechaEntrega());
-//        this.service.setEstadoService(s.getEstadoService());
-//        this.service.setPrioridad(s.getPrioridad());
-//        this.service.setCliente(s.getCliente());
-//        this.service.setOrden(s.getOrden());
-//        this.service.setMontoTotal(s.getMontoTotal());
-//        this.service.setMontoFaltante(s.getMontoFaltante());
-//        // Propiedades VM
-//        this.codigo.set(s.getId());
-//        this.fechaCarga.set(s.getFechaCarga().toString());
-//        this.fechaEntrega.set(s.getFechaEntrega().toString());
-//        this.estado.set(s.getEstadoService().toString());
-//        this.prioridad.set(s.getPrioridad().toString());
-//        this.montoFaltante.set("$ " + s.getMontoFaltante());
-//        this.montoTotal.set("$ " + s.getMontoTotal());
-//    }
 
     /**
      * Para formatear la fecha o devolver un texto por defecto si es nula.
