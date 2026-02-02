@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface NotaRetiroServ {
 
+    ResultadoPaginado<NotaRetiro> verTodas(int pagina, int tamanioPaginado);
+
     ResultadoPaginado<NotaRetiro> buscarPaginado(FiltroNotaRetiro filtros, int pagina, int tamanioPagina);
 
     Optional<NotaRetiro> verDetalle(Long id);

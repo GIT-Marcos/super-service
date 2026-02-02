@@ -107,7 +107,7 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
         TypedQuery<Object[]> query = em.createQuery(
                         "SELECT dr.repuesto, COUNT(dr.repuesto) "
                                 + "FROM NotaRetiro nr "
-                                + "JOIN nr.detalleRetiroList dr "
+                                + "JOIN nr.detalleRetiro dr "
                                 + "WHERE nr.fecha BETWEEN :fechaInicio AND :fechaFin "
                                 + "GROUP BY dr.repuesto "
                                 + "ORDER BY COUNT(dr.repuesto) DESC",
@@ -126,7 +126,7 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
                                 "SUM(CASE WHEN n.tipoUso = SPRService.SPRService.entities.NotaRetiro.TipoUsoRetiro.SERVICE THEN dr.cantidadRetirada ELSE 0.0 END) " +
                                 ") " +
                                 "FROM NotaRetiro n " +
-                                "JOIN n.detalleRetiroList dr " +
+                                "JOIN n.detalleRetiro dr " +
                                 "WHERE n.fecha BETWEEN :fMin AND :fMax",
                         ReporteUsoDeRepuestosDTO.class)
                 .setParameter("fMin", fechaMin)

@@ -16,23 +16,27 @@ public class DetalleRetiro implements Serializable {
     private Long id;
 
     @Column(length = 10, nullable = false)
-    private Double cantidadRetirada;
+    private Double cantidadRetirada = 0D;
 
     @Column(name = "sub_total", precision = 16, scale = 2, nullable = false)
-    private BigDecimal subTotal;
+    private BigDecimal subTotal = BigDecimal.ZERO;
 
     @ManyToOne(optional = false, cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_repuesto", nullable = false)
     private Repuesto repuesto;
 
-    public DetalleRetiro() {
+    protected DetalleRetiro() {
     }
 
-    public DetalleRetiro(Long id, Double cantidadRetirada, Repuesto repuesto) {
-        this.id = id;
+    public DetalleRetiro(Double cantidadRetirada, Repuesto repuesto) {
         this.cantidadRetirada = cantidadRetirada;
         this.repuesto = repuesto;
         calcularSubTotal();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
     }
 
     public Long getId() {

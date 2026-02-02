@@ -168,7 +168,7 @@ public class CargarServiceController implements Initializable, ModalController<S
             this.cliente.asociarVehiculo(this.vehiculo);
 
             this.orden = new Orden(motivo, null, estadoIngreso);
-            this.orden.asignarNota(new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, obtenerDetalles()));
+            this.orden.asignarNota(new NotaRetiro(NotaRetiro.TipoUsoRetiro.SERVICE, obtenerDetalles()));
             this.orden.setVehiculo(vehiculo);
             this.orden.agregarTrabajos(obtenerTrabajos());
 
@@ -296,18 +296,18 @@ public class CargarServiceController implements Initializable, ModalController<S
         lblTotal.setText("TOTAL: $ " + totalService);
     }
 
-    private List<DetalleRetiro> obtenerDetalles() {
+    private Set<DetalleRetiro> obtenerDetalles() {
         List<ItemDetalleRetiroViewModel> items = this.items.stream().filter(i -> i instanceof ItemDetalleRetiroViewModel)
                 .map(i -> (ItemDetalleRetiroViewModel) i)
                 .toList();
         if (!items.isEmpty()) {
-            List<DetalleRetiro> detalles = new ArrayList<>();
+            Set<DetalleRetiro> detalles = new HashSet<>();
             for (ItemDetalleRetiroViewModel i : items) {
                 detalles.add(i.getDetalleRetiro());
             }
             return detalles;
         }
-        return new ArrayList<>();
+        return new HashSet<>();
     }
 
     private Set<Trabajo> obtenerTrabajos() {

@@ -96,7 +96,7 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     }
 
     private void cargarProductosLista() {
-        List<ItemDetalleRetiroViewModel> detalles = this.ventaRepuesto.getNotaRetiro().getDetallesRetiroList()
+        List<ItemDetalleRetiroViewModel> detalles = this.ventaRepuesto.getNotaRetiro().getDetallesRetiro()
                 .stream().map(ItemDetalleRetiroViewModel::new).toList();
         itemsDetalles.setAll(detalles);
     }

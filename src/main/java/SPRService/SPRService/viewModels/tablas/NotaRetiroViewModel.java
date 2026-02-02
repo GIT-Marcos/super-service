@@ -17,7 +17,7 @@ public class NotaRetiroViewModel {
     private final StringProperty estado;
     private final BooleanProperty esAnulada; // Para lógica de colores/botones sin comparar strings
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public NotaRetiroViewModel(NotaRetiro n) {
         this.notaOriginal = n;

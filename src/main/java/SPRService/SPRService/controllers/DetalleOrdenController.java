@@ -98,7 +98,7 @@ public class DetalleOrdenController implements Initializable, DataReceiver<Servi
             items.add(new ItemTrabajoViewModel(t));
         }
         if (orden.getNotaRetiro() != null) {
-            for (DetalleRetiro d : orden.getNotaRetiro().getDetallesRetiroList()) {
+            for (DetalleRetiro d : orden.getNotaRetiro().getDetallesRetiro()) {
                 items.add(new ItemDetalleRetiroViewModel(d));
             }
         }

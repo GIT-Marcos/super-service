@@ -27,12 +27,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 public class AgregarRepuestoController implements Initializable, ModalController<DetalleRetiro>,
-        DataReceiver<List<DetalleRetiro>> {
+        DataReceiver<Set<DetalleRetiro>> {
 
     private DetalleRetiro detalleRetiro;
-    private List<DetalleRetiro> detallesExistentes;
+    private Set<DetalleRetiro> detallesExistentes;
     private final RepuestoServ repuestoServ;
     private ValidationSupport valSupp;
     private ObservableList<ItemRepuestoViewModel> items = FXCollections.observableArrayList();
@@ -73,7 +74,7 @@ public class AgregarRepuestoController implements Initializable, ModalController
     }
 
     @Override
-    public void receiveData(List<DetalleRetiro> data) {
+    public void receiveData(Set<DetalleRetiro> data) {
         this.detallesExistentes = data;
     }
 
@@ -106,7 +107,7 @@ public class AgregarRepuestoController implements Initializable, ModalController
         try {
             cantidad = ManejadorInputs.cantidadStock(ctfCantidad.getText(), true);
             validarStock(r, cantidad);
-            detalleRetiro = new DetalleRetiro(null, cantidad, r);
+            detalleRetiro = new DetalleRetiro(cantidad, r);
             cerrarVentana();
         } catch (RuntimeException e) {
             NotificationHelper.mostrarAdvertencia("Agregar repuesto", e.getMessage());

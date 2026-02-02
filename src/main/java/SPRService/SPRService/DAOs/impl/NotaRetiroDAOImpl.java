@@ -30,6 +30,11 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
     }
 
     @Override
+    public ResultadoPaginado<NotaRetiro> verTodas(int pagina, int tamanioPagina) {
+        return buscarPaginado(new FiltroNotaRetiro(), pagina, tamanioPagina);
+    }
+
+    @Override
     public ResultadoPaginado<NotaRetiro> buscarPaginado(FiltroNotaRetiro filtros, int pagina, int tamanioPagina) {
         EntityManager em = emProvider.get();
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -84,7 +89,7 @@ public class NotaRetiroDAOImpl extends GenericDAOImpl<NotaRetiro, Long> implemen
     public Optional<NotaRetiro> verDetalles(Long id) {
         EntityManager em = emProvider.get();
         return em.createQuery("select n from NotaRetiro n " +
-                                "left join fetch n.detalleRetiroList d " +
+                                "left join fetch n.detalleRetiro d " +
                                 "left join fetch d.repuesto r " +
                                 "left join fetch r.marcaRepuesto " +
                                 "left join fetch r.stock s " +

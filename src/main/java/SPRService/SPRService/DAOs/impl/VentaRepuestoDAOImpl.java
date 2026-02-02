@@ -36,7 +36,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
         // detalles de nota
         Optional<VentaRepuesto> result = em.createQuery("select v from VentaRepuesto v " +
                                 "left join fetch v.notaRetiro n " +
-                                "left join fetch n.detalleRetiroList d " +
+                                "left join fetch n.detalleRetiro d " +
                                 "left join fetch d.repuesto r " +
                                 "left join fetch r.marcaRepuesto " +
                                 "left join fetch v.cliente c " +
@@ -251,7 +251,7 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
                                 "SUM(dr.subTotal)) " +
                                 "FROM VentaRepuesto v " +
                                 "JOIN v.notaRetiro nr " +
-                                "JOIN nr.detalleRetiroList dr " +
+                                "JOIN nr.detalleRetiro dr " +
                                 "JOIN dr.repuesto r " +
                                 "JOIN r.marcaRepuesto mr " +
                                 "WHERE v.estadoVenta = :estado " +

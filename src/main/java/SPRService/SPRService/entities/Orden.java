@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -117,7 +116,7 @@ public class Orden implements Serializable {
         }
     }
 
-    public void agregarRepuestos(List<DetalleRetiro> detalles) {
+    public void agregarRepuestos(Set<DetalleRetiro> detalles) {
         if (detalles != null) {
             this.notaRetiro.agregarDetalle(detalles);
             actualizarTotalRepuestos();
@@ -129,7 +128,7 @@ public class Orden implements Serializable {
 
     public void quitarRepuesto(DetalleRetiro detalle) {
         if (detalle != null && this.notaRetiro != null) {
-            boolean eliminado = this.notaRetiro.getDetallesRetiroList().remove(detalle);
+            boolean eliminado = this.notaRetiro.getDetallesRetiro().remove(detalle);
 
             if (eliminado) {
                 actualizarTotalRepuestos();
@@ -144,7 +143,7 @@ public class Orden implements Serializable {
     private void actualizarTotalRepuestos() {
         if (this.notaRetiro != null) {
             totalRepuestos = BigDecimal.ZERO;
-            for (DetalleRetiro d : notaRetiro.getDetallesRetiroList()) {
+            for (DetalleRetiro d : notaRetiro.getDetallesRetiro()) {
                 totalRepuestos = totalRepuestos.add(d.getSubTotal());
             }
         } else {

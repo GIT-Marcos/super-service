@@ -56,7 +56,7 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
         // detalles retiro
         em.createQuery("select o from Orden o " +
                                 "left join fetch o.notaRetiro n " +
-                                "left join fetch n.detalleRetiroList d " +
+                                "left join fetch n.detalleRetiro d " +
                                 "left join fetch d.repuesto r " +
                                 "left join fetch r.marcaRepuesto " +
                                 "left join fetch r.stock " +

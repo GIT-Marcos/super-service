@@ -94,7 +94,7 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
             if (orden.getNotaRetiro() != null) {
                 this.notaRetiro = orden.getNotaRetiro();
             } else {
-                this.notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, new ArrayList<>());
+                this.notaRetiro = new NotaRetiro(NotaRetiro.TipoUsoRetiro.SERVICE, new HashSet<>());
                 this.orden.setNotaRetiro(this.notaRetiro);
             }
             this.trabajos = orden.getTrabajos();
@@ -115,7 +115,7 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
             items.add(new ItemTrabajoViewModel(t));
         }
         if (orden.getNotaRetiro() != null) {
-            for (DetalleRetiro d : orden.getNotaRetiro().getDetallesRetiroList()) {
+            for (DetalleRetiro d : orden.getNotaRetiro().getDetallesRetiro()) {
                 items.add(new ItemDetalleRetiroViewModel(d));
             }
         }
@@ -233,9 +233,9 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
     @FXML
     private void agregarRepuesto() {
         Optional<DetalleRetiro> result = navigator.openModal(Views.AGREGAR_REPUESTO,
-                "Agregar repuesto", this.notaRetiro.getDetallesRetiroList());
+                "Agregar repuesto", this.notaRetiro.getDetallesRetiro());
         result.ifPresent(detalle -> {
-            orden.agregarRepuestos(List.of(detalle));
+            orden.agregarRepuestos(Set.of(detalle));
             items.addFirst(new ItemDetalleRetiroViewModel(detalle));
             agregarTotal(detalle.getSubTotal());
         });

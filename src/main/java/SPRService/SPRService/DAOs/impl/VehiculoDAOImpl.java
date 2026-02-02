@@ -61,7 +61,7 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
             // DETALLES NOTA
             em.createQuery("select o from Orden o " +
                                     "left join fetch o.notaRetiro n " +
-                                    "left join fetch n.detalleRetiroList d " +
+                                    "left join fetch n.detalleRetiro d " +
                                     "left join fetch d.repuesto " +
                                     "where o.vehiculo.id = :id",
                             Orden.class)
