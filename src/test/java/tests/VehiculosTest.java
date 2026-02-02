@@ -86,8 +86,6 @@ public class VehiculosTest {
             // C. Crear los vehículos del lote
             for (int i = 0; i < cantidadLote; i++) {
                 try {
-                    //Cliente clienteAsignado = clientes.get(random.nextInt(clientes.size()));
-
                     // Generar datos aleatorios únicos
                     String patente = generarPatenteUnica(random, patentesGeneradas);
                     String chasis = generarAlfanumerico(17);
@@ -95,17 +93,6 @@ public class VehiculosTest {
                     String color = obtenerColorAleatorio(random);
 
                     // Instanciar Vehículo según el constructor de tu Entidad
-//                    Vehiculo vehiculo = new Vehiculo(
-//                            null,               // ID
-//                            patente,            // Patente
-//                            chasis,             // Nro Chasis
-//                            motor,              // Nro Motor
-//                            color,              // Color
-//                            true,               // Estado (Boolean)
-//                            modeloSeleccionado, // Entidad ModeloVehiculo
-//                            clienteAsignado,     // Entidad Cliente
-//                            null                // Ordenes
-//                    );
                     Vehiculo vehiculo = new Vehiculo(null, patente, chasis, motor, color, modeloSeleccionado);
                     // Nota: fechaRegistro se asigna automáticamente a LocalDate.now() en el constructor
 
@@ -170,5 +157,18 @@ public class VehiculosTest {
                 "Gris Silverstone", "Gris Scandium", "Azul Jazz", "Bordó"
         };
         return colores[random.nextInt(colores.length)];
+    }
+
+    @Test
+    void test() {
+        Vehiculo v = vehiculoServ.verDetalle(9L).get();
+        System.out.println(v + "++++++" + v.getModeloVehiculo());
+        v.getOrdenes().forEach(o -> {
+            System.out.println(o);
+            System.out.println(o.getService());
+            System.out.println(o.getService().getPrioridad());
+        });
+
+        System.out.println(vehiculoServ.verTodosActivos());
     }
 }
