@@ -93,8 +93,8 @@ public class VehiculosTest {
                     String color = obtenerColorAleatorio(random);
 
                     // Instanciar Vehículo según el constructor de tu Entidad
-                    Vehiculo vehiculo = new Vehiculo(null, patente, chasis, motor, color, modeloSeleccionado);
-                    // Nota: fechaRegistro se asigna automáticamente a LocalDate.now() en el constructor
+                    Vehiculo vehiculo = new Vehiculo( patente, chasis, motor, color);
+                    vehiculo.asociarModelo(modeloSeleccionado);
 
                     // Guardar en BD
                     vehiculoServ.cargarVehiculo(vehiculo);

@@ -6,7 +6,6 @@ import SPRService.SPRService.services.VehiculoServ;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.ExportadorTabla;
-import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import SPRService.SPRService.viewModels.VehiculoVM;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
@@ -27,7 +26,6 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -44,7 +42,7 @@ public class VehiculosController implements Initializable {
     @FXML
     private TableView<VehiculoRowViewModel> tablaVehiculos;
     @FXML
-    private TableColumn<VehiculoRowViewModel, String> colPatente, colMarca, colModelo, colAnio, colColor;
+    private TableColumn<VehiculoRowViewModel, String> colPatente, colMarca, colModelo, colAnio, colColor, colFechaReg;
     @FXML
     private TableColumn<VehiculoRowViewModel, Double> colCil;
     @FXML
@@ -185,6 +183,7 @@ public class VehiculosController implements Initializable {
         colCil.setCellValueFactory(new PropertyValueFactory<>("cilindrada"));
         colAnio.setCellValueFactory(new PropertyValueFactory<>("anio"));
         colColor.setCellValueFactory(new PropertyValueFactory<>("color"));
+        colFechaReg.setCellValueFactory(new PropertyValueFactory<>("fechaRegistro"));
     }
 
     private void llenarCombos() {

@@ -9,7 +9,7 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
 import java.util.Locale;
@@ -191,7 +191,7 @@ public class VehiculoVM {
         vehiculoParaGuardar.setNroChasis(nroChasis.get());
         vehiculoParaGuardar.setNroMotor(nroMotor.get());
         vehiculoParaGuardar.setColor(color.get());
-        vehiculoParaGuardar.setFechaRegistro(LocalDate.now());
+        vehiculoParaGuardar.setFechaRegistro(LocalDateTime.now());
         vehiculoParaGuardar.setEstado(Boolean.TRUE);
         vehiculoParaGuardar.setModeloVehiculo(modeloSeleccionado.get());
 
