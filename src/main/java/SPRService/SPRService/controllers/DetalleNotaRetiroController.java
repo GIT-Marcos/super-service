@@ -38,7 +38,7 @@ public class DetalleNotaRetiroController implements Initializable, DataReceiver<
 
     @Override
     public void receiveData(NotaRetiroViewModel data) {
-        java.util.List<ItemDetalleRetiroViewModel> retiros = data.getNotaOriginal().getDetallesRetiroList().stream()
+        java.util.List<ItemDetalleRetiroViewModel> retiros = data.getNotaOriginal().getDetallesRetiro().stream()
                 .map(ItemDetalleRetiroViewModel::new).toList();
         this.items.setAll(retiros);
 

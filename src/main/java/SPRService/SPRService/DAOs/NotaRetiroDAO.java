@@ -6,7 +6,9 @@ import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.util.Optional;
 
-public interface NotaRetiroDAO extends GenericDAO<NotaRetiro, Long>{
+public interface NotaRetiroDAO extends GenericDAO<NotaRetiro, Long> {
+
+    ResultadoPaginado<NotaRetiro> verTodas(int pagina, int tamanioPagina);
 
     ResultadoPaginado<NotaRetiro> buscarPaginado(FiltroNotaRetiro filtros, int pagina, int tamanioPagina);
 

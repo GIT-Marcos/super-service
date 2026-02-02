@@ -11,4 +11,14 @@ public record FiltroNotaRetiro(
         Boolean activo,
         Set<NotaRetiro.TipoUsoRetiro> tipoDeUsos
 ) {
+
+    public FiltroNotaRetiro() {
+        this(
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
 }

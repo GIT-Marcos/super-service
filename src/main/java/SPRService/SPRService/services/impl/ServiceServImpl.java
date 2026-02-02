@@ -38,11 +38,11 @@ public class ServiceServImpl implements ServiceServ {
      */
     // todo: al modificar quita stock de los repuestos de nuevo
     private void validarNota(Service s) {
-        if (s.getOrden().getNotaRetiro() == null || s.getOrden().getNotaRetiro().getDetallesRetiroList().isEmpty()) {
+        if (s.getOrden().getNotaRetiro() == null || s.getOrden().getNotaRetiro().getDetallesRetiro().isEmpty()) {
             //todo: ver si cancelar nota
             s.getOrden().setNotaRetiro(null);
         } else {
-            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiroList()) {
+            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiro()) {
                 stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
             }
         }

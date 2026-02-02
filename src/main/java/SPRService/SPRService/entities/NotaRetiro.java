@@ -3,9 +3,9 @@ package SPRService.SPRService.entities;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "notas_retiros")
@@ -17,41 +17,43 @@ public class NotaRetiro implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDate fecha;
+    private LocalDateTime fecha = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_uso", nullable = false)
     private TipoUsoRetiro tipoUso;
 
     @Column(nullable = false)
-    private Boolean activo;
+    private Boolean activo = true;
 
-    //todo: hacer esto un Set
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "fk_nota_retiro")
-    private List<DetalleRetiro> detalleRetiroList = new ArrayList<>();
+    private Set<DetalleRetiro> detalleRetiro = new HashSet<>();
 
-    public NotaRetiro() {
-        this.activo = Boolean.TRUE;
+    protected NotaRetiro() {
     }
 
-    public NotaRetiro(Long id, TipoUsoRetiro tipoUso, List<DetalleRetiro> detalleRetiroList) {
-        this.id = id;
-        this.fecha = LocalDate.now();
+    public NotaRetiro(TipoUsoRetiro tipoUso, Set<DetalleRetiro> detalleRetiroList) {
         this.tipoUso = tipoUso;
-        this.activo = Boolean.TRUE;
-        this.detalleRetiroList = detalleRetiroList;
+        agregarDetalle(detalleRetiroList);
     }
 
-    public void agregarDetalle(List<DetalleRetiro> detalleRetiros) {
-        if (detalleRetiros != null) {
-            for (DetalleRetiro d : detalleRetiros) {
-                // Evitar duplicados al cargar
-                if (!this.detalleRetiroList.contains(d)) {
-                    this.detalleRetiroList.add(d);
-                }
-            }
-        }
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        this.fecha = LocalDateTime.now();
+        this.activo = true;
+        if (this.detalleRetiro == null) this.detalleRetiro = new HashSet<>();
+    }
+
+    public void agregarDetalle(DetalleRetiro d) {
+        if (d != null) this.detalleRetiro.add(d);
+    }
+
+    public void agregarDetalle(Set<DetalleRetiro> detalleRetiros) {
+        if (detalleRetiros == null) detalleRetiros = new HashSet<>();
+
+        detalleRetiros.forEach(this::agregarDetalle);
     }
 
     /**
@@ -70,11 +72,11 @@ public class NotaRetiro implements Serializable {
         this.id = id;
     }
 
-    public LocalDate getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(LocalDate fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 
@@ -94,12 +96,12 @@ public class NotaRetiro implements Serializable {
         this.activo = activo;
     }
 
-    public List<DetalleRetiro> getDetallesRetiroList() {
-        return detalleRetiroList;
+    public Set<DetalleRetiro> getDetallesRetiro() {
+        return detalleRetiro;
     }
 
-    public void setDetallesRetiroList(List<DetalleRetiro> detallesRetiro) {
-        this.detalleRetiroList = detallesRetiro;
+    public void setDetallesRetiro(Set<DetalleRetiro> detallesRetiro) {
+        this.detalleRetiro = detallesRetiro;
     }
 
     @Override

@@ -24,6 +24,12 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
 
     @Transactional
     @Override
+    public ResultadoPaginado<NotaRetiro> verTodas(int pagina, int tamanioPaginado) {
+        return daoNota.verTodas(pagina, tamanioPaginado);
+    }
+
+    @Transactional
+    @Override
     public ResultadoPaginado<NotaRetiro> buscarPaginado(FiltroNotaRetiro filtros, int pagina, int tamanioPagina) {
         return daoNota.buscarPaginado(filtros, pagina, tamanioPagina);
     }
@@ -37,7 +43,7 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
     @Transactional
     @Override
     public NotaRetiro guardarNota(NotaRetiro notaRetiro) {
-        for (DetalleRetiro d : notaRetiro.getDetallesRetiroList()) {
+        for (DetalleRetiro d : notaRetiro.getDetallesRetiro()) {
             d.getRepuesto().getStock().salidaDeStock(d.getCantidadRetirada());
         }
         daoNota.save(notaRetiro);
@@ -50,7 +56,7 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
         Optional<NotaRetiro> result = verDetalle(id);
         result.ifPresent(managedNota -> {
             managedNota.cancelarNota();
-            for (DetalleRetiro d : managedNota.getDetallesRetiroList()) {
+            for (DetalleRetiro d : managedNota.getDetallesRetiro()) {
                 d.getRepuesto().getStock().entradaStock(d.getCantidadRetirada());
             }
         });

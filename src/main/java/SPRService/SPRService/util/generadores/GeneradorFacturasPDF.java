@@ -182,7 +182,7 @@ public class GeneradorFacturasPDF {
 
             Font smallFont = new Font(Font.HELVETICA, 9, Font.NORMAL);
 
-            for (DetalleRetiro d : venta.getNotaRetiro().getDetallesRetiroList()) {
+            for (DetalleRetiro d : venta.getNotaRetiro().getDetallesRetiro()) {
                 BigDecimal subtotal = d.getRepuesto().getPrecio().multiply(new BigDecimal(d.getCantidadRetirada()));
                 total = total.add(subtotal);
 

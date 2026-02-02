@@ -56,7 +56,7 @@ public record FacturaServiceDTO(
 
                 // detalles (En Orden es NotaRetiro -> List, aquí pide Set. Validamos null)
                 (service.getOrden().getNotaRetiro() != null)
-                        ? new HashSet<>(service.getOrden().getNotaRetiro().getDetallesRetiroList())
+                        ? new HashSet<>(service.getOrden().getNotaRetiro().getDetallesRetiro())
                         : new HashSet<>(),
 
                 // fechas

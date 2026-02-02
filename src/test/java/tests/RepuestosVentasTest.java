@@ -178,12 +178,9 @@ class RepuestosVentasTest {
                         // Cantidad entre 1 y 4
                         double cantidad = 1.0 + random.nextInt(4);
 
-                        DetalleRetiro detalle = new DetalleRetiro(null, cantidad, repuestoAleatorio);
-                        NotaRetiro notaRetiro = new NotaRetiro(
-                                null,
-                                NotaRetiro.TipoUsoRetiro.VENTA,
-                                new ArrayList<>(List.of(detalle))
-                        );
+                        DetalleRetiro detalle = new DetalleRetiro(cantidad, repuestoAleatorio);
+                        NotaRetiro notaRetiro = new NotaRetiro(NotaRetiro.TipoUsoRetiro.VENTA, new HashSet<>());
+                        notaRetiro.agregarDetalle(detalle);
 
                         // Cliente aleatorio o consumidor final (null)
                         // Aproximadamente 50% de ventas con cliente y 50% consumidor final

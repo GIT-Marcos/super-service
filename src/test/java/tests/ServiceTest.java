@@ -197,15 +197,15 @@ public class ServiceTest {
                     orden.agregarTrabajos(trabajos);
 
                     // 9. AGREGAR REPUESTOS
-                    NotaRetiro notaRetiro = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.SERVICE, new ArrayList<>());
+                    NotaRetiro notaRetiro = new NotaRetiro(NotaRetiro.TipoUsoRetiro.SERVICE, new HashSet<>());
 
                     if (!repuestos.isEmpty() && random.nextDouble() > 0.4) {
                         int cantRepuestos = random.nextInt(2) + 1;
-                        List<DetalleRetiro> detalles = new ArrayList<>();
+                        Set<DetalleRetiro> detalles = new HashSet<>();
 
                         for (int k = 0; k < cantRepuestos; k++) {
                             Repuesto rep = repuestos.get(random.nextInt(repuestos.size()));
-                            detalles.add(new DetalleRetiro(null, (double) (random.nextInt(2) + 1), rep));
+                            detalles.add(new DetalleRetiro((double) (random.nextInt(2) + 1), rep));
                         }
                         notaRetiro.agregarDetalle(detalles);
                     }

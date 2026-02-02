@@ -266,7 +266,7 @@ public class NotasRetiroController implements Initializable {
                     new FileChooser.ExtensionFilter("Archivos de texto (*.txt)", "*.txt"));
         }
         if (file == null) return;
-        GeneradorTXT.generaNotaRetiro(result.get().getDetallesRetiroList(), file);
+        GeneradorTXT.generaNotaRetiro(result.get().getDetallesRetiro().stream().toList(), file);
 
         if (SimpleDialogs.confirmacion("Imprimir ticket", "¿Desea imprimir el ticket generado?"))
             Impresor.imprimirConSistema(file);

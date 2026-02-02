@@ -35,7 +35,7 @@ import java.util.*;
 public class CargarVentaController implements Initializable {
 
     private final Navigator navigator;
-    private List<DetalleRetiro> detallesCargados = new ArrayList<>();
+    private Set<DetalleRetiro> detallesCargados = new HashSet<>();
     private ObservableList<ItemDetalleViewModel> items = FXCollections.observableArrayList();
     private Cliente cliente;
 
@@ -113,7 +113,7 @@ public class CargarVentaController implements Initializable {
             guardarNota(event);
         }
 
-        NotaRetiro nota = new NotaRetiro(null, NotaRetiro.TipoUsoRetiro.VENTA, detallesCargados);
+        NotaRetiro nota = new NotaRetiro(NotaRetiro.TipoUsoRetiro.VENTA, this.detallesCargados);
         VentaRepuesto venta = new VentaRepuesto(nota);
         venta.asociarCliente(this.cliente);
         Optional<VentaRepuesto> result = navigator.openModal(Views.PAGO, "Pagar", venta);
@@ -134,7 +134,7 @@ public class CargarVentaController implements Initializable {
                     new FileChooser.ExtensionFilter("Archivos de texto (*.txt)", "*.txt"));
         }
         if (file == null) return;
-        GeneradorTXT.generaNotaRetiro(detallesCargados, file);
+        GeneradorTXT.generaNotaRetiro(detallesCargados.stream().toList(), file);
 
         if (chkImprimir.isSelected())
             Impresor.imprimirConSistema(file);

@@ -78,8 +78,8 @@ public class VentaRepuesto implements Serializable, Transaccion {
     @Override
     public void recalcularMontos() {
         // calcular total
-        if (this.notaRetiro != null && this.notaRetiro.getDetallesRetiroList() != null) {
-            this.montoTotal = this.notaRetiro.getDetallesRetiroList().stream()
+        if (this.notaRetiro != null && this.notaRetiro.getDetallesRetiro() != null) {
+            this.montoTotal = this.notaRetiro.getDetallesRetiro().stream()
                     .map(DetalleRetiro::getSubTotal)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             this.montoFaltante = this.montoTotal;

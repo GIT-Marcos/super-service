@@ -17,7 +17,6 @@ import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -121,7 +120,7 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
         venta.recalcularMontos();
 
         //quita cantidades stocks
-        for (DetalleRetiro d : venta.getNotaRetiro().getDetallesRetiroList()) {
+        for (DetalleRetiro d : venta.getNotaRetiro().getDetallesRetiro()) {
             d.getRepuesto().getStock().salidaDeStock(d.getCantidadRetirada());
         }
         daoStock.update(obtenerStocksDeVenta(venta));
@@ -163,7 +162,7 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
 
     private List<Stock> obtenerStocksDeVenta(VentaRepuesto v) {
         List<Stock> stocks = new ArrayList<>();
-        for (DetalleRetiro d : v.getNotaRetiro().getDetallesRetiroList()) {
+        for (DetalleRetiro d : v.getNotaRetiro().getDetallesRetiro()) {
             stocks.add(d.getRepuesto().getStock());
         }
         return stocks;
