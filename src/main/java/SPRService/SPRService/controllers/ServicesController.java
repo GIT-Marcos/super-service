@@ -26,16 +26,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
-import javafx.util.Duration;
 import org.controlsfx.control.CheckComboBox;
-import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.net.URL;
@@ -50,7 +47,7 @@ public class ServicesController implements Initializable {
     private ObservableList<ServiceRowViewModel> obsListServiceVM = FXCollections.observableArrayList();
 
     @FXML
-    private TextField tfCodigo;
+    private TextField tfCodigo, tfDniCliente;
     @FXML
     private CheckComboBox<PrioridadService> ccbPrioridades;
     @FXML
@@ -63,7 +60,7 @@ public class ServicesController implements Initializable {
     private TableColumn<Long, Long> colCodigo;
     @FXML
     private TableColumn<String, String> colFechaCarga, colFechaEntrega, colEstado, colPrioridad, colMontoFaltante,
-            colMontoTotal;
+            colMontoTotal, colCliente;
 
     @Inject
     public ServicesController(AppCoordinator coordinator, ServiceServ serviceServ) {
@@ -91,6 +88,7 @@ public class ServicesController implements Initializable {
 
         FiltroServiceDTO filtros = new FiltroServiceDTO(
                 ManejadorInputs.codigoVenta(tfCodigo.getText().strip(), false),
+                tfDniCliente.getText(),
                 dpMinimaCarga.getValue(), dpMaximaCarga.getValue(),
                 dpMinimaRetiro.getValue(), dpMaximaRetiro.getValue(),
                 ccbEstados.getCheckModel().getCheckedItems(), ccbPrioridades.getCheckModel().getCheckedItems());
@@ -303,5 +301,6 @@ public class ServicesController implements Initializable {
         colPrioridad.setCellValueFactory(new PropertyValueFactory<>("prioridad"));
         colMontoFaltante.setCellValueFactory(new PropertyValueFactory<>("montoFaltante"));
         colMontoTotal.setCellValueFactory(new PropertyValueFactory<>("montoTotal"));
+        colCliente.setCellValueFactory(new PropertyValueFactory<>("dniCliente"));
     }
 }

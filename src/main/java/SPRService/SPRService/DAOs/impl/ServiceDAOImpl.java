@@ -5,6 +5,7 @@ import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
+import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.entities.Orden;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.enums.EstadoService;
@@ -94,7 +95,7 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
                                 "left join fetch v.modeloVehiculo mo " +
                                 "left join fetch mo.marcaVehiculo " +
                                 "where s.id = :id",
-                Service.class)
+                        Service.class)
                 .setParameter("id", id)
                 .getResultStream().findFirst();
     }
@@ -106,12 +107,19 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
 
         CriteriaQuery<Service> query = cb.createQuery(Service.class);
         Root<Service> root = query.from(Service.class);
+
+        root.fetch("cliente", JoinType.LEFT);
+        Join<Service, Cliente> joinCliente = root.join("cliente", JoinType.LEFT);
+
         query.distinct(true);
 
         List<Predicate> predicates = new ArrayList<>();
 
         if (filtros.codigo() != null && filtros.codigo() != 0)
             predicates.add(cb.equal(root.get("id"), filtros.codigo()));
+
+        if (filtros.dniCliente() != null && !filtros.dniCliente().isBlank())
+            predicates.add(cb.like(cb.lower(joinCliente.get("dni")), "%" + filtros.dniCliente().toLowerCase() + "%"));
 
         if (filtros.fchMinCarga() != null && filtros.fchMaxCarga() != null) {
             predicates.add(cb.between(root.get("fechaCarga"), filtros.fchMinCarga(), filtros.fchMaxCarga()));
