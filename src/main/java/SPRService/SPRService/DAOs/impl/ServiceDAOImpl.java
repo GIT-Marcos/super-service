@@ -10,9 +10,11 @@ import SPRService.SPRService.entities.Orden;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.EstadoVentaRepuesto;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
 import java.math.BigDecimal;
@@ -30,7 +32,6 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
     public ServiceDAOImpl() {
         super(Service.class);
     }
-
 
     @Override
     public List<Service> verTodos() {
@@ -103,8 +104,48 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
     @Override
     public List<Service> buscarConFiltros(FiltroServiceDTO filtros) {
         EntityManager em = emProvider.get();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+        return crearQueryBusqueda(em, filtros).getResultList();
+    }
 
+    @Override
+    public ResultadoPaginado<Service> buscarPaginado(FiltroServiceDTO filtros) {
+        EntityManager em = emProvider.get();
+
+        // 1. Obtener el conteo total
+        Long total = contarServices(em, filtros);
+
+        // 2. Obtener los resultados paginados
+        TypedQuery<Service> query = crearQueryBusqueda(em, filtros);
+
+        if (filtros.offset() != null && filtros.limit() != null) {
+            query.setFirstResult(filtros.offset());
+            query.setMaxResults(filtros.limit());
+        }
+
+        List<Service> resultados = query.getResultList();
+        return new ResultadoPaginado<>(resultados, total);
+    }
+
+    /**
+     * Cuenta el total de services que coinciden con el filtro
+     */
+    private Long contarServices(EntityManager em, FiltroServiceDTO filtros) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Service> root = countQuery.from(Service.class);
+
+        Join<Service, Cliente> joinCliente = root.join("cliente", JoinType.LEFT);
+        List<Predicate> predicates = construirPredicados(cb, root, joinCliente, filtros);
+        countQuery.select(cb.count(root));
+        countQuery.where(cb.and(predicates.toArray(new Predicate[0])));
+        return em.createQuery(countQuery).getSingleResult();
+    }
+
+    /**
+     * Crea la query de búsqueda con todos los filtros
+     */
+    private TypedQuery<Service> crearQueryBusqueda(EntityManager em, FiltroServiceDTO filtros) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Service> query = cb.createQuery(Service.class);
         Root<Service> root = query.from(Service.class);
 
@@ -112,14 +153,28 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
         Join<Service, Cliente> joinCliente = root.join("cliente", JoinType.LEFT);
 
         query.distinct(true);
+        List<Predicate> predicates = construirPredicados(cb, root, joinCliente, filtros);
+        query.where(cb.and(predicates.toArray(new Predicate[0])));
+        query.orderBy(cb.desc(root.get("fechaEntrega")));
+        return em.createQuery(query);
+    }
 
+    /**
+     * Construye los predicados (condiciones WHERE) basándose en el filtro
+     */
+    private List<Predicate> construirPredicados(CriteriaBuilder cb, Root<Service> root,
+                                                Join<Service, Cliente> joinCliente,
+                                                FiltroServiceDTO filtros) {
         List<Predicate> predicates = new ArrayList<>();
 
-        if (filtros.codigo() != null && filtros.codigo() != 0)
+        if (filtros.codigo() != null && filtros.codigo() != 0) {
             predicates.add(cb.equal(root.get("id"), filtros.codigo()));
+        }
 
-        if (filtros.dniCliente() != null && !filtros.dniCliente().isBlank())
-            predicates.add(cb.like(cb.lower(joinCliente.get("dni")), "%" + filtros.dniCliente().toLowerCase() + "%"));
+        if (filtros.dniCliente() != null && !filtros.dniCliente().isBlank()) {
+            predicates.add(cb.like(cb.lower(joinCliente.get("dni")),
+                    "%" + filtros.dniCliente().toLowerCase() + "%"));
+        }
 
         if (filtros.fchMinCarga() != null && filtros.fchMaxCarga() != null) {
             predicates.add(cb.between(root.get("fechaCarga"), filtros.fchMinCarga(), filtros.fchMaxCarga()));
@@ -145,8 +200,7 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
             predicates.add(root.get("estadoService").in(filtros.estados()));
         }
 
-        query.where(cb.and(predicates.toArray(predicates.toArray(new Predicate[0]))));
-        return em.createQuery(query).getResultList();
+        return predicates;
     }
 
     @Override
@@ -210,7 +264,6 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
     public ReporteComparacionDTO generarComparacion(LocalDate fechaMin, LocalDate fechaMax) {
         EntityManager em = emProvider.get();
 
-        // ===== QUERY SERVICE PAGADOS =====
         Object[] serviceData = em.createQuery(
                         "SELECT COALESCE(SUM(s.montoTotal), 0), " +
                                 "       COUNT(s) " +
@@ -226,7 +279,6 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
         BigDecimal ingService = (BigDecimal) serviceData[0];
         Long cantService = (Long) serviceData[1];
 
-        // ===== QUERY VENTAS PAGADAS =====
         Object[] ventaData = em.createQuery(
                         "SELECT COALESCE(SUM(v.montoTotal), 0), " +
                                 "       COUNT(v) " +
@@ -241,14 +293,6 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
 
         BigDecimal ingVenta = (BigDecimal) ventaData[0];
         Long cantVenta = (Long) ventaData[1];
-
-        // ===== CONSTRUCCIÓN DEL DTO =====
-        return new ReporteComparacionDTO(
-                ingService,
-                ingVenta,
-                cantService,
-                cantVenta
-        );
+        return new ReporteComparacionDTO(ingService, ingVenta, cantService, cantVenta);
     }
-
 }

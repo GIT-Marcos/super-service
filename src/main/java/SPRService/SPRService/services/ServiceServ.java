@@ -7,6 +7,7 @@ import SPRService.SPRService.DTOs.ReporteIngresosEnAnioPorMesDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.entities.Usuario;
+import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,8 @@ public interface ServiceServ {
     List<Service> verTodos();
 
     List<Service> buscarConFiltros(FiltroServiceDTO filtros);
+
+    ResultadoPaginado<Service> buscarPaginado(FiltroServiceDTO filtros, int pagina, int itemsPorPagina);
 
     Optional<Service> datosParaModificar(Long id);
 

@@ -12,6 +12,7 @@ import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
+import SPRService.SPRService.util.ResultadoPaginado;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
@@ -26,25 +27,25 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.CheckComboBox;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ServicesController implements Initializable {
 
+    private static final int ITEMS_POR_PAGINA = 30;
     private final Navigator navigator;
     private final ServiceServ serviceServ;
-    private ObservableList<ServiceRowViewModel> obsListServiceVM = FXCollections.observableArrayList();
+    private final ObservableList<ServiceRowViewModel> obsListServiceVM = FXCollections.observableArrayList();
+    private int paginaActual = 0;
+    private int totalPaginas = 1;
 
     @FXML
     private TextField tfCodigo, tfDniCliente;
@@ -59,8 +60,10 @@ public class ServicesController implements Initializable {
     @FXML
     private TableColumn<Long, Long> colCodigo;
     @FXML
-    private TableColumn<String, String> colFechaCarga, colFechaEntrega, colEstado, colPrioridad, colMontoFaltante,
-            colMontoTotal, colCliente;
+    private TableColumn<ServiceRowViewModel, String> colFechaCarga, colFechaEntrega, colEstado, colPrioridad,
+            colMontoFaltante, colMontoTotal, colCliente;
+    @FXML
+    private Pagination paginacion;
 
     @Inject
     public ServicesController(AppCoordinator coordinator, ServiceServ serviceServ) {
@@ -71,51 +74,138 @@ public class ServicesController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configurarControles();
+        configurarPaginacion();
+        tablaServices.setItems(obsListServiceVM);
 
-        cargarTabla(serviceServ.verTodos());
+        // Cargar primera página
+        cargarPagina(0);
     }
+
+    // ==================== PAGINACIÓN ====================
+
+    private void configurarPaginacion() {
+        paginacion.setPageCount(1);
+        paginacion.setCurrentPageIndex(0);
+        paginacion.setMaxPageIndicatorCount(10);
+
+        // Listener para cambios de página
+        paginacion.currentPageIndexProperty().addListener((obs, oldPage, newPage) -> {
+            if (newPage != null && !newPage.equals(oldPage)) {
+                cargarPagina(newPage.intValue());
+            }
+        });
+    }
+
+    /**
+     * Carga una página específica de resultados
+     */
+    private void cargarPagina(int numeroPagina) {
+        // Validar que haya al menos un estado y una prioridad seleccionados
+        if (ccbPrioridades.getCheckModel().getCheckedItems().isEmpty() ||
+                ccbEstados.getCheckModel().getCheckedItems().isEmpty()) {
+            obsListServiceVM.clear();
+            paginacion.setPageCount(1);
+            return;
+        }
+
+        FiltroServiceDTO filtros = construirFiltro();
+
+        ResultadoPaginado<Service> resultado = serviceServ.buscarPaginado(
+                filtros, numeroPagina, ITEMS_POR_PAGINA);
+
+        // Actualizar datos de paginación
+        int paginas = (int) Math.ceil((double) resultado.getCantidadResultados() / ITEMS_POR_PAGINA);
+        totalPaginas = Math.max(1, paginas);
+        paginaActual = numeroPagina;
+
+        // Actualizar el control de paginación
+        paginacion.setPageCount(totalPaginas);
+
+        // Actualizar la tabla
+        obsListServiceVM.clear();
+        for (Service s : resultado.getLista()) {
+            obsListServiceVM.add(new ServiceRowViewModel(s));
+        }
+    }
+
+    /**
+     * Construye el DTO de filtro basándose en los valores actuales de la UI
+     */
+    private FiltroServiceDTO construirFiltro() {
+        return new FiltroServiceDTO(
+                ManejadorInputs.codigoVenta(tfCodigo.getText().strip(), false),
+                tfDniCliente.getText(),
+                dpMinimaCarga.getValue(),
+                dpMaximaCarga.getValue(),
+                dpMinimaRetiro.getValue(),
+                dpMaximaRetiro.getValue(),
+                ccbEstados.getCheckModel().getCheckedItems(),
+                ccbPrioridades.getCheckModel().getCheckedItems()
+        );
+    }
+
+    /**
+     * Recarga la página actual
+     */
+    private void recargarPaginaActual() {
+        cargarPagina(paginaActual);
+    }
+
+    // ==================== ACCIONES ====================
 
     @FXML
     private void verTodos() {
-        cargarTabla(serviceServ.verTodos());
+        tfCodigo.clear();
+        tfDniCliente.clear();
+        dpMinimaCarga.setValue(null);
+        dpMaximaCarga.setValue(null);
+        dpMinimaRetiro.setValue(null);
+        dpMaximaRetiro.setValue(null);
+        ccbEstados.getCheckModel().checkAll();
+        ccbPrioridades.getCheckModel().checkAll();
+
+        paginacion.setCurrentPageIndex(0);
+        cargarPagina(0);
     }
 
     @FXML
     private void buscarConFiltros() {
-        if (ccbPrioridades.getCheckModel().getItemCount() == 0 &&
-                ccbPrioridades.getCheckModel().getItemCount() == 0)
+        if (ccbPrioridades.getCheckModel().getCheckedItems().isEmpty() ||
+                ccbEstados.getCheckModel().getCheckedItems().isEmpty()) {
+            NotificationHelper.mostrarAdvertencia("Buscar",
+                    "Debe seleccionar al menos un estado y una prioridad.");
             return;
+        }
 
-        FiltroServiceDTO filtros = new FiltroServiceDTO(
-                ManejadorInputs.codigoVenta(tfCodigo.getText().strip(), false),
-                tfDniCliente.getText(),
-                dpMinimaCarga.getValue(), dpMaximaCarga.getValue(),
-                dpMinimaRetiro.getValue(), dpMaximaRetiro.getValue(),
-                ccbEstados.getCheckModel().getCheckedItems(), ccbPrioridades.getCheckModel().getCheckedItems());
-        cargarTabla(serviceServ.buscarConFiltros(filtros));
+        paginacion.setCurrentPageIndex(0);
+        cargarPagina(0);
     }
 
     @FXML
     private void nuevoService() {
         Optional<Service> result = navigator.openModal(Views.CARGAR_SERVICE, "Nuevo service", null);
-        result.ifPresent(service -> obsListServiceVM.addFirst(new ServiceRowViewModel(service)));
+        if (result.isPresent()) {
+            paginacion.setCurrentPageIndex(0);
+            cargarPagina(0);
+        }
     }
 
     @FXML
     private void modificarService() {
         ServiceRowViewModel dto = tablaServices.getSelectionModel().getSelectedItem();
         if (dto == null) {
-            NotificationHelper.mostrarAdvertencia("Detalles de service", "Debes seleccionar un service se la tabla para " +
-                    "ver sus detalles.");
+            NotificationHelper.mostrarAdvertencia("Detalles de service",
+                    "Debes seleccionar un service de la tabla para ver sus detalles.");
             return;
         }
 
         serviceServ.datosParaModificar(dto.getCodigo())
                 .ifPresent(s -> {
-                    Optional<Service> mod = navigator.openModal(Views.MODIFICAR_SERVICE, "Detalles del service", s);
-                    // todo: que refresque la página
-
-//                    mod.ifPresent(dto::updateFromService);
+                    Optional<Service> mod = navigator.openModal(Views.MODIFICAR_SERVICE,
+                            "Detalles del service", s);
+                    if (mod.isPresent()) {
+                        recargarPaginaActual();
+                    }
                 });
     }
 
@@ -123,58 +213,53 @@ public class ServicesController implements Initializable {
     private void agregarPago() {
         ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            NotificationHelper.mostrarAdvertencia("Agregar pago", "Debe seleccionar un service para agregarle el pago.");
+            NotificationHelper.mostrarAdvertencia("Agregar pago",
+                    "Debe seleccionar un service para agregarle el pago.");
             return;
         }
         if (vm.getService().getEstadoService() == EstadoService.CANCELADO ||
                 vm.getService().getEstadoService() == EstadoService.PAGADO) {
-            NotificationHelper.mostrarAdvertencia("Agregar pago", "No se pueden agregar pagos a las ventas que están canceladas" +
-                    " o pagadas");
+            NotificationHelper.mostrarAdvertencia("Agregar pago",
+                    "No se pueden agregar pagos a los services que están cancelados o pagados.");
             return;
         }
 
         serviceServ.datosPagos(vm.getCodigo()).ifPresent(s -> {
             Optional<Service> conPago = navigator.openModal(Views.PAGO, "Agregar pago", s);
-            // todo: que refresque la página
-//            conPago.ifPresent(vm::updateFromService);
+            if (conPago.isPresent()) {
+                recargarPaginaActual();
+            }
         });
-
-
-//        Optional<Service> result = navigator.openModal(Views.PAGO, "Agregar pago", vm.getService());
-//        result.ifPresent(service -> obsListServiceVM.set(obsListServiceVM.indexOf(vm), new ServiceRowViewModel(service)));
     }
 
     @FXML
     private void verPagos() {
         ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            NotificationHelper.mostrarAdvertencia("Agregar pago", "Debe seleccionar un service para ver sus pagos.");
+            NotificationHelper.mostrarAdvertencia("Ver pagos",
+                    "Debe seleccionar un service para ver sus pagos.");
             return;
         }
 
         serviceServ.datosPagos(vm.getCodigo()).ifPresent(s -> {
-            Optional<Service> conPago = navigator.openModal(Views.VER_PAGOS, "Agregar pago", s);
-            // todo: que refresque la página
-
-//            conPago.ifPresent(vm::updateFromService);
+            Optional<Service> conPago = navigator.openModal(Views.VER_PAGOS, "Ver pagos", s);
+            if (conPago.isPresent()) {
+                recargarPaginaActual();
+            }
         });
-
-//        Optional<ServiceRowViewModel> result = navigator.openModal(Views.VER_PAGOS, "Ver pagos", vm);
-//        if (result.isPresent()) {
-//            obsListServiceVM.set(obsListServiceVM.indexOf(vm), result.get());
-//            tablaServices.getSelectionModel().select(result.get());
-//        }
     }
 
     @FXML
     private void generarFactura(ActionEvent event) {
         ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            NotificationHelper.mostrarAdvertencia("Factura service", "Debe seleccionar un service para imprimir su factura.");
+            NotificationHelper.mostrarAdvertencia("Factura service",
+                    "Debe seleccionar un service para imprimir su factura.");
             return;
         }
         if (vm.getService().getEstadoService() == EstadoService.CANCELADO) {
-            NotificationHelper.mostrarAdvertencia("Factura service", "No es posible generar facturas de services cancelados.");
+            NotificationHelper.mostrarAdvertencia("Factura service",
+                    "No es posible generar facturas de services cancelados.");
             return;
         }
 
@@ -184,9 +269,7 @@ public class ServicesController implements Initializable {
         if (file == null) return;
 
         serviceServ.datosParaModificar(vm.getCodigo())
-                .ifPresent(s -> {
-                    GeneradorFacturasPDF.generaPDFService(new FacturaServiceDTO(s), file);
-                });
+                .ifPresent(s -> GeneradorFacturasPDF.generaPDFService(new FacturaServiceDTO(s), file));
     }
 
     @FXML
@@ -199,8 +282,8 @@ public class ServicesController implements Initializable {
         }
         if (vm.getService().getEstadoService() == EstadoService.CANCELADO ||
                 vm.getService().getEstadoService() == EstadoService.PAGADO) {
-            NotificationHelper.mostrarAdvertencia("generar ticket",
-                    "No es posible generar el ticket de una factura en estado 'Pagado' o 'Cancelado'.");
+            NotificationHelper.mostrarAdvertencia("Generar ticket",
+                    "No es posible generar el ticket de un service en estado 'Pagado' o 'Cancelado'.");
             return;
         }
 
@@ -219,33 +302,36 @@ public class ServicesController implements Initializable {
 
     @FXML
     private void darDeBaja() {
-        SPRService.SPRService.viewModels.tablas.ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
+        ServiceRowViewModel vm = tablaServices.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            NotificationHelper.mostrarAdvertencia("Cancelar service", "Debe seleccionar un service para cancelarlo.");
+            NotificationHelper.mostrarAdvertencia("Cancelar service",
+                    "Debe seleccionar un service para cancelarlo.");
             return;
         }
 
         if (vm.getService().getEstadoService() == EstadoService.PAGADO ||
                 vm.getService().getEstadoService() == EstadoService.CANCELADO) {
-            NotificationHelper.mostrarAdvertencia("Cancelar service", "No es posible cancelar services en estado 'Pagado' o " +
-                    "'Cancelado'.");
+            NotificationHelper.mostrarAdvertencia("Cancelar service",
+                    "No es posible cancelar services en estado 'Pagado' o 'Cancelado'.");
             return;
         }
 
         Usuario usuarioCancelador = SessionManager.getUsuarioSesion();
         if (usuarioCancelador == null) {
-            NotificationHelper.mostrarError("Cancelación de venta", "No hay usuario en la sesión activa.");
+            NotificationHelper.mostrarError("Cancelación de service",
+                    "No hay usuario en la sesión activa.");
             return;
         }
 
-        if (!SimpleDialogs.confirmacion("Cancelar service", "¿Está seguro de que desea cancelar el service?"))
+        if (!SimpleDialogs.confirmacion("Cancelar service",
+                "¿Está seguro de que desea cancelar el service?"))
             return;
 
         String motivo = SimpleDialogs.motivoBorrado();
         if (motivo == null) return;
 
-        boolean confirmacion2 = SimpleDialogs.confirmacion("Cancelar service", "Esta acción es " +
-                "irreversible.\n ¿Confirmar el borrado de service?");
+        boolean confirmacion2 = SimpleDialogs.confirmacion("Cancelar service",
+                "Esta acción es irreversible.\n¿Confirmar la cancelación del service?");
         if (!confirmacion2) return;
 
         Boolean restablecerStock = SimpleDialogs.confirmacionRestablecerStocks();
@@ -253,7 +339,7 @@ public class ServicesController implements Initializable {
 
         try {
             serviceServ.cancelarService(vm.getCodigo(), restablecerStock, motivo, usuarioCancelador);
-            // todo refrescar página
+            recargarPaginaActual();
             NotificationHelper.mostrarExito("Cancelar service", "Se ha cancelado el service con éxito.");
         } catch (RuntimeException e) {
             NotificationHelper.mostrarError("Cancelar service", e.getMessage());
@@ -271,16 +357,10 @@ public class ServicesController implements Initializable {
         navigator.openModal(Views.CHART_COMPARACION_INGRESOS, "Comparación de ingresos", null);
     }
 
-    private void cargarTabla(List<Service> services) {
-        obsListServiceVM.clear();
-        for (Service s : services) {
-            obsListServiceVM.add(new ServiceRowViewModel(s));
-        }
-    }
+    // ==================== CONFIGURACIÓN ====================
 
     private void configurarControles() {
         configColumnas();
-        tablaServices.setItems(obsListServiceVM);
 
         dpMinimaCarga.setConverter(new SafeLocalDateConverter());
         dpMaximaCarga.setConverter(new SafeLocalDateConverter());
@@ -291,6 +371,72 @@ public class ServicesController implements Initializable {
         ccbEstados.getCheckModel().checkAll();
         ccbPrioridades.getItems().setAll(PrioridadService.values());
         ccbPrioridades.getCheckModel().checkAll();
+
+        colFechaEntrega.setCellFactory(column -> new TableCell<ServiceRowViewModel, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(null);
+                setStyle("");
+                if (empty || item == null) {
+                    return;
+                }
+
+                setText(item);
+                ServiceRowViewModel vm = getTableView().getItems().get(getIndex());
+
+                if (vm.getService().getFechaEntrega().isBefore(LocalDateTime.now())
+                        && vm.getService().getEstadoService() != EstadoService.PAGADO
+                        && vm.getService().getEstadoService() != EstadoService.CANCELADO
+                        && vm.getService().getEstadoService() != EstadoService.PAGO_PENDIENTE
+                        && vm.getService().getEstadoService() != EstadoService.FINALIZADO) {
+
+                    setStyle("-fx-text-fill: #952122; -fx-font-weight: bold;");
+                }
+            }
+        });
+
+        colEstado.setCellFactory(column -> new TableCell<ServiceRowViewModel, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(null);
+                setStyle("");
+                if (empty || item == null) {
+                    return;
+                }
+                setText(item);
+                ServiceRowViewModel vm = getTableView().getItems().get(getIndex());
+                if (vm.getService().getEstadoService().equals(EstadoService.CANCELADO)) {
+                    setStyle("-fx-text-fill: #952122; -fx-font-weight: bold;");
+                } else if (vm.getService().getEstadoService().equals(EstadoService.PAGADO)) {
+                    setStyle("-fx-text-fill: #366140; -fx-font-weight: bold;");
+                }
+            }
+        });
+
+        colPrioridad.setCellFactory(column -> new TableCell<ServiceRowViewModel, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(null);
+                setStyle("");
+                if (empty || item == null) {
+                    return;
+                }
+
+                setText(item);
+                ServiceRowViewModel vm = getTableView().getItems().get(getIndex());
+                switch (vm.getService().getPrioridad()) {
+                    case MUY_ALTA -> setStyle("-fx-text-fill: #912121; -fx-font-weight: bold;");
+                    case ALTA -> setStyle("-fx-text-fill: #b6aa21; -fx-font-weight: bold;");
+                    case MEDIA -> setStyle("-fx-text-fill: #0b0b0b; -fx-font-weight: bold;");
+                    case BAJA -> setStyle("-fx-text-fill: #1e9a74; -fx-font-weight: bold;");
+                    case MUY_BAJA -> setStyle("-fx-text-fill: #236b9e; -fx-font-weight: bold;");
+                }
+            }
+        });
+
     }
 
     private void configColumnas() {

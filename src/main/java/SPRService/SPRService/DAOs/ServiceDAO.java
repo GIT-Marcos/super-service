@@ -5,6 +5,7 @@ import SPRService.SPRService.DTOs.ReporteComparacionDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroServiceDTO;
 import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.Service;
+import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,6 +34,8 @@ public interface ServiceDAO extends GenericDAO<Service, Long> {
     Optional<Service> traerDatosParaTicket(Long id);
 
     List<Service> buscarConFiltros(FiltroServiceDTO filtros);
+
+    ResultadoPaginado<Service> buscarPaginado(FiltroServiceDTO filtros);
 
     //--- ESCRITURA ---
 

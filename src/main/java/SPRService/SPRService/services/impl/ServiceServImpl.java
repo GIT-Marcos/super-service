@@ -11,6 +11,7 @@ import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.services.NotaRetiroServ;
 import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.services.StockServ;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 
@@ -62,6 +63,26 @@ public class ServiceServImpl implements ServiceServ {
 
     @Transactional
     @Override
+    public ResultadoPaginado<Service> buscarPaginado(FiltroServiceDTO filtros, int pagina, int itemsPorPagina) {
+        int offset = pagina * itemsPorPagina;
+        // Crear nuevo filtro con paginación
+        FiltroServiceDTO filtroPaginado = new FiltroServiceDTO(
+                filtros.codigo(),
+                filtros.dniCliente(),
+                filtros.fchMinCarga(),
+                filtros.fchMaxCarga(),
+                filtros.fchMinRetiro(),
+                filtros.fchMaxRetiro(),
+                filtros.estados(),
+                filtros.prioridadServices(),
+                offset,
+                itemsPorPagina
+        );
+        return daoService.buscarPaginado(filtroPaginado);
+    }
+
+    @Transactional
+    @Override
     public Optional<Service> datosParaModificar(Long id) {
         return daoService.traerDatosParaModificar(id);
     }
@@ -101,7 +122,6 @@ public class ServiceServImpl implements ServiceServ {
         daoService.traerDatosParaModificar(id)
                 .ifPresent(managedService -> {
                     managedService.setEstadoService(EstadoService.CANCELADO);
-
                     managedService.getPagos().forEach(Pago::cancelarPago);
 
                     if (restablecerStocks) {
