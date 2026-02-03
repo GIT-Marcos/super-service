@@ -16,6 +16,7 @@ public class VentaRepuestoVMtabla {
     private final StringProperty estadoVenta;
     private final StringProperty fechaVenta;
     private final ObjectProperty<BigDecimal> montoVenta;
+    private final ObjectProperty<BigDecimal> montoFaltante;
     private final StringProperty clienteDNI;
 
     public VentaRepuestoVMtabla(VentaRepuesto v) {
@@ -24,6 +25,7 @@ public class VentaRepuestoVMtabla {
         this.estadoVenta = new SimpleStringProperty(v.getEstadoVenta().toString());
         this.fechaVenta = new SimpleStringProperty(v.getFechaVenta().format(DATE_FORMATTER));
         this.montoVenta = new SimpleObjectProperty<>(v.getMontoTotal());
+        this.montoFaltante = new SimpleObjectProperty<>(v.getMontoFaltante());
         this.clienteDNI = new SimpleStringProperty((v.getCliente() != null) ? v.getCliente().getDni() :
                 "Consumidor final");
     }
@@ -62,6 +64,14 @@ public class VentaRepuestoVMtabla {
 
     public ObjectProperty<BigDecimal> montoVentaProperty() {
         return montoVenta;
+    }
+
+    public BigDecimal getMontoFaltante() {
+        return montoFaltante.get();
+    }
+
+    public ObjectProperty<BigDecimal> montoFaltanteProperty() {
+        return montoFaltante;
     }
 
     public String getClienteDNI() {
