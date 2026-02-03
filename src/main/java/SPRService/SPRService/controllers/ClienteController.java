@@ -5,6 +5,7 @@ import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ClienteServ;
+import SPRService.SPRService.util.ResultadoPaginado;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.tablas.ClienteViewModelTabla;
@@ -13,21 +14,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ClienteController implements Initializable {
 
+    private static final int ITEMS_POR_PAGINA = 30;
     private final ClienteServ clienteServ;
     private final Navigator navigator;
-    private ObservableList<ClienteViewModelTabla> obsListClientes = FXCollections.observableArrayList();
+    private final ObservableList<ClienteViewModelTabla> obsListClientes = FXCollections.observableArrayList();
+    private int paginaActual = 0;
+    private int totalPaginas = 1;
 
     @FXML
     private TextField tfDNI;
@@ -43,6 +44,8 @@ public class ClienteController implements Initializable {
     private TableColumn<ClienteViewModelTabla, String> colApellido;
     @FXML
     private TableColumn<ClienteViewModelTabla, String> colNombre;
+    @FXML
+    private Pagination paginacion;
 
     @Inject
     public ClienteController(ClienteServ clienteServ, AppCoordinator appCoordinator) {
@@ -52,40 +55,107 @@ public class ClienteController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        obsListClientes.setAll();
         configColumnas();
-        llenarFilas(clienteServ.verTodosActivos());
+        configurarPaginacion();
+        tablaClientes.setItems(obsListClientes);
+
+        // Cargar primera página
+        cargarPagina(0);
     }
+
+    // ==================== PAGINACIÓN ====================
+
+    private void configurarPaginacion() {
+        paginacion.setPageCount(1);
+        paginacion.setCurrentPageIndex(0);
+        paginacion.setMaxPageIndicatorCount(5);
+
+        // Listener para cambios de página
+        paginacion.currentPageIndexProperty().addListener((obs, oldPage, newPage) -> {
+            if (newPage != null && !newPage.equals(oldPage)) {
+                cargarPagina(newPage.intValue());
+            }
+        });
+    }
+
+    /**
+     * Carga una página específica de resultados
+     */
+    private void cargarPagina(int numeroPagina) {
+        String dni = tfDNI.getText() != null ? tfDNI.getText().strip() : "";
+        String apellido = tfApellido.getText() != null ? tfApellido.getText().strip() : "";
+        String nombre = tfNombre.getText() != null ? tfNombre.getText().strip() : "";
+
+        ResultadoPaginado<Cliente> resultado = clienteServ.buscarPaginado(
+                dni, apellido, nombre, numeroPagina, ITEMS_POR_PAGINA);
+
+        // Actualizar datos de paginación
+        int paginas = (int) Math.ceil((double) resultado.getCantidadResultados() / ITEMS_POR_PAGINA);
+        totalPaginas = Math.max(1, paginas);
+        paginaActual = numeroPagina;
+
+        // Actualizar el control de paginación
+        paginacion.setPageCount(totalPaginas);
+
+        // Actualizar la tabla
+        obsListClientes.clear();
+        for (Cliente c : resultado.getLista()) {
+            obsListClientes.add(new ClienteViewModelTabla(c));
+        }
+    }
+
+    /**
+     * Recarga la página actual
+     */
+    private void recargarPaginaActual() {
+        cargarPagina(paginaActual);
+    }
+
+    // ==================== ACCIONES ====================
 
     @FXML
     private void todosLosClientes() {
-        llenarFilas(clienteServ.verTodosActivos());
+        tfDNI.clear();
+        tfApellido.clear();
+        tfNombre.clear();
+
+        paginacion.setCurrentPageIndex(0);
+        cargarPagina(0);
     }
 
     @FXML
     private void buscarConFiltros() {
-        llenarFilas(clienteServ.filteredSearch(tfDNI.getText().strip(), tfApellido.getText().strip(),
-                tfNombre.getText().strip()));
+        paginacion.setCurrentPageIndex(0);
+        cargarPagina(0);
     }
 
     @FXML
     private void nuevoCliente() {
         Optional<Cliente> optional = navigator.openModal(Views.CARGAR_CLIENTE, "Cargar nuevo cliente", null);
-        optional.ifPresent(cliente -> obsListClientes.addFirst(new ClienteViewModelTabla(cliente)));
+
+        if (optional.isPresent()) {
+            // Ir a la primera página para ver el nuevo cliente
+            paginacion.setCurrentPageIndex(0);
+            cargarPagina(0);
+        }
     }
 
     @FXML
     private void modificar() {
         ClienteViewModelTabla cvmt = tablaClientes.getSelectionModel().getSelectedItem();
         if (cvmt == null) {
-            NotificationHelper.mostrarAdvertencia("Modificar cliente", "Debe seleccionar un cliente para modificarlo.");
+            NotificationHelper.mostrarAdvertencia("Modificar cliente",
+                    "Debe seleccionar un cliente para modificarlo.");
             return;
         }
 
         Optional<Cliente> result = clienteServ.verDatosContacto(cvmt.getClienteEntity().getId());
         result.ifPresent(c -> {
-            navigator.openModal(Views.CARGAR_CLIENTE, "Modificar cliente",
-                    c);
+            Optional<Cliente> editResult = navigator.openModal(Views.CARGAR_CLIENTE, "Modificar cliente", c);
+            // Recargar la página actual si hubo modificación
+            if (editResult.isPresent()) {
+                recargarPaginaActual();
+            }
         });
     }
 
@@ -97,37 +167,38 @@ public class ClienteController implements Initializable {
                     "Debe seleccionar un cliente para ver sus operaciones.");
             return;
         }
+
         Optional<Cliente> result = clienteServ.verOperacionesConVehiculos(vm.getClienteEntity().getId());
         result.ifPresent(c -> navigator.openModal(Views.OPERACIONES_CLIENTE, "Operaciones de cliente", c));
-
     }
 
     @FXML
     private void darDeBaja() {
         ClienteViewModelTabla cvmt = tablaClientes.getSelectionModel().getSelectedItem();
         if (cvmt == null) {
-            NotificationHelper.mostrarAdvertencia("Dar de baja cliente", "Debe seleccionar un cliente para darlo de baja.");
+            NotificationHelper.mostrarAdvertencia("Dar de baja cliente",
+                    "Debe seleccionar un cliente para darlo de baja.");
             return;
         }
-        if (!SimpleDialogs.confirmacion("Dar de baja cliente", "¿Confirmar baja de cliente?")) return;
+
+        if (!SimpleDialogs.confirmacion("Dar de baja cliente", "¿Confirmar baja de cliente?")) {
+            return;
+        }
 
         try {
             clienteServ.softDeleteClient(cvmt.getClienteEntity());
             NotificationHelper.mostrarExito("Dar de baja cliente", "Se ha dado de baja el cliente con éxito.");
-            obsListClientes.remove(cvmt);
+            // Recargar la página actual para reflejar el cambio
+            recargarPaginaActual();
         } catch (Exception e) {
             NotificationHelper.mostrarError("Dar de baja cliente", "Ha ocurrido un error inesperado.");
             throw new RuntimeException(e);
         }
     }
 
-    private void llenarFilas(List<Cliente> clienteList) {
-        obsListClientes.clear();
-        for (Cliente c : clienteList) obsListClientes.add(new ClienteViewModelTabla(c));
-    }
+    // ==================== CONFIGURACIÓN ====================
 
     private void configColumnas() {
-        tablaClientes.setItems(obsListClientes);
         colDNI.setCellValueFactory(new PropertyValueFactory<>("dni"));
         colApellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));

@@ -1,6 +1,8 @@
 package SPRService.SPRService.DAOs;
 
+import SPRService.SPRService.DTOs.filtros.FiltroClienteDTO;
 import SPRService.SPRService.entities.Cliente;
+import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,5 +31,7 @@ public interface ClienteDAO extends GenericDAO<Cliente, Long> {
      * Usada para filtrar según sus parámetros.
      */
     List<Cliente> filteredSearch(String dni, String lastName, String firstName);
+
+    ResultadoPaginado<Cliente> buscarPaginado(FiltroClienteDTO filtro);
 
 }
