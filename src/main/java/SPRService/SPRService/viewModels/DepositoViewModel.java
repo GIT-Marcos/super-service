@@ -1,6 +1,7 @@
 package SPRService.SPRService.viewModels;
 
 import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
+import SPRService.SPRService.util.ResultadoPaginado;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
 import SPRService.SPRService.entities.Repuesto;
@@ -19,19 +20,22 @@ import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DepositoViewModel {
 
-    // --- Dependencias (Inyectadas desde el Modelo y la Infraestructura) ---
+    // --- Dependencias ---
     private final RepuestoServ repuestoServ;
     private final StockServ stockServ;
     private final Navigator navigator;
 
-    // --- Propiedades de Estado para la Vista (Data Binding) ---
-    private final ListProperty<RepuestoRowViewModel> repuestosViewModels = new SimpleListProperty<>(FXCollections.observableArrayList());
+    // --- Constante de paginación ---
+    private static final int ITEMS_POR_PAGINA = 30;
+
+    // --- Propiedades de Estado para la Vista ---
+    private final ListProperty<RepuestoRowViewModel> repuestosViewModels =
+            new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<RepuestoRowViewModel> selectedRepuesto = new SimpleObjectProperty<>();
 
     // Filtros
@@ -42,18 +46,24 @@ public class DepositoViewModel {
     public final BooleanProperty mostrarBajo = new SimpleBooleanProperty(true);
 
     // Ordenamiento
-    public final ObservableList<String> ordenarPorOptions = FXCollections.observableArrayList("Detalle", "Marca", "Cod Barra", "Precio");
-    public final StringProperty selectedOrdenarPor = new SimpleStringProperty(ordenarPorOptions.get(0));
-    public final ObservableList<String> tipoOrdenOptions = FXCollections.observableArrayList("Ascendente", "Descendente");
-    public final StringProperty selectedTipoOrden = new SimpleStringProperty(tipoOrdenOptions.get(0));
+    public final ObservableList<String> ordenarPorOptions =
+            FXCollections.observableArrayList("Detalle", "Marca", "Cod Barra", "Precio");
+    public final StringProperty selectedOrdenarPor = new SimpleStringProperty(ordenarPorOptions.getFirst());
+    public final ObservableList<String> tipoOrdenOptions =
+            FXCollections.observableArrayList("Ascendente", "Descendente");
+    public final StringProperty selectedTipoOrden = new SimpleStringProperty(tipoOrdenOptions.getFirst());
 
     // Exportación
     public final ObservableList<String> formatosExportacion = FXCollections.observableArrayList("CSV", "XLSX");
-    public final StringProperty selectedFormatoExportacion = new SimpleStringProperty(formatosExportacion.get(0));
+    public final StringProperty selectedFormatoExportacion = new SimpleStringProperty(formatosExportacion.getFirst());
 
     // Otros estados
     private final BooleanProperty avisoStockBajoVisible = new SimpleBooleanProperty(false);
 
+    // ====== NUEVAS PROPIEDADES DE PAGINACIÓN ======
+    private final IntegerProperty paginaActual = new SimpleIntegerProperty(0);
+    private final IntegerProperty totalPaginas = new SimpleIntegerProperty(1);
+    private final LongProperty totalResultados = new SimpleLongProperty(0);
 
     @Inject
     public DepositoViewModel(RepuestoServ repuestoServ, StockServ stockServ, AppCoordinator appCoordinator) {
@@ -66,24 +76,58 @@ public class DepositoViewModel {
         cargarTodosRepuestos();
     }
 
-    // --- Acciones (Métodos públicos llamados por el Controller) ---
-
     public void cargarTodosRepuestos() {
         codigoFiltro.setValue("");
         nombreFiltro.setValue("");
         marcaFiltro.setValue("");
         mostrarNormal.setValue(true);
         mostrarBajo.setValue(true);
-        List<Repuesto> todos = repuestoServ.verTodos();
-        actualizarTabla(todos);
+        paginaActual.set(0);
+        cargarPagina(0);
     }
 
     public void buscarConFiltros() {
+        paginaActual.set(0);
+        cargarPagina(0);
+    }
+
+    /**
+     * Principal que carga una página específica.
+     * Es llamado por el Pagination cuando cambia de página.
+     */
+    public void cargarPagina(int numeroPagina) {
         if (!mostrarNormal.get() && !mostrarBajo.get()) {
             repuestosViewModels.clear();
+            totalPaginas.set(1);
+            totalResultados.set(0);
             return;
         }
 
+        FiltroRepuestoDTO filtro = construirFiltro();
+
+        ResultadoPaginado<Repuesto> resultado = repuestoServ.buscarRepuestosPaginado(
+                filtro, numeroPagina, ITEMS_POR_PAGINA);
+
+        // Actualizar datos de paginación
+        totalResultados.set(resultado.getCantidadResultados());
+        int paginas = (int) Math.ceil((double) resultado.getCantidadResultados() / ITEMS_POR_PAGINA);
+        totalPaginas.set(Math.max(1, paginas));
+        paginaActual.set(numeroPagina);
+
+        // Actualizar la tabla
+        repuestosViewModels.setAll(
+                resultado.getLista().stream()
+                        .map(RepuestoRowViewModel::new)
+                        .collect(Collectors.toList())
+        );
+
+        verificarBajoStock();
+    }
+
+    /**
+     * Construye el DTO de filtro basándose en los valores actuales de la UI
+     */
+    private FiltroRepuestoDTO construirFiltro() {
         String colOrden = switch (selectedOrdenarPor.get()) {
             case "Marca" -> "marcaRepuesto";
             case "Cod Barra" -> "codBarra";
@@ -92,22 +136,36 @@ public class DepositoViewModel {
         };
         int tipoOrden = tipoOrdenOptions.indexOf(selectedTipoOrden.get());
 
-        FiltroRepuestoDTO filtro = new FiltroRepuestoDTO(codigoFiltro.get(), nombreFiltro.get(), marcaFiltro.get(),
-                mostrarNormal.get(), mostrarBajo.get(), colOrden, tipoOrden);
+        return new FiltroRepuestoDTO(
+                codigoFiltro.get(),
+                nombreFiltro.get(),
+                marcaFiltro.get(),
+                mostrarNormal.get(),
+                mostrarBajo.get(),
+                colOrden,
+                tipoOrden
+        );
+    }
 
-        actualizarTabla(repuestoServ.buscarRepuestos(filtro));
+    /**
+     * Recarga la página actual (útil después de modificaciones)
+     */
+    public void recargarPaginaActual() {
+        cargarPagina(paginaActual.get());
     }
 
     public void crearNuevoRepuesto() {
         Optional<Repuesto> result = navigator.openModal(Views.GUARDAR_REPUESTO, "Nuevo repuesto", null);
         result.ifPresent(nuevoRepuesto -> {
-            repuestosViewModels.addFirst(new RepuestoRowViewModel(nuevoRepuesto));
-            verificarBajoStock();
+            // Recargar la primera página para mostrar el nuevo repuesto
+            paginaActual.set(0);
+            cargarPagina(0);
         });
     }
 
     public void modificarRepuesto(RepuestoRowViewModel vm) {
-        Optional<Repuesto> result = navigator.openModal(Views.GUARDAR_REPUESTO, "Modificar repuesto", vm.getRepuestoOriginal());
+        Optional<Repuesto> result = navigator.openModal(
+                Views.GUARDAR_REPUESTO, "Modificar repuesto", vm.getRepuestoOriginal());
         result.ifPresent(r -> {
             vm.updateFrom(r);
             verificarBajoStock();
@@ -116,8 +174,8 @@ public class DepositoViewModel {
 
     public void borrarRepuesto(RepuestoRowViewModel vm) {
         repuestoServ.borrarRepuesto(vm.getRepuestoOriginal());
-        repuestosViewModels.remove(vm);
-        verificarBajoStock();
+        // Recargar la página actual para reflejar el cambio
+        recargarPaginaActual();
     }
 
     public void ingresarStock(RepuestoRowViewModel vm, Double cantidad) {
@@ -132,7 +190,6 @@ public class DepositoViewModel {
         navigator.openModal(Views.CHART_MAS_RETIRADOS, "Repuestos más retirados", null);
     }
 
-    // TODO: el vm no debe conocer las clases de javaFX
     public void exportarTabla(ActionEvent event) {
         FileChooser.ExtensionFilter filter;
         String defaultFileName;
@@ -160,20 +217,11 @@ public class DepositoViewModel {
     }
 
     // --- Lógica Privada ---
-    private void actualizarTabla(List<Repuesto> listaRepuestos) {
-        repuestosViewModels.setAll(
-                listaRepuestos.stream()
-                        .map(RepuestoRowViewModel::new)
-                        .collect(Collectors.toList())
-        );
-        verificarBajoStock();
-    }
-
     private void verificarBajoStock() {
         avisoStockBajoVisible.set(repuestoServ.contarStockBajo() > 0);
     }
 
-    // --- Getters para las Propiedades (para el binding en el Controller) ---
+    // --- Getters para las Propiedades ---
     public ListProperty<RepuestoRowViewModel> repuestosViewModelsProperty() {
         return repuestosViewModels;
     }
@@ -184,5 +232,22 @@ public class DepositoViewModel {
 
     public BooleanProperty avisoStockBajoVisibleProperty() {
         return avisoStockBajoVisible;
+    }
+
+    // ====== GETTERS DE PAGINACIÓN ======
+    public IntegerProperty paginaActualProperty() {
+        return paginaActual;
+    }
+
+    public IntegerProperty totalPaginasProperty() {
+        return totalPaginas;
+    }
+
+    public LongProperty totalResultadosProperty() {
+        return totalResultados;
+    }
+
+    public int getItemsPorPagina() {
+        return ITEMS_POR_PAGINA;
     }
 }
