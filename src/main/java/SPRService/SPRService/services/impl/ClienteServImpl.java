@@ -1,10 +1,12 @@
 package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.ClienteDAO;
+import SPRService.SPRService.DTOs.filtros.FiltroClienteDTO;
 import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.entities.DatosContacto;
 import SPRService.SPRService.exceptions.DuplicateClientDNI;
 import SPRService.SPRService.services.ClienteServ;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
@@ -54,13 +56,25 @@ public class ClienteServImpl implements ClienteServ {
 
     @Transactional
     @Override
+    public ResultadoPaginado<Cliente> buscarPaginado(String dni, String apellido, String nombre,
+                                                     int pagina, int itemsPorPagina) {
+        if (dni == null) dni = "";
+        if (apellido == null) apellido = "";
+        if (nombre == null) nombre = "";
+
+        int offset = pagina * itemsPorPagina;
+        FiltroClienteDTO filtro = new FiltroClienteDTO(dni, apellido, nombre, offset, itemsPorPagina);
+        return dao.buscarPaginado(filtro);
+    }
+
+    @Transactional
+    @Override
     public Cliente saveClient(Cliente c) {
         if (c == null) throw new IllegalArgumentException("Cliente nulo en servicio.");
         poneMayus(c);
 
         try {
             dao.save(c);
-            //todo: reemplazar los catch similares a este por excepciones de más bajo nivel para no acoplar
         } catch (org.hibernate.exception.ConstraintViolationException e) {
             throw new DuplicateClientDNI("Ya existe un cliente con el DNI: " + c.getDni() + " en el sistema.");
         } catch (Exception e) {
@@ -69,26 +83,21 @@ public class ClienteServImpl implements ClienteServ {
         return c;
     }
 
-    //todo: reemplazar todas las ediciones de entidades por este formato usando escritura manual de datos y dejando que
-    // Hibernate edite al terminar la transacción.
     @Transactional
     @Override
     public Optional<Cliente> editClient(Cliente clienteDTO) {
         if (clienteDTO == null)
             throw new IllegalArgumentException("Cliente nulo en servicio.");
 
-        // Cargar cliente existente (managed)
         Cliente existente = dao.getById(clienteDTO.getId());
         if (existente == null)
             throw new EntityNotFoundException("Cliente no encontrado");
 
-        // Actualizar campos
         poneMayus(clienteDTO);
         existente.setDni(clienteDTO.getDni());
         existente.setNombre(clienteDTO.getNombre());
         existente.setApellido(clienteDTO.getApellido());
 
-        // Actualizar contactos
         DatosContacto contactosExistentes = existente.getContactosCliente();
         DatosContacto contactosNuevos = clienteDTO.getContactosCliente();
 
@@ -98,7 +107,6 @@ public class ClienteServImpl implements ClienteServ {
         contactosExistentes.getNroTelefonoSet().clear();
         contactosExistentes.getNroTelefonoSet().addAll(contactosNuevos.getNroTelefonoSet());
 
-        // Cargar relaciones lazy para devolver
         Hibernate.initialize(existente.getVehiculos());
         Hibernate.initialize(existente.getVentas());
         Hibernate.initialize(existente.getServices());
