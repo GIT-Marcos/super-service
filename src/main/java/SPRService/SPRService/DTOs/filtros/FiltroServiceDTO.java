@@ -20,16 +20,18 @@ public record FiltroServiceDTO(
         LocalDateTime fchMinRetiro,
         LocalDateTime fchMaxRetiro,
         List<EstadoService> estados,
-        List<PrioridadService> prioridadServices
+        List<PrioridadService> prioridadServices,
+        Integer offset,
+        Integer limit
 ) {
 
     /**
      * Constructor principal que recibe los valores de los controles de la UI.
      * Se encarga de la conversión segura de LocalDate a LocalDateTime y maneja los valores nulos.
      */
-    public FiltroServiceDTO(Long codigo, String dniCliente, LocalDate fchMinCarga, LocalDate fchMaxCarga, LocalDate fchMinRetiro,
-                            LocalDate fchMaxRetiro, List<EstadoService> estados,
-                            List<PrioridadService> prioridadServices) {
+    public FiltroServiceDTO(Long codigo, String dniCliente, LocalDate fchMinCarga, LocalDate fchMaxCarga,
+                            LocalDate fchMinRetiro, LocalDate fchMaxRetiro,
+                            List<EstadoService> estados, List<PrioridadService> prioridadServices) {
         this(
                 codigo,
                 dniCliente,
@@ -38,23 +40,37 @@ public record FiltroServiceDTO(
                 (fchMinRetiro != null) ? fchMinRetiro.atStartOfDay() : null,
                 (fchMaxRetiro != null) ? fchMaxRetiro.atTime(LocalTime.MAX) : null,
                 estados,
-                prioridadServices
+                prioridadServices,
+                null,
+                null
+        );
+    }
+
+    /**
+     * Constructor con paginación (recibe LocalDate)
+     */
+    public FiltroServiceDTO(Long codigo, String dniCliente, LocalDate fchMinCarga, LocalDate fchMaxCarga,
+                            LocalDate fchMinRetiro, LocalDate fchMaxRetiro,
+                            List<EstadoService> estados, List<PrioridadService> prioridadServices,
+                            Integer offset, Integer limit) {
+        this(
+                codigo,
+                dniCliente,
+                (fchMinCarga != null) ? fchMinCarga.atStartOfDay() : null,
+                (fchMaxCarga != null) ? fchMaxCarga.atTime(LocalTime.MAX) : null,
+                (fchMinRetiro != null) ? fchMinRetiro.atStartOfDay() : null,
+                (fchMaxRetiro != null) ? fchMaxRetiro.atTime(LocalTime.MAX) : null,
+                estados,
+                prioridadServices,
+                offset,
+                limit
         );
     }
 
     /**
      * Constructor para un estado de "ver todos" o sin filtros aplicados.
-     * Llama directamente al constructor canónico con valores por defecto que representan
-     * un filtro sin restricciones de fecha.
      */
     public FiltroServiceDTO() {
-        this(null,
-                null,
-                (LocalDate) null,
-                null,
-                null,
-                null,
-                null,
-                null);
+        this(null, null, (LocalDateTime) null, null, null, null, null, null, null, null);
     }
 }
