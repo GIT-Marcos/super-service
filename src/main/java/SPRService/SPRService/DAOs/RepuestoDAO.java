@@ -3,6 +3,7 @@ package SPRService.SPRService.DAOs;
 import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.entities.Repuesto;
+import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,8 +33,9 @@ public interface RepuestoDAO extends GenericDAO<Repuesto, Long> {
     /**
      * Busca por filtros y trae repuestos con datos simples para tabla principal.
      */
-    //todo: paginar
     List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro);
+
+    ResultadoPaginado<Repuesto> buscarRepuestosPaginado(FiltroRepuestoDTO filtro);
 
     // ____   ____ ____    ___   ____  ______  ____  __
     // || \\ ||    || \\  // \\  || \\ | || | ||    (( \

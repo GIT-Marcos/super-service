@@ -3,6 +3,8 @@ package SPRService.SPRService.viewModels.tablas;
 import javafx.beans.property.*;
 import SPRService.SPRService.entities.Repuesto;
 
+import java.math.BigDecimal;
+
 public class RepuestoRowViewModel {
     private final Repuesto repuestoOriginal; // Guardamos una referencia al modelo original
 
@@ -10,7 +12,7 @@ public class RepuestoRowViewModel {
     private final StringProperty coBarra;
     private final StringProperty nombre;
     private final StringProperty marca;
-    private final StringProperty precio;
+    private final ObjectProperty<BigDecimal> precio;
     private final DoubleProperty cantidad;
     private final DoubleProperty cantidadMinima;
     private final StringProperty uniMedida;
@@ -21,7 +23,7 @@ public class RepuestoRowViewModel {
         this.coBarra = new SimpleStringProperty(r.getCodBarra());
         this.nombre = new SimpleStringProperty(r.getDetalle());
         this.marca = new SimpleStringProperty(r.getMarcaRepuesto().getNombreMarca());
-        this.precio = new SimpleStringProperty("$ " + r.getPrecio());
+        this.precio = new SimpleObjectProperty<>(r.getPrecio());
         this.cantidad = new SimpleDoubleProperty(r.getStock().getCantidadExistente());
         this.cantidadMinima = new SimpleDoubleProperty(r.getStock().getCantMinima());
         this.uniMedida = new SimpleStringProperty(r.getStock().getUnidadMedida());
@@ -54,7 +56,7 @@ public class RepuestoRowViewModel {
         this.coBarra.set(repuestoActualizado.getCodBarra());
         this.nombre.set(repuestoActualizado.getDetalle());
         this.marca.set(repuestoActualizado.getMarcaRepuesto().getNombreMarca());
-        this.precio.set("$ " + repuestoActualizado.getPrecio());
+        this.precio.set(repuestoActualizado.getPrecio());
         this.cantidad.set(repuestoActualizado.getStock().getCantidadExistente());
         this.cantidadMinima.set(repuestoActualizado.getStock().getCantMinima());
         this.uniMedida.set(repuestoActualizado.getStock().getUnidadMedida());
@@ -101,11 +103,11 @@ public class RepuestoRowViewModel {
         return marca;
     }
 
-    public String getPrecio() {
+    public BigDecimal getPrecio() {
         return precio.get();
     }
 
-    public StringProperty precioProperty() {
+    public ObjectProperty<BigDecimal> precioProperty() {
         return precio;
     }
 

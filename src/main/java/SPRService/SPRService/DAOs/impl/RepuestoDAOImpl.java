@@ -4,14 +4,15 @@ import SPRService.SPRService.DAOs.RepuestoDAO;
 import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
+import SPRService.SPRService.entities.Repuesto;
+import SPRService.SPRService.entities.Stock;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import SPRService.SPRService.entities.Repuesto;
-import SPRService.SPRService.entities.Stock;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -58,38 +59,71 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
     @Override
     public List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro) {
         EntityManager em = emProvider.get();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Repuesto> query = cb.createQuery(Repuesto.class);
-        Root<Repuesto> root = query.from(Repuesto.class);
+        TypedQuery<Repuesto> query = crearQueryBusqueda(em, filtro);
+        return query.getResultList();
+    }
 
-        Fetch<Repuesto, Stock> fetchStock = root.fetch("stock", JoinType.LEFT);
-        fetchStock.fetch("ubicacion", JoinType.LEFT);
-        root.fetch("marcaRepuesto", JoinType.LEFT);
+    @Override
+    public ResultadoPaginado<Repuesto> buscarRepuestosPaginado(FiltroRepuestoDTO filtro) {
+        EntityManager em = emProvider.get();
+
+        // 1. Obtener el conteo total
+        Long total = contarRepuestos(em, filtro);
+
+        // 2. Obtener los resultados paginados
+        TypedQuery<Repuesto> query = crearQueryBusqueda(em, filtro);
+
+        if (filtro.offset() != null && filtro.limit() != null) {
+            query.setFirstResult(filtro.offset());
+            query.setMaxResults(filtro.limit());
+        }
+
+        List<Repuesto> resultados = query.getResultList();
+
+        return new ResultadoPaginado<>(resultados, total);
+    }
+
+    /**
+     * Cuenta el total de repuestos que coinciden con el filtro (sin paginación)
+     */
+    private Long contarRepuestos(EntityManager em, FiltroRepuestoDTO filtro) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Repuesto> root = countQuery.from(Repuesto.class);
 
         Join<Repuesto, MarcaRepuesto> joinMarca = root.join("marcaRepuesto", JoinType.LEFT);
         Join<Repuesto, Stock> joinStock = root.join("stock", JoinType.LEFT);
 
-        List<Predicate> filtros = new ArrayList<>();
-        filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
-        filtros.add(cb.equal(joinStock.get("activo"), Boolean.TRUE));
+        List<Predicate> predicates = construirPredicados(cb, root, joinMarca, joinStock, filtro);
 
-        if (filtro.codBarras() != null && !filtro.codBarras().isBlank()) {
-            filtros.add(cb.like(cb.lower(root.get("codBarra")), "%" + filtro.codBarras().toLowerCase() + "%"));
-        }
-        if (filtro.nombre() != null && !filtro.nombre().isBlank()) {
-            filtros.add(cb.like(cb.lower(root.get("detalle")), "%" + filtro.nombre().toLowerCase() + "%"));
-        }
-        if (filtro.marca() != null && !filtro.marca().isBlank()) {
-            filtros.add(cb.like(cb.lower(joinMarca.get("nombreMarca")),
-                    "%" + filtro.marca().toLowerCase(Locale.ROOT) + "%"));
-        }
-        //SI LOS 2 VIENEN VERDADEROS, O SEA QUIERE VER TODOS, NO ENTRA EN NINGÚN IF
-        if (filtro.stockNormal() && !filtro.stockBajo()) {
-            filtros.add(cb.greaterThan(joinStock.get("cantidadExistente"), joinStock.get("cantMinima")));
-        } else if (filtro.stockBajo() && !filtro.stockNormal()) {
-            filtros.add(cb.lessThanOrEqualTo(joinStock.get("cantidadExistente"), joinStock.get("cantMinima")));
-        }
-        query.where(cb.and(filtros.toArray(new Predicate[0])));
+        countQuery.select(cb.count(root));
+        countQuery.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        return em.createQuery(countQuery).getSingleResult();
+    }
+
+    /**
+     * Crea la query de búsqueda con todos los filtros y ordenamiento
+     */
+    private TypedQuery<Repuesto> crearQueryBusqueda(EntityManager em, FiltroRepuestoDTO filtro) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Repuesto> query = cb.createQuery(Repuesto.class);
+        Root<Repuesto> root = query.from(Repuesto.class);
+
+        // Fetches para evitar N+1
+        Fetch<Repuesto, Stock> fetchStock = root.fetch("stock", JoinType.LEFT);
+        fetchStock.fetch("ubicacion", JoinType.LEFT);
+        root.fetch("marcaRepuesto", JoinType.LEFT);
+
+        // Joins para filtros
+        Join<Repuesto, MarcaRepuesto> joinMarca = root.join("marcaRepuesto", JoinType.LEFT);
+        Join<Repuesto, Stock> joinStock = root.join("stock", JoinType.LEFT);
+
+        List<Predicate> predicates = construirPredicados(cb, root, joinMarca, joinStock, filtro);
+
+        query.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        // Ordenamiento
         if (filtro.tipoOrden() != null && filtro.colOrden() != null) {
             if (filtro.tipoOrden() == 0) {
                 query.orderBy(cb.asc(root.get(filtro.colOrden())));
@@ -97,7 +131,45 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
                 query.orderBy(cb.desc(root.get(filtro.colOrden())));
             }
         }
-        return em.createQuery(query).getResultList();
+
+        return em.createQuery(query);
+    }
+
+    /**
+     * Construye los predicados (condiciones WHERE) basándose en el filtro
+     */
+    private List<Predicate> construirPredicados(CriteriaBuilder cb, Root<Repuesto> root,
+                                                Join<Repuesto, MarcaRepuesto> joinMarca,
+                                                Join<Repuesto, Stock> joinStock,
+                                                FiltroRepuestoDTO filtro) {
+        List<Predicate> filtros = new ArrayList<>();
+
+        filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
+        filtros.add(cb.equal(joinStock.get("activo"), Boolean.TRUE));
+
+        if (filtro.codBarras() != null && !filtro.codBarras().isBlank()) {
+            filtros.add(cb.like(cb.lower(root.get("codBarra")),
+                    "%" + filtro.codBarras().toLowerCase() + "%"));
+        }
+        if (filtro.nombre() != null && !filtro.nombre().isBlank()) {
+            filtros.add(cb.like(cb.lower(root.get("detalle")),
+                    "%" + filtro.nombre().toLowerCase() + "%"));
+        }
+        if (filtro.marca() != null && !filtro.marca().isBlank()) {
+            filtros.add(cb.like(cb.lower(joinMarca.get("nombreMarca")),
+                    "%" + filtro.marca().toLowerCase(Locale.ROOT) + "%"));
+        }
+
+        // Filtros de stock
+        if (filtro.stockNormal() && !filtro.stockBajo()) {
+            filtros.add(cb.greaterThan(joinStock.get("cantidadExistente"),
+                    joinStock.get("cantMinima")));
+        } else if (filtro.stockBajo() && !filtro.stockNormal()) {
+            filtros.add(cb.lessThanOrEqualTo(joinStock.get("cantidadExistente"),
+                    joinStock.get("cantMinima")));
+        }
+
+        return filtros;
     }
 
     @Override
@@ -133,5 +205,4 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
                 .setParameter("fMax", fechaMax)
                 .getSingleResult();
     }
-
 }

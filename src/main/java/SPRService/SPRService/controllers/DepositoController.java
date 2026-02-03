@@ -10,7 +10,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
-import javafx.stage.FileChooser;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -24,7 +23,6 @@ public class DepositoController implements Initializable {
         this.viewModel = viewModel;
     }
 
-    // --- Componentes FXML (sin cambios) ---
     @FXML
     private TableView<RepuestoRowViewModel> tablaRepuestos;
     @FXML
@@ -39,17 +37,15 @@ public class DepositoController implements Initializable {
     private TextField tfCodigo, tfNombre, tfMarca;
     @FXML
     private Label labelAvisoStock;
+    @FXML
+    private Pagination paginacion;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // 1. Configurar la UI que no se puede hacer con binding
         configColumnas();
         seteaEstiloTabla();
-
-        // 2. Enlazar (bind) la UI a las propiedades del ViewModel
+        configurarPaginacion();
         bindViewModel();
-
-        // 3. Cargar los datos iniciales
         viewModel.initialize();
     }
 
@@ -58,7 +54,7 @@ public class DepositoController implements Initializable {
         tablaRepuestos.itemsProperty().bind(viewModel.repuestosViewModelsProperty());
         viewModel.selectedRepuestoProperty().bind(tablaRepuestos.getSelectionModel().selectedItemProperty());
 
-        // Enlazar filtros (bidireccional para que el ViewModel sepa los cambios de la UI)
+        // Enlazar filtros
         tfCodigo.textProperty().bindBidirectional(viewModel.codigoFiltro);
         tfNombre.textProperty().bindBidirectional(viewModel.nombreFiltro);
         tfMarca.textProperty().bindBidirectional(viewModel.marcaFiltro);
@@ -75,22 +71,48 @@ public class DepositoController implements Initializable {
 
         // Enlazar otros elementos
         labelAvisoStock.visibleProperty().bind(viewModel.avisoStockBajoVisibleProperty());
+
+        // Enlazar paginación
+        paginacion.pageCountProperty().bind(viewModel.totalPaginasProperty());
+        paginacion.currentPageIndexProperty().addListener((obs, oldPage, newPage) -> {
+            if (newPage != null && !newPage.equals(oldPage)) {
+                viewModel.cargarPagina(newPage.intValue());
+            }
+        });
     }
 
-    // --- Métodos de acción (simples delegaciones) ---
+    private void configurarPaginacion() {
+        paginacion.setPageCount(1);
+        paginacion.setCurrentPageIndex(0);
+        paginacion.setMaxPageIndicatorCount(10); // Número de botones de página visibles
+
+        // PageFactory para crear el contenido de cada página
+        // Retornamos un nodo vacío, ya que la tabla se actualiza vía binding
+        paginacion.setPageFactory(pageIndex -> {
+            // No necesitamos hacer nada aquí porque el listener
+            // de currentPageIndex ya llama a cargarPagina()
+            return new Label(""); // Nodo invisible
+        });
+    }
+
+    // --- Métodos de acción ---
     @FXML
     private void buscarConFiltros() {
+        paginacion.setCurrentPageIndex(0); // Resetear a primera página
         viewModel.buscarConFiltros();
     }
 
     @FXML
     private void todosRepuestos() {
+        paginacion.setCurrentPageIndex(0); // Resetear a primera página
         viewModel.cargarTodosRepuestos();
     }
 
     @FXML
     private void nuevoRepuesto() {
         viewModel.crearNuevoRepuesto();
+        // Después de crear, ir a la primera página
+        paginacion.setCurrentPageIndex(0);
     }
 
     @FXML
@@ -111,9 +133,11 @@ public class DepositoController implements Initializable {
             NotificationHelper.mostrarAdvertencia("Borrar", "Seleccione un repuesto para borrarlo.");
             return;
         }
-        if (!SimpleDialogs.confirmacion("Borrar repuesto", "Esta acción es irreversible.\n¿Desea continuar con el borrado?"))
+        if (!SimpleDialogs.confirmacion("Borrar repuesto",
+                "Esta acción es irreversible.\n¿Desea continuar con el borrado?"))
             return;
-        if (!SimpleDialogs.confirmacion("Borrar repuesto", "¿Confirmar borrado de:\n" + vm.getNombre() + " ?") )
+        if (!SimpleDialogs.confirmacion("Borrar repuesto",
+                "¿Confirmar borrado de:\n" + vm.getNombre() + " ?"))
             return;
 
         try {
@@ -162,7 +186,6 @@ public class DepositoController implements Initializable {
         viewModel.exportarTabla(event);
     }
 
-    // --- Configuración de la Vista (se queda en el Controller) ---
     private void configColumnas() {
         colCodBarra.setCellValueFactory(new PropertyValueFactory<>("coBarra"));
         colDetalle.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -177,41 +200,29 @@ public class DepositoController implements Initializable {
         tablaRepuestos.setRowFactory(tv -> {
             TableRow<RepuestoRowViewModel> row = new TableRow<>();
 
-            // 1. Define la lógica de actualización de estilo en un listener.
-            // Usamos InvalidationListener porque no nos importa el valor viejo/nuevo,
-            // solo saber que "algo cambió".
             final javafx.beans.InvalidationListener listener = observable -> {
                 RepuestoRowViewModel item = row.getItem();
-                // Asegúrate de que la fila no esté vacía y tenga un item
                 if (item != null) {
                     if (item.getCantidad() <= item.getCantidadMinima()) {
                         row.setStyle("-fx-background-color: lightcoral;");
                     } else {
-                        row.setStyle(""); // Restablece el estilo si el stock es normal
+                        row.setStyle("");
                     }
                 } else {
-                    // Si la fila está vacía, asegúrate de que no tenga estilo
                     row.setStyle("");
                 }
             };
 
-            // 2. Escucha los cambios en el "item" que se muestra en la fila.
-            // Esto es crucial para agregar/quitar listeners de las propiedades del item.
             row.itemProperty().addListener((obs, oldItem, newItem) -> {
-                // Si había un item antiguo, deja de escuchar sus propiedades
                 if (oldItem != null) {
                     oldItem.cantidadProperty().removeListener(listener);
                     oldItem.cantidadMinimaProperty().removeListener(listener);
                 }
-                // Si hay un item nuevo, empieza a escuchar sus propiedades
                 if (newItem != null) {
                     newItem.cantidadProperty().addListener(listener);
                     newItem.cantidadMinimaProperty().addListener(listener);
-
-                    // Llama al listener una vez para establecer el color inicial
                     listener.invalidated(null);
                 } else {
-                    // Si la fila se queda vacía, limpia el estilo
                     row.setStyle("");
                 }
             });

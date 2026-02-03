@@ -11,6 +11,7 @@ import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.entities.Ubicacion;
 import SPRService.SPRService.exceptions.DuplicateProductException;
 import SPRService.SPRService.services.RepuestoServ;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
@@ -45,6 +46,27 @@ public class RepuestoServImpl implements RepuestoServ {
     @Override
     public Long contarStockBajo() {
         return daoRepuesto.cuentaRespBajoStock();
+    }
+
+    @Transactional
+    @Override
+    public ResultadoPaginado<Repuesto> buscarRepuestosPaginado(FiltroRepuestoDTO filtro,
+                                                               int pagina, int itemsPorPagina) {
+        int offset = pagina * itemsPorPagina;
+
+        FiltroRepuestoDTO filtroPaginado = new FiltroRepuestoDTO(
+                filtro.codBarras(),
+                filtro.nombre(),
+                filtro.marca(),
+                filtro.stockNormal(),
+                filtro.stockBajo(),
+                filtro.colOrden(),
+                filtro.tipoOrden(),
+                offset,
+                itemsPorPagina
+        );
+
+        return daoRepuesto.buscarRepuestosPaginado(filtroPaginado);
     }
 
     @Transactional

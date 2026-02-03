@@ -4,6 +4,7 @@ import SPRService.SPRService.DTOs.ReporteUsoDeRepuestosDTO;
 import SPRService.SPRService.DTOs.RepuestoRetiradoReporteDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.entities.Repuesto;
+import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +15,8 @@ public interface RepuestoServ {
     List<Repuesto> verTodos();
 
     Long contarStockBajo();
+
+    ResultadoPaginado<Repuesto> buscarRepuestosPaginado(FiltroRepuestoDTO filtro, int pagina, int itemsPorPagina);
 
     List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro);
 
