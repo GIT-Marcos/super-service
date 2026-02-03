@@ -2,7 +2,9 @@ package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.VehiculoDAO;
 import SPRService.SPRService.DTOs.ModelosMasRegistradosDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroVehiculoDTO;
 import SPRService.SPRService.entities.*;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -35,7 +37,6 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
     public Optional<Vehiculo> verDetalle(Long id) {
         EntityManager em = emProvider.get();
 
-        // ORDENES
         Optional<Vehiculo> result = em.createQuery("select v from Vehiculo v " +
                                 "left join fetch v.ordenes o " +
                                 "left join fetch o.estadoIngreso " +
@@ -50,7 +51,6 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
                 .getResultStream().findAny();
 
         if (result.isPresent()) {
-            // TRABAJOS
             em.createQuery("select o from Orden o " +
                                     "left join fetch o.trabajos " +
                                     "where o.vehiculo.id = :id",
@@ -58,7 +58,6 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
                     .setParameter("id", id)
                     .getResultList();
 
-            // DETALLES NOTA
             em.createQuery("select o from Orden o " +
                                     "left join fetch o.notaRetiro n " +
                                     "left join fetch n.detalleRetiro d " +
@@ -69,42 +68,105 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
                     .getResultList();
         }
 
-        // CLIENTES DE VEHÍCULO
-        // todo: no funciona
-//        em.createQuery("select v from Vehiculo v " +
-//                                "left join fetch v.clientes " +
-//                                "where v.id = :id",
-//                        Vehiculo.class)
-//                .setParameter("id", id);
         return result;
     }
 
     @Override
     public List<Vehiculo> buscarPor(String patente, String modelo, String marca) {
+        FiltroVehiculoDTO filtro = new FiltroVehiculoDTO(patente, modelo, marca);
         EntityManager em = emProvider.get();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Vehiculo> query = cb.createQuery(Vehiculo.class);
-        Root<Vehiculo> root = query.from(Vehiculo.class);
+        return crearQueryBusqueda(em, filtro).getResultList();
+    }
 
-        Fetch<Vehiculo, ModeloVehiculo> fetchModelo = root.fetch("modeloVehiculo", JoinType.LEFT);
-        fetchModelo.fetch("marcaVehiculo", JoinType.LEFT);
+    @Override
+    public ResultadoPaginado<Vehiculo> buscarPaginado(FiltroVehiculoDTO filtro) {
+        EntityManager em = emProvider.get();
+
+        // 1. Obtener el conteo total
+        Long total = contarVehiculos(em, filtro);
+
+        // 2. Obtener los resultados paginados
+        TypedQuery<Vehiculo> query = crearQueryBusqueda(em, filtro);
+
+        if (filtro.offset() != null && filtro.limit() != null) {
+            query.setFirstResult(filtro.offset());
+            query.setMaxResults(filtro.limit());
+        }
+
+        List<Vehiculo> resultados = query.getResultList();
+
+        return new ResultadoPaginado<>(resultados, total);
+    }
+
+    /**
+     * Cuenta el total de vehículos que coinciden con el filtro
+     */
+    private Long contarVehiculos(EntityManager em, FiltroVehiculoDTO filtro) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Vehiculo> root = countQuery.from(Vehiculo.class);
 
         Join<Vehiculo, ModeloVehiculo> joinModelo = root.join("modeloVehiculo", JoinType.LEFT);
         Join<ModeloVehiculo, MarcaVehiculo> joinMarca = joinModelo.join("marcaVehiculo", JoinType.LEFT);
 
+        List<Predicate> predicates = construirPredicados(cb, root, joinModelo, joinMarca, filtro);
+
+        countQuery.select(cb.count(root));
+        countQuery.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        return em.createQuery(countQuery).getSingleResult();
+    }
+
+    /**
+     * Crea la query de búsqueda con todos los filtros y ordenamiento
+     */
+    private TypedQuery<Vehiculo> crearQueryBusqueda(EntityManager em, FiltroVehiculoDTO filtro) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Vehiculo> query = cb.createQuery(Vehiculo.class);
+        Root<Vehiculo> root = query.from(Vehiculo.class);
+
+        // Fetches para evitar N+1
+        Fetch<Vehiculo, ModeloVehiculo> fetchModelo = root.fetch("modeloVehiculo", JoinType.LEFT);
+        fetchModelo.fetch("marcaVehiculo", JoinType.LEFT);
+
+        // Joins para filtros
+        Join<Vehiculo, ModeloVehiculo> joinModelo = root.join("modeloVehiculo", JoinType.LEFT);
+        Join<ModeloVehiculo, MarcaVehiculo> joinMarca = joinModelo.join("marcaVehiculo", JoinType.LEFT);
+
+        List<Predicate> predicates = construirPredicados(cb, root, joinModelo, joinMarca, filtro);
+
+        query.where(cb.and(predicates.toArray(new Predicate[0])));
+        query.orderBy(cb.desc(root.get("fechaRegistro")));
+
+        return em.createQuery(query);
+    }
+
+    /**
+     * Construye los predicados (condiciones WHERE) basándose en el filtro
+     */
+    private List<Predicate> construirPredicados(CriteriaBuilder cb, Root<Vehiculo> root,
+                                                Join<Vehiculo, ModeloVehiculo> joinModelo,
+                                                Join<ModeloVehiculo, MarcaVehiculo> joinMarca,
+                                                FiltroVehiculoDTO filtro) {
         List<Predicate> filtros = new ArrayList<>();
+
+        // Siempre filtrar solo activos
         filtros.add(cb.equal(root.get("estado"), Boolean.TRUE));
 
-        if (!patente.isBlank())
-            filtros.add(cb.like(cb.upper(root.get("patente")), "%" + patente.toUpperCase(Locale.ROOT) + "%"));
-        if (!modelo.isBlank())
-            filtros.add(cb.like(cb.lower(joinModelo.get("nombreModelo")), "%" + modelo + "%"));
-        if (!marca.isBlank())
-            filtros.add(cb.like(cb.lower(joinMarca.get("nombreMarca")), "%" + marca + "%"));
+        if (filtro.patente() != null && !filtro.patente().isBlank()) {
+            filtros.add(cb.like(cb.upper(root.get("patente")),
+                    "%" + filtro.patente().toUpperCase(Locale.ROOT) + "%"));
+        }
+        if (filtro.modelo() != null && !filtro.modelo().isBlank()) {
+            filtros.add(cb.like(cb.lower(joinModelo.get("nombreModelo")),
+                    "%" + filtro.modelo().toLowerCase() + "%"));
+        }
+        if (filtro.marca() != null && !filtro.marca().isBlank()) {
+            filtros.add(cb.like(cb.lower(joinMarca.get("nombreMarca")),
+                    "%" + filtro.marca().toLowerCase() + "%"));
+        }
 
-        query.where(cb.and(filtros.toArray(filtros.toArray(new Predicate[0]))));
-        query.orderBy(cb.asc(joinModelo.get("nombreModelo")));
-        return em.createQuery(query).getResultList();
+        return filtros;
     }
 
     @Override

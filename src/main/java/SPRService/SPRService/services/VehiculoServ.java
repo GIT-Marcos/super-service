@@ -2,6 +2,7 @@ package SPRService.SPRService.services;
 
 import SPRService.SPRService.DTOs.ModelosMasRegistradosDTO;
 import SPRService.SPRService.entities.Vehiculo;
+import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,6 +13,8 @@ public interface VehiculoServ {
     List<Vehiculo> verTodosActivos();
     Optional<Vehiculo> verDetalle(Long id);
     List<Vehiculo> buscarPor(String patente, String modelo, String marca);
+    ResultadoPaginado<Vehiculo> buscarPaginado(String patente, String modelo, String marca,
+                                               int pagina, int itemsPorPagina);
     List<ModelosMasRegistradosDTO> generarReporteModelosMasRegistrados(Integer cantidad, LocalDate fechaMin,
                                                                        LocalDate fechaMax);
 

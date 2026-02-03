@@ -3,6 +3,7 @@ package SPRService.SPRService.controllers;
 import SPRService.SPRService.entities.Vehiculo;
 import SPRService.SPRService.navigation.WizardStateProvider;
 import SPRService.SPRService.services.VehiculoServ;
+import SPRService.SPRService.util.ResultadoPaginado;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.ExportadorTabla;
@@ -17,26 +18,28 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class VehiculosController implements Initializable {
 
+    private static final int ITEMS_POR_PAGINA = 30;
     private final Navigator navigator;
     private final WizardStateProvider wizardStateProvider;
-    private ObservableList<VehiculoRowViewModel> obsListViewModel = FXCollections.observableArrayList();
     private final VehiculoServ vehiculoServ;
 
+    // --- Estado ---
+    private final ObservableList<VehiculoRowViewModel> obsListViewModel = FXCollections.observableArrayList();
+    private int paginaActual = 0;
+    private int totalPaginas = 10;
+
+    // --- Componentes FXML ---
     @FXML
     private TextField tfPatente, tfModelo, tfMarca;
     @FXML
@@ -47,6 +50,8 @@ public class VehiculosController implements Initializable {
     private TableColumn<VehiculoRowViewModel, Double> colCil;
     @FXML
     private ComboBox<String> comboFormato;
+    @FXML
+    private Pagination paginacion;
 
     @Inject
     public VehiculosController(AppCoordinator appCoordinator, WizardStateProvider wizardStateProvider,
@@ -60,30 +65,90 @@ public class VehiculosController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         configColumnas();
         llenarCombos();
+        configurarPaginacion();
         tablaVehiculos.setItems(obsListViewModel);
-        crearFilas(vehiculoServ.verTodosActivos());
 
-        obsListViewModel.addAll();
+        // Cargar primera página
+        cargarPagina(0);
     }
+
+    // ==================== PAGINACIÓN ====================
+
+    private void configurarPaginacion() {
+        paginacion.setPageCount(1);
+        paginacion.setCurrentPageIndex(0);
+        paginacion.setMaxPageIndicatorCount(5);
+
+        // Listener para cambios de página
+        paginacion.currentPageIndexProperty().addListener((obs, oldPage, newPage) -> {
+            if (newPage != null && !newPage.equals(oldPage)) {
+                cargarPagina(newPage.intValue());
+            }
+        });
+    }
+
+    /**
+     * Carga una página específica de resultados
+     */
+    private void cargarPagina(int numeroPagina) {
+        String patente = tfPatente.getText() != null ? tfPatente.getText().strip() : "";
+        String modelo = tfModelo.getText() != null ? tfModelo.getText().strip() : "";
+        String marca = tfMarca.getText() != null ? tfMarca.getText().strip() : "";
+
+        ResultadoPaginado<Vehiculo> resultado = vehiculoServ.buscarPaginado(
+                patente, modelo, marca, numeroPagina, ITEMS_POR_PAGINA);
+
+        // Actualizar datos de paginación
+        int paginas = (int) Math.ceil((double) resultado.getCantidadResultados() / ITEMS_POR_PAGINA);
+        totalPaginas = Math.max(1, paginas);
+        paginaActual = numeroPagina;
+
+        // Actualizar el control de paginación
+        paginacion.setPageCount(totalPaginas);
+
+        // Actualizar la tabla
+        obsListViewModel.clear();
+        for (Vehiculo v : resultado.getLista()) {
+            obsListViewModel.add(new VehiculoRowViewModel(v));
+        }
+    }
+
+    /**
+     * Recarga la página actual
+     */
+    private void recargarPaginaActual() {
+        cargarPagina(paginaActual);
+    }
+
+    // ==================== ACCIONES ====================
 
     @FXML
     private void buscarConFiltros() {
-        List<Vehiculo> vehiculos = vehiculoServ.buscarPor(tfPatente.getText().strip(),
-                tfModelo.getText().strip(), tfMarca.getText().strip());
-        crearFilas(vehiculos);
+        paginacion.setCurrentPageIndex(0);
+        cargarPagina(0);
     }
 
     @FXML
     private void todosLosVehiculos() {
-        crearFilas(vehiculoServ.verTodosActivos());
+        // Limpiar filtros
+        tfPatente.clear();
+        tfModelo.clear();
+        tfMarca.clear();
+
+        paginacion.setCurrentPageIndex(0);
+        cargarPagina(0);
     }
 
     @FXML
     private void cargarVehiculo() {
         Optional<VehiculoVM> result = navigator.openModal(Views.CARGAR_VEHICULO,
                 "Cargar nuevo vehículo", null);
-        result.ifPresent(vehiculoVM -> obsListViewModel.addFirst(
-                new VehiculoRowViewModel(vehiculoVM.obtenerEntidadActualizada())));
+
+        if (result.isPresent()) {
+            // Ir a la primera página para ver el nuevo vehículo
+            paginacion.setCurrentPageIndex(0);
+            cargarPagina(0);
+        }
     }
 
     @FXML
@@ -94,11 +159,16 @@ public class VehiculosController implements Initializable {
                     "Debe seleccionar un vehículo para modificarlo.");
             return;
         }
+
         wizardStateProvider.startEditVehicleWizard(vrvm.getVehiculo());
         Optional<VehiculoVM> result = navigator.openModal(Views.CARGAR_VEHICULO, "Modificar Vehículo", null);
+
         if (result.isPresent()) {
+            // Actualizar la fila en lugar de recargar toda la página
             int i = obsListViewModel.indexOf(vrvm);
-            obsListViewModel.set(i, new VehiculoRowViewModel(result.get().obtenerEntidadActualizada()));
+            if (i >= 0) {
+                obsListViewModel.set(i, new VehiculoRowViewModel(result.get().obtenerEntidadActualizada()));
+            }
         }
     }
 
@@ -110,6 +180,7 @@ public class VehiculosController implements Initializable {
                     "Debe seleccionar un vehículo para ver sus detalles.");
             return;
         }
+
         Optional<Vehiculo> result = vehiculoServ.verDetalle(vrvm.getVehiculo().getId());
         result.ifPresent(v ->
                 navigator.openModal(Views.DETALLE_VEHICULO, "Detalles de vehículo", v));
@@ -119,20 +190,25 @@ public class VehiculosController implements Initializable {
     private void eliminarVehiculo() {
         VehiculoRowViewModel vrvm = tablaVehiculos.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
-            NotificationHelper.mostrarAdvertencia("Eliminación de vehículo", "Debe seleccionar un vehículo para poder " +
-                    "eliminarlo.");
+            NotificationHelper.mostrarAdvertencia("Eliminación de vehículo",
+                    "Debe seleccionar un vehículo para poder eliminarlo.");
             return;
         }
+
         Vehiculo v = vrvm.getVehiculo();
-        boolean r = SimpleDialogs.confirmacion("Eliminación de vehículo",
+        boolean confirmar = SimpleDialogs.confirmacion("Eliminación de vehículo",
                 "¿Confirmar eliminación de vehículo?");
-        if (!r) return;
+        if (!confirmar) return;
+
         try {
             vehiculoServ.borradoLogico(v);
-            obsListViewModel.remove(vrvm);
-            NotificationHelper.mostrarExito("Eliminación de vehículo", "Se ha eliminado el vehículo con éxito.");
+            // Recargar la página actual para reflejar el cambio
+            recargarPaginaActual();
+            NotificationHelper.mostrarExito("Eliminación de vehículo",
+                    "Se ha eliminado el vehículo con éxito.");
         } catch (RuntimeException e) {
-            NotificationHelper.mostrarExito("Eliminación de vehículo", "Ha ocurrido un error al eliminar el vehículo.");
+            NotificationHelper.mostrarError("Eliminación de vehículo",
+                    "Ha ocurrido un error al eliminar el vehículo.");
             e.printStackTrace();
         }
     }
@@ -149,11 +225,12 @@ public class VehiculosController implements Initializable {
         String defaultFileName;
         if (comboFormato.getValue().equals("CSV")) {
             filter = new FileChooser.ExtensionFilter("Archivos CSV (*.csv)", "*.csv");
-            defaultFileName = "tabla_vehículos.csv";
+            defaultFileName = "tabla_vehiculos.csv";
         } else {
             filter = new FileChooser.ExtensionFilter("Archivos Excel (*.xlsx)", "*.xlsx");
-            defaultFileName = "tabla_vehículos.xlsx";
+            defaultFileName = "tabla_vehiculos.xlsx";
         }
+
         File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta", defaultFileName, filter);
         if (file == null) return;
 
@@ -169,12 +246,7 @@ public class VehiculosController implements Initializable {
         navigator.openModal(Views.CHART_VEHICULOS, "Reporte de modelos más registrados", null);
     }
 
-    private void crearFilas(List<Vehiculo> vehiculos) {
-        obsListViewModel.clear();
-        for (Vehiculo v : vehiculos) {
-            obsListViewModel.add(new VehiculoRowViewModel(v));
-        }
-    }
+    // ==================== CONFIGURACIÓN ====================
 
     private void configColumnas() {
         colPatente.setCellValueFactory(new PropertyValueFactory<>("patente"));
@@ -187,11 +259,8 @@ public class VehiculosController implements Initializable {
     }
 
     private void llenarCombos() {
-        ObservableList<String> obsFormato = FXCollections.observableArrayList();
-        obsFormato.add("CSV");
-        obsFormato.add("XLSX");
+        ObservableList<String> obsFormato = FXCollections.observableArrayList("CSV", "XLSX");
         comboFormato.setItems(obsFormato);
         comboFormato.getSelectionModel().select(0);
     }
-
 }
