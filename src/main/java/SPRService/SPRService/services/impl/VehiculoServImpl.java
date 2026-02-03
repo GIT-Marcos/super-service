@@ -4,12 +4,14 @@ import SPRService.SPRService.DAOs.MarcaVehiculoDAO;
 import SPRService.SPRService.DAOs.ModeloVehiculoDAO;
 import SPRService.SPRService.DAOs.VehiculoDAO;
 import SPRService.SPRService.DTOs.ModelosMasRegistradosDTO;
+import SPRService.SPRService.DTOs.filtros.FiltroVehiculoDTO;
 import SPRService.SPRService.entities.MarcaVehiculo;
 import SPRService.SPRService.entities.ModeloVehiculo;
 import SPRService.SPRService.entities.Vehiculo;
 import SPRService.SPRService.exceptions.DuplicateVehicleException;
 import SPRService.SPRService.services.ModeloVehiculoServ;
 import SPRService.SPRService.services.VehiculoServ;
+import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
@@ -40,7 +42,6 @@ public class VehiculoServImpl implements VehiculoServ {
     }
 
     @Transactional
-    //todo: ver si esta va en la interfaz de serv
     public List<MarcaVehiculo> getAllBrands() {
         return daoMarca.getAllAlphabetically();
     }
@@ -65,6 +66,19 @@ public class VehiculoServImpl implements VehiculoServ {
         if (marca == null) marca = "";
 
         return daoVehiculo.buscarPor(patente, modelo, marca);
+    }
+
+    @Transactional
+    @Override
+    public ResultadoPaginado<Vehiculo> buscarPaginado(String patente, String modelo, String marca,
+                                                      int pagina, int itemsPorPagina) {
+        if (patente == null) patente = "";
+        if (modelo == null) modelo = "";
+        if (marca == null) marca = "";
+
+        int offset = pagina * itemsPorPagina;
+        FiltroVehiculoDTO filtro = new FiltroVehiculoDTO(patente, modelo, marca, offset, itemsPorPagina);
+        return daoVehiculo.buscarPaginado(filtro);
     }
 
     @Transactional
@@ -128,27 +142,7 @@ public class VehiculoServImpl implements VehiculoServ {
     public void borradoLogico(Vehiculo v) {
         if (v == null) throw new NullPointerException("Error: vehículo nulo en servicio");
         v.setEstado(Boolean.FALSE);
-        // todo: buscar que tan malo es esto a largo plazo, sobretodo en reportes históricos.
-        //  En caso de querer "reactivar" un borrado por error, se tendrá que revertir esto
-        //  considerando el vehículo ya activo. Parece que el usuario deberá escoger cual mantener activo.
-        // Modificación de patente única para cada borrado. Para poder cargar vehículos nuevos
-        // con la misma patente sin sobreescribir borrados y mantener integridad referencial.
         v.setPatente(v.getPatente().concat(".DEL" + v.getId()));
         daoVehiculo.update(v);
     }
-
-//    @Transactional
-//    private Boolean consultarEstado(Vehiculo v) {
-//        List<Boolean> result = daoVehiculo.consultarEstado(v.getPatente());
-//        if (result.isEmpty()) return null;
-//        return result.getFirst();
-//    }
-
-//    @Transactional
-//    private void reactivarVehiculo(Vehiculo v) {
-//        v.setEstado(Boolean.TRUE);
-//        Long id = daoVehiculo.consultarId(v.getPatente());
-//        v.setId(id);
-//        daoVehiculo.update(v);
-//    }
 }
