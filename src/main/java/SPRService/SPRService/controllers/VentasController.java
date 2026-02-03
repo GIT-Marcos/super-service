@@ -7,6 +7,7 @@ import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.util.*;
 import SPRService.SPRService.util.alertas.NotificationHelper;
+import SPRService.SPRService.viewModels.tablas.NotaRetiroViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,7 +52,7 @@ public class VentasController implements Initializable {
     @FXML
     private TableColumn<VentaRepuestoVMtabla, String> colEstadoVenta, colFechaVenta, colCliente;
     @FXML
-    private TableColumn<VentaRepuestoVMtabla, BigDecimal> colMontoVenta;
+    private TableColumn<VentaRepuestoVMtabla, BigDecimal> colMontoVenta, colFaltante;
     @FXML
     private DatePicker dateFechaMin, dateFechaMax;
     @FXML
@@ -286,7 +287,31 @@ public class VentasController implements Initializable {
         colEstadoVenta.setCellValueFactory(new PropertyValueFactory<>("estadoVenta"));
         colFechaVenta.setCellValueFactory(new PropertyValueFactory<>("fechaVenta"));
         colMontoVenta.setCellValueFactory(new PropertyValueFactory<>("montoVenta"));
+        colFaltante.setCellValueFactory(new PropertyValueFactory<>("montoFaltante"));
         colCliente.setCellValueFactory(new PropertyValueFactory<>("clienteDNI"));
+
+        if (colEstadoVenta != null) {
+            colEstadoVenta.setCellFactory(column -> new TableCell<VentaRepuestoVMtabla, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item);
+                        VentaRepuestoVMtabla vm = getTableView().getItems().get(getIndex());
+                        if (vm.estadoVentaProperty().get().equals(EstadoVentaRepuesto.CANCELADO.toString())) {
+                            setStyle("-fx-text-fill: #952122; -fx-font-weight: bold; -fx-alignment: CENTER");
+                        } else if (vm.estadoVentaProperty().get().equals(EstadoVentaRepuesto.PENDIENTE_PAGO.toString())) {
+                            setStyle("-fx-text-fill: #b6aa21; -fx-font-weight: bold; -fx-alignment: CENTER");
+                        } else if (vm.estadoVentaProperty().get().equals(EstadoVentaRepuesto.PAGADO.toString())) {
+                            setStyle("-fx-text-fill: #026e21; -fx-font-weight: bold; -fx-alignment: CENTER");
+                        }
+                    }
+                }
+            });
+        }
     }
 
     private void llenarCombos() {

@@ -40,7 +40,7 @@
                         <Separator orientation="VERTICAL" />
 
                         <!-- NUEVO: Búsqueda por Cliente (DNI) -->
-                        <Label text="DNI/CUIL:" />
+                        <Label text="DNI:" />
                         <TextField fx:id="tfBuscarDni" prefWidth="115.0" promptText="Buscar Cliente" />
 
                         <Separator orientation="VERTICAL" />
@@ -97,11 +97,12 @@
             <children>
                 <TableView fx:id="tablaVentas" fixedCellSize="0.0" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colCodVenta" prefWidth="120.0" text="Código" />
+                        <TableColumn fx:id="colCodVenta" prefWidth="100.0" text="Código" />
                         <TableColumn fx:id="colEstadoVenta" prefWidth="120.0" style="-fx-alignment: CENTER;" text="Estado" />
                         <TableColumn fx:id="colFechaVenta" prefWidth="140.0" style="-fx-alignment: CENTER;" text="Fecha" />
                         <TableColumn fx:id="colMontoVenta" prefWidth="120.0" style="-fx-alignment: CENTER-RIGHT;" text="Monto Total $" />
-                        <TableColumn fx:id="colCliente" prefWidth="120.0" style="-fx-alignment: CENTER-RIGHT;" text="DNI/CUIL Cliente" />
+                  <TableColumn fx:id="colFaltante" prefWidth="100.0" style="-fx-alignment: CENTER-RIGHT;" text="Faltante $" />
+                        <TableColumn fx:id="colCliente" prefWidth="100.0" style="-fx-alignment: CENTER-RIGHT;" text="DNI Cliente" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
