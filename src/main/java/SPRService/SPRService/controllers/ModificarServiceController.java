@@ -236,6 +236,7 @@ public class ModificarServiceController implements Initializable, DataReceiver<S
                 "Agregar repuesto", this.notaRetiro.getDetallesRetiro());
         result.ifPresent(detalle -> {
             orden.agregarRepuestos(Set.of(detalle));
+            this.notaRetiro.agregarDetalle(detalle);
             items.addFirst(new ItemDetalleRetiroViewModel(detalle));
             agregarTotal(detalle.getSubTotal());
         });

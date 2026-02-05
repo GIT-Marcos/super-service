@@ -1,5 +1,6 @@
 package SPRService.SPRService.services.impl;
 
+import SPRService.SPRService.DAOs.RepuestoDAO;
 import SPRService.SPRService.DAOs.ServiceDAO;
 import SPRService.SPRService.DTOs.DatosReporteServiceDTO;
 import SPRService.SPRService.DTOs.ReporteCantidadEnAnioDTO;
@@ -17,36 +18,21 @@ import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ServiceServImpl implements ServiceServ {
 
     private final ServiceDAO daoService;
     private final StockServ stockServ;
     private final NotaRetiroServ notaRetiroServ;
+    private final RepuestoDAO repuestoDAO;
 
     @Inject
-    public ServiceServImpl(ServiceDAO daoService, StockServ stockServ, NotaRetiroServ notaRetiroServ) {
+    public ServiceServImpl(ServiceDAO daoService, StockServ stockServ, NotaRetiroServ notaRetiroServ, RepuestoDAO repuestoDAO) {
         this.daoService = daoService;
         this.stockServ = stockServ;
         this.notaRetiroServ = notaRetiroServ;
-    }
-
-    /**
-     * Para que no se guarden notas de retiro vacías
-     */
-    // todo: al modificar quita stock de los repuestos de nuevo
-    private void validarNota(Service s) {
-        if (s.getOrden().getNotaRetiro() == null || s.getOrden().getNotaRetiro().getDetallesRetiro().isEmpty()) {
-            //todo: ver si cancelar nota
-            s.getOrden().setNotaRetiro(null);
-        } else {
-            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiro()) {
-                stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
-            }
-        }
+        this.repuestoDAO = repuestoDAO;
     }
 
     @Transactional
@@ -108,12 +94,90 @@ public class ServiceServImpl implements ServiceServ {
         return s;
     }
 
+    private void validarNota(Service s) {
+        if (s.getOrden().getNotaRetiro() == null || s.getOrden().getNotaRetiro().getDetallesRetiro().isEmpty()) {
+            s.getOrden().setNotaRetiro(null);
+        } else {
+            for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiro()) {
+                // Solo restamos stock de los items NUEVOS (los que agregan al modificar)
+                if (d.getId() == null) {
+                    stockServ.quitarExistente(d.getRepuesto().getStock(), d.getCantidadRetirada());
+                }
+            }
+        }
+    }
+
     @Transactional
     @Override
     public Service modificarService(Service s) {
-        validarNota(s);
+        // 1. Devolver stock de lo que se eliminó de la lista
+        gestionarDevoluciones(s);
+
+        // 2. Procesar lo nuevo y (MUY IMPORTANTE) actualizar referencias para evitar sobrescritura
+        procesarNuevosYActualizarReferencias(s);
+
         s.recalcularMontos();
         return daoService.update(s);
+    }
+
+    /**
+     * Compara la versión guardada en BD con la versión nueva.
+     * Si un detalle existía en BD y ya no está en la nueva lista, devuelve el stock.
+     */
+    private void gestionarDevoluciones(Service serviceNuevo) {
+        Optional<Service> serviceOriginalOpt = daoService.traerDatosParaModificar(serviceNuevo.getId());
+
+        if (serviceOriginalOpt.isPresent()) {
+            Service serviceOriginal = serviceOriginalOpt.get();
+            NotaRetiro notaOriginal = serviceOriginal.getOrden().getNotaRetiro();
+
+            if (notaOriginal == null || notaOriginal.getDetallesRetiro().isEmpty()) return;
+
+            // IDs que sobreviven en la nueva lista
+            Set<Long> idsEnNuevaLista = new HashSet<>();
+            if (serviceNuevo.getOrden().getNotaRetiro() != null) {
+                for (DetalleRetiro d : serviceNuevo.getOrden().getNotaRetiro().getDetallesRetiro()) {
+                    if (d.getId() != null) idsEnNuevaLista.add(d.getId());
+                }
+            }
+
+            // Si estaba en la original y NO está en la nueva, devolvemos el stock
+            for (DetalleRetiro viejo : notaOriginal.getDetallesRetiro()) {
+                if (!idsEnNuevaLista.contains(viejo.getId())) {
+                    // Importante: Usar el stock del objeto viejo (que es managed) para asegurar la actualización
+                    stockServ.agregarExistente(viejo.getRepuesto().getStock(), viejo.getCantidadRetirada());
+                }
+            }
+        }
+    }
+
+    /**
+     * Recorre la lista nueva.
+     * 1. Recarga el Repuesto "fresco" de la BD para tener el Stock actualizado.
+     * 2. Reemplaza el Repuesto en el detalle por el fresco (evita el bug de sobrescritura).
+     * 3. Si es un item nuevo, resta el stock.
+     */
+    private void procesarNuevosYActualizarReferencias(Service s) {
+        if (s.getOrden().getNotaRetiro() == null) return;
+
+        // Iteramos sobre una copia o directamente si no modificamos la estructura de la colección
+        for (DetalleRetiro d : s.getOrden().getNotaRetiro().getDetallesRetiro()) {
+
+            // A. RECARGAR REPUESTO (CRUCIAL PARA SOLUCIONAR TU ERROR)
+            // Buscamos el repuesto real en la BD para ver el stock que quedó después de las devoluciones
+            // Asumo que tienes un findById o similar en tu RepuestoDAO
+            Repuesto repuestoFresco = repuestoDAO.getById(d.getRepuesto().getId());
+
+            // B. VINCULAR
+            // Reemplazamos el objeto "viejo" que venía de la pantalla por el "fresco" de la BD
+            d.setRepuesto(repuestoFresco);
+
+            // C. RESTAR SI ES NUEVO
+            // Al ser id nulo, sabemos que es el nuevo registro con la nueva cantidad
+            if (d.getId() == null) {
+                stockServ.quitarExistente(repuestoFresco.getStock(), d.getCantidadRetirada());
+            }
+        }
     }
 
     @Transactional
