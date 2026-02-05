@@ -20,12 +20,6 @@ public class AppCoordinator {
     private Stage primaryStage;
     private final Navigator mainNavigator;
 
-//    @Inject
-//    public AppCoordinator(Provider<FXMLLoader> fxmlLoaderProvider, Navigator mainNavigator) {
-//        this.fxmlLoaderProvider = fxmlLoaderProvider;
-//        this.mainNavigator = mainNavigator;
-//    }
-
     @Inject
     public AppCoordinator(Provider<FXMLLoader> fxmlLoaderProvider) {
         this.fxmlLoaderProvider = fxmlLoaderProvider;
@@ -57,6 +51,7 @@ public class AppCoordinator {
 
     public void closeSesion() {
         primaryStage.close();
+        mainNavigator.limpiarCaches();
         showLoginScreen();
     }
 

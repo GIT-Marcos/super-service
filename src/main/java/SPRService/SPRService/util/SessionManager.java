@@ -1,7 +1,6 @@
 package SPRService.SPRService.util;
 
 import SPRService.SPRService.entities.Usuario;
-import SPRService.SPRService.util.alertas.Alertas;
 
 //TODO: ver si conviene manejar esto con inyección de dependencias.
 public class SessionManager {

@@ -182,4 +182,10 @@ public class DefaultNavigator implements Navigator {
             super(message, cause);
         }
     }
+
+    @Override
+    public void limpiarCaches() {
+        this.viewCache.clear();
+        this.controllerCache.clear();
+    }
 }
