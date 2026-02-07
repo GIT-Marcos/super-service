@@ -15,6 +15,7 @@ import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Singleton
 public class UsuarioDAOImpl extends GenericDAOImpl<Usuario, Long> implements UsuarioDAO {
@@ -57,13 +58,13 @@ public class UsuarioDAOImpl extends GenericDAOImpl<Usuario, Long> implements Usu
     }
 
     @Override
-    public List<Usuario> buscarPorNombre(String nombre) {
+    public Optional<Usuario> buscarPorNombre(String nombre) {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT DISTINCT u FROM Usuario u " +
                                 "WHERE u.nombre = :nombre",
                         Usuario.class)
                 .setParameter("nombre", nombre)
                 .setMaxResults(1)
-                .getResultList();
+                .getResultStream().findFirst();
     }
 }
