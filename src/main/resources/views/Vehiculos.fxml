@@ -108,7 +108,7 @@
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cargarVehiculo" styleClass="btn-success" text="➕ Cargar vehículo" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#modificarVehiculo" text="✏ Modificar vehículo" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#verDetalles" styleClass="button" text="👁 Ver detalles" />
-                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#eliminarVehiculo" styleClass="btn-danger" text="🗑 Eliminar vehículo" />
+                <Button fx:id="btnCancelar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#eliminarVehiculo" styleClass="btn-danger" text="🗑 Eliminar vehículo" />
 
                 <Separator prefWidth="200.0" />
 
@@ -117,7 +117,7 @@
                         <Font name="System Bold" size="14.0" />
                     </font>
                 </Label>
-                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#generarReporteMasRegistrados" styleClass="btn-report" text="🏆 Modelos más registrados" wrapText="true">
+                <Button fx:id="btnRepMod" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#generarReporteMasRegistrados" styleClass="btn-report" text="🏆 Modelos más registrados" wrapText="true">
                     <font>
                         <Font size="12.0" />
                     </font>

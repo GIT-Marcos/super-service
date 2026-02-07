@@ -105,7 +105,7 @@
                     <tooltip><Tooltip text="Agregar nuevo repuesto" /></tooltip>
                 </Button>
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modRepuesto" text="📝 Detalles/Modificar" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#borrarRepuesto" styleClass="btn-danger" text="🗑 Baja" />
+                <Button fx:id="btnBaja" maxWidth="Infinity" mnemonicParsing="false" onAction="#borrarRepuesto" styleClass="btn-danger" text="🗑 Baja" />
 
                 <Separator />
 
@@ -115,8 +115,8 @@
                 <Separator />
 
                 <Label styleClass="section-label" text="REPORTES" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#masRetiradosParaVenta" styleClass="btn-report" text="📊 Más Retirados" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#usoDeRepuestos" styleClass="btn-report" text="📉 Uso Repuestos" />
+                <Button fx:id="btnRepMasRetirados" maxWidth="Infinity" mnemonicParsing="false" onAction="#masRetiradosParaVenta" styleClass="btn-report" text="📊 Más Retirados" />
+                <Button fx:id="btnRepUsos" maxWidth="Infinity" mnemonicParsing="false" onAction="#usoDeRepuestos" styleClass="btn-report" text="📉 Uso Repuestos" />
 
                 <Separator />
                 <Label styleClass="section-label" text="EXPORTAR" />

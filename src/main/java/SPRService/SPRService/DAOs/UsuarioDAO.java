@@ -4,6 +4,7 @@ import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.entities.Usuario;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UsuarioDAO extends GenericDAO<Usuario, Long> {
 
@@ -16,5 +17,5 @@ public interface UsuarioDAO extends GenericDAO<Usuario, Long> {
      *
      * @param nombre nombre del usuario que quiere loguearse.
      */
-    List<Usuario> buscarPorNombre(String nombre);
+    Optional<Usuario> buscarPorNombre(String nombre);
 }

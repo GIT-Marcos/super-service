@@ -7,6 +7,7 @@ import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.PrioridadService;
+import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
@@ -64,6 +65,8 @@ public class ServicesController implements Initializable {
             colMontoFaltante, colMontoTotal, colCliente;
     @FXML
     private Pagination paginacion;
+    @FXML
+    private Button btnCancelarServ, btnAgregarPago, btnRepAnual, btnRepComp;
 
     @Inject
     public ServicesController(AppCoordinator coordinator, ServiceServ serviceServ) {
@@ -79,6 +82,21 @@ public class ServicesController implements Initializable {
 
         // Cargar primera página
         cargarPagina(0);
+
+        configPermisos();
+    }
+
+    private void configPermisos() {
+        RolUsuario rol = SessionManager.getRolUsuario();
+        if (rol == RolUsuario.OPERATIVO_TALLER) {
+            btnCancelarServ.setDisable(true);
+            btnRepAnual.setDisable(true);
+            btnRepComp.setDisable(true);
+            btnAgregarPago.setDisable(true);
+        } else if (rol == RolUsuario.OPERATIVO_RECEPCION) {
+            btnRepAnual.setDisable(true);
+            btnRepComp.setDisable(true);
+        }
     }
 
     // ==================== PAGINACIÓN ====================

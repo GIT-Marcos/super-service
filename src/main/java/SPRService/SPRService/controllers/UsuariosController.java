@@ -93,7 +93,7 @@ public class UsuariosController implements Initializable {
     @FXML
     public void nuevo() {
         Optional<UsuarioViewModelTabla> result = navigator.openModal(Views.CARGAR_USUARIO, "Crear usuario", null);
-        result.ifPresent(obsListUsuariosVM::addFirst);
+        result.ifPresent(u -> verTodos());
     }
 
     @FXML

@@ -107,17 +107,6 @@
 
                 <Separator prefWidth="200.0" />
 
-                <Label styleClass="section-label" text="GENERACIÓN DE EPORTES">
-                    <font>
-                        <Font name="System Bold" size="14.0" />
-                    </font>
-                </Label>
-                <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn-report" text="🏆 Clientes con más services" wrapText="true">
-                    <font>
-                        <Font size="12.0" />
-                    </font>
-                </Button>
-
             </children>
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

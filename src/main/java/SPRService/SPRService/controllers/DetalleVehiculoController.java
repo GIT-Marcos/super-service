@@ -4,10 +4,12 @@ import SPRService.SPRService.components.CeldaOperacionUniversal;
 import SPRService.SPRService.entities.Orden;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.entities.Vehiculo;
+import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
+import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.viewModels.celdas.ItemOperacionViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemServiceViewModel;
 import com.google.inject.Inject;
@@ -17,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
@@ -41,6 +44,8 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
     private ImageView imgMarca;
     @FXML
     private ListView<ItemOperacionViewModel> lvServices;
+    @FXML
+    private Button btnNuevo;
 
     @Inject
     public DetalleVehiculoController(AppCoordinator coordinator) {
@@ -50,6 +55,14 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configurarLista();
+        configPermisos();
+    }
+
+    private void configPermisos() {
+        RolUsuario rol = SessionManager.getRolUsuario();
+        if (rol == RolUsuario.OPERATIVO_TALLER) {
+            btnNuevo.setDisable(true);
+        }
     }
 
     @Override
@@ -59,11 +72,6 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
             cargarLabels(data);
             cargarLista(data);
         }
-    }
-
-    @FXML
-    private void verDetalle() {
-
     }
 
     @FXML

@@ -94,20 +94,20 @@ public class UsuarioServImpl implements UsuarioServ {
     @Transactional
     @Override
     public Usuario loguear(String nombre, String inputPass) {
-        if (nombre == null || inputPass == null) {
-            throw new NullPointerException("nombre o contraseña nula al loguear.");
-        }
-        Usuario usuario;
-        List<Usuario> list = daoUsuario.buscarPorNombre(nombre);
-        if (list.isEmpty()) {
+        Optional<Usuario> result = daoUsuario.buscarPorNombre(nombre);
+        if (result.isEmpty()) {
             throw new HibernateException("No se encontró usuario con nombre " + nombre);
-        } else {
-            usuario = list.getFirst();
-            if (!BCrypt.checkpw(inputPass, usuario.getPassword())) {
-                throw new HibernateException("Contraseña incorrecta para el usuario: " + nombre);
-            }
         }
-        return usuario;
+
+        Usuario usuarioEncontrado = result.get();
+
+        if (usuarioEncontrado.getActivo() == false)
+            throw new HibernateException("El usuario: '" + usuarioEncontrado.getNombre() + "' está dado de baja.");
+
+        if (!BCrypt.checkpw(inputPass, usuarioEncontrado.getPassword()))
+            throw new HibernateException("Contraseña incorrecta para el usuario: " + nombre);
+
+        return usuarioEncontrado;
     }
 
     //TODO: reemplazar en casos como estos usar Optional<>

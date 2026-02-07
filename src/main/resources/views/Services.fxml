@@ -144,10 +144,10 @@
 
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#nuevoService" styleClass="btn-success" text="➕ Nuevo service" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modificarService" text="✏ Modificar/Detalles" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#agregarPago" styleClass="btn-primary" text="💰 Agregar pago" />
+                <Button fx:id="btnAgregarPago" maxWidth="Infinity" mnemonicParsing="false" onAction="#agregarPago" styleClass="btn-primary" text="💰 Agregar pago" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#verPagos" styleClass="button" text="🏧 Ver pagos" />
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#generarTicket" styleClass="button" text="📄 Generar ticket retiro" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#darDeBaja" styleClass="btn-danger" text="🚫 Cancelar service" />
+                <Button fx:id="btnCancelarServ" maxWidth="Infinity" mnemonicParsing="false" onAction="#darDeBaja" styleClass="btn-danger" text="🚫 Cancelar service" />
 
                 <Separator />
 
@@ -157,8 +157,8 @@
                 <Separator />
 
                 <Label styleClass="section-label" text="REPORTES" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#reportesAnuales" styleClass="btn-report" text="📊 Anuales" />
-                <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#comparacionIngresos" styleClass="btn-report" text="📈 Comparación de Ingresos" wrapText="true" />
+                <Button fx:id="btnRepAnual" maxWidth="Infinity" mnemonicParsing="false" onAction="#reportesAnuales" styleClass="btn-report" text="📊 Anuales" />
+                <Button fx:id="btnRepComp" maxWidth="Infinity" mnemonicParsing="false" onAction="#comparacionIngresos" styleClass="btn-report" text="📈 Comparación de Ingresos" wrapText="true" />
             </children>
         </VBox>
     </right>

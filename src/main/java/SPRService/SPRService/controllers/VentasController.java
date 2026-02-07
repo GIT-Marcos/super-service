@@ -1,6 +1,7 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.DTOs.filtros.FiltroVentaRepuestoDTO;
+import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
@@ -56,6 +57,8 @@ public class VentasController implements Initializable {
     private DatePicker dateFechaMin, dateFechaMax;
     @FXML
     private Pagination paginacion;
+    @FXML
+    private Button btnCancelar, btnRepMens, btnRepAnu, btnRepMasIng;
 
     @Inject
     public VentasController(VentaRepuestoServ ventaRepuestoServ, AppCoordinator appCoordinator) {
@@ -75,6 +78,17 @@ public class VentasController implements Initializable {
         configurarControles();
         tablaVentas.setItems(obsListVentasVM);
         paginacion.setPageFactory(this::cargarPagina);
+
+        configPermisos();
+    }
+
+    private void configPermisos() {
+        RolUsuario rol = SessionManager.getRolUsuario();
+        if (rol == RolUsuario.OPERATIVO_VENTAS) {
+            btnRepMens.setDisable(true);
+            btnRepAnu.setDisable(true);
+            btnRepMasIng.setDisable(true);
+        }
     }
 
     private Node cargarPagina(int indicePagina) {

@@ -24,4 +24,6 @@ public interface Navigator {
      * @return Un Optional que contiene el controlador si existe, o un Optional vacío.
      */
     Optional<Object> getControllerFor(Views view);
+
+    void limpiarCaches();
 }
