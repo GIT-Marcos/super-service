@@ -1,7 +1,9 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.DTOs.filtros.FiltroNotaRetiro;
+import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.util.ResultadoPaginado;
+import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.GeneradorTXT;
@@ -53,6 +55,8 @@ public class NotasRetiroController implements Initializable {
     private DatePicker dateFechaMin, dateFechaMax;
     @FXML
     private CheckBox chkVentas, chkService, chkActivas, chkInactivas, chkOtro;
+    @FXML
+    private Button btnCancelar;
 
     @Inject
     public NotasRetiroController(NotaRetiroServ notaRetiroServ, AppCoordinator appCoordinator) {
@@ -66,6 +70,14 @@ public class NotasRetiroController implements Initializable {
         configurarTabla();
         // Configurar Paginación (esto disparará la primera carga)
         paginacion.setPageFactory(this::cargarPagina);
+        configPermisos();
+    }
+
+    private void configPermisos() {
+        RolUsuario rol = SessionManager.getRolUsuario();
+        if (rol == RolUsuario.OPERATIVO_VENTAS) {
+            btnCancelar.setDisable(true);
+        }
     }
 
     private void configurarDatePickers() {

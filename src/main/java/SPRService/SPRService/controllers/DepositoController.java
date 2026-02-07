@@ -1,5 +1,7 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.enums.RolUsuario;
+import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.DepositoViewModel;
@@ -39,6 +41,17 @@ public class DepositoController implements Initializable {
     private Label labelAvisoStock;
     @FXML
     private Pagination paginacion;
+    @FXML
+    private Button btnBaja, btnRepMasRetirados, btnRepUsos;
+
+    private void configPermisos() {
+        RolUsuario rol = SessionManager.getRolUsuario();
+        if (rol == RolUsuario.OPERATIVO_DEPOSITO) {
+            btnBaja.setDisable(true);
+            btnRepUsos.setDisable(true);
+            btnRepMasRetirados.setDisable(true);
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -47,6 +60,7 @@ public class DepositoController implements Initializable {
         configurarPaginacion();
         bindViewModel();
         viewModel.initialize();
+        configPermisos();
     }
 
     private void bindViewModel() {

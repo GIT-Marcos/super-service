@@ -1,5 +1,6 @@
 package SPRService.SPRService.navigation;
 
+import SPRService.SPRService.util.SessionManager;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -89,7 +90,7 @@ public class AppCoordinator {
             // La lógica de vinculación del Pane y la navegación inicial siguen
             // dentro de MainController.initialize(), lo cual es correcto.
 
-            mainStage.setTitle("SuperService");
+            mainStage.setTitle("SuperService | Permisos de rol: " + SessionManager.getRolUsuario().toString());
             mainStage.setScene(new Scene(root));
             Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/imgs/icon.png")));
             mainStage.getIcons().add(icon);

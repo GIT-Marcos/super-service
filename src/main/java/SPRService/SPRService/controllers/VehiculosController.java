@@ -1,9 +1,11 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.entities.Vehiculo;
+import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.navigation.WizardStateProvider;
 import SPRService.SPRService.services.VehiculoServ;
 import SPRService.SPRService.util.ResultadoPaginado;
+import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.ExportadorTabla;
@@ -52,6 +54,8 @@ public class VehiculosController implements Initializable {
     private ComboBox<String> comboFormato;
     @FXML
     private Pagination paginacion;
+    @FXML
+    private Button btnCancelar, btnRepMod;
 
     @Inject
     public VehiculosController(AppCoordinator appCoordinator, WizardStateProvider wizardStateProvider,
@@ -70,6 +74,18 @@ public class VehiculosController implements Initializable {
 
         // Cargar primera página
         cargarPagina(0);
+
+        configPermisos();
+    }
+
+    private void configPermisos() {
+        RolUsuario rol = SessionManager.getRolUsuario();
+        if (rol == RolUsuario.OPERATIVO_TALLER) {
+            btnCancelar.setDisable(true);
+            btnRepMod.setDisable(true);
+        } else if (rol == RolUsuario.OPERATIVO_RECEPCION) {
+            btnRepMod.setDisable(true);
+        }
     }
 
     // ==================== PAGINACIÓN ====================

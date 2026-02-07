@@ -1,6 +1,7 @@
 package SPRService.SPRService.util;
 
 import SPRService.SPRService.entities.Usuario;
+import SPRService.SPRService.enums.RolUsuario;
 
 //TODO: ver si conviene manejar esto con inyección de dependencias.
 public class SessionManager {
@@ -25,5 +26,12 @@ public class SessionManager {
 
     public static boolean haySesionActiva() {
         return usuarioSesion != null;
+    }
+
+    public static RolUsuario getRolUsuario() {
+        if (usuarioSesion == null)
+            return RolUsuario.GERENCIAL;
+
+        return usuarioSesion.getRol();
     }
 }

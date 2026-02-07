@@ -3,7 +3,9 @@ package SPRService.SPRService.controllers;
 import SPRService.SPRService.components.CeldaPago;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.enums.EstadoService;
+import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.navigation.*;
+import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.viewModels.celdas.ItemPagoViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -41,6 +43,14 @@ public class VerPagosController implements Initializable, DataReceiver<Service>,
         lista.setCellFactory(f -> new CeldaPago());
         String css = getClass().getResource("/styles/celdaPago.css").toExternalForm();
         lista.getStylesheets().add(css);
+        configPermisos();
+    }
+
+    private void configPermisos() {
+        RolUsuario rol = SessionManager.getRolUsuario();
+        if (rol == RolUsuario.OPERATIVO_TALLER) {
+            btnAgregarPago.setDisable(true);
+        }
     }
 
     @Override

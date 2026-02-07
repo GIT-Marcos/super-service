@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../styles/notaRetiro.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.NotasRetiroController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../styles/notaRetiro.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.NotasRetiroController">
 
     <!-- PARTE SUPERIOR: Filtros de Fecha y Tipo -->
     <top>
@@ -102,7 +102,7 @@
                     </tooltip>
                 </Button>
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#verDetalles" text="📄 Ver detalles" />
-            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#cancelarNota" styleClass="btn-danger" text="🚫 Cancelar Nota" />
+            <Button fx:id="btnCancelar" maxWidth="Infinity" mnemonicParsing="false" onAction="#cancelarNota" styleClass="btn-danger" text="🚫 Cancelar Nota" />
 
                 <Separator prefWidth="200.0" />
 

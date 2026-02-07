@@ -4,18 +4,16 @@ import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.services.UsuarioServ;
 import SPRService.SPRService.util.EMailSender;
 import SPRService.SPRService.util.SimpleDialogs;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SessionManager;
-import javafx.util.Duration;
 import org.apache.commons.mail.EmailException;
-import org.controlsfx.control.Notifications;
 import org.hibernate.HibernateException;
 
 import java.net.URL;
@@ -43,7 +41,6 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
     }
 
     @FXML
@@ -52,12 +49,7 @@ public class LoginController implements Initializable {
         String inputPass = tfContrasenia.getText().trim();
         if (flagDebug) {
             appCoordinator.onLoginSuccess();
-            Notifications.create()
-                    .position(Pos.BOTTOM_RIGHT)
-                    .hideAfter(Duration.seconds(3))
-                    .title("Inicio sesión")
-                    .text("Sesión iniciada con éxito.")
-                    .showInformation();
+            NotificationHelper.mostrarExito("Inicio sesión", "Sesión iniciada con éxito.");
         } else {
             try {
                 ManejadorInputs.textoGenerico(nombreUsuario, true, "Nombre de usuario",
@@ -66,26 +58,11 @@ public class LoginController implements Initializable {
                 Usuario usuario = usuarioServ.loguear(nombreUsuario, inputPass);
                 SessionManager.iniciarSesion(usuario);
                 appCoordinator.onLoginSuccess();
-                Notifications.create()
-                        .position(Pos.BOTTOM_RIGHT)
-                        .hideAfter(Duration.seconds(3))
-                        .title("Inicio sesión")
-                        .text("Sesión iniciada con éxito.")
-                        .showInformation();
+                NotificationHelper.mostrarExito("Inicio sesión", "Sesión iniciada con éxito.");
             } catch (IllegalArgumentException | HibernateException e) {
-                Notifications.create()
-                        .position(Pos.CENTER)
-                        .hideAfter(Duration.seconds(3))
-                        .title("Inicio sesión")
-                        .text(e.getMessage())
-                        .showWarning();
+                NotificationHelper.mostrarAdvertencia("Inicio sesión", e.getMessage());
             } catch (Exception e) {
-                Notifications.create()
-                        .position(Pos.CENTER)
-                        .hideAfter(Duration.seconds(5))
-                        .title("Inicio sesión")
-                        .text("Ha ocurrido un error inesperado al iniciar sesión.")
-                        .showError();
+                NotificationHelper.mostrarError("Inicio sesión", e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -97,19 +74,10 @@ public class LoginController implements Initializable {
         if (direccion == null) return;
         try {
             eMailSender.enviarMailRecuperacionContrasenia(direccion);
-            Notifications.create()
-                    .title("Recuperar contraseña")
-                    .text("El correo de recuperación se ha enviado con éxito.")
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showInformation();
+            NotificationHelper.mostrarExito("Recuperar contraseña", "El correo de recuperación se ha enviado con éxito.");
         } catch (EmailException e) {
-            Notifications.create()
-                    .title("Recuperar contraseña")
-                    .text("Fallo al enviar el correo. Verifique su conexión o configuración: " + e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showError();
+            NotificationHelper.mostrarError("Recuperar contraseña",
+                    "Fallo al enviar el correo. Verifique su conexión o configuración: " + e.getMessage());
             e.printStackTrace();
         }
     }
