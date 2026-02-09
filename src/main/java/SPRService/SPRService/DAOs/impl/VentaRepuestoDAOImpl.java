@@ -16,6 +16,7 @@ import jakarta.persistence.criteria.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -237,12 +238,8 @@ public class VentaRepuestoDAOImpl extends GenericDAOImpl<VentaRepuesto, Long> im
     }
 
     @Override
-    public List<ReporteIngresosRepuestoDTO> ingresosPorRepuesto(LocalDate fechaMin, LocalDate fechaMax, Integer cantidad) {
+    public List<ReporteIngresosRepuestoDTO> ingresosPorRepuesto(LocalDateTime fechaMin, LocalDateTime fechaMax, Integer cantidad) {
         EntityManager em = emProvider.get();
-
-        if (fechaMin == null) fechaMin = LocalDate.of(2000, 1, 1);
-        if (fechaMax == null) fechaMax = LocalDate.now();
-
         return em.createQuery("SELECT new SPRService.SPRService.DTOs.ReporteIngresosRepuestoDTO(" +
                                 "r.codBarra, " +
                                 "mr.nombreMarca, " +

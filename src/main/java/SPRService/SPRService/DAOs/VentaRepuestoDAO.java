@@ -9,6 +9,7 @@ import SPRService.SPRService.util.ResultadoPaginado;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,7 +80,7 @@ public interface VentaRepuestoDAO extends GenericDAO<VentaRepuesto, Long> {
      * @param cantidad de elementos a buscar.
      * @return lista con DTOs que representan un repuesto con datos de negocio.
      */
-    List<ReporteIngresosRepuestoDTO> ingresosPorRepuesto(LocalDate fechaMin, LocalDate fechaMax, Integer cantidad);
+    List<ReporteIngresosRepuestoDTO> ingresosPorRepuesto(LocalDateTime fechaMin, LocalDateTime fechaMax, Integer cantidad);
 
     //ESCRITURA
 

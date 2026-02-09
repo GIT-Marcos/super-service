@@ -53,11 +53,6 @@ public class ChartIngresosRepuestoController implements Initializable {
         SpinnerValueFactory<Integer> valueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 10);
         spinner.setValueFactory(valueFactory);
-
-        dpFechaMax.setValue(LocalDate.now());
-        dpFechaMin.setValue(LocalDate.now().minusMonths(1));
-
-        generar();
     }
 
     @FXML
@@ -123,7 +118,7 @@ public class ChartIngresosRepuestoController implements Initializable {
             }
 
             chart.getData().add(series);
-
+            NotificationHelper.mostrarExito("Ingresos por repuesto", "Se ha generado el reporte con éxito.");
         } catch (Exception e) {
             NotificationHelper.mostrarError("Error al generar gráfico",
                     "No se pudieron cargar los ingresos: " + e.getMessage());

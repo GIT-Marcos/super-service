@@ -17,6 +17,7 @@ import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -110,7 +111,7 @@ public class VentaRepuestoServImpl implements VentaRepuestoServ {
         if (fechaMin == null) fechaMin = LocalDate.of(2000, 1, 1);
         if (fechaMax == null) fechaMax = LocalDate.now();
         if (cantidad < 0 || cantidad > 20) cantidad = 1;
-        return daoVenta.ingresosPorRepuesto(fechaMin, fechaMax, cantidad);
+        return daoVenta.ingresosPorRepuesto(fechaMin.atStartOfDay(), fechaMax.atTime(LocalTime.MAX), cantidad);
     }
 
     @Transactional
