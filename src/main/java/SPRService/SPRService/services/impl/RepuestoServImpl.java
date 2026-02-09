@@ -17,6 +17,7 @@ import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -79,19 +80,15 @@ public class RepuestoServImpl implements RepuestoServ {
     @Override
     public List<RepuestoRetiradoReporteDTO> repuestosMasRetiradosParaVenta(Integer cantidad, LocalDate fechaMin,
                                                                            LocalDate fechaMax) {
-        if (cantidad == null || cantidad < 0 || cantidad > 30) {
-            cantidad = 5;
-        }
-        if (fechaMin == null) {
-            fechaMin = LocalDate.now().minusYears(20L);
-        }
-        if (fechaMax == null) {
-            fechaMax = LocalDate.now();
-        }
+        if (cantidad == null || cantidad < 0 || cantidad > 30) cantidad = 5;
+        if (fechaMin == null) fechaMin = LocalDate.now().minusYears(20L);
+        if (fechaMax == null) fechaMax = LocalDate.now();
+
         Integer finalCantidad = cantidad;
         LocalDate finalFechaMin = fechaMin;
         LocalDate finalFechaMax = fechaMax;
-        List<Object[]> objects = daoRepuesto.masRetiradosParaVenta(finalCantidad, finalFechaMin, finalFechaMax);
+        List<Object[]> objects = daoRepuesto.masRetiradosParaVenta(finalCantidad,
+                finalFechaMin.atStartOfDay(), finalFechaMax.atTime(LocalTime.MAX));
         List<RepuestoRetiradoReporteDTO> dtos = new ArrayList<>();
         for (Object[] fila : objects) {
             Repuesto repuesto = (Repuesto) fila[0];
@@ -110,9 +107,9 @@ public class RepuestoServImpl implements RepuestoServ {
     @Transactional
     @Override
     public ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDate fechaMin, LocalDate fechaMax) {
-        if (fechaMin == null) fechaMin = LocalDate.of(1900, 1, 1);
+        if (fechaMin == null) fechaMin = LocalDate.now().minusYears(20L);
         if (fechaMax == null) fechaMax = LocalDate.now();
-        ReporteUsoDeRepuestosDTO dto = daoRepuesto.usoDeRepuestos(fechaMin, fechaMax);
+        ReporteUsoDeRepuestosDTO dto = daoRepuesto.usoDeRepuestos(fechaMin.atStartOfDay(), fechaMax.atTime(LocalTime.MAX));
         if (dto.paraService() == null || dto.paraVenta() == null) {
             return null;
         }

@@ -6,6 +6,7 @@ import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.EMailSender;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -13,13 +14,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.BorderPane;
-import javafx.util.Duration;
 import org.apache.commons.mail.EmailException;
-import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +51,7 @@ public class ChartUsoDeRepuestosController implements Initializable {
 
     @FXML
     private void generar() {
-        if (fechaMin.getValue() == null) fechaMin.setValue(LocalDate.of(1900, 1, 1));
+        if (fechaMin.getValue() == null) fechaMin.setValue(LocalDate.now().minusYears(20L));
         if (fechaMax.getValue() == null) fechaMax.setValue(LocalDate.now());
         ReporteUsoDeRepuestosDTO dto = repuestoServ.usoDeRepuestos(fechaMin.getValue(), fechaMax.getValue());
         obsPie.clear();
@@ -67,12 +65,8 @@ public class ChartUsoDeRepuestosController implements Initializable {
             obsPie.add(new PieChart.Data("Service: " + dto.paraService() + " - " + dto.pctParaService() + " %",
                     dto.paraService()));
         } else {
-            Notifications.create()
-                    .title("Reporte de uso")
-                    .text("No se encontraron notas de retiro entre esas fechas.")
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Reporte de uso",
+                    "No se encontraron notas de retiro entre esas fechas.");
         }
     }
 
@@ -81,24 +75,16 @@ public class ChartUsoDeRepuestosController implements Initializable {
         if (!obsPie.isEmpty()) {
             GeneradorImagenes.exportarJPEG(event, rootPane, "Reporte de usos de repuestos");
         } else {
-            Notifications.create()
-                    .title("Reporte de uso")
-                    .text("No hay datos para exportar.")
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Reporte de uso",
+                    "No hay datos para exportar.");
         }
     }
 
     @FXML
     private void enviarMail() {
         if (obsPie.isEmpty()) {
-            Notifications.create()
-                    .title("Reporte de uso")
-                    .text("Primero debe generar el reporte para poder enviarlo.")
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Reporte de uso",
+                    "No hay datos para enviar.");
             return;
         }
         String destinatario = SimpleDialogs.pedirMailParaEnviarReporte();
@@ -106,12 +92,8 @@ public class ChartUsoDeRepuestosController implements Initializable {
             ManejadorInputs.eMail(destinatario, true);
             enviarSnapshotPorCorreo(destinatario);
         } catch (IllegalArgumentException e) {
-            Notifications.create()
-                    .title("Ingreso de dirección de correo")
-                    .text(e.getMessage())
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarError("Reporte de uso",
+                    e.getMessage());
         }
     }
 
@@ -127,29 +109,17 @@ public class ChartUsoDeRepuestosController implements Initializable {
             eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
             // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
-            Notifications.create()
-                    .title("Reporte de usos de repuestos")
-                    .text("El reporte se envió correctamente a " + destinatario)
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showInformation();
+            NotificationHelper.mostrarExito("Reporte enviado",
+                    "El reporte se envió correctamente a " + destinatario);
             // Opcional: borrar el archivo temporal inmediatamente
             tempFile.deleteOnExit();
         } catch (IOException e) {
-            Notifications.create()
-                    .title("Error IO")
-                    .text("No se pudo generar la imagen temporal: " + e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showError();
+            NotificationHelper.mostrarError("Error de IO",
+                    "No se pudo generar la imagen temporal: " + e.getMessage());
             e.printStackTrace();
         } catch (EmailException e) {
-            Notifications.create()
-                    .title("Error Mail")
-                    .text("Fallo al enviar el correo. Verifique su conexión o configuración: " + e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showError();
+            NotificationHelper.mostrarError("Error Mail",
+                    "Fallo al enviar el correo: " + e.getMessage());
             e.printStackTrace();
         }
     }

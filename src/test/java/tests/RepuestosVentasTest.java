@@ -17,10 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.time.YearMonth;
+import java.time.*;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -129,7 +126,7 @@ class RepuestosVentasTest {
         uow.begin();   // 👈 abrir contexto de trabajo
 
         try {
-            System.out.println("--- Iniciando población de Ventas con Pagos Variados ---");
+            System.out.println("--- Iniciando población de Ventas para todo el año 2024 ---");
 
             List<Repuesto> listaRepuestos = repuestoServ.verTodos();
             if (listaRepuestos.isEmpty()) {
@@ -147,58 +144,68 @@ class RepuestosVentasTest {
             }
 
             Random random = new Random();
-            int anioActual = Year.now().getValue();
+            int anio = 2025;
             int totalVentasGeneradas = 0;
 
             String[] bancos = {"Banco Galicia", "Santander", "BBVA", "Banco Nación", "ICBC", "Macro"};
             String[] marcasTarjetas = {"Visa", "Mastercard", "Amex", "Cabal"};
 
+            // 👇 Generar ventas para todos los meses del 2024
             for (int mes = 1; mes <= 12; mes++) {
-                int numVentasEsteMes = random.nextInt(40);
-                int diasEnMes = YearMonth.of(anioActual, mes).lengthOfMonth();
+                // Número variable de ventas por mes (entre 25 y 45 para tener buena distribución)
+                int numVentasEsteMes = 25 + random.nextInt(21);
+                int diasEnMes = YearMonth.of(anio, mes).lengthOfMonth();
 
-                if (mes == LocalDate.now().getMonthValue() && anioActual == LocalDate.now().getYear()) {
-                    diasEnMes = LocalDate.now().getDayOfMonth();
-                } else if (mes > LocalDate.now().getMonthValue() && anioActual == LocalDate.now().getYear()) {
-                    continue;
-                }
+                System.out.println("Generando " + numVentasEsteMes + " ventas para " +
+                        Month.of(mes).name() + " 2024...");
 
                 for (int i = 0; i < numVentasEsteMes; i++) {
                     try {
+                        // Distribución de días y horas para simular actividad comercial realista
                         int diaAleatorio = random.nextInt(diasEnMes) + 1;
-                        int horaAleatoria = random.nextInt(24);
+                        // Horario comercial: principalmente entre 8 AM y 8 PM
+                        int horaAleatoria = 8 + random.nextInt(12);
                         int minutoAleatorio = random.nextInt(60);
 
                         LocalDateTime fechaVenta = LocalDateTime.of(
-                                anioActual, mes, diaAleatorio, horaAleatoria, minutoAleatorio
+                                anio, mes, diaAleatorio, horaAleatoria, minutoAleatorio
                         );
 
+                        // Selección aleatoria de repuesto
                         Repuesto repuestoAleatorio = listaRepuestos.get(random.nextInt(listaRepuestos.size()));
 
-                        // Cantidad entre 1 y 4
-                        double cantidad = 1.0 + random.nextInt(4);
+                        // Cantidad variable entre 1 y 5 unidades
+                        double cantidad = 1.0 + random.nextInt(5);
 
                         DetalleRetiro detalle = new DetalleRetiro(cantidad, repuestoAleatorio);
                         NotaRetiro notaRetiro = new NotaRetiro(NotaRetiro.TipoUsoRetiro.VENTA, new HashSet<>());
                         notaRetiro.agregarDetalle(detalle);
 
-                        // Cliente aleatorio o consumidor final (null)
-                        // Aproximadamente 50% de ventas con cliente y 50% consumidor final
+                        // 60% de probabilidad de tener cliente registrado, 40% consumidor final
                         Cliente cliente = null;
-                        if (!listaClientes.isEmpty() && random.nextBoolean()) {
+                        if (!listaClientes.isEmpty() && random.nextDouble() < 0.6) {
                             cliente = listaClientes.get(random.nextInt(listaClientes.size()));
                         }
 
-                        // Constructor nuevo de VentaRepuesto: calcula montoTotal, montoFaltante, estado, etc.
                         VentaRepuesto venta = new VentaRepuesto(notaRetiro);
                         venta.asociarCliente(cliente);
                         venta.setFechaVenta(fechaVenta);
 
-                        MetodosPago metodoSeleccionado = MetodosPago.values()[random.nextInt(MetodosPago.values().length)];
+                        // Distribución de métodos de pago más realista
+                        MetodosPago metodoSeleccionado;
+                        double probMetodo = random.nextDouble();
+                        if (probMetodo < 0.35) {
+                            metodoSeleccionado = MetodosPago.EFECTIVO;
+                        } else if (probMetodo < 0.60) {
+                            metodoSeleccionado = MetodosPago.TARJETA_DEBITO;
+                        } else if (probMetodo < 0.85) {
+                            metodoSeleccionado = MetodosPago.TARJETA_CREDITO;
+                        } else {
+                            metodoSeleccionado = MetodosPago.TRANSFERENCIA;
+                        }
 
                         String banco = null, marcaTarjeta = null, ultimos4 = null, referencia = null;
 
-                        // Si hay cliente, usamos su DNI; si no, marcamos como consumidor final
                         String identificadorCliente = (cliente != null)
                                 ? cliente.getDni()
                                 : "CONSUMIDOR_FINAL";
@@ -209,15 +216,18 @@ class RepuestosVentasTest {
                                 banco = bancos[random.nextInt(bancos.length)];
                                 marcaTarjeta = marcasTarjetas[random.nextInt(marcasTarjetas.length)];
                                 ultimos4 = String.valueOf(random.nextInt(9000) + 1000);
-                                referencia = "REF-" + random.nextInt(999999);
+                                referencia = "REF-2024" + String.format("%02d", mes) +
+                                        String.format("%03d", i);
                                 break;
                             case TRANSFERENCIA:
                                 banco = bancos[random.nextInt(bancos.length)];
-                                referencia = "TRF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                                referencia = "TRF-2024-" + String.format("%02d", mes) + "-" +
+                                        UUID.randomUUID().toString().substring(0, 6).toUpperCase();
                                 break;
                             case EFECTIVO:
                             default:
-                                referencia = "TKT-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+                                referencia = "TKT-2024-" + String.format("%02d", mes) + "-" +
+                                        String.format("%04d", totalVentasGeneradas + 1);
                                 break;
                         }
 
@@ -233,19 +243,26 @@ class RepuestosVentasTest {
 
                         pago.setFechaPago(fechaVenta);
 
-                        // Actualiza montoFaltante y estadoVenta internamente
                         venta.asociarPago(pago);
 
                         ventaRepuestoServ.cargarVenta(venta, pago);
                         totalVentasGeneradas++;
 
                     } catch (Exception e) {
-                        System.err.println("Error al generar venta: " + e.getMessage());
+                        System.err.println("Error al generar venta en mes " + mes + ": " + e.getMessage());
                     }
                 }
-                System.out.println("Mes " + mes + " procesado. Ventas acumuladas: " + totalVentasGeneradas);
+
+                System.out.println("✓ Mes " + String.format("%02d", mes) + "/2024 completado. " +
+                        "Ventas acumuladas: " + totalVentasGeneradas);
             }
-            System.out.println("--- Fin población Ventas. Total generadas: " + totalVentasGeneradas + " ---");
+
+            System.out.println("\n===========================================");
+            System.out.println("RESUMEN FINAL:");
+            System.out.println("- Año procesado: 2024 (completo)");
+            System.out.println("- Total de ventas generadas: " + totalVentasGeneradas);
+            System.out.println("- Promedio por mes: " + (totalVentasGeneradas / 12));
+            System.out.println("===========================================\n");
 
         } finally {
             uow.end();  // 👈 cerrar contexto

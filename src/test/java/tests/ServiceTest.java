@@ -20,10 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Year;
+import java.time.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -38,6 +35,7 @@ public class ServiceTest {
     private VehiculoServ vehiculoServ;
     private RepuestoServ repuestoServ;
     private Provider<EntityManager> emProvider;
+    private final int ANIO_GENERACION = 2025;
 
     @BeforeEach
     void setUp() {
@@ -61,13 +59,14 @@ public class ServiceTest {
 
     @Test
     void poblarServices() {
-        System.out.println("--- Iniciando población de Services ---");
+        System.out.println("--- Iniciando población de Services (Año 2025 completo) ---");
 
         UnitOfWork uow = injector.getInstance(UnitOfWork.class);
         uow.begin();
 
         try {
             EntityManager em = injector.getProvider(EntityManager.class).get();
+
             // 1. OBTENER ENTIDADES EXISTENTES
             List<Cliente> clientesFull = em.createQuery("select distinct c from Cliente c " +
                             "left join fetch c.vehiculos",
@@ -91,19 +90,16 @@ public class ServiceTest {
             // Asignar vehículos a cada cliente
             for (Cliente cliente : clientesFull) {
                 try {
-                    // Determinar cuántos vehículos asignar a este cliente (1-3)
                     int cantVehiculos = random.nextInt(3) + 1;
                     Set<Long> vehiculosAsignados = new HashSet<>();
 
                     for (int i = 0; i < cantVehiculos && !vehiculos.isEmpty(); i++) {
-                        // Intentar asignar un vehículo que no tenga ya este cliente
                         Vehiculo vehiculoSeleccionado = null;
                         int intentos = 0;
 
                         while (intentos < 10 && vehiculoSeleccionado == null) {
                             Vehiculo candidato = vehiculos.get(random.nextInt(vehiculos.size()));
 
-                            // Verificar que no se repita para este cliente
                             if (!vehiculosAsignados.contains(candidato.getId())) {
                                 vehiculoSeleccionado = candidato;
                                 vehiculosAsignados.add(candidato.getId());
@@ -112,21 +108,17 @@ public class ServiceTest {
                         }
 
                         if (vehiculoSeleccionado != null) {
-                            //todo: lazyexcep. Traer con otro método de servicio
                             cliente.asociarVehiculo(vehiculoSeleccionado);
                             System.out.println("Asociado vehículo " + vehiculoSeleccionado.getPatente() +
                                     " al cliente " + cliente.getNombre() + " " + cliente.getApellido());
                         }
                     }
 
-                    // Persistir la asociación actualizando el cliente
-                    //clienteServ.editClient(cliente);
-
                 } catch (Exception e) {
                     System.err.println("Error al asociar vehículos al cliente " + cliente.getId() + ": " + e.getMessage());
                 }
             }
-            System.out.println("--- Asociaciones completadas ---");
+            System.out.println("--- Asociaciones completadas ---\n");
 
             // 3. RECARGAR CLIENTES CON VEHÍCULOS ACTUALIZADOS
             clientesFull = clienteServ.verTodosActivos();
@@ -135,114 +127,209 @@ public class ServiceTest {
             Map<Long, Cliente> mapaClientesFull = clientesFull.stream()
                     .collect(Collectors.toMap(Cliente::getId, c -> c));
 
-            // 4. CREAR SERVICES
-            int cantidadServices = 70;
-            int creados = 0;
+            // 4. CONFIGURACIÓN PARA AÑO 2025
+            int totalServicesCreados = 0;
 
-            List<EstadoService> estadosPosibles = Arrays.stream(EstadoService.values())
-                    .filter(e -> e != EstadoService.PAGADO)
-                    .toList();
-
-            String[] motivos = {"Falla en arranque", "Service 10.000km", "Ruido tren delantero",
+            String[] motivos = {
+                    "Falla en arranque", "Service 10.000km", "Ruido tren delantero",
                     "Cambio pastillas freno", "Revisión aire acondicionado",
-                    "Pérdida de aceite", "Control de fluidos", "Cambio de correa"};
+                    "Pérdida de aceite", "Control de fluidos", "Cambio de correa",
+                    "Service 20.000km", "Cambio de embrague", "Falla en transmisión",
+                    "Reparación sistema eléctrico", "Cambio de amortiguadores",
+                    "Alineación y balanceo", "Diagnóstico general", "Falla sensor oxígeno"
+            };
 
-            String[] trabajosLista = {"Mano de obra mecánica", "Diagnóstico computarizado",
+            String[] trabajosLista = {
+                    "Mano de obra mecánica", "Diagnóstico computarizado",
                     "Alineación", "Balanceo", "Limpieza de inyectores",
-                    "Cambio de filtros", "Regulación de frenos"};
+                    "Cambio de filtros", "Regulación de frenos", "Cambio de aceite",
+                    "Reparación eléctrica", "Soldadura", "Pintura", "Pulido",
+                    "Instalación de accesorios", "Revisión de suspensión"
+            };
 
-            for (int i = 0; i < cantidadServices; i++) {
-                try {
-                    // 5. SELECCIONAR CLIENTE Y VEHÍCULO
-                    Cliente clienteAsignado = clientesFull.get(random.nextInt(clientesFull.size()));
+            System.out.println("===========================================");
+            System.out.println("Generando Services para todo el año 2025");
+            System.out.println("===========================================\n");
 
-                    // Seleccionar un vehículo de los que tiene asignados este cliente
-                    Vehiculo vehiculoAsignado = null;
+            // 5. GENERAR SERVICES POR CADA MES DEL 2025
+            for (int mes = 1; mes <= 12; mes++) {
+                // Número variable de services por mes (entre 5 y 10 para un total de ~90 services)
+                int numServicesEsteMes = 5 + random.nextInt(6);
+                int diasEnMes = YearMonth.of(ANIO_GENERACION, mes).lengthOfMonth();
 
-                    if (!clienteAsignado.getVehiculos().isEmpty()) {
-                        // Convertir Set a List para acceder por índice
-                        List<Vehiculo> vehiculosCliente = new ArrayList<>(clienteAsignado.getVehiculos());
-                        vehiculoAsignado = vehiculosCliente.get(random.nextInt(vehiculosCliente.size()));
-                    } else {
-                        // Si el cliente no tiene vehículos (no debería pasar), usar uno aleatorio
-                        System.out.println("ADVERTENCIA: Cliente " + clienteAsignado.getId() + " sin vehículos asignados");
-                        vehiculoAsignado = vehiculos.get(random.nextInt(vehiculos.size()));
-                    }
+                System.out.println("📅 Procesando " + Month.of(mes).name() + " 2025 - Generando " +
+                        numServicesEsteMes + " services...");
 
-                    // 6. CREAR ESTADO INGRESO
-                    EstadoIngreso estadoIngreso = new EstadoIngreso(
-                            null,
-                            "Sin observaciones",
-                            "Rueda auxilio, Cricket",
-                            random.nextInt(200000),
-                            random.nextInt(100)
-                    );
+                for (int i = 0; i < numServicesEsteMes; i++) {
+                    try {
+                        // 6. GENERAR FECHA ALEATORIA EN EL MES
+                        int diaAleatorio = random.nextInt(diasEnMes) + 1;
+                        // Horario de taller: 8 AM - 6 PM
+                        int horaAleatoria = 8 + random.nextInt(10);
+                        int minutoAleatorio = random.nextInt(60);
 
-                    Orden orden = new Orden(motivos[random.nextInt(motivos.length)],
-                            "Informe técnico generado automáticamente.",
-                            estadoIngreso);
+                        LocalDateTime fechaCarga = LocalDateTime.of(
+                                ANIO_GENERACION, mes, diaAleatorio, horaAleatoria, minutoAleatorio
+                        );
 
-                    orden.asociarVehiculo(vehiculoAsignado);
+                        // Fecha de entrega: entre 3 y 20 días después de la carga
+                        int diasParaEntrega = 3 + random.nextInt(18);
+                        LocalDateTime fechaEntrega = fechaCarga.plusDays(diasParaEntrega);
 
-                    // 8. AGREGAR TRABAJOS
-                    int cantTrabajos = random.nextInt(3) + 1;
-                    Set<Trabajo> trabajos = new HashSet<>();
-                    for (int j = 0; j < cantTrabajos; j++) {
-                        trabajos.add(new Trabajo(
-                                null,
-                                trabajosLista[random.nextInt(trabajosLista.length)],
-                                BigDecimal.valueOf(random.nextInt(45000) + 4000)
-                        ));
-                    }
-                    orden.agregarTrabajos(trabajos);
+                        // 7. SELECCIONAR CLIENTE Y VEHÍCULO
+                        Cliente clienteAsignado = clientesFull.get(random.nextInt(clientesFull.size()));
 
-                    // 9. AGREGAR REPUESTOS
-                    NotaRetiro notaRetiro = new NotaRetiro(NotaRetiro.TipoUsoRetiro.SERVICE, new HashSet<>());
+                        Vehiculo vehiculoAsignado = null;
 
-                    if (!repuestos.isEmpty() && random.nextDouble() > 0.4) {
-                        int cantRepuestos = random.nextInt(2) + 1;
-                        Set<DetalleRetiro> detalles = new HashSet<>();
-
-                        for (int k = 0; k < cantRepuestos; k++) {
-                            Repuesto rep = repuestos.get(random.nextInt(repuestos.size()));
-                            detalles.add(new DetalleRetiro((double) (random.nextInt(2) + 1), rep));
+                        if (!clienteAsignado.getVehiculos().isEmpty()) {
+                            List<Vehiculo> vehiculosCliente = new ArrayList<>(clienteAsignado.getVehiculos());
+                            vehiculoAsignado = vehiculosCliente.get(random.nextInt(vehiculosCliente.size()));
+                        } else {
+                            System.out.println("  ⚠️ ADVERTENCIA: Cliente " + clienteAsignado.getId() +
+                                    " sin vehículos asignados");
+                            vehiculoAsignado = vehiculos.get(random.nextInt(vehiculos.size()));
                         }
-                        notaRetiro.agregarDetalle(detalles);
+
+                        // 8. CREAR ESTADO INGRESO
+                        String[] observaciones = {
+                                "Sin observaciones", "Rayón en puerta derecha",
+                                "Golpe menor en paragolpes", "Luz de check engine encendida",
+                                "Cliente reporta vibración", "Ruido al frenar",
+                                "Pérdida de potencia", "Consumo excesivo de combustible"
+                        };
+
+                        String[] herramientas = {
+                                "Rueda auxilio, Cricket", "Rueda auxilio, Cricket, Matafuegos",
+                                "Rueda auxilio", "Cricket, Llave de rueda",
+                                "Kit completo de herramientas", "Rueda auxilio, Triángulo"
+                        };
+
+                        EstadoIngreso estadoIngreso = new EstadoIngreso(
+                                null,
+                                observaciones[random.nextInt(observaciones.length)],
+                                herramientas[random.nextInt(herramientas.length)],
+                                random.nextInt(200000),
+                                20 + random.nextInt(80)  // Nivel de combustible entre 20% y 100%
+                        );
+
+                        Orden orden = new Orden(
+                                motivos[random.nextInt(motivos.length)],
+                                "Informe técnico generado automáticamente para service del " +
+                                        fechaCarga.toLocalDate() + ".",
+                                estadoIngreso
+                        );
+
+                        orden.asociarVehiculo(vehiculoAsignado);
+
+                        // 9. AGREGAR TRABAJOS (1 a 4 trabajos por orden)
+                        int cantTrabajos = 1 + random.nextInt(4);
+                        Set<Trabajo> trabajos = new HashSet<>();
+                        Set<String> trabajosUsados = new HashSet<>();
+
+                        for (int j = 0; j < cantTrabajos; j++) {
+                            String trabajoDescripcion;
+                            int intentos = 0;
+                            do {
+                                trabajoDescripcion = trabajosLista[random.nextInt(trabajosLista.length)];
+                                intentos++;
+                            } while (trabajosUsados.contains(trabajoDescripcion) && intentos < 10);
+
+                            if (!trabajosUsados.contains(trabajoDescripcion)) {
+                                trabajosUsados.add(trabajoDescripcion);
+                                trabajos.add(new Trabajo(
+                                        null,
+                                        trabajoDescripcion,
+                                        BigDecimal.valueOf(5000 + random.nextInt(50000))
+                                ));
+                            }
+                        }
+                        orden.agregarTrabajos(trabajos);
+
+                        // 10. AGREGAR REPUESTOS (60% de probabilidad)
+                        NotaRetiro notaRetiro = new NotaRetiro(NotaRetiro.TipoUsoRetiro.SERVICE, new HashSet<>());
+
+                        if (!repuestos.isEmpty() && random.nextDouble() < 0.6) {
+                            int cantRepuestos = 1 + random.nextInt(3);
+                            Set<DetalleRetiro> detalles = new HashSet<>();
+                            Set<Long> repuestosUsados = new HashSet<>();
+
+                            for (int k = 0; k < cantRepuestos; k++) {
+                                Repuesto rep;
+                                int intentos = 0;
+                                do {
+                                    rep = repuestos.get(random.nextInt(repuestos.size()));
+                                    intentos++;
+                                } while (repuestosUsados.contains(rep.getId()) && intentos < 10);
+
+                                if (!repuestosUsados.contains(rep.getId())) {
+                                    repuestosUsados.add(rep.getId());
+                                    detalles.add(new DetalleRetiro(
+                                            (double) (1 + random.nextInt(3)),
+                                            rep
+                                    ));
+                                }
+                            }
+                            notaRetiro.agregarDetalle(detalles);
+                        }
+
+                        orden.setNotaRetiro(notaRetiro);
+
+                        // 11. CONFIGURAR PRIORIDAD basada en el motivo
+                        PrioridadService prioridad;
+                        String motivoSeleccionado = orden.getMotivoIngreso();
+
+                        if (motivoSeleccionado.contains("Falla") || motivoSeleccionado.contains("Pérdida")) {
+                            // Mayor probabilidad de alta prioridad para fallas
+                            prioridad = random.nextDouble() < 0.7 ?
+                                    PrioridadService.ALTA : PrioridadService.MEDIA;
+                        } else if (motivoSeleccionado.contains("Service") || motivoSeleccionado.contains("Control")) {
+                            // Services de rutina suelen ser de prioridad baja o media
+                            prioridad = random.nextDouble() < 0.6 ?
+                                    PrioridadService.BAJA : PrioridadService.MEDIA;
+                        } else {
+                            prioridad = PrioridadService.values()[random.nextInt(PrioridadService.values().length)];
+                        }
+
+                        // 12. CREAR SERVICE
+                        // El estado se asigna automáticamente al cargar el service
+                        Service service = new Service(fechaEntrega, prioridad);
+                        service.asignarCliente(clienteAsignado);
+                        service.asignarOrden(orden);
+                        service.setFechaCarga(fechaCarga);
+
+                        // 13. GUARDAR
+                        serviceServ.cargarService(service);
+                        totalServicesCreados++;
+
+                        System.out.println("  ✓ Service #" + totalServicesCreados +
+                                " | " + fechaCarga.toLocalDate() +
+                                " | Cliente: " + clienteAsignado.getApellido() +
+                                " | Vehículo: " + vehiculoAsignado.getPatente() +
+                                " | Prioridad: " + prioridad);
+
+                    } catch (Exception e) {
+                        System.err.println("  ❌ Error al guardar service: " + e.getMessage());
+                        e.printStackTrace();
                     }
-
-                    orden.setNotaRetiro(notaRetiro);
-
-                    // 10. CONFIGURAR FECHAS Y PRIORIDAD
-                    LocalDateTime fechaCarga = generarFechaAleatoriaEnElAnio();
-                    LocalDateTime fechaEntrega = fechaCarga.plusDays(random.nextInt(15));
-                    PrioridadService prioridad = PrioridadService.values()[random.nextInt(PrioridadService.values().length)];
-
-                    // 11. CREAR SERVICE
-
-                    Service service = new Service(fechaEntrega, prioridad);
-                    service.asignarCliente(clienteAsignado);
-                    service.asignarOrden(orden);
-
-                    service.setFechaCarga(fechaCarga);
-                    service.setEstadoService(estadosPosibles.get(random.nextInt(estadosPosibles.size())));
-
-                    // 12. GUARDAR
-                    serviceServ.cargarService(service);
-                    creados++;
-                    System.out.println("Service guardado [" + creados + "/" + cantidadServices +
-                            "] | Cliente: " + clienteAsignado.getApellido() +
-                            " | Vehículo: " + vehiculoAsignado.getPatente() +
-                            " | Fecha: " + fechaCarga.toLocalDate());
-
-                } catch (Exception e) {
-                    fail("Error al guardar service " + (i + 1) + ": " + e.getMessage());
-                    e.printStackTrace();
                 }
+
+                System.out.println("  📊 Mes " + String.format("%02d", mes) + "/2025 completado. " +
+                        "Total acumulado: " + totalServicesCreados + "\n");
             }
 
-            System.out.println("--- Fin población Services. Total creados: " + creados + " ---");
-        } catch (RuntimeException e) {
+            // RESUMEN FINAL
+            System.out.println("\n===========================================");
+            System.out.println("RESUMEN FINAL DE SERVICES:");
+            System.out.println("- Año procesado: 2025 (completo)");
+            System.out.println("- Total de services creados: " + totalServicesCreados);
+            System.out.println("- Promedio por mes: " + (totalServicesCreados / 12));
+            System.out.println("- Clientes utilizados: " + clientesFull.size());
+            System.out.println("- Vehículos disponibles: " + vehiculos.size());
+            System.out.println("===========================================\n");
 
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            fail("Error durante la población de services: " + e.getMessage());
         } finally {
             uow.end();  // 👈 cerrar contexto
         }
@@ -250,7 +337,7 @@ public class ServiceTest {
 
     @Test
     void poblarPagos() {
-        System.out.println("--- Iniciando población de Pagos para Services ---");
+        System.out.println("--- Iniciando población de Pagos para Services (Año 2025) ---");
 
         UnitOfWork uow = injector.getInstance(UnitOfWork.class);
         uow.begin();
@@ -275,82 +362,147 @@ public class ServiceTest {
             Collections.shuffle(candidatosAPagar);
             Random random = new Random();
 
-            int cantidadObjetivo = 40;
-            int cantidadAPagar = Math.min(cantidadObjetivo, candidatosAPagar.size());
-            int pagosRealizados = 0;
+            int totalPagosGenerados = 0;
 
-            System.out.println("Se procederá a pagar " + cantidadAPagar + " services.");
+            String[] bancos = {"Banco Galicia", "Santander", "BBVA", "Banco Nación", "ICBC", "Macro", "HSBC"};
+            String[] tarjetas = {"Visa", "Mastercard", "Amex", "Cabal", "Naranja"};
 
-            String[] bancos = {"Banco Galicia", "Santander", "BBVA", "Banco Nación", "ICBC"};
-            String[] tarjetas = {"Visa", "Mastercard", "Amex"};
+            System.out.println("Services disponibles para pagar: " + candidatosAPagar.size());
+            System.out.println("Generando pagos distribuidos durante todo el año 2025...\n");
 
-            for (int i = 0; i < cantidadAPagar; i++) {
-                Service service = candidatosAPagar.get(i);
+            // Distribuir pagos a lo largo del año 2025
+            for (int mes = 1; mes <= 12; mes++) {
+                // Número variable de pagos por mes (entre 30 y 50)
+                int numPagosEsteMes = 30 + random.nextInt(21);
+                int diasEnMes = YearMonth.of(ANIO_GENERACION, mes).lengthOfMonth();
 
-                try {
-                    // 2. DEFINIR MONTO
-                    boolean pagoTotal = random.nextDouble() > 0.2;
-                    BigDecimal montoAPagar;
+                System.out.println("Procesando " + Month.of(mes).name() + " 2025 - Generando " +
+                        numPagosEsteMes + " pagos...");
 
-                    if (pagoTotal) {
-                        montoAPagar = service.getMontoFaltante();
-                    } else {
-                        double porcentaje = 0.1 + (0.8 * random.nextDouble());
-                        montoAPagar = service.getMontoFaltante().multiply(BigDecimal.valueOf(porcentaje));
-                        montoAPagar = montoAPagar.setScale(2, java.math.RoundingMode.HALF_UP);
+                for (int i = 0; i < numPagosEsteMes && !candidatosAPagar.isEmpty(); i++) {
+                    Service service = candidatosAPagar.get(random.nextInt(candidatosAPagar.size()));
+
+                    try {
+                        // Generar fecha aleatoria en el mes
+                        int diaAleatorio = random.nextInt(diasEnMes) + 1;
+                        // Horario bancario típico: 9 AM - 5 PM
+                        int horaAleatoria = 9 + random.nextInt(8);
+                        int minutoAleatorio = random.nextInt(60);
+
+                        LocalDateTime fechaPago = LocalDateTime.of(
+                                ANIO_GENERACION, mes, diaAleatorio, horaAleatoria, minutoAleatorio
+                        );
+
+                        // DEFINIR MONTO DEL PAGO
+                        boolean pagoTotal = random.nextDouble() > 0.25; // 75% pagos totales, 25% parciales
+                        BigDecimal montoAPagar;
+
+                        if (pagoTotal) {
+                            montoAPagar = service.getMontoFaltante();
+                        } else {
+                            // Pago parcial: entre 20% y 90% del monto faltante
+                            double porcentaje = 0.2 + (0.7 * random.nextDouble());
+                            montoAPagar = service.getMontoFaltante().multiply(BigDecimal.valueOf(porcentaje));
+                            montoAPagar = montoAPagar.setScale(2, java.math.RoundingMode.HALF_UP);
+                        }
+
+                        // DEFINIR PAGO con distribución realista
+                        MetodosPago metodo;
+                        double probMetodo = random.nextDouble();
+                        if (probMetodo < 0.30) {
+                            metodo = MetodosPago.EFECTIVO;
+                        } else if (probMetodo < 0.55) {
+                            metodo = MetodosPago.TARJETA_DEBITO;
+                        } else if (probMetodo < 0.80) {
+                            metodo = MetodosPago.TARJETA_CREDITO;
+                        } else {
+                            metodo = MetodosPago.TRANSFERENCIA;
+                        }
+
+                        String banco = null, marcaTarjeta = null, ultimos4 = null, referencia = null;
+
+                        switch (metodo) {
+                            case TARJETA_CREDITO:
+                            case TARJETA_DEBITO:
+                                banco = bancos[random.nextInt(bancos.length)];
+                                marcaTarjeta = tarjetas[random.nextInt(tarjetas.length)];
+                                ultimos4 = String.valueOf(random.nextInt(9000) + 1000);
+                                referencia = "REF-2025-" + String.format("%02d", mes) + "-" +
+                                        String.format("%04d", totalPagosGenerados + 1);
+                                break;
+                            case TRANSFERENCIA:
+                                banco = bancos[random.nextInt(bancos.length)];
+                                referencia = "TRF-2025-" + String.format("%02d", mes) + "-" +
+                                        UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                                break;
+                            case EFECTIVO:
+                            default:
+                                referencia = "TKT-2025-" + String.format("%02d", mes) + "-" +
+                                        String.format("%05d", totalPagosGenerados + 1);
+                                break;
+                        }
+
+                        String dniCliente = service.getCliente().getDni();
+
+                        // CREAR PAGO
+                        Pago nuevoPago = new Pago(dniCliente,
+                                montoAPagar,
+                                marcaTarjeta,
+                                banco,
+                                referencia,
+                                BigDecimal.ZERO,
+                                ultimos4,
+                                null,
+                                metodo);
+
+                        nuevoPago.setFechaPago(fechaPago);
+
+                        // VINCULAR Y PERSISTIR
+                        // El estado del service se actualiza automáticamente al asociar el pago
+                        service.asociarPago(nuevoPago);
+                        serviceServ.modificarService(service);
+                        totalPagosGenerados++;
+
+                        // Si el service está completamente pagado, lo removemos de la lista
+                        if (service.getMontoFaltante().compareTo(BigDecimal.ZERO) <= 0) {
+                            candidatosAPagar.remove(service);
+                            System.out.println("  ✓ Service ID: " + service.getId() +
+                                    " - PAGADO COMPLETAMENTE (Estado: " + service.getEstadoService() + ")");
+                        } else {
+                            System.out.println("  → Service ID: " + service.getId() +
+                                    " - Pago parcial registrado (Faltante: $" +
+                                    service.getMontoFaltante().setScale(2, java.math.RoundingMode.HALF_UP) + ")");
+                        }
+
+                    } catch (Exception e) {
+                        System.err.println("Error al registrar pago en mes " + mes + ": " + e.getMessage());
                     }
-
-                    // 3. DEFINIR DETALLES PAGO
-                    MetodosPago metodo = MetodosPago.values()[random.nextInt(MetodosPago.values().length)];
-                    String banco = null, marcaTarjeta = null, ultimos4 = null, referencia = null;
-
-                    if (metodo == MetodosPago.TARJETA_CREDITO || metodo == MetodosPago.TARJETA_DEBITO) {
-                        banco = bancos[random.nextInt(bancos.length)];
-                        marcaTarjeta = tarjetas[random.nextInt(tarjetas.length)];
-                        ultimos4 = String.valueOf(random.nextInt(9000) + 1000);
-                        referencia = "REF-" + random.nextInt(999999);
-                    } else if (metodo == MetodosPago.TRANSFERENCIA) {
-                        banco = bancos[random.nextInt(bancos.length)];
-                        referencia = "TRF-" + random.nextInt(99999999);
-                    } else {
-                        // Efectivo
-                        referencia = "TKT-" + random.nextInt(999999);
-                    }
-
-                    String dniCliente = service.getCliente().getDni();
-
-                    // 4. CREAR PAGO
-                    Pago nuevoPago = new Pago(dniCliente,
-                            montoAPagar,
-                            marcaTarjeta,
-                            banco,
-                            referencia,
-                            BigDecimal.ZERO,
-                            ultimos4,
-                            null,
-                            metodo);
-
-                    LocalDate fechaEntrega = service.getFechaEntrega().toLocalDate();
-                    if (fechaEntrega.isBefore(LocalDate.now())) {
-                        nuevoPago.setFechaPago(fechaEntrega.atTime(LocalTime.NOON));
-                    } else {
-                        nuevoPago.setFechaPago(LocalDateTime.now());
-                    }
-
-                    // 5. VINCULAR Y PERSISTIR
-                    service.asociarPago(nuevoPago);
-                    serviceServ.modificarService(service);
-                    pagosRealizados++;
-
-                    System.out.println("Pago registrado [" + pagosRealizados + "/" + cantidadAPagar + "] Service ID: " + service.getId());
-
-                } catch (Exception e) {
-                    System.err.println("Error al registrar pago: " + e.getMessage());
-                    e.printStackTrace();
                 }
+
+                System.out.println("Mes " + String.format("%02d", mes) + "/2025 completado. " +
+                        "Total pagos acumulados: " + totalPagosGenerados + "\n");
             }
 
-            System.out.println("--- Fin de población de Pagos. Total procesados: " + pagosRealizados + " ---");
+            // RESUMEN FINAL
+            System.out.println("\n===========================================");
+            System.out.println("RESUMEN FINAL DE PAGOS:");
+            System.out.println("- Año procesado: 2025 (completo)");
+            System.out.println("- Total de pagos generados: " + totalPagosGenerados);
+            System.out.println("- Promedio por mes: " + (totalPagosGenerados / 12));
+
+            // Estadísticas adicionales
+            long servicesPagadosCompletos = todosLosServices.stream()
+                    .filter(s -> s.getEstadoService() == EstadoService.PAGADO)
+                    .count();
+            long servicesConPagosParciales = todosLosServices.stream()
+                    .filter(s -> s.getMontoFaltante().compareTo(BigDecimal.ZERO) > 0 &&
+                            s.getPagos() != null && !s.getPagos().isEmpty())
+                    .count();
+
+            System.out.println("- Services pagados completamente: " + servicesPagadosCompletos);
+            System.out.println("- Services con pagos parciales: " + servicesConPagosParciales);
+            System.out.println("===========================================\n");
+
         } catch (RuntimeException e) {
             e.printStackTrace();
         } finally {

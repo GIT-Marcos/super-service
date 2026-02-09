@@ -14,7 +14,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -174,7 +174,7 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
 
     @Override
     public List<Object[]> masRetiradosParaVenta(Integer cantidadRepuestos,
-                                                LocalDate fechaInicio, LocalDate fechaFin) {
+                                                LocalDateTime fechaInicio, LocalDateTime fechaFin) {
         EntityManager em = emProvider.get();
         TypedQuery<Object[]> query = em.createQuery(
                         "SELECT dr.repuesto, COUNT(dr.repuesto) "
@@ -191,7 +191,7 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
     }
 
     @Override
-    public ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDate fechaMin, LocalDate fechaMax) {
+    public ReporteUsoDeRepuestosDTO usoDeRepuestos(LocalDateTime fechaMin, LocalDateTime fechaMax) {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT new " + DTO + "(" +
                                 "SUM(CASE WHEN n.tipoUso = SPRService.SPRService.entities.NotaRetiro.TipoUsoRetiro.VENTA THEN dr.cantidadRetirada ELSE 0.0 END), " +

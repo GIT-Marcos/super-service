@@ -58,20 +58,17 @@ public class ChartMasRetiradosController implements Initializable {
         SpinnerValueFactory<Integer> valueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, 10);
         spinner.setValueFactory(valueFactory);
-
-        // 2. Configurar fechas
-        dpFechaMax.setValue(LocalDate.now());
-        dpFechaMin.setValue(LocalDate.now().minusMonths(3));
-
-        // 3. Cargar datos iniciales
-        generar();
     }
 
     @FXML
     private void generar() {
         // 1. Obtener parámetros
-        LocalDate fechaMin = dpFechaMin.getValue();
-        LocalDate fechaMax = dpFechaMax.getValue();
+        LocalDate fechaMin;
+        LocalDate fechaMax;
+        if (dpFechaMin.getValue() == null) dpFechaMin.setValue(LocalDate.now().minusYears(20L));
+        if (dpFechaMax.getValue() == null) dpFechaMax.setValue(LocalDate.now());
+        fechaMin = dpFechaMin.getValue();
+        fechaMax = dpFechaMax.getValue();
         Integer cantidad = spinner.getValue();
 
         // 2. Validar
@@ -124,7 +121,7 @@ public class ChartMasRetiradosController implements Initializable {
 
             // 6. Agregar la serie al gráfico
             chart.getData().add(series);
-
+            NotificationHelper.mostrarExito("Ingresos por repuesto", "Se ha generado el reporte con éxito.");
         } catch (Exception e) {
             NotificationHelper.mostrarError("Error al generar gráfico",
                     "Hubo un problema cargando los datos: " + e.getMessage());
