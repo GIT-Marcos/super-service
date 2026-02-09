@@ -7,7 +7,7 @@ import SPRService.SPRService.entities.AuditoriaVenta;
 import SPRService.SPRService.entities.Service;
 import SPRService.SPRService.util.ResultadoPaginado;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,5 +61,5 @@ public interface ServiceDAO extends GenericDAO<Service, Long> {
     /**
      * Para generar datos comparativos sobre ventas y service durante un periodo de tiempo.
      */
-    ReporteComparacionDTO generarComparacion(LocalDate fechaMin, LocalDate fechaMax);
+    ReporteComparacionDTO generarComparacion(LocalDateTime fechaMin, LocalDateTime fechaMax);
 }

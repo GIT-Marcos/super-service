@@ -55,19 +55,16 @@ public class ChartVehiculosController implements Initializable {
         SpinnerValueFactory<Integer> valueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 10);
         spinner.setValueFactory(valueFactory);
-
-        // 2. Configurar Fechas (Por defecto último año, ya que los vehículos tienen menos rotación que repuestos)
-        dpFechaMax.setValue(LocalDate.now());
-        dpFechaMin.setValue(LocalDate.now().minusYears(1));
-
-        // 3. Generar inicial
-        generar();
     }
 
     @FXML
     private void generar() {
-        LocalDate fechaMin = dpFechaMin.getValue();
-        LocalDate fechaMax = dpFechaMax.getValue();
+        LocalDate fechaMin;
+        LocalDate fechaMax;
+        if (dpFechaMin.getValue() == null) dpFechaMin.setValue(LocalDate.now().minusYears(20L));
+        if (dpFechaMax.getValue() == null) dpFechaMax.setValue(LocalDate.now());
+        fechaMin = dpFechaMin.getValue();
+        fechaMax = dpFechaMax.getValue();
         Integer cantidad = spinner.getValue();
 
         if (fechaMin != null && fechaMax != null && fechaMin.isAfter(fechaMax)) {
@@ -126,7 +123,7 @@ public class ChartVehiculosController implements Initializable {
             }
 
             chart.getData().add(series);
-
+            NotificationHelper.mostrarExito("Generar reporte", "Se ha generado el reporte con éxito.");
         } catch (Exception e) {
             NotificationHelper.mostrarError("Error al generar gráfico",
                     "No se pudieron cargar los datos de vehículos: " + e.getMessage());

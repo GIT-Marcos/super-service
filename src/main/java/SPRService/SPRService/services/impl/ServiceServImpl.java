@@ -18,6 +18,7 @@ import com.google.inject.persist.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 public class ServiceServImpl implements ServiceServ {
@@ -241,8 +242,8 @@ public class ServiceServImpl implements ServiceServ {
     @Transactional
     @Override
     public ReporteComparacionDTO generarComparacion(LocalDate fechaMin, LocalDate fechaMax) {
-        if (fechaMin == null) fechaMin = LocalDate.of(1900, 1, 1);
+        if (fechaMin == null) fechaMin = LocalDate.now().minusYears(20L);
         if (fechaMax == null) fechaMax = LocalDate.now();
-        return daoService.generarComparacion(fechaMin, fechaMax);
+        return daoService.generarComparacion(fechaMin.atStartOfDay(), fechaMax.atTime(LocalTime.MAX));
     }
 }

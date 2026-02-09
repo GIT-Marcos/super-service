@@ -57,8 +57,12 @@ public class ChartIngresosRepuestoController implements Initializable {
 
     @FXML
     private void generar() {
-        LocalDate fechaMin = dpFechaMin.getValue();
-        LocalDate fechaMax = dpFechaMax.getValue();
+        LocalDate fechaMin;
+        LocalDate fechaMax;
+        if (dpFechaMin.getValue() == null) dpFechaMin.setValue(LocalDate.now().minusYears(20L));
+        if (dpFechaMax.getValue() == null) dpFechaMax.setValue(LocalDate.now());
+        fechaMin = dpFechaMin.getValue();
+        fechaMax = dpFechaMax.getValue();
         Integer cantidad = spinner.getValue();
 
         // Validaciones...

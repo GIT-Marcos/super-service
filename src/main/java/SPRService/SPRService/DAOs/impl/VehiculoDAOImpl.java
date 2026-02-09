@@ -12,7 +12,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -170,8 +170,8 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
     }
 
     @Override
-    public List<ModelosMasRegistradosDTO> reporteModelosMasRegistrados(Integer cantidad, LocalDate fechaMin,
-                                                                       LocalDate fechaMax) {
+    public List<ModelosMasRegistradosDTO> reporteModelosMasRegistrados(Integer cantidad, LocalDateTime fechaMin,
+                                                                       LocalDateTime fechaMax) {
         EntityManager em = emProvider.get();
         TypedQuery<ModelosMasRegistradosDTO> query = em.createQuery(
                         "SELECT new SPRService.SPRService.DTOs.ModelosMasRegistradosDTO(" +

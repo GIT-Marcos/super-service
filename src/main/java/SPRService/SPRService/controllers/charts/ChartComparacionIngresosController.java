@@ -6,6 +6,7 @@ import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SafeLocalDateConverter;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.EMailSender;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -13,19 +14,17 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Duration;
 import org.apache.commons.mail.EmailException;
-import org.controlsfx.control.Notifications;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 public class ChartComparacionIngresosController implements Initializable {
@@ -57,14 +56,18 @@ public class ChartComparacionIngresosController implements Initializable {
     @FXML
     private void generar() {
         limpiarVista();
-        ReporteComparacionDTO dto = serviceServ.generarComparacion(dpFechaMin.getValue(), dpFechaMax.getValue());
+
+        LocalDate fechaMin;
+        LocalDate fechaMax;
+        if (dpFechaMin.getValue() == null) dpFechaMin.setValue(LocalDate.now().minusYears(20L));
+        if (dpFechaMax.getValue() == null) dpFechaMax.setValue(LocalDate.now());
+        fechaMin = dpFechaMin.getValue();
+        fechaMax = dpFechaMax.getValue();
+
+        ReporteComparacionDTO dto = serviceServ.generarComparacion(fechaMin, fechaMax);
         if (dto.isEmpty()) {
-            Notifications.create()
-                    .title("Generar reporte")
-                    .text("No se encontraron datos para generar el reporte.")
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("generar reporte",
+                    "No se encontraron datos para generar el reporte.");
             return;
         }
         obsPie.add(new PieChart.Data("Ventas: " + dto.pctVenta() + " %", dto.ingVenta().doubleValue()));
@@ -77,12 +80,7 @@ public class ChartComparacionIngresosController implements Initializable {
         if (!obsPie.isEmpty()) {
             GeneradorImagenes.exportarJPEG(event, rootPane, "Comparación de ingresos");
         } else {
-            Notifications.create()
-                    .title("Exportar reporte")
-                    .text("No hay datos para exportar.")
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Exportar reporte", "No hay datos para exportar.");
         }
     }
 
@@ -93,12 +91,7 @@ public class ChartComparacionIngresosController implements Initializable {
             ManejadorInputs.eMail(destinatario, true);
             enviarSnapshotPorCorreo(destinatario);
         } catch (IllegalArgumentException e) {
-            Notifications.create()
-                    .title("Ingreso de dirección de correo")
-                    .text(e.getMessage())
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Ingreso de dirección de correo", e.getMessage());
         }
     }
 
@@ -113,30 +106,17 @@ public class ChartComparacionIngresosController implements Initializable {
 
             eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
-            // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
-            Notifications.create()
-                    .title("Reporte de comparación de ingresos")
-                    .text("El reporte se envió correctamente a " + destinatario)
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showInformation();
-            // Opcional: borrar el archivo temporal inmediatamente
+            NotificationHelper.mostrarExito("Reporte enviado",
+                    "El reporte se envió correctamente a " + destinatario);
+
             tempFile.deleteOnExit();
         } catch (IOException e) {
-            Notifications.create()
-                    .title("Error IO")
-                    .text("No se pudo generar la imagen temporal: " + e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showError();
+            NotificationHelper.mostrarError("Error de IO",
+                    "No se pudo generar la imagen temporal: " + e.getMessage());
             e.printStackTrace();
         } catch (EmailException e) {
-            Notifications.create()
-                    .title("Error Mail")
-                    .text("Fallo al enviar el correo. Verifique su conexión o configuración: " + e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showError();
+            NotificationHelper.mostrarError("Error Mail",
+                    "Fallo al enviar el correo: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -166,7 +146,6 @@ public class ChartComparacionIngresosController implements Initializable {
 
         pieChart.setData(obsPie);
         String css = getClass().getResource("/styles/pieChartColores.css").toExternalForm();
-        ;
         pieChart.getStylesheets().add(css);
     }
 }

@@ -7,6 +7,7 @@ import SPRService.SPRService.services.ServiceServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.EMailSender;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.util.generadores.GeneradorImagenes;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
@@ -14,7 +15,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
@@ -22,9 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Duration;
 import org.apache.commons.mail.EmailException;
-import org.controlsfx.control.Notifications;
 
 import java.awt.*;
 import java.io.File;
@@ -89,12 +87,7 @@ public class ChartReportesAnualesServiceController implements Initializable {
         if (!obsPie.isEmpty()) {
             GeneradorImagenes.exportarJPEG(event, rootPane, "Reporte anual service");
         } else {
-            Notifications.create()
-                    .title("Exportar reporte")
-                    .text("No hay datos para exportar.")
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Exportar reporte", "No hay datos para exportar.");
         }
     }
 
@@ -105,12 +98,7 @@ public class ChartReportesAnualesServiceController implements Initializable {
             ManejadorInputs.eMail(destinatario, true);
             enviarSnapshotPorCorreo(destinatario);
         } catch (IllegalArgumentException e) {
-            Notifications.create()
-                    .title("Ingreso de dirección de correo")
-                    .text(e.getMessage())
-                    .position(Pos.CENTER)
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Ingreso de dirección de correo", e.getMessage());
         }
     }
 
@@ -125,30 +113,17 @@ public class ChartReportesAnualesServiceController implements Initializable {
 
             eMailSender.enviarEmailApache(destinatario, asunto, cuerpo, tempFile);
 
-            // --- PASO C: CONFIRMACIÓN Y LIMPIEZA ---
-            Notifications.create()
-                    .title("Reporte anual de service")
-                    .text("El reporte se envió correctamente a " + destinatario)
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showInformation();
-            // Opcional: borrar el archivo temporal inmediatamente
+            NotificationHelper.mostrarExito("Reporte enviado",
+                    "El reporte se envió correctamente a " + destinatario);
+
             tempFile.deleteOnExit();
         } catch (IOException e) {
-            Notifications.create()
-                    .title("Error IO")
-                    .text("No se pudo generar la imagen temporal: " + e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showError();
+            NotificationHelper.mostrarError("Error de IO",
+                    "No se pudo generar la imagen temporal: " + e.getMessage());
             e.printStackTrace();
         } catch (EmailException e) {
-            Notifications.create()
-                    .title("Error Mail")
-                    .text("Fallo al enviar el correo. Verifique su conexión o configuración: " + e.getMessage())
-                    .hideAfter(Duration.seconds(5))
-                    .position(Pos.CENTER)
-                    .showError();
+            NotificationHelper.mostrarError("Error Mail",
+                    "Fallo al enviar el correo: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -260,30 +235,17 @@ public class ChartReportesAnualesServiceController implements Initializable {
     private boolean limpiaChartYVerificaDTO(List<?> dtoList) {
         chart.getData().clear();
         if (dtoList == null) {
-            Notifications.create()
-                    .position(Pos.CENTER)
-                    .title("Generación de reporte")
-                    .text("Error al obtener los datos.")
-                    .hideAfter(Duration.seconds(5))
-                    .showError();
+            NotificationHelper.mostrarError("Generar reporte",
+                    "Error inesperado al obtener datos.");
             return false;
         }
         if (dtoList.isEmpty()) {
-            Notifications.create()
-                    .position(Pos.CENTER)
-                    .title("Generación de reporte")
-                    .text("No se encontraron registros para esa fecha.")
-                    .hideAfter(Duration.seconds(5))
-                    .showWarning();
+            NotificationHelper.mostrarAdvertencia("Generar reporte",
+                    "No se encontraron registros para esa fecha.");
             restableceLabels();
             return false;
         } else {
-            Notifications.create()
-                    .position(Pos.BOTTOM_RIGHT)
-                    .title("Generación de reporte")
-                    .text("Se ha generado el reporte con éxito.")
-                    .hideAfter(Duration.seconds(5))
-                    .showInformation();
+            NotificationHelper.mostrarExito("Generar reporte", "Se ha generado el reporte con éxito.");
             poblarLabels();
             return true;
         }

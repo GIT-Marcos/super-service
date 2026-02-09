@@ -18,7 +18,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -261,7 +261,7 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
     }
 
     @Override
-    public ReporteComparacionDTO generarComparacion(LocalDate fechaMin, LocalDate fechaMax) {
+    public ReporteComparacionDTO generarComparacion(LocalDateTime fechaMin, LocalDateTime fechaMax) {
         EntityManager em = emProvider.get();
 
         Object[] serviceData = em.createQuery(
@@ -272,8 +272,8 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
                                 "AND s.fechaCarga BETWEEN :fMin AND :fMax",
                         Object[].class)
                 .setParameter("estado", EstadoService.PAGADO)
-                .setParameter("fMin", fechaMin.atStartOfDay())
-                .setParameter("fMax", fechaMax.atTime(23, 59, 59))
+                .setParameter("fMin", fechaMin)
+                .setParameter("fMax", fechaMax)
                 .getSingleResult();
 
         BigDecimal ingService = (BigDecimal) serviceData[0];

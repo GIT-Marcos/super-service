@@ -20,6 +20,7 @@ import jakarta.persistence.PersistenceException;
 import org.hibernate.Hibernate;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -85,10 +86,10 @@ public class VehiculoServImpl implements VehiculoServ {
     @Override
     public List<ModelosMasRegistradosDTO> generarReporteModelosMasRegistrados(Integer cantidad, LocalDate fechaMin,
                                                                               LocalDate fechaMax) {
-        if (fechaMin == null) fechaMin = LocalDate.of(2000, 1, 1);
+        if (fechaMin == null) fechaMin = LocalDate.now().minusYears(20L);
         if (fechaMax == null) fechaMax = LocalDate.now();
         if (cantidad < 0 || cantidad > 20) cantidad = 1;
-        return daoVehiculo.reporteModelosMasRegistrados(cantidad, fechaMin, fechaMax);
+        return daoVehiculo.reporteModelosMasRegistrados(cantidad, fechaMin.atStartOfDay(), fechaMax.atTime(LocalTime.MAX));
     }
 
     @Transactional
