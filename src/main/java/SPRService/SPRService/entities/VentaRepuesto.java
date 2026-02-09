@@ -52,6 +52,14 @@ public class VentaRepuesto implements Serializable, Transaccion {
     public VentaRepuesto(NotaRetiro notaRetiro) {
         this.notaRetiro = notaRetiro;
         recalcularMontos();
+        this.fechaVenta = LocalDateTime.now();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.id = null;
+        this.activo = true;
+//        this.fechaVenta = LocalDateTime.now();
     }
 
     /**
@@ -195,12 +203,5 @@ public class VentaRepuesto implements Serializable, Transaccion {
                 ", activo=" + activo +
                 ", estadoVenta=" + estadoVenta +
                 '}';
-    }
-
-    @PrePersist
-    public void prePersist() {
-        this.id = null;
-        this.activo = true;
-        this.fechaVenta = LocalDateTime.now();
     }
 }

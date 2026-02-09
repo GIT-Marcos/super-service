@@ -56,12 +56,13 @@ public class Service implements Serializable, Transaccion {
     public Service(LocalDateTime fechaEntrega, PrioridadService prioridad) {
         this.fechaEntrega = fechaEntrega;
         this.prioridad = prioridad;
+        this.fechaCarga = LocalDateTime.now();
     }
 
     @PrePersist
     public void prePersist() {
         this.id = null;
-        this.fechaCarga = LocalDateTime.now();
+//        this.fechaCarga = LocalDateTime.now();
         this.estadoService = EstadoService.PENDIENTE;
         if (this.pagos == null) {
             this.pagos = new HashSet<>();
