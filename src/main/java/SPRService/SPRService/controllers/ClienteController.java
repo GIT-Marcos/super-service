@@ -31,19 +31,13 @@ public class ClienteController implements Initializable {
     private int totalPaginas = 1;
 
     @FXML
-    private TextField tfDNI;
+    private TextField tfDNI, tfApellido, tfNombre;
     @FXML
-    private TextField tfApellido;
-    @FXML
-    private TextField tfNombre;
+    private CheckBox cbActivos, cbInactivos;
     @FXML
     private TableView<ClienteViewModelTabla> tablaClientes;
     @FXML
-    private TableColumn<ClienteViewModelTabla, String> colDNI;
-    @FXML
-    private TableColumn<ClienteViewModelTabla, String> colApellido;
-    @FXML
-    private TableColumn<ClienteViewModelTabla, String> colNombre;
+    private TableColumn<ClienteViewModelTabla, String> colDNI, colApellido, colNombre, colEstado;
     @FXML
     private Pagination paginacion;
 
@@ -85,9 +79,11 @@ public class ClienteController implements Initializable {
         String dni = tfDNI.getText() != null ? tfDNI.getText().strip() : "";
         String apellido = tfApellido.getText() != null ? tfApellido.getText().strip() : "";
         String nombre = tfNombre.getText() != null ? tfNombre.getText().strip() : "";
+        boolean verActivos = cbActivos.isSelected();
+        boolean verBaja = cbInactivos.isSelected();
 
         ResultadoPaginado<Cliente> resultado = clienteServ.buscarPaginado(
-                dni, apellido, nombre, numeroPagina, ITEMS_POR_PAGINA);
+                dni, apellido, nombre, verActivos, verBaja, numeroPagina, ITEMS_POR_PAGINA);
 
         // Actualizar datos de paginación
         int paginas = (int) Math.ceil((double) resultado.getCantidadResultados() / ITEMS_POR_PAGINA);
@@ -118,6 +114,8 @@ public class ClienteController implements Initializable {
         tfDNI.clear();
         tfApellido.clear();
         tfNombre.clear();
+        cbActivos.setSelected(true);
+        cbInactivos.setSelected(true);
 
         paginacion.setCurrentPageIndex(0);
         cargarPagina(0);
@@ -125,6 +123,10 @@ public class ClienteController implements Initializable {
 
     @FXML
     private void buscarConFiltros() {
+        if (!cbInactivos.isSelected() && !cbActivos.isSelected()) {
+            obsListClientes.clear();
+            return;
+        }
         paginacion.setCurrentPageIndex(0);
         cargarPagina(0);
     }
@@ -202,5 +204,27 @@ public class ClienteController implements Initializable {
         colDNI.setCellValueFactory(new PropertyValueFactory<>("dni"));
         colApellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+
+        if (colEstado != null) {
+            colEstado.setCellFactory(col -> new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(null);
+                    setStyle("");
+                    if (empty || item == null) {
+                        return;
+                    }
+                    setText(item);
+                    ClienteViewModelTabla row = getTableView().getItems().get(getIndex());
+                    if (row.getClienteEntity().getActivo()) {
+                        setStyle("-fx-text-fill: #028126; -fx-font-weight: bold; -fx-alignment: CENTER");
+                    } else {
+                        setStyle("-fx-text-fill: #912a2b; -fx-font-weight: bold; -fx-alignment: CENTER");
+                    }
+                }
+            });
+        }
     }
 }

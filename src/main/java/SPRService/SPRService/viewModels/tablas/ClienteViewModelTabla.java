@@ -10,12 +10,16 @@ public class ClienteViewModelTabla {
     private final StringProperty dni;
     private final StringProperty apellido;
     private final StringProperty nombre;
+    private final StringProperty estado;
 
     public ClienteViewModelTabla(Cliente c) {
         this.clienteEntity = c;
         this.dni = new SimpleStringProperty(c.getDni());
         this.apellido = new SimpleStringProperty(c.getApellido());
         this.nombre = new SimpleStringProperty(c.getNombre());
+        this.estado = new SimpleStringProperty(
+                c.getActivo() ? "ACTIVO" : "BAJA"
+        );
     }
 
     public void updateFrom(Cliente clienteActualizado) {
@@ -23,6 +27,9 @@ public class ClienteViewModelTabla {
         this.dni.set(clienteActualizado.getDni());
         this.apellido.set(clienteActualizado.getApellido());
         this.nombre.set(clienteActualizado.getNombre());
+        this.estado.set(
+                clienteActualizado.getActivo() ? "ACTIVO" : "BAJA"
+        );
     }
 
     public Cliente getClienteEntity() {
@@ -51,5 +58,13 @@ public class ClienteViewModelTabla {
 
     public StringProperty nombreProperty() {
         return nombre;
+    }
+
+    public String getEstado() {
+        return estado.get();
+    }
+
+    public StringProperty estadoProperty() {
+        return estado;
     }
 }

@@ -30,7 +30,7 @@ public interface ClienteDAO extends GenericDAO<Cliente, Long> {
     /**
      * Usada para filtrar según sus parámetros.
      */
-    List<Cliente> filteredSearch(String dni, String lastName, String firstName);
+    List<Cliente> filteredSearch(String dni, String lastName, String firstName, boolean activos, boolean baja);
 
     ResultadoPaginado<Cliente> buscarPaginado(FiltroClienteDTO filtro);
 

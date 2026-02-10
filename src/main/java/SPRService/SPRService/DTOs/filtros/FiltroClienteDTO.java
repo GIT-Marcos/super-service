@@ -4,16 +4,18 @@ public record FiltroClienteDTO(
         String dni,
         String apellido,
         String nombre,
+        boolean activos,
+        boolean baja,
         Integer offset,
         Integer limit
 ) {
     // Constructor sin paginación
-    public FiltroClienteDTO(String dni, String apellido, String nombre) {
-        this(dni, apellido, nombre, null, null);
+    public FiltroClienteDTO(String dni, String apellido, String nombre, boolean activos, boolean baja) {
+        this(dni, apellido, nombre, activos, baja, null, null);
     }
 
     // Constructor por defecto
     public FiltroClienteDTO() {
-        this("", "", "", null, null);
+        this("", "", "", true, true, null, null);
     }
 }
