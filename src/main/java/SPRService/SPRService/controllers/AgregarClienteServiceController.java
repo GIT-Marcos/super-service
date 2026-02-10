@@ -80,6 +80,11 @@ public class AgregarClienteServiceController implements Initializable, ModalCont
                     "Debe seleccionar un cliente para continuar.");
             return;
         }
+        if (!lvClientes.getSelectionModel().getSelectedItem().getActivo()) {
+            NotificationHelper.mostrarAdvertencia("Asignar cliente",
+                    "No se pueden asignar clientes inactivos que han sido dados de baja.");
+            return;
+        }
 
         clienteServ.verOperacionesConVehiculos(lvClientes.getSelectionModel().getSelectedItem().getId())
                 .ifPresent(cliente -> {

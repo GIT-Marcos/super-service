@@ -18,6 +18,7 @@ public class CeldaCliente extends ListCell<Cliente> {
     private final Label dniLabel;
     private final Label nombreCompletoLabel;
     private final Label idLabel;
+    private final Label estadoLabel; // Nuevo label para mostrar estado
 
     public CeldaCliente() {
         super();
@@ -29,7 +30,7 @@ public class CeldaCliente extends ListCell<Cliente> {
 
         // Usamos un StackPane para centrar correctamente el texto rotado
         StackPane dniContainer = new StackPane(dniLabel);
-        dniContainer.setMinWidth(40); // Ancho para la columna del DNI
+        dniContainer.setMinWidth(40);
         dniContainer.setAlignment(Pos.CENTER);
 
         // --- CENTRO: Nombre completo del cliente ---
@@ -37,11 +38,16 @@ public class CeldaCliente extends ListCell<Cliente> {
         nombreCompletoLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         nombreCompletoLabel.getStyleClass().add("nombre-completo-cliente");
 
-        HBox infoBox = new HBox(5);
-        infoBox.getChildren().add(nombreCompletoLabel);
+        // Label de estado (opcional, para mostrar texto "INACTIVO")
+        estadoLabel = new Label();
+        estadoLabel.setFont(Font.font("Arial", FontWeight.BOLD, 10));
+        estadoLabel.getStyleClass().add("estado-label");
+
+        HBox infoBox = new HBox(10);
+        infoBox.getChildren().addAll(nombreCompletoLabel, estadoLabel);
         infoBox.setAlignment(Pos.CENTER_LEFT);
 
-        // --- LADO DERECHO: ID del cliente (opcional) ---
+        // --- LADO DERECHO: ID del cliente ---
         idLabel = new Label();
         idLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         idLabel.setTextFill(Color.web("#757575"));
@@ -67,19 +73,37 @@ public class CeldaCliente extends ListCell<Cliente> {
 
         if (empty || item == null) {
             setGraphic(null);
+            // Limpiar clases de estado
+            mainPane.getStyleClass().removeAll("cliente-activo", "cliente-inactivo");
         } else {
             // Actualizar DNI
             dniLabel.setText(formatDNI(item.getDni()));
 
-            // Actualizar nombre completo (nombre + apellido)
+            // Actualizar nombre completo
             String nombreCompleto = item.getNombre() + " " + item.getApellido();
             nombreCompletoLabel.setText(nombreCompleto);
 
-            // Si el cliente tiene ID, mostrarlo
+            // Mostrar ID
             if (item.getId() != null) {
                 idLabel.setText("#" + item.getId());
             } else {
                 idLabel.setText("");
+            }
+
+            // --- MANEJO DEL ESTADO ACTIVO/INACTIVO ---
+            // Limpiar clases previas
+            mainPane.getStyleClass().removeAll("cliente-activo", "cliente-inactivo");
+            estadoLabel.getStyleClass().removeAll("estado-activo", "estado-inactivo");
+
+            // Aplicar clase según estado
+            if (item.getActivo() != null && item.getActivo()) {
+                mainPane.getStyleClass().add("cliente-activo");
+                estadoLabel.setText(""); // No mostrar texto para activos
+                estadoLabel.getStyleClass().add("estado-activo");
+            } else {
+                mainPane.getStyleClass().add("cliente-inactivo");
+                estadoLabel.setText("INACTIVO");
+                estadoLabel.getStyleClass().add("estado-inactivo");
             }
 
             setGraphic(mainPane);
@@ -92,12 +116,11 @@ public class CeldaCliente extends ListCell<Cliente> {
     private String formatDNI(String dni) {
         if (dni == null || dni.isEmpty()) return "";
 
-        // Si el DNI es numérico, formatearlo con puntos
         try {
             long dniNum = Long.parseLong(dni);
             return String.format("%,d", dniNum).replace(",", ".");
         } catch (NumberFormatException e) {
-            return dni; // Si no es numérico, devolver tal cual
+            return dni;
         }
     }
 }
