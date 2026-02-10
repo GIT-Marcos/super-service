@@ -28,7 +28,7 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
 
     @Override
     public List<Cliente> verTodos() {
-        return filteredSearch("", "", "");
+        return filteredSearch("", "", "", true, true);
     }
 
     @Override
@@ -94,8 +94,8 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
     }
 
     @Override
-    public List<Cliente> filteredSearch(String dni, String lastName, String firstName) {
-        FiltroClienteDTO filtro = new FiltroClienteDTO(dni, lastName, firstName);
+    public List<Cliente> filteredSearch(String dni, String lastName, String firstName, boolean activos, boolean baja) {
+        FiltroClienteDTO filtro = new FiltroClienteDTO(dni, lastName, firstName, activos, baja);
         EntityManager em = emProvider.get();
         return crearQueryBusqueda(em, filtro).getResultList();
     }
@@ -159,8 +159,11 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
                                                 FiltroClienteDTO filtro) {
         List<Predicate> filtros = new ArrayList<>();
 
-        // Siempre filtrar solo activos
-        filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
+        if (filtro.activos() && !filtro.baja()) {
+            filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
+        } else if (!filtro.activos() && filtro.baja()) {
+            filtros.add(cb.equal(root.get("activo"), Boolean.FALSE));
+        }
 
         if (filtro.dni() != null && !filtro.dni().isBlank()) {
             filtros.add(cb.like(cb.lower(root.get("dni")),

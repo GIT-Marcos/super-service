@@ -12,7 +12,7 @@
 <!-- Asegúrate de vincular tu hoja de estilos aquí si no lo haces desde el código Java
      stylesheets="@tu_archivo.css" -->
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="650.0" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.OperacionesClienteController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="550.0" prefWidth="500.0" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.OperacionesClienteController">
 
    <!-- ENCABEZADO: Usa el estilo .top-panel del CSS -->
    <top>

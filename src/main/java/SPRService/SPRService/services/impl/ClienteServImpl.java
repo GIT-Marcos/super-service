@@ -47,23 +47,15 @@ public class ClienteServImpl implements ClienteServ {
 
     @Transactional
     @Override
-    public List<Cliente> filteredSearch(String dni, String lastName, String firstName) {
-        if (dni == null) dni = "";
-        if (lastName == null) lastName = "";
-        if (firstName == null) firstName = "";
-        return dao.filteredSearch(dni, lastName, firstName);
-    }
-
-    @Transactional
-    @Override
     public ResultadoPaginado<Cliente> buscarPaginado(String dni, String apellido, String nombre,
+                                                     boolean activos, boolean baja,
                                                      int pagina, int itemsPorPagina) {
         if (dni == null) dni = "";
         if (apellido == null) apellido = "";
         if (nombre == null) nombre = "";
 
         int offset = pagina * itemsPorPagina;
-        FiltroClienteDTO filtro = new FiltroClienteDTO(dni, apellido, nombre, offset, itemsPorPagina);
+        FiltroClienteDTO filtro = new FiltroClienteDTO(dni, apellido, nombre, activos, baja, offset, itemsPorPagina);
         return dao.buscarPaginado(filtro);
     }
 
@@ -117,9 +109,7 @@ public class ClienteServImpl implements ClienteServ {
     @Transactional
     @Override
     public void softDeleteClient(Cliente c) {
-        if (c == null) throw new IllegalArgumentException("Cliente nulo en servicio.");
         Cliente managedClient = dao.getById(c.getId());
-        managedClient.setDni(managedClient.getDni() + ".DEL" + managedClient.getId());
         managedClient.setActivo(Boolean.FALSE);
     }
 
