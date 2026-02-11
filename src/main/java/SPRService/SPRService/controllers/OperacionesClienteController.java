@@ -2,10 +2,16 @@ package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.components.CeldaOperacionUniversal;
 import SPRService.SPRService.entities.Cliente;
-import SPRService.SPRService.navigation.DataReceiver;
+import SPRService.SPRService.entities.Service;
+import SPRService.SPRService.entities.VentaRepuesto;
+import SPRService.SPRService.navigation.*;
+import SPRService.SPRService.services.ClienteServ;
+import SPRService.SPRService.services.ServiceServ;
+import SPRService.SPRService.services.VentaRepuestoServ;
 import SPRService.SPRService.viewModels.celdas.ItemOperacionViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemServiceViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemVentaViewModel;
+import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,26 +24,35 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class OperacionesClienteController implements Initializable, DataReceiver<Cliente> {
 
+    private final ClienteServ clienteServ;
+    private final VentaRepuestoServ ventaServ;
+    private final ServiceServ serviceServ;
+    private final Navigator navigator;
     private Cliente cliente;
     private ObservableList<ItemOperacionViewModel> obsList = FXCollections.observableArrayList();
 
     @FXML
-    private Label lblTituloCliente;
-    @FXML
-    private Label lblCantVentas;
-    @FXML
-    private Label lblCantServices;
+    private Label lblTituloCliente, lblCantVentas, lblCantServices;
     @FXML
     ListView<ItemOperacionViewModel> listViewOperaciones;
+
+    @Inject
+    public OperacionesClienteController(ClienteServ clienteServ, VentaRepuestoServ ventaServ, ServiceServ serviceServ, AppCoordinator coordinator) {
+        this.clienteServ = clienteServ;
+        this.ventaServ = ventaServ;
+        this.serviceServ = serviceServ;
+        this.navigator = coordinator.getMainNavigator();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         listViewOperaciones.setItems(obsList);
-        listViewOperaciones.setCellFactory(c -> new CeldaOperacionUniversal());
+        listViewOperaciones.setCellFactory(c -> new CeldaOperacionUniversal(this::detallesOperacion));
         String css = getClass().getResource("/styles/celda-operacion.css").toExternalForm();
         listViewOperaciones.getStylesheets().add(css);
     }
@@ -57,6 +72,29 @@ public class OperacionesClienteController implements Initializable, DataReceiver
         Node n = ((Node) event.getSource());
         Stage s = (Stage) n.getScene().getWindow();
         s.close();
+    }
+
+    private void detallesOperacion(ItemOperacionViewModel item) {
+        if (item == null) return;
+
+        if (item instanceof ItemVentaViewModel) {
+            ventaServ.verDetalle(item.getCodigo())
+                    .ifPresent(v -> {
+                        Optional<VentaRepuesto> huboCambios = navigator.openModal(Views.DETALLE_VENTA, "Detalles de venta", v);
+                        huboCambios.ifPresent(vm -> recargarCliente());
+                    });
+        } else if (item instanceof ItemServiceViewModel) {
+            serviceServ.datosParaModificar(item.getCodigo())
+                    .ifPresent(s -> {
+                        Optional<Service> huboCambios = navigator.openModal(Views.MODIFICAR_SERVICE, "Service de cliente", s);
+                        huboCambios.ifPresent(sm -> recargarCliente());
+                    });
+        }
+    }
+
+    private void recargarCliente() {
+        clienteServ.verOperacionesConVehiculos(this.cliente.getId())
+                .ifPresent(this::receiveData);
     }
 
     private void llenarCampos() {

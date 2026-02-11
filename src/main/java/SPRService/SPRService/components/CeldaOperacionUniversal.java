@@ -5,7 +5,10 @@ import SPRService.SPRService.enums.EstadoVentaRepuesto;
 import SPRService.SPRService.viewModels.celdas.ItemOperacionViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemServiceViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemVentaViewModel;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+
+import java.util.function.Consumer;
 
 public class CeldaOperacionUniversal extends CeldaItemOperacion<ItemOperacionViewModel> {
 
@@ -13,35 +16,68 @@ public class CeldaOperacionUniversal extends CeldaItemOperacion<ItemOperacionVie
     private Label lblPatente;
     private Label lblEstado;
 
-    public CeldaOperacionUniversal() {
-        super(); // 1. El padre arma la estructura básica
+    private Button btnVerDetalles;
+
+    // 2. La acción a ejecutar (Callback)
+    private final Consumer<ItemOperacionViewModel> onVerDetallesAction;
+
+    // 3. Modificamos el constructor para recibir la acción
+    public CeldaOperacionUniversal(Consumer<ItemOperacionViewModel> onVerDetallesAction) {
+        super();
+        this.onVerDetallesAction = onVerDetallesAction;
         inicializarComponentesExclusivos();
     }
 
     private void inicializarComponentesExclusivos() {
-        // Inicializamos Patente (Panel Izquierdo)
+        // --- Labels existentes ---
         lblPatente = new Label();
         lblPatente.getStyleClass().add("celda-label-patente");
-        // leftContainer viene heredado del padre
         leftContainer.getChildren().add(lblPatente);
 
-        // Inicializamos Estado (Panel Derecho)
         lblEstado = new Label();
         lblEstado.getStyleClass().add("celda-estado-base");
-        // rightContainer viene heredado del padre
         rightContainer.getChildren().add(lblEstado);
+
+        // --- 4. Configuración del Botón ---
+        btnVerDetalles = new Button("Ver"); // O usa un icono
+        btnVerDetalles.getStyleClass().add("btn-ver-detalles");
+
+        // Añadimos el botón al contenedor principal (mainContainer es protected en el padre)
+        // Lo agregamos al final para que quede a la derecha de los montos
+        mainContainer.getChildren().add(btnVerDetalles);
+    }
+
+    @Override
+    protected void updateItem(ItemOperacionViewModel item, boolean empty) {
+        // Llamamos al super para que haga la lógica básica (textos, fechas, null check)
+        super.updateItem(item, empty);
+
+        if (empty || item == null) {
+            // El padre ya pone setGraphic(null), pero aseguramos que el botón no tenga acción
+            btnVerDetalles.setOnAction(null);
+        } else {
+            // 5. Asignamos la acción al botón pasando el Item actual
+            btnVerDetalles.setOnAction(event -> {
+                if (onVerDetallesAction != null) {
+                    onVerDetallesAction.accept(item);
+                }
+            });
+
+            // Estilos específicos (tu lógica existente)
+            actualizarContenido(item);
+        }
     }
 
     @Override
     protected void actualizarContenido(ItemOperacionViewModel item) {
-        // 1. Limpieza general de estilos (Crucial para el reciclaje)
         limpiarEstilos();
 
-        // 2. Lógica por tipo
         if (item instanceof ItemVentaViewModel) {
             configurarComoVenta((ItemVentaViewModel) item);
+            btnVerDetalles.setText("📝 Detalles");
         } else if (item instanceof ItemServiceViewModel) {
             configurarComoService((ItemServiceViewModel) item);
+            btnVerDetalles.setText("📝 Detalles");
         }
     }
 

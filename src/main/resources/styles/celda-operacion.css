@@ -200,3 +200,15 @@
     -fx-background-color: transparent;
     -fx-border-color: transparent; /* Quitamos el borde interno para que mande el de la celda */
 }
+
+.btn-ver-detalles {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-padding: 5 10;
+    -fx-background-radius: 4;
+}
+
+.btn-ver-detalles:hover {
+    -fx-background-color: #0056b3;
+}
