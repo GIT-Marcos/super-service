@@ -21,6 +21,8 @@ public interface ClienteServ {
 
     Optional<Cliente> editClient(Cliente clienteDTO);
 
+    void reActivar(Cliente c);
+
     void softDeleteClient(Cliente c);
 
 }
