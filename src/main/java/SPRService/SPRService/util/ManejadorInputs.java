@@ -16,6 +16,7 @@ public class ManejadorInputs {
     private static final Pattern PATRON_NROS_DNI = Pattern.compile("^\\d+$");
     private static final Pattern PATRON_PATENTE = Pattern.compile("^[a-zA-Z0-9]*$");
     private static final Pattern PATRON_KILOMETRAJE = Pattern.compile("^\\d{1,7}$");
+    private static final Pattern NRO_TELEFONO = Pattern.compile("^\\+?(?:[1-9][\\s-]?){8,15}[0-9]$");
     private static final Pattern PATRON_EMAIL = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\n");
 
     // Para evitar que la clase sea instanciada
@@ -54,7 +55,7 @@ public class ManejadorInputs {
         if (trimmedInput.contains(" ")) {
             throw new IllegalArgumentException("El kilometraje no puede contener espacios.");
         }
-        if (!PATRON_KILOMETRAJE.matcher(trimmedInput).matches()){
+        if (!PATRON_KILOMETRAJE.matcher(trimmedInput).matches()) {
             throw new IllegalArgumentException("Formato inválido en kilometraje.");
         }
         return Integer.parseInt(trimmedInput);
@@ -302,16 +303,25 @@ public class ManejadorInputs {
         }
         if (trimmedInput.contains(" "))
             throw new IllegalArgumentException("El número de teléfono no puede contener espacios en blanco.");
-        if (trimmedInput.length() < 9 || trimmedInput.length() > 15)
-            throw new IllegalArgumentException("El número de teléfono debe tener entre 9 y 15 caracteres.");
-        if (!PATRON_NROS_DNI.matcher(trimmedInput).matches())
-            throw new IllegalArgumentException("El número de teléfono sólo puede contener números enteros.");
-        return trimmedInput;
+        if (trimmedInput.startsWith("0"))
+            throw new IllegalArgumentException("El número de teléfono no puede comenzar con '0'.");
+        if (trimmedInput.length() < 6 || trimmedInput.length() > 15)
+            throw new IllegalArgumentException("El número de teléfono debe tener entre 6 y 15 caracteres.");
+        if (!NRO_TELEFONO.matcher(trimmedInput).matches())
+            throw new IllegalArgumentException("El número de teléfono está en formato incorrecto.\n" +
+                    "Solo se permiten números, '-' y '+'.");
+        return limpiarTelefono(trimmedInput);
     }
 
     // ==============================
     // Métodos Privados Auxiliares
     // ==============================
+
+    private static String limpiarTelefono(String telefono) {
+        if (telefono == null) return null;
+        // Quita lo que no sea dígito
+        return telefono.replaceAll("\\D", "");
+    }
 
     private static String capitalize(String str) {
         if (str == null || str.isEmpty()) {

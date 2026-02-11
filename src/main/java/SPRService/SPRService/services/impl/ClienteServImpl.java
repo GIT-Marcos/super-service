@@ -108,6 +108,13 @@ public class ClienteServImpl implements ClienteServ {
 
     @Transactional
     @Override
+    public void reActivar(Cliente c) {
+        c.setActivo(true);
+        dao.update(c);
+    }
+
+    @Transactional
+    @Override
     public void softDeleteClient(Cliente c) {
         Cliente managedClient = dao.getById(c.getId());
         managedClient.setActivo(Boolean.FALSE);

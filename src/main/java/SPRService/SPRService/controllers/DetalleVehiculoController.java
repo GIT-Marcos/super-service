@@ -9,6 +9,8 @@ import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
+import SPRService.SPRService.services.ServiceServ;
+import SPRService.SPRService.services.VehiculoServ;
 import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.viewModels.celdas.ItemOperacionViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemServiceViewModel;
@@ -28,11 +30,14 @@ import javafx.stage.Stage;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class DetalleVehiculoController implements Initializable, DataReceiver<Vehiculo> {
 
+    private final VehiculoServ vehiculoServ;
+    private final ServiceServ serviceServ;
     private final Navigator navigator;
     private Vehiculo vehiculo;
     private ObservableList<ItemOperacionViewModel> items = FXCollections.observableArrayList();
@@ -48,7 +53,9 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
     private Button btnNuevo;
 
     @Inject
-    public DetalleVehiculoController(AppCoordinator coordinator) {
+    public DetalleVehiculoController(VehiculoServ vehiculoServ, ServiceServ serviceServ, AppCoordinator coordinator) {
+        this.vehiculoServ = vehiculoServ;
+        this.serviceServ = serviceServ;
         this.navigator = coordinator.getMainNavigator();
     }
 
@@ -93,9 +100,27 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
 
     private void configurarLista() {
         lvServices.setItems(items);
-        lvServices.setCellFactory(f -> new CeldaOperacionUniversal());
+        lvServices.setCellFactory(f -> new CeldaOperacionUniversal(this::detallesOperacion));
         String css = getClass().getResource("/styles/celda-operacion.css").toExternalForm();
         lvServices.getStylesheets().add(css);
+    }
+
+    private void detallesOperacion(ItemOperacionViewModel item) {
+        if (item == null) return;
+
+        if (item instanceof ItemServiceViewModel) {
+            serviceServ.datosParaModificar(item.getCodigo())
+                    .ifPresent(s -> {
+                        Optional<Service> huboCambios = navigator.openModal(Views.MODIFICAR_SERVICE,
+                                "Detalles del service", s);
+                        huboCambios.ifPresent(sm -> recargarVista());
+                    });
+        }
+    }
+
+    private void recargarVista() {
+        vehiculoServ.verDetalle(this.vehiculo.getId())
+                .ifPresent(this::receiveData);
     }
 
     private void cargarLabels(Vehiculo data) {
@@ -107,7 +132,7 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
         lblModelo.setText(data.getModeloVehiculo().getNombreModelo());
         lblAnio.setText(data.getModeloVehiculo().getAnio().toString());
         lblCilindrada.setText(data.getModeloVehiculo().getCilindrada() + "cc.");
-        lblFechaRegistro.setText(data.getFechaRegistro().toString());
+        lblFechaRegistro.setText(data.getFechaRegistro().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
         InputStream stream = getClass().getResourceAsStream(data.getModeloVehiculo().getMarcaVehiculo().getRutaLogo());
         if (stream != null) {
             Image img = new Image(stream);

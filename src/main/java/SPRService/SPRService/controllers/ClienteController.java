@@ -170,8 +170,8 @@ public class ClienteController implements Initializable {
             return;
         }
 
-        Optional<Cliente> result = clienteServ.verOperacionesConVehiculos(vm.getClienteEntity().getId());
-        result.ifPresent(c -> navigator.openModal(Views.OPERACIONES_CLIENTE, "Operaciones de cliente", c));
+        clienteServ.verOperacionesConVehiculos(vm.getClienteEntity().getId())
+                .ifPresent(c -> navigator.openModal(Views.OPERACIONES_CLIENTE, "Operaciones de cliente", c));
     }
 
     @FXML

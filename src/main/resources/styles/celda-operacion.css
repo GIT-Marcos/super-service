@@ -104,3 +104,111 @@
     -fx-text-fill: #555;
     -fx-padding: 2 0 0 0;
 }
+
+/* --- DIFERENCIACIÓN DE TIPO DE OPERACIÓN --- */
+
+/* 1. Estilos para el Título (Texto) */
+
+/* Sobrescribe el color base para Ventas */
+.tipo-venta-titulo {
+    -fx-text-fill: #00897b; /* Teal Oscuro */
+}
+
+/* Sobrescribe el color base para Services */
+.tipo-service-titulo {
+    -fx-text-fill: #3949ab; /* Indigo */
+}
+
+
+/* 2. Estilos para el Borde Lateral (Indicador visual rápido) */
+/* Esto se aplica a la celda completa (ListCell) */
+
+.tipo-venta-borde {
+    /* Borde izquierdo grueso color Teal */
+    -fx-border-color: transparent transparent #e0e0e0 #00897b;
+    -fx-border-width: 0 0 1 5; /* Arriba Der Abajo Izq */
+    -fx-padding: 0 0 0 5; /* Añade padding para compensar el borde visual */
+}
+
+.tipo-service-borde {
+    /* Borde izquierdo grueso color Indigo */
+    -fx-border-color: transparent transparent #e0e0e0 #3949ab;
+    -fx-border-width: 0 0 1 5;
+    -fx-padding: 0 0 0 5;
+}
+
+/* Ajuste cuando se selecciona la celda para que se vea bien */
+.list-cell:filled:selected.tipo-venta-borde,
+.list-cell:filled:selected.tipo-service-borde {
+    -fx-border-color: transparent transparent transparent white; /* Opcional: quitar borde al seleccionar */
+    /* O mantener el color pero más brillante */
+}
+
+/* ================================================================= */
+/* EFECTOS DE SELECCIÓN Y HOVER AVANZADOS                           */
+/* ================================================================= */
+
+/* 1. Reset básico para la celda seleccionada */
+.list-cell:filled:selected {
+    -fx-background-color: #e3f2fd; /* Azul base si no tiene clase específica */
+    -fx-table-cell-border-color: transparent;
+}
+
+/* 2. SELECCIÓN PARA TIPO VENTA (Teal)
+   Mantiene el borde izquierdo Teal y pone un fondo verde azulado muy suave */
+.list-cell:filled:selected.tipo-venta-borde {
+    -fx-background-color: #e0f2f1; /* Teal muy claro (Material 50) */
+    -fx-border-color: transparent transparent #b2dfdb #00897b; /* Borde inferior suave, Izquierdo FUERTE */
+    -fx-border-width: 0 0 1 6; /* Hacemos el borde izq un poco más grueso al seleccionar (6px) */
+}
+
+/* Efecto Hover sobre selección para Venta */
+.list-cell:filled:selected:hover.tipo-venta-borde {
+    -fx-background-color: #b2dfdb; /* Un poco más oscuro al pasar el mouse estando seleccionado */
+}
+
+
+/* 3. SELECCIÓN PARA TIPO SERVICE (Indigo)
+   Mantiene el borde izquierdo Indigo y pone un fondo azul índigo muy suave */
+.list-cell:filled:selected.tipo-service-borde {
+    -fx-background-color: #e8eaf6; /* Indigo muy claro (Material 50) */
+    -fx-border-color: transparent transparent #c5cae9 #3949ab;
+    -fx-border-width: 0 0 1 6;
+}
+
+/* Efecto Hover sobre selección para Service */
+.list-cell:filled:selected:hover.tipo-service-borde {
+    -fx-background-color: #c5cae9;
+}
+
+
+/* 4. AJUSTE DE TEXTOS AL SELECCIONAR (Opcional)
+   Aumenta un poco el contraste de los textos secundarios cuando la celda está seleccionada */
+
+/* El título se vuelve un poco más oscuro/negro puro */
+.list-cell:filled:selected .celda-op-titulo {
+    -fx-text-fill: #000000;
+}
+
+/* La fecha se oscurece para leerse mejor sobre el fondo de color */
+.list-cell:filled:selected .celda-op-fecha {
+    -fx-text-fill: #555555;
+}
+
+/* Asegurar que el contenedor interno sea transparente para ver el color de la celda */
+.list-cell:filled:selected .celda-operacion-container {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent; /* Quitamos el borde interno para que mande el de la celda */
+}
+
+.btn-ver-detalles {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-padding: 5 10;
+    -fx-background-radius: 4;
+}
+
+.btn-ver-detalles:hover {
+    -fx-background-color: #0056b3;
+}

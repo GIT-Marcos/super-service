@@ -1,5 +1,6 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.components.CeldaDatoContacto;
 import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.entities.DatosContacto;
 import SPRService.SPRService.exceptions.DuplicateClientDNI;
@@ -9,6 +10,7 @@ import SPRService.SPRService.services.ClienteServ;
 import SPRService.SPRService.util.ManejadorInputs;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
+import SPRService.SPRService.viewModels.celdas.ItemDatoContactoViewModel;
 import com.google.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import javafx.collections.FXCollections;
@@ -31,23 +33,16 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
     private Cliente clienteParaDevolver;
     private final ClienteServ clienteServ;
     private boolean flagModifyMode = false;
-    private ObservableList<String> obsListEmails = FXCollections.observableArrayList();
-    private ObservableList<String> obsListNrosTelefono = FXCollections.observableArrayList();
+    private ObservableList<ItemDatoContactoViewModel> items = FXCollections.observableArrayList();
 
     @FXML
-    private TextField tfDNI;
+    private TextField tfDNI, tfNombre, tfApellido, tfDatoContacto;
     @FXML
-    private TextField tfNombre;
+    private Button btnGuardar, btnReActivar;
     @FXML
-    private TextField tfApellido;
+    private ComboBox<ItemDatoContactoViewModel.TipoContacto> cbTipoContacto;
     @FXML
-    private TextField tfEmail;
-    @FXML
-    private TextField tfNro;
-    @FXML
-    private ListView<String> lvEmails;
-    @FXML
-    private ListView<String> lvNrosTelefono;
+    private ListView<ItemDatoContactoViewModel> lvDatosContacto;
 
     @Inject
     public CargarClienteController(ClienteServ clienteServ) {
@@ -56,10 +51,22 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        lvEmails.setItems(obsListEmails);
-        lvNrosTelefono.setItems(obsListNrosTelefono);
+        lvDatosContacto.setItems(items);
+        lvDatosContacto.setCellFactory(cell -> new CeldaDatoContacto());
 
-        configListenersListViews();
+        cbTipoContacto.getItems().addAll(ItemDatoContactoViewModel.TipoContacto.values());
+        cbTipoContacto.getSelectionModel().selectFirst();
+
+        cbTipoContacto.setOnAction(e -> actualizarPlaceholder());
+        actualizarPlaceholder();
+    }
+
+    private void actualizarPlaceholder() {
+        ItemDatoContactoViewModel.TipoContacto tipo = cbTipoContacto.getValue();
+        switch (tipo) {
+            case EMAIL -> tfDatoContacto.setPromptText("email@ejemplo.com");
+            case TELEFONO -> tfDatoContacto.setPromptText("+5491123456789");
+        }
     }
 
 
@@ -71,8 +78,13 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
             tfDNI.setText(data.getDni());
             tfNombre.setText(data.getNombre());
             tfApellido.setText(data.getApellido());
-            obsListEmails.setAll(data.getContactosCliente().getEmailSet());
-            obsListNrosTelefono.setAll(data.getContactosCliente().getNroTelefonoSet());
+
+            items.setAll(ItemDatoContactoViewModel.fromEntity(data.getContactosCliente()));
+
+            if (!data.getActivo()) {
+                btnGuardar.setDisable(true);
+                btnReActivar.setDisable(false);
+            }
         }
     }
 
@@ -82,39 +94,53 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
     }
 
     @FXML
-    private void addEmail() {
-        String eMail;
-        try {
-            eMail = ManejadorInputs.eMail(tfEmail.getText(), true);
-        } catch (RuntimeException e) {
-            NotificationHelper.mostrarAdvertencia("Agregar eMail", e.getMessage());
-            return;
-        }
-        if (obsListEmails.contains(eMail)) {
-            tfEmail.setText("");
+    private void addDatoContacto() {
+        ItemDatoContactoViewModel.TipoContacto tipo = cbTipoContacto.getSelectionModel().getSelectedItem();
+        if (tipo == null) {
             return;
         }
 
-        obsListEmails.add(eMail);
-        tfEmail.setText("");
+        try {
+            String datoNuevo;
+            switch (tipo) {
+                case EMAIL -> datoNuevo = ManejadorInputs.eMail(tfDatoContacto.getText(), true);
+                case TELEFONO -> datoNuevo = ManejadorInputs.nroTel(tfDatoContacto.getText(), true);
+                default -> {
+                    return;
+                }
+            }
+
+            ItemDatoContactoViewModel nuevoContacto = new ItemDatoContactoViewModel(tipo, datoNuevo);
+            if (items.contains(nuevoContacto)) {
+                NotificationHelper.mostrarAdvertencia("Agregar contacto", "Ese contacto ya existe.");
+                return;
+            }
+
+            items.add(nuevoContacto);
+            tfDatoContacto.clear();
+        } catch (IllegalArgumentException e) {
+            NotificationHelper.mostrarAdvertencia("Agregar contacto", e.getMessage());
+        }
     }
 
     @FXML
-    private void addNro() {
-        String nro;
+    private void reActivar() {
+        if (!SimpleDialogs.confirmacion("Guardar cliente",
+                "¿Está seguro que quiere re-activar el cliente?")) return;
         try {
-            nro = ManejadorInputs.nroTel(tfNro.getText(), true);
-        } catch (RuntimeException e) {
-            NotificationHelper.mostrarAdvertencia("Agregar número de teléfono.", e.getMessage());
-            return;
-        }
-        if (obsListNrosTelefono.contains(nro)) {
-            tfNro.setText("");
-            return;
-        }
+            clienteServ.reActivar(this.cliente);
+            this.cliente.setActivo(true);
 
-        obsListNrosTelefono.add(nro);
-        tfNro.setText("");
+            btnGuardar.setDisable(false);
+            btnReActivar.setDisable(true);
+
+            this.clienteParaDevolver = this.cliente;
+            NotificationHelper.mostrarExito("Re-activar cliente",
+                    "Se ha re-activado el cliente con éxito.");
+        } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Re-activar cliente", "Ha ocurrido un error inesperado.");
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -131,7 +157,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         }
 
         // 2. Validar contactos
-        if (obsListEmails.isEmpty() && obsListNrosTelefono.isEmpty()) {
+        if (items.isEmpty()) {
             NotificationHelper.mostrarAdvertencia("Datos de contacto", "Debe haber al menos un dato de contacto.");
             return;
         }
@@ -144,12 +170,10 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         if (flagModifyMode && cliente.getContactosCliente() != null) {
             contactos.setId(cliente.getContactosCliente().getId()); // ⚠ Reusar ID existente
         }
-        contactos.setEmailSet(new HashSet<>(obsListEmails));
-        contactos.setNroTelefonoSet(new HashSet<>(obsListNrosTelefono));
+        ItemDatoContactoViewModel.updateEntity(contactos, items);
 
         // 5. Construir Cliente
         Cliente clienteParaCargar = new Cliente(
-                //flagModifyMode ? cliente.getId() : null,
                 dni,
                 nombre,
                 apellido,
@@ -184,56 +208,16 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         }
     }
 
+    private void crearNuevo() {
+
+    }
+
+
+
     @FXML
     private void cancelar(ActionEvent event) {
         Node n = ((Node) event.getSource());
         Stage s = (Stage) n.getScene().getWindow();
         s.close();
-    }
-
-    private void configListenersListViews() {
-        lvEmails.setCellFactory(lv -> {
-            ListCell<String> cell = new ListCell<>();
-            ContextMenu cm = new ContextMenu();
-            MenuItem menuItem = new MenuItem("Quitar eMail");
-
-            menuItem.setOnAction(event -> {
-                obsListEmails.remove(cell.getItem());
-            });
-            cm.getItems().add(menuItem);
-
-            cell.textProperty().bind(cell.itemProperty());
-
-            cell.emptyProperty().addListener((obs, wasEmpty, isEmpty) -> {
-                if (isEmpty) {
-                    cell.setContextMenu(null);
-                } else {
-                    cell.setContextMenu(cm);
-                }
-            });
-            return cell;
-        });
-
-        lvNrosTelefono.setCellFactory(lv -> {
-            ListCell<String> cell = new ListCell<>();
-            ContextMenu cm = new ContextMenu();
-            MenuItem menuItem = new MenuItem("Quitar n° de teléfono");
-
-            menuItem.setOnAction(event -> {
-                obsListNrosTelefono.remove(cell.getItem());
-            });
-            cm.getItems().add(menuItem);
-
-            cell.textProperty().bind(cell.itemProperty());
-
-            cell.emptyProperty().addListener((obs, wasEmpty, isEmpty) -> {
-                if (isEmpty) {
-                    cell.setContextMenu(null);
-                } else {
-                    cell.setContextMenu(cm);
-                }
-            });
-            return cell;
-        });
     }
 }
