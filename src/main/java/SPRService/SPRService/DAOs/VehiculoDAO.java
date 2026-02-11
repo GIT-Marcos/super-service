@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface VehiculoDAO extends GenericDAO<Vehiculo, Long>{
+public interface VehiculoDAO extends GenericDAO<Vehiculo, Long> {
 
     /**
      * Trae todos los vehículos solo con los datos mínimos para llenar la tabla principal.
@@ -21,7 +21,7 @@ public interface VehiculoDAO extends GenericDAO<Vehiculo, Long>{
      */
     Optional<Vehiculo> verDetalle(Long id);
 
-    List<Vehiculo> buscarPor(String patente, String modelo, String marca);
+    List<Vehiculo> buscarPor(String patente, String modelo, String marca, boolean activos, boolean baja);
 
     ResultadoPaginado<Vehiculo> buscarPaginado(FiltroVehiculoDTO filtro);
 

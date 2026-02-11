@@ -78,6 +78,8 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
             this.vehiculo = data;
             cargarLabels(data);
             cargarLista(data);
+
+            if (!data.getEstado()) btnNuevo.setDisable(true);
         }
     }
 

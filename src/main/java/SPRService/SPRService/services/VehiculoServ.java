@@ -12,9 +12,9 @@ public interface VehiculoServ {
 
     List<Vehiculo> verTodosActivos();
     Optional<Vehiculo> verDetalle(Long id);
-    List<Vehiculo> buscarPor(String patente, String modelo, String marca);
+    List<Vehiculo> buscarPor(String patente, String modelo, String marca, boolean activos, boolean baja);
     ResultadoPaginado<Vehiculo> buscarPaginado(String patente, String modelo, String marca,
-                                               int pagina, int itemsPorPagina);
+                                               boolean activos, boolean baja, int pagina, int itemsPorPagina);
     List<ModelosMasRegistradosDTO> generarReporteModelosMasRegistrados(Integer cantidad, LocalDate fechaMin,
                                                                        LocalDate fechaMax);
 

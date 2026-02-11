@@ -45,9 +45,11 @@ public class VehiculosController implements Initializable {
     @FXML
     private TextField tfPatente, tfModelo, tfMarca;
     @FXML
+    private CheckBox chkActivos, chkInactivos;
+    @FXML
     private TableView<VehiculoRowViewModel> tablaVehiculos;
     @FXML
-    private TableColumn<VehiculoRowViewModel, String> colPatente, colMarca, colModelo, colAnio, colColor, colFechaReg;
+    private TableColumn<VehiculoRowViewModel, String> colPatente, colMarca, colModelo, colAnio, colColor, colFechaReg, colEstado;
     @FXML
     private TableColumn<VehiculoRowViewModel, Double> colCil;
     @FXML
@@ -110,9 +112,11 @@ public class VehiculosController implements Initializable {
         String patente = tfPatente.getText() != null ? tfPatente.getText().strip() : "";
         String modelo = tfModelo.getText() != null ? tfModelo.getText().strip() : "";
         String marca = tfMarca.getText() != null ? tfMarca.getText().strip() : "";
+        boolean verActivos = chkActivos.isSelected();
+        boolean verBaja = chkInactivos.isSelected();
 
         ResultadoPaginado<Vehiculo> resultado = vehiculoServ.buscarPaginado(
-                patente, modelo, marca, numeroPagina, ITEMS_POR_PAGINA);
+                patente, modelo, marca, verActivos, verBaja, numeroPagina, ITEMS_POR_PAGINA);
 
         // Actualizar datos de paginación
         int paginas = (int) Math.ceil((double) resultado.getCantidadResultados() / ITEMS_POR_PAGINA);
@@ -146,10 +150,11 @@ public class VehiculosController implements Initializable {
 
     @FXML
     private void todosLosVehiculos() {
-        // Limpiar filtros
         tfPatente.clear();
         tfModelo.clear();
         tfMarca.clear();
+        chkActivos.setSelected(true);
+        chkInactivos.setSelected(true);
 
         paginacion.setCurrentPageIndex(0);
         cargarPagina(0);
@@ -206,14 +211,20 @@ public class VehiculosController implements Initializable {
     private void eliminarVehiculo() {
         VehiculoRowViewModel vrvm = tablaVehiculos.getSelectionModel().getSelectedItem();
         if (vrvm == null) {
-            NotificationHelper.mostrarAdvertencia("Eliminación de vehículo",
-                    "Debe seleccionar un vehículo para poder eliminarlo.");
+            NotificationHelper.mostrarAdvertencia("Baja de vehículo",
+                    "Debe seleccionar un vehículo para poder darlo de baja.");
+            return;
+        }
+
+        if (!vrvm.getVehiculo().getEstado()) {
+            NotificationHelper.mostrarAdvertencia("Baja de vehículo",
+                    "Ese vehículo ya está dado de baja.");
             return;
         }
 
         Vehiculo v = vrvm.getVehiculo();
-        boolean confirmar = SimpleDialogs.confirmacion("Eliminación de vehículo",
-                "¿Confirmar eliminación de vehículo?");
+        boolean confirmar = SimpleDialogs.confirmacion("Baja de vehículo",
+                "¿Confirmar baja de vehículo?");
         if (!confirmar) return;
 
         try {
@@ -272,6 +283,27 @@ public class VehiculosController implements Initializable {
         colAnio.setCellValueFactory(new PropertyValueFactory<>("anio"));
         colColor.setCellValueFactory(new PropertyValueFactory<>("color"));
         colFechaReg.setCellValueFactory(new PropertyValueFactory<>("fechaRegistro"));
+        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+
+        if (colEstado != null) {
+            colEstado.setCellFactory(col -> new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(null);
+                    setStyle("");
+                    if (empty || item == null) return;
+
+                    setText(item);
+                    VehiculoRowViewModel vm = getTableView().getItems().get(getIndex());
+                    if (vm.getVehiculo().getEstado()) {
+                        setStyle("-fx-text-fill: #028126; -fx-font-weight: bold; -fx-alignment: CENTER");
+                    } else {
+                        setStyle("-fx-text-fill: #912a2b; -fx-font-weight: bold; -fx-alignment: CENTER");
+                    }
+                }
+            });
+        }
     }
 
     private void llenarCombos() {

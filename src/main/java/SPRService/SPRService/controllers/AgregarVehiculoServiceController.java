@@ -85,7 +85,7 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
     @FXML
     private void buscar() {
         this.obsListVehiculo.setAll(vehiculoServ.buscarPor(tfPatente.getText().strip(),
-                tfModelo.getText().strip(), tfMarca.getText().strip()));
+                tfModelo.getText().strip(), tfMarca.getText().strip(), true, true));
     }
 
 }

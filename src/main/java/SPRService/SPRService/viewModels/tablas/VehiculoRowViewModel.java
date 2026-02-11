@@ -16,6 +16,7 @@ public class VehiculoRowViewModel {
     private final DoubleProperty cilindrada;
     private final IntegerProperty anio;
     private final StringProperty color;
+    private final StringProperty estado;
 
     public VehiculoRowViewModel(Vehiculo v) {
         this.vehiculo = v;
@@ -26,6 +27,9 @@ public class VehiculoRowViewModel {
         this.cilindrada = new SimpleDoubleProperty(v.getModeloVehiculo().getCilindrada());
         this.anio = new SimpleIntegerProperty(v.getModeloVehiculo().getAnio().getValue());
         this.color = new SimpleStringProperty(v.getColor());
+        this.estado = new SimpleStringProperty(
+                (v.getEstado()) ? "ACTIVO" : "BAJA"
+        );
     }
 
     public Vehiculo getVehiculo() {
@@ -86,5 +90,13 @@ public class VehiculoRowViewModel {
 
     public StringProperty colorProperty() {
         return color;
+    }
+
+    public String getEstado() {
+        return estado.get();
+    }
+
+    public StringProperty estadoProperty() {
+        return estado;
     }
 }
