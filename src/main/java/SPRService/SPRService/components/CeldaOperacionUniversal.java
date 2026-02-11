@@ -34,10 +34,10 @@ public class CeldaOperacionUniversal extends CeldaItemOperacion<ItemOperacionVie
 
     @Override
     protected void actualizarContenido(ItemOperacionViewModel item) {
-        // 1. Limpieza IMPORTANTE (por el reciclaje de celdas de JavaFX)
+        // 1. Limpieza general de estilos (Crucial para el reciclaje)
         limpiarEstilos();
 
-        // 2. Bifurcación de lógica según el tipo
+        // 2. Lógica por tipo
         if (item instanceof ItemVentaViewModel) {
             configurarComoVenta((ItemVentaViewModel) item);
         } else if (item instanceof ItemServiceViewModel) {
@@ -47,15 +47,19 @@ public class CeldaOperacionUniversal extends CeldaItemOperacion<ItemOperacionVie
 
     // --- LÓGICA ESPECÍFICA DE VENTA ---
     private void configurarComoVenta(ItemVentaViewModel venta) {
-        // Venta NO tiene patente -> ocultar
         setVisible(lblPatente, false);
 
-        // Lógica de Estado
+        // --- ESTILO DIFERENCIAL ---
+        // Asumiendo que 'lblTitulo' es protected en la clase padre
+        lblTitulo.getStyleClass().add("tipo-venta-titulo");
+        // Opcional: Agregar borde al contenedor principal
+        getStyleClass().add("tipo-venta-borde");
+
         EstadoVentaRepuesto estado = venta.getEstado();
         if (estado != null) {
-            lblEstado.setText(estado.toString()); // Usa el "nombreEstado" del Enum
+            lblEstado.setText(estado.toString());
             setVisible(lblEstado, true);
-            aplicarColorVenta(estado); // <--- LÓGICA DE ESTADOS AQUÍ
+            aplicarColorVenta(estado);
         } else {
             setVisible(lblEstado, false);
         }
@@ -63,7 +67,6 @@ public class CeldaOperacionUniversal extends CeldaItemOperacion<ItemOperacionVie
 
     // --- LÓGICA ESPECÍFICA DE SERVICE ---
     private void configurarComoService(ItemServiceViewModel service) {
-        // Service SÍ tiene patente -> mostrar
         String patente = service.getPatente();
         if (patente != null && !patente.isBlank()) {
             lblPatente.setText("Patente: " + patente.toUpperCase());
@@ -72,12 +75,16 @@ public class CeldaOperacionUniversal extends CeldaItemOperacion<ItemOperacionVie
             setVisible(lblPatente, false);
         }
 
-        // Lógica de Estado
+        // --- ESTILO DIFERENCIAL ---
+        lblTitulo.getStyleClass().add("tipo-service-titulo");
+        // Opcional: Agregar borde al contenedor principal
+        getStyleClass().add("tipo-service-borde");
+
         EstadoService estado = service.getEstado();
         if (estado != null) {
-            lblEstado.setText(estado.toString()); // Usa el "nombreEstado" del Enum
+            lblEstado.setText(estado.toString());
             setVisible(lblEstado, true);
-            aplicarColorService(estado); // <--- LÓGICA DE ESTADOS AQUÍ
+            aplicarColorService(estado);
         } else {
             setVisible(lblEstado, false);
         }
@@ -87,62 +94,51 @@ public class CeldaOperacionUniversal extends CeldaItemOperacion<ItemOperacionVie
 
     private void aplicarColorVenta(EstadoVentaRepuesto estado) {
         switch (estado) {
-            case PRESUPUESTANDO:
-                lblEstado.getStyleClass().add("estado-proceso"); break;
-            case ACEPTADO:
-            case PENDIENTE_PAGO:
-                lblEstado.getStyleClass().add("estado-pendiente"); break;
-            case PAGADO:
-                lblEstado.getStyleClass().add("estado-finalizado"); break;
-            case CANCELADO:
-                lblEstado.getStyleClass().add("estado-cancelado"); break;
-            default:
-                lblEstado.getStyleClass().add("estado-pendiente");
+            case PRESUPUESTANDO -> lblEstado.getStyleClass().add("estado-proceso");
+            case ACEPTADO, PENDIENTE_PAGO -> lblEstado.getStyleClass().add("estado-pendiente");
+            case PAGADO -> lblEstado.getStyleClass().add("estado-finalizado");
+            case CANCELADO -> lblEstado.getStyleClass().add("estado-cancelado");
+            default -> lblEstado.getStyleClass().add("estado-pendiente");
         }
     }
 
     private void aplicarColorService(EstadoService estado) {
         switch (estado) {
             // Grupo Pendientes / Pausa
-            case PENDIENTE:
-            case EN_ESPERA:
-            case PAUSADO:
-                lblEstado.getStyleClass().add("estado-pendiente"); break;
-
+            case PENDIENTE, EN_ESPERA, PAUSADO -> lblEstado.getStyleClass().add("estado-pendiente");
             // Grupo Acción
-            case TRABAJANDO:
-                lblEstado.getStyleClass().add("estado-proceso"); break;
-
+            case TRABAJANDO -> lblEstado.getStyleClass().add("estado-proceso");
             // Grupo Alerta
-            case PAGO_PENDIENTE:
-                lblEstado.getStyleClass().add("estado-alerta"); break;
-
+            case PAGO_PENDIENTE -> lblEstado.getStyleClass().add("estado-alerta");
             // Grupo Final
-            case FINALIZADO:
-            case PAGADO:
-                lblEstado.getStyleClass().add("estado-finalizado"); break;
-
+            case FINALIZADO, PAGADO -> lblEstado.getStyleClass().add("estado-finalizado");
             // Grupo Cancelado
-            case CANCELADO:
-                lblEstado.getStyleClass().add("estado-cancelado"); break;
-
-            default:
-                lblEstado.getStyleClass().add("estado-pendiente");
+            case CANCELADO -> lblEstado.getStyleClass().add("estado-cancelado");
+            default -> lblEstado.getStyleClass().add("estado-pendiente");
         }
     }
 
     // --- Utilitarios ---
 
     private void limpiarEstilos() {
-        // Elimina todas las clases de estado posibles para no acumularlas
+        // Limpia los estados
         lblEstado.getStyleClass().removeAll(
                 "estado-pendiente", "estado-proceso",
                 "estado-finalizado", "estado-cancelado", "estado-alerta"
         );
+
+        // Limpia los estilos de TIPO (Venta vs Service) del Título
+        // (Nota: lblTitulo debe ser accesible desde el padre)
+        if (lblTitulo != null) {
+            lblTitulo.getStyleClass().removeAll("tipo-venta-titulo", "tipo-service-titulo");
+        }
+
+        // Limpia los estilos de borde de la celda misma
+        getStyleClass().removeAll("tipo-venta-borde", "tipo-service-borde");
     }
 
     private void setVisible(Label lbl, boolean visible) {
         lbl.setVisible(visible);
-        lbl.setManaged(visible); // Hace que el nodo desaparezca del layout si no es visible
+        lbl.setManaged(visible);
     }
 }
