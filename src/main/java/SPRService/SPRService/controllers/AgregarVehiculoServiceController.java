@@ -74,6 +74,12 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
             return;
         }
 
+        if (!lvVehiculos.getSelectionModel().getSelectedItem().getEstado()) {
+            NotificationHelper.mostrarAdvertencia("Asignar vehículo",
+                    "No se pueden asignar vehículos inactivos que han sido dados de baja.");
+            return;
+        }
+
         Optional<Vehiculo> result = vehiculoServ.verDetalle(vehiculoSeleccionado.getId());
         result.ifPresent(v -> {
             this.vehiculoSeleccionado = v;
@@ -85,7 +91,20 @@ public class AgregarVehiculoServiceController implements Initializable, ModalCon
     @FXML
     private void buscar() {
         this.obsListVehiculo.setAll(vehiculoServ.buscarPor(tfPatente.getText().strip(),
-                tfModelo.getText().strip(), tfMarca.getText().strip()));
+                tfModelo.getText().strip(), tfMarca.getText().strip(), true, true));
     }
 
+    @FXML
+    private void cancelar() {
+        this.vehiculoSeleccionado = null;
+        Stage s = (Stage) lvVehiculos.getScene().getWindow();
+        s.close();
+    }
+
+    @FXML
+    private void limpiarFiltros() {
+        tfMarca.clear();
+        tfModelo.clear();
+        tfPatente.clear();
+    }
 }

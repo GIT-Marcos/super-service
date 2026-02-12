@@ -61,24 +61,24 @@ public class VehiculoServImpl implements VehiculoServ {
 
     @Transactional
     @Override
-    public List<Vehiculo> buscarPor(String patente, String modelo, String marca) {
+    public List<Vehiculo> buscarPor(String patente, String modelo, String marca, boolean activos, boolean baja) {
         if (patente == null) patente = "";
         if (modelo == null) modelo = "";
         if (marca == null) marca = "";
 
-        return daoVehiculo.buscarPor(patente, modelo, marca);
+        return daoVehiculo.buscarPor(patente, modelo, marca, activos, baja);
     }
 
     @Transactional
     @Override
     public ResultadoPaginado<Vehiculo> buscarPaginado(String patente, String modelo, String marca,
-                                                      int pagina, int itemsPorPagina) {
+                                                      boolean activos, boolean baja, int pagina, int itemsPorPagina) {
         if (patente == null) patente = "";
         if (modelo == null) modelo = "";
         if (marca == null) marca = "";
 
         int offset = pagina * itemsPorPagina;
-        FiltroVehiculoDTO filtro = new FiltroVehiculoDTO(patente, modelo, marca, offset, itemsPorPagina);
+        FiltroVehiculoDTO filtro = new FiltroVehiculoDTO(patente, modelo, marca, activos, baja, offset, itemsPorPagina);
         return daoVehiculo.buscarPaginado(filtro);
     }
 
@@ -141,9 +141,7 @@ public class VehiculoServImpl implements VehiculoServ {
     @Transactional
     @Override
     public void borradoLogico(Vehiculo v) {
-        if (v == null) throw new NullPointerException("Error: vehículo nulo en servicio");
         v.setEstado(Boolean.FALSE);
-        v.setPatente(v.getPatente().concat(".DEL" + v.getId()));
         daoVehiculo.update(v);
     }
 }

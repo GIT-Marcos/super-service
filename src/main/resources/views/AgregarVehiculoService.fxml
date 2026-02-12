@@ -1,30 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="470.0" maxWidth="560.0" minHeight="400.0" minWidth="560.0" prefHeight="470.0" prefWidth="560.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarVehiculoServiceController">
+<AnchorPane prefHeight="570.0" prefWidth="620.0" styleClass="root" stylesheets="@../styles/vehiculos.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarVehiculoServiceController">
    <children>
-      <Button layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#cargarNuevoVehiculo" text="Cargar nuevo vehículo" AnchorPane.bottomAnchor="13.208955958097192" AnchorPane.leftAnchor="14.0" />
-      <Button layoutX="307.0" layoutY="361.0" mnemonicParsing="false" onAction="#asignarVehiculo" text="ASIGNAR VEHÍCULO" AnchorPane.bottomAnchor="13.208955958097192" AnchorPane.rightAnchor="16.910451350697443" />
-      <ListView fx:id="lvVehiculos" layoutX="15.0" layoutY="68.05969955502127" minHeight="280.0" prefHeight="280.0" prefWidth="531.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="70.0" />
-      <Label layoutX="15.0" layoutY="3.0" text="Seleccione un vehículo para hacerle service:" AnchorPane.topAnchor="5.0">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <HBox layoutX="15.0" layoutY="25.0" prefHeight="30.0" spacing="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="30.0">
+
+      <!-- ========== PANEL SUPERIOR - TÍTULO ========== -->
+      <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="top-panel" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
          <children>
-            <TextField fx:id="tfPatente" maxWidth="100.0" promptText="Patente..." />
-            <TextField fx:id="tfModelo" promptText="Modelo..." />
-            <TextField fx:id="tfMarca" promptText="Marca..." />
-            <Button mnemonicParsing="false" onAction="#buscar" text="Buscar" />
+            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Seleccionar Vehículo para Service" />
          </children>
       </HBox>
+
+      <!-- ========== CONTENEDOR PRINCIPAL ========== -->
+      <VBox spacing="8.0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="30.0">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <children>
+
+            <!-- ========== SECCIÓN DE BÚSQUEDA ========== -->
+            <VBox spacing="5.0" styleClass="sidebar">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <children>
+                  <Label styleClass="section-label" text="FILTROS DE BÚSQUEDA" />
+
+                  <HBox alignment="CENTER_LEFT" spacing="10">
+                     <children>
+                        <!-- Campo Patente -->
+                        <VBox spacing="3">
+                           <children>
+                              <Label style="-fx-font-size: 11px; -fx-text-fill: #636e72;" text="Patente" />
+                              <TextField fx:id="tfPatente" maxWidth="100" prefWidth="100" promptText="ABC123..." styleClass="text-field" />
+                           </children>
+                        </VBox>
+
+                        <!-- Campo Marca -->
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label style="-fx-font-size: 11px; -fx-text-fill: #636e72;" text="Marca" />
+                              <TextField fx:id="tfMarca" promptText="Toyota, Ford..." styleClass="text-field" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+
+                        <!-- Campo Modelo -->
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label style="-fx-font-size: 11px; -fx-text-fill: #636e72;" text="Modelo" />
+                              <TextField fx:id="tfModelo" promptText="Corolla, Focus..." styleClass="text-field" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+
+                        <!-- Botón Buscar -->
+                        <VBox alignment="BOTTOM_CENTER" spacing="3">
+                           <children>
+                              <Region prefHeight="14" />
+                              <Button onAction="#buscar" prefHeight="28" styleClass="btn-primary" text="🔍 Buscar" />
+                           </children>
+                        </VBox>
+
+                        <!-- Botón Limpiar -->
+                        <VBox alignment="BOTTOM_CENTER" spacing="3">
+                           <children>
+                              <Region prefHeight="14" />
+                              <Button fx:id="btnLimpiar" onAction="#limpiarFiltros" prefHeight="28" prefWidth="28" styleClass="btn-danger, btn-small" text="✕" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+
+            <!-- ========== LISTA DE VEHÍCULOS ========== -->
+            <VBox spacing="5" VBox.vgrow="ALWAYS">
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="10">
+                     <children>
+                        <Label styleClass="section-label" text="VEHÍCULOS DISPONIBLES" />
+                        <Separator HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+
+                  <ListView fx:id="lvVehiculos" style="-fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #dcdcdc;" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+
+            <!-- ========== BARRA DE ACCIONES ========== -->
+            <Separator />
+
+            <HBox alignment="CENTER" spacing="10">
+               <children>
+                  <!-- Botón Nuevo Vehículo -->
+                  <Button onAction="#cargarNuevoVehiculo" prefHeight="35" styleClass="btn-success" text="➕ Cargar Nuevo Vehículo">
+                  </Button>
+
+                  <!-- Espaciador -->
+                  <Region HBox.hgrow="ALWAYS" />
+
+                  <!-- Botón Cancelar -->
+                  <Button fx:id="btnCancelar" onAction="#cancelar" prefHeight="35" prefWidth="100" styleClass="btn-danger" text="Cancelar" />
+
+                  <!-- Botón Asignar -->
+                  <Button fx:id="btnAsignar" onAction="#asignarVehiculo" prefHeight="35" prefWidth="180" style="-fx-font-weight: bold;" styleClass="btn-primary" text="ASIGNAR VEHÍCULO" />
+               </children>
+            </HBox>
+
+         </children>
+      </VBox>
+
    </children>
 </AnchorPane>

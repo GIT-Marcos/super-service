@@ -4,16 +4,18 @@ public record FiltroVehiculoDTO(
         String patente,
         String modelo,
         String marca,
+        boolean activos,
+        boolean baja,
         Integer offset,
         Integer limit
 ) {
     // Constructor sin paginación
-    public FiltroVehiculoDTO(String patente, String modelo, String marca) {
-        this(patente, modelo, marca, null, null);
+    public FiltroVehiculoDTO(String patente, String modelo, String marca, boolean activos, boolean baja) {
+        this(patente, modelo, marca, true, true, null, null);
     }
 
     // Constructor por defecto
     public FiltroVehiculoDTO() {
-        this("", "", "", null, null);
+        this("", "", "", true, true, null, null);
     }
 }

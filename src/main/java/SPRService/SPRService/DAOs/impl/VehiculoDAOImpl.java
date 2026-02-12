@@ -30,7 +30,7 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
 
     @Override
     public List<Vehiculo> verTodos() {
-        return buscarPor("", "", "");
+        return buscarPor("", "", "", true, true);
     }
 
     @Override
@@ -72,8 +72,8 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
     }
 
     @Override
-    public List<Vehiculo> buscarPor(String patente, String modelo, String marca) {
-        FiltroVehiculoDTO filtro = new FiltroVehiculoDTO(patente, modelo, marca);
+    public List<Vehiculo> buscarPor(String patente, String modelo, String marca, boolean activos, boolean baja) {
+        FiltroVehiculoDTO filtro = new FiltroVehiculoDTO(patente, modelo, marca, activos, baja);
         EntityManager em = emProvider.get();
         return crearQueryBusqueda(em, filtro).getResultList();
     }
@@ -150,8 +150,11 @@ public class VehiculoDAOImpl extends GenericDAOImpl<Vehiculo, Long> implements V
                                                 FiltroVehiculoDTO filtro) {
         List<Predicate> filtros = new ArrayList<>();
 
-        // Siempre filtrar solo activos
-        filtros.add(cb.equal(root.get("estado"), Boolean.TRUE));
+        if (filtro.activos() && !filtro.baja()) {
+            filtros.add(cb.equal(root.get("estado"), Boolean.TRUE));
+        } else if (!filtro.activos() && filtro.baja()) {
+            filtros.add(cb.equal(root.get("estado"), Boolean.FALSE));
+        }
 
         if (filtro.patente() != null && !filtro.patente().isBlank()) {
             filtros.add(cb.like(cb.upper(root.get("patente")),
