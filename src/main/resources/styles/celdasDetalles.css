@@ -92,7 +92,7 @@
    ========================================== */
 
 .celda-item-container:hover {
-    -fx-background-color: #e8e8e8;
+    -fx-background-color: #c4e5ff;
     -fx-cursor: hand;
 }
 

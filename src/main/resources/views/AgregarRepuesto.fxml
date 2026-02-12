@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="700.0" prefHeight="600.0" prefWidth="700.0" styleClass="root" stylesheets="@../styles/agregarRepuesto.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarRepuestoController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="700.0" prefHeight="600.0" prefWidth="700.0" styleClass="root" stylesheets="@../styles/agregarRepuesto.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.AgregarRepuestoController">
 
     <!-- 1. HEADER SUPERIOR -->
     <top>
@@ -80,7 +80,7 @@
         <VBox spacing="5.0" BorderPane.alignment="CENTER">
             <children>
                 <Label styleClass="section-label" text="Resultados:" />
-                <ListView fx:id="lvRepuestos" styleClass="custom-list-view" VBox.vgrow="ALWAYS" />
+                <ListView fx:id="lvRepuestos" VBox.vgrow="ALWAYS" />
             </children>
             <padding>
                 <Insets bottom="5.0" left="20.0" right="20.0" top="0.0" />
