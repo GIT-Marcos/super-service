@@ -113,3 +113,9 @@
 .btn-secondary-outline:hover {
     -fx-background-color: #ebf5fb;
 }
+
+.error-border {
+    -fx-border-color: red;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}

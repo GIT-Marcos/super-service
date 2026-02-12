@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="400.0" styleClass="root" stylesheets="@../styles/pago.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.PagoController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="620.0" prefWidth="400.0" styleClass="root" stylesheets="@../styles/pago.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.PagoController">
     <children>
 
         <!-- HEADER: TOTAL A PAGAR -->
@@ -119,7 +119,7 @@
                                     </rowConstraints>
                                     <children>
                                         <!-- NUEVO CAMPO: DNI CLIENTE (Fila 0) -->
-                                        <Label text="DNI Cliente:" />
+                                        <Label text="DNI:" />
                                         <TextField fx:id="tfDniCliente" promptText="Ingrese DNI" styleClass="input-field" GridPane.columnIndex="1" />
 
                                         <!-- Elementos desplazados 1 fila hacia abajo -->
