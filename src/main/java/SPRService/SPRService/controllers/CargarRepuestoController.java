@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
@@ -39,6 +40,8 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
     private ComboBox<String> comboUniMedidas;
     @FXML
     private ComboBox<Ubicacion> comboUbicaciones;
+    @FXML
+    private Button btnReactivar, btnGuardarRepuesto;
 
     @Inject
     public CargarRepuestoController(CargaRepuestoViewModel viewModel) {
@@ -114,9 +117,20 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
         else control.setStyle("");
     }
 
+    /**
+     * Solo se ejecuta cuando se modifica un repuesto.
+     */
     @Override
     public void receiveData(Repuesto data) {
-        if (data != null) viewModel.poblarParaModificacion(data);
+        if (data != null) {
+            viewModel.poblarParaModificacion(data);
+
+            btnReactivar.setVisible(true);
+            if (!data.getActivo()) {
+                btnGuardarRepuesto.setDisable(true);
+                btnReactivar.setDisable(false);
+            }
+        }
     }
 
     @Override
@@ -154,6 +168,27 @@ public class CargarRepuestoController implements Initializable, DataReceiver<Rep
         } catch (RuntimeException e) {
             e.printStackTrace();
             NotificationHelper.mostrarError("Error BD", "Error al guardar repuesto.");
+        }
+    }
+
+    @FXML
+    private void reactivarRepuesto() {
+        if (!SimpleDialogs.confirmacion("Reactivar repuesto",
+                "¿Está seguro que quiere reactivar el repuesto?")) return;
+
+        try {
+            viewModel.reactivar();
+
+            btnReactivar.setDisable(true);
+            btnGuardarRepuesto.setDisable(false);
+            // No hace falta llevar datos, solo avisar que hubo cambios.
+            this.resultado = new Repuesto();
+
+            NotificationHelper.mostrarExito("Reactivar", "Repuesto reactivado con éxito.");
+        } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Error al reactivar",
+                    "Ha ocurrido un erro inesperado al reactivar el repuesto.");
+            e.printStackTrace();
         }
     }
 

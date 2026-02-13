@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="590.0" minWidth="500.0" prefHeight="590.0" prefWidth="600.0" styleClass="root" stylesheets="@../styles/deposito.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarRepuestoController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="590.0" minWidth="500.0" prefHeight="590.0" prefWidth="600.0" styleClass="root" stylesheets="@../styles/deposito.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarRepuestoController">
 
     <!-- 1. HEADER -->
     <top>
@@ -203,13 +203,18 @@
 
     <!-- 3. FOOTER -->
     <bottom>
-        <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
+        <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
             </padding>
             <children>
+
                 <Button fx:id="btnCerrar" cancelButton="true" mnemonicParsing="false" onAction="#cerrar" styleClass="btn-danger" text="Cancelar" />
-                <Button fx:id="btnCargarRepuesto" defaultButton="true" mnemonicParsing="false" onAction="#cargarRepuesto" prefWidth="160.0" styleClass="btn-success" text="Guardar Repuesto" />
+
+                <Region HBox.hgrow="ALWAYS" />
+                <!-- Botón Reactivar (visible solo cuando el repuesto está inactivo) -->
+                <Button fx:id="btnReactivar" disable="true" mnemonicParsing="false" onAction="#reactivarRepuesto" styleClass="btn-action" text="Re-activar" visible="false" />
+                <Button fx:id="btnGuardarRepuesto" defaultButton="true" mnemonicParsing="false" onAction="#cargarRepuesto" prefWidth="160.0" styleClass="btn-primary" text="Guardar Repuesto" />
             </children>
         </HBox>
     </bottom>

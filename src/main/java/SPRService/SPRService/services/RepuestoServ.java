@@ -26,6 +26,8 @@ public interface RepuestoServ {
 
     void darDeBaja(Repuesto repuesto);
 
+    void reactivar(Repuesto repuesto);
+
     // ____   ____ ____    ___   ____  ______  ____  __
     // || \\ ||    || \\  // \\  || \\ | || | ||    (( \
     // ||_// ||==  ||_// ((   )) ||_//   ||   ||==   \\

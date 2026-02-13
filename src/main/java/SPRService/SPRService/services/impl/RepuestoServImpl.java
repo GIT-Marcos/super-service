@@ -169,4 +169,12 @@ public class RepuestoServImpl implements RepuestoServ {
         r.getStock().setActivo(Boolean.FALSE);
         daoRepuesto.update(r);
     }
+
+    @Transactional
+    @Override
+    public void reactivar(Repuesto repuesto) {
+        repuesto.setActivo(Boolean.TRUE);
+        repuesto.getStock().setActivo(Boolean.TRUE);
+        daoRepuesto.update(repuesto);
+    }
 }

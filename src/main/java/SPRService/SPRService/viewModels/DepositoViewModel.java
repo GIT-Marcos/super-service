@@ -173,7 +173,7 @@ public class DepositoViewModel {
         Optional<Repuesto> result = navigator.openModal(
                 Views.GUARDAR_REPUESTO, "Modificar repuesto", vm.getRepuestoOriginal());
         result.ifPresent(r -> {
-            vm.updateFrom(r);
+            cargarPagina(paginaActual.get());
             verificarBajoStock();
         });
     }
