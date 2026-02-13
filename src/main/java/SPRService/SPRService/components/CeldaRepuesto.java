@@ -25,6 +25,7 @@ public class CeldaRepuesto extends ListCell<ItemRepuestoViewModel> {
     private Label lblPrecio;
     private Label lblStock;
     private Label lblEstadoStock;
+    private Label lblInactivo;
 
     public CeldaRepuesto() {
         inicializarUI();
@@ -61,8 +62,14 @@ public class CeldaRepuesto extends ListCell<ItemRepuestoViewModel> {
         lblMarca = new Label();
         lblMarca.getStyleClass().add("celda-repuesto-marca");
 
+        lblInactivo = new Label("INACTIVO");
+        lblInactivo.getStyleClass().add("celda-repuesto-inactivo");
+        lblInactivo.setVisible(false);
+        lblInactivo.setManaged(false);
+
         filaSuperior.getChildren().addAll(
                 lblCodBarras,
+                lblInactivo,
                 lblNombreRepuesto,
                 lblMarca
         );
@@ -118,6 +125,36 @@ public class CeldaRepuesto extends ListCell<ItemRepuestoViewModel> {
 
         // Verificar estado del stock
         aplicarEstadoStock(item.getCantidadExistente(), item.getCantidadMinima());
+
+        aplicarEstadoActivo(item.isActivo());
+    }
+
+    private void aplicarEstadoActivo(boolean activo) {
+        // Limpiar estado previo
+        container.getStyleClass().remove("container-inactivo");
+        lblNombreRepuesto.getStyleClass().remove("nombre-inactivo");
+        lblCodBarras.getStyleClass().remove("codigo-inactivo");
+
+        if (!activo) {
+            // Mostrar badge INACTIVO
+            lblInactivo.setVisible(true);
+            lblInactivo.setManaged(true);
+
+            // Aplicar estilos de inactivo
+            container.getStyleClass().add("container-inactivo");
+            lblNombreRepuesto.getStyleClass().add("nombre-inactivo");
+            lblCodBarras.getStyleClass().add("codigo-inactivo");
+
+            // Tooltip informativo
+            container.setOnMouseEntered(e -> {
+                Tooltip tooltip = new Tooltip("⚠ Este repuesto está INACTIVO y no puede ser vendido");
+                Tooltip.install(container, tooltip);
+            });
+        } else {
+            // Ocultar badge INACTIVO
+            lblInactivo.setVisible(false);
+            lblInactivo.setManaged(false);
+        }
     }
 
     private String formatearPrecio(BigDecimal precio) {

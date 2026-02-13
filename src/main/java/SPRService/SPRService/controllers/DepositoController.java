@@ -149,6 +149,13 @@ public class DepositoController implements Initializable {
                     "Seleccione un repuesto para darlo de baja.");
             return;
         }
+
+        if (!vm.getRepuestoOriginal().getActivo()) {
+            NotificationHelper.mostrarAdvertencia("Dar de baja",
+                    "El repuesto seleccionado ya está dado de baja.");
+            return;
+        }
+
         if (!SimpleDialogs.confirmacion("Dar de baja",
                 "¿Confirmar baja de:\n" + vm.getNombre() + " ?"))
             return;

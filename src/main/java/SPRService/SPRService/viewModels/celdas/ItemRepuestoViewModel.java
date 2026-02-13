@@ -16,6 +16,7 @@ public class ItemRepuestoViewModel {
     private final DoubleProperty cantidadExistente = new SimpleDoubleProperty();
     private final DoubleProperty cantidadMinima = new SimpleDoubleProperty();
     private final StringProperty unidadMedida = new SimpleStringProperty();
+    private final BooleanProperty activo = new SimpleBooleanProperty();
 
     public ItemRepuestoViewModel(Repuesto r) {
         this.repuesto = r;
@@ -26,6 +27,7 @@ public class ItemRepuestoViewModel {
         this.cantidadExistente.set(r.getStock().getCantidadExistente());
         this.cantidadMinima.set(r.getStock().getCantMinima());
         this.unidadMedida.set(r.getStock().getUnidadMedida());
+        this.activo.set(r.getActivo());
     }
 
     public Repuesto getRepuesto() {
@@ -86,5 +88,13 @@ public class ItemRepuestoViewModel {
 
     public StringProperty unidadMedidaProperty() {
         return unidadMedida;
+    }
+
+    public boolean isActivo() {
+        return activo.get();
+    }
+
+    public BooleanProperty activoProperty() {
+        return activo;
     }
 }
