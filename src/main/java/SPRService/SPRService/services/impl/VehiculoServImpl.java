@@ -140,8 +140,15 @@ public class VehiculoServImpl implements VehiculoServ {
 
     @Transactional
     @Override
-    public void borradoLogico(Vehiculo v) {
+    public void darDeBaja(Vehiculo v) {
         v.setEstado(Boolean.FALSE);
+        daoVehiculo.update(v);
+    }
+
+    @Transactional
+    @Override
+    public void reactivar(Vehiculo v) {
+        v.setEstado(Boolean.TRUE);
         daoVehiculo.update(v);
     }
 }

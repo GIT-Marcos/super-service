@@ -20,6 +20,6 @@ public interface VehiculoServ {
 
     Vehiculo cargarVehiculo(Vehiculo vehiculoDTO);
     Vehiculo modificarVehiculo(Vehiculo vehiculo);
-    void borradoLogico(Vehiculo vehiculo);
-
+    void darDeBaja(Vehiculo vehiculo);
+    void reactivar(Vehiculo v);
 }

@@ -181,16 +181,17 @@ public class VehiculosController implements Initializable {
             return;
         }
 
+        if (!vrvm.getVehiculo().getEstado()) {
+            NotificationHelper.mostrarAdvertencia("Modificar vehículo",
+                    "No es posible modificar un vehículo dado de baja, debe reactivarlo.");
+            return;
+        }
+
         wizardStateProvider.startEditVehicleWizard(vrvm.getVehiculo());
         Optional<VehiculoVM> result = navigator.openModal(Views.CARGAR_VEHICULO, "Modificar Vehículo", null);
-
-        if (result.isPresent()) {
-            // Actualizar la fila en lugar de recargar toda la página
-            int i = obsListViewModel.indexOf(vrvm);
-            if (i >= 0) {
-                obsListViewModel.set(i, new VehiculoRowViewModel(result.get().obtenerEntidadActualizada()));
-            }
-        }
+        result.ifPresent(huboCambios -> {
+            cargarPagina(paginaActual);
+        });
     }
 
     @FXML
@@ -205,6 +206,33 @@ public class VehiculosController implements Initializable {
         Optional<Vehiculo> result = vehiculoServ.verDetalle(vrvm.getVehiculo().getId());
         result.ifPresent(v ->
                 navigator.openModal(Views.DETALLE_VEHICULO, "Detalles de vehículo", v));
+    }
+
+    @FXML
+    private void reactivar() {
+        VehiculoRowViewModel vrvm = tablaVehiculos.getSelectionModel().getSelectedItem();
+        if (vrvm == null) {
+            NotificationHelper.mostrarAdvertencia("Reactivar vehículo",
+                    "Debe seleccionar un vehículo para reactivarlo.");
+            return;
+        }
+
+        if (vrvm.getVehiculo().getEstado()) {
+            NotificationHelper.mostrarAdvertencia("Reactivar vehículo",
+                    "Solo se pueden reactivar vehículos dados de baja.");
+            return;
+        }
+
+        if (!SimpleDialogs.confirmacion("Reactivar vehículo", "¿Confirmar reactivación de vehículo?"))
+            return;
+
+        try {
+            vehiculoServ.reactivar(vrvm.getVehiculo());
+            cargarPagina(paginaActual);
+        } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Reactivar vehículo", "Ha ocurrido un error inesperado.");
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -228,7 +256,7 @@ public class VehiculosController implements Initializable {
         if (!confirmar) return;
 
         try {
-            vehiculoServ.borradoLogico(v);
+            vehiculoServ.darDeBaja(v);
             // Recargar la página actual para reflejar el cambio
             recargarPaginaActual();
             NotificationHelper.mostrarExito("Eliminación de vehículo",
