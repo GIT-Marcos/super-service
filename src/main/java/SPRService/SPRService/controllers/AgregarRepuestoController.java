@@ -45,7 +45,7 @@ public class AgregarRepuestoController implements Initializable, ModalController
     @FXML
     private TextField tfCodBarras, tfNombre, tfMarca;
     @FXML
-    private CheckBox cbStockBajo, cbStockNormal;
+    private CheckBox cbStockBajo, cbStockNormal, cbActivos, cbInactivos;
 
     @Inject
     public AgregarRepuestoController(RepuestoServ repuestoServ) {
@@ -65,7 +65,7 @@ public class AgregarRepuestoController implements Initializable, ModalController
         lvRepuestos.getStylesheets().add(css);
         lvRepuestos.setItems(items);
 
-        cargarItems(repuestoServ.verTodos());
+        buscar();
     }
 
     @Override
@@ -82,18 +82,23 @@ public class AgregarRepuestoController implements Initializable, ModalController
     private void buscar() {
         FiltroRepuestoDTO filtro = new FiltroRepuestoDTO(tfCodBarras.getText().strip(), tfNombre.getText().strip(),
                 tfMarca.getText().strip(), cbStockNormal.isSelected(), cbStockBajo.isSelected(),
-                "detalle", 0);
+                cbActivos.isSelected(), cbInactivos.isSelected(), "detalle", 0);
         cargarItems(repuestoServ.buscarRepuestos(filtro));
     }
 
     @FXML
     private void agregarRepuesto() {
         Double cantidad;
-        SPRService.SPRService.viewModels.celdas.ItemRepuestoViewModel vm =
-                lvRepuestos.getSelectionModel().getSelectedItem();
+        ItemRepuestoViewModel vm = lvRepuestos.getSelectionModel().getSelectedItem();
         if (vm == null) {
             NotificationHelper.mostrarAdvertencia("Agregar repuesto", "Debe seleccionar un repuesto para " +
                     "agregarlo.");
+            return;
+        }
+
+        if (!vm.getRepuesto().getActivo()) {
+            NotificationHelper.mostrarAdvertencia("Agregar repuesto",
+                    "No es posible agregar repuestos INACTIVOS.");
             return;
         }
 

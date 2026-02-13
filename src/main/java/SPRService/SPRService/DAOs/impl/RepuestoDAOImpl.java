@@ -144,21 +144,23 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
                                                 FiltroRepuestoDTO filtro) {
         List<Predicate> filtros = new ArrayList<>();
 
-        filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
-        filtros.add(cb.equal(joinStock.get("activo"), Boolean.TRUE));
+        if (filtro.activos() && !filtro.inactivos()) {
+            filtros.add(cb.equal(root.get("activo"), Boolean.TRUE));
+        } else if (!filtro.activos() && filtro.inactivos()) {
+            filtros.add(cb.equal(root.get("activo"), Boolean.FALSE));
+        }
 
-        if (filtro.codBarras() != null && !filtro.codBarras().isBlank()) {
+        if (filtro.codBarras() != null && !filtro.codBarras().isBlank())
             filtros.add(cb.like(cb.lower(root.get("codBarra")),
                     "%" + filtro.codBarras().toLowerCase() + "%"));
-        }
-        if (filtro.nombre() != null && !filtro.nombre().isBlank()) {
+
+        if (filtro.nombre() != null && !filtro.nombre().isBlank())
             filtros.add(cb.like(cb.lower(root.get("detalle")),
                     "%" + filtro.nombre().toLowerCase() + "%"));
-        }
-        if (filtro.marca() != null && !filtro.marca().isBlank()) {
+
+        if (filtro.marca() != null && !filtro.marca().isBlank())
             filtros.add(cb.like(cb.lower(joinMarca.get("nombreMarca")),
                     "%" + filtro.marca().toLowerCase(Locale.ROOT) + "%"));
-        }
 
         // Filtros de stock
         if (filtro.stockNormal() && !filtro.stockBajo()) {
@@ -168,7 +170,6 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
             filtros.add(cb.lessThanOrEqualTo(joinStock.get("cantidadExistente"),
                     joinStock.get("cantMinima")));
         }
-
         return filtros;
     }
 

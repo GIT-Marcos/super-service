@@ -122,6 +122,10 @@ public class CargaRepuestoViewModel {
         }
     }
 
+    public void reactivar() {
+        repuestoService.reactivar(this.repuestoOriginal);
+    }
+
     public void crearNuevaMarca(String nombreMarca) {
         MarcaRepuesto nuevaMarca = new MarcaRepuesto(null, nombreMarca, new HashSet<>());
         marcaRepuestoService.cargarMarca(nuevaMarca)

@@ -23,7 +23,7 @@
             <children>
                 <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="top-panel">
                     <padding>
-                        <Insets bottom="15.0" left="15.0" right="5.0" top="15.0" />
+                        <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                     </padding>
                     <children>
 
@@ -125,7 +125,8 @@
 
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cargarVehiculo" styleClass="btn-success" text="➕ Cargar vehículo" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#modificarVehiculo" text="✏ Modificar vehículo" />
-                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#verDetalles" styleClass="button" text="👁 Ver detalles" />
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#verDetalles" styleClass="button" text="📋 Ver detalles" />
+            <Button layoutX="21.0" layoutY="105.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#reactivar" text="🔄 Reactivar" />
                 <Button fx:id="btnCancelar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#eliminarVehiculo" styleClass="btn-danger" text="🗑 Dar de baja" />
 
                 <Separator prefWidth="200.0" />

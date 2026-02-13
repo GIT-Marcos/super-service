@@ -44,6 +44,8 @@ public class DepositoViewModel {
     public final StringProperty marcaFiltro = new SimpleStringProperty("");
     public final BooleanProperty mostrarNormal = new SimpleBooleanProperty(true);
     public final BooleanProperty mostrarBajo = new SimpleBooleanProperty(true);
+    public final BooleanProperty mostrarActivo = new SimpleBooleanProperty(true);
+    public final BooleanProperty mostrarInactivo = new SimpleBooleanProperty(true);
 
     // Ordenamiento
     public final ObservableList<String> ordenarPorOptions =
@@ -82,6 +84,8 @@ public class DepositoViewModel {
         marcaFiltro.setValue("");
         mostrarNormal.setValue(true);
         mostrarBajo.setValue(true);
+        mostrarActivo.setValue(true);
+        mostrarInactivo.setValue(true);
         paginaActual.set(0);
         cargarPagina(0);
     }
@@ -96,7 +100,7 @@ public class DepositoViewModel {
      * Es llamado por el Pagination cuando cambia de página.
      */
     public void cargarPagina(int numeroPagina) {
-        if (!mostrarNormal.get() && !mostrarBajo.get()) {
+        if (!mostrarNormal.get() && !mostrarBajo.get() && !mostrarInactivo.get() && !mostrarActivo.get()) {
             repuestosViewModels.clear();
             totalPaginas.set(1);
             totalResultados.set(0);
@@ -142,6 +146,8 @@ public class DepositoViewModel {
                 marcaFiltro.get(),
                 mostrarNormal.get(),
                 mostrarBajo.get(),
+                mostrarActivo.get(),
+                mostrarInactivo.get(),
                 colOrden,
                 tipoOrden
         );
@@ -167,13 +173,13 @@ public class DepositoViewModel {
         Optional<Repuesto> result = navigator.openModal(
                 Views.GUARDAR_REPUESTO, "Modificar repuesto", vm.getRepuestoOriginal());
         result.ifPresent(r -> {
-            vm.updateFrom(r);
+            cargarPagina(paginaActual.get());
             verificarBajoStock();
         });
     }
 
     public void borrarRepuesto(RepuestoRowViewModel vm) {
-        repuestoServ.borrarRepuesto(vm.getRepuestoOriginal());
+        repuestoServ.darDeBaja(vm.getRepuestoOriginal());
         // Recargar la página actual para reflejar el cambio
         recargarPaginaActual();
     }

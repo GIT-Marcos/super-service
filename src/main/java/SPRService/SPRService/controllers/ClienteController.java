@@ -183,6 +183,12 @@ public class ClienteController implements Initializable {
             return;
         }
 
+        if (!cvmt.getClienteEntity().getActivo()) {
+            NotificationHelper.mostrarAdvertencia("Dar de baja cliente",
+                    "El cliente seleccionado ya está dado de baja.");
+            return;
+        }
+
         if (!SimpleDialogs.confirmacion("Dar de baja cliente", "¿Confirmar baja de cliente?")) {
             return;
         }
