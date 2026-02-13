@@ -82,7 +82,7 @@ public class AgregarRepuestoController implements Initializable, ModalController
     private void buscar() {
         FiltroRepuestoDTO filtro = new FiltroRepuestoDTO(tfCodBarras.getText().strip(), tfNombre.getText().strip(),
                 tfMarca.getText().strip(), cbStockNormal.isSelected(), cbStockBajo.isSelected(),
-                "detalle", 0);
+                true, true, "detalle", 0);
         cargarItems(repuestoServ.buscarRepuestos(filtro));
     }
 

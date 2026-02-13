@@ -23,7 +23,7 @@
     <top>
         <VBox spacing="8.0" styleClass="top-panel" BorderPane.alignment="CENTER">
             <padding>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
             </padding>
             <children>
                 <!-- FILA 1: Búsqueda Principal -->
@@ -43,11 +43,16 @@
                 </HBox>
 
                 <!-- FILA 2: Filtros y Ordenamiento -->
-                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <HBox alignment="CENTER_LEFT" spacing="5.0">
                     <children>
                         <Label text="Filtros:" textFill="#b2bec3" />
                         <CheckBox fx:id="checkMostrarNormal" selected="true" text="Ver stock normal" />
                         <CheckBox fx:id="checkMostrarBajo" selected="true" text="Ver stock bajo" />
+
+                        <Separator orientation="VERTICAL" />
+
+                        <CheckBox fx:id="chActivos" selected="true" text="Activos" />
+                        <CheckBox fx:id="chInactivos" text="Inactivos" />
 
                         <!-- Aviso de Stock (Se muestra aquí para ahorrar espacio vertical) -->
                         <Label fx:id="labelAvisoStock" styleClass="alert-label-compact" text="⚠ Repuestos con Stock Crítico" visible="false">
@@ -74,12 +79,13 @@
                 <TableView fx:id="tablaRepuestos" fixedCellSize="0.0" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colCodBarra" prefWidth="100.0" text="Cód. Barras" />
-                        <TableColumn fx:id="colDetalle" prefWidth="200.0" text="Nombre / Descripción" />
-                        <TableColumn fx:id="colMarca" prefWidth="100.0" text="Marca" />
-                        <TableColumn fx:id="colPrecio" prefWidth="90.0" style="-fx-alignment: CENTER-RIGHT;" text="Precio $" />
-                        <TableColumn fx:id="colCantidad" prefWidth="80.0" style="-fx-alignment: CENTER;" text="Stock" />
-                        <TableColumn fx:id="colCantidadMinima" prefWidth="80.0" style="-fx-alignment: CENTER;" text="Mín." />
-                        <TableColumn fx:id="colUniMedida" prefWidth="90.0" text="Unidad" />
+                        <TableColumn fx:id="colDetalle" prefWidth="210.0" text="Nombre / Descripción" />
+                        <TableColumn fx:id="colMarca" text="Marca" />
+                        <TableColumn fx:id="colPrecio" style="-fx-alignment: CENTER-RIGHT;" text="Precio $" />
+                        <TableColumn fx:id="colCantidad" prefWidth="60.0" style="-fx-alignment: CENTER;" text="Stock" />
+                        <TableColumn fx:id="colCantidadMinima" prefWidth="60.0" style="-fx-alignment: CENTER;" text="Mín." />
+                        <TableColumn fx:id="colUniMedida" prefWidth="60.0" text="Unidad" />
+                        <TableColumn fx:id="colEstado" prefWidth="70.0" text="Estado" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -105,7 +111,7 @@
                     <tooltip><Tooltip text="Agregar nuevo repuesto" /></tooltip>
                 </Button>
                 <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#modRepuesto" text="📝 Detalles/Modificar" />
-                <Button fx:id="btnBaja" maxWidth="Infinity" mnemonicParsing="false" onAction="#borrarRepuesto" styleClass="btn-danger" text="🗑 Baja" />
+                <Button fx:id="btnBaja" maxWidth="Infinity" mnemonicParsing="false" onAction="#borrarRepuesto" styleClass="btn-danger" text="🗑 Dar de baja" />
 
                 <Separator />
 

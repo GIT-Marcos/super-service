@@ -24,7 +24,7 @@ public interface RepuestoServ {
 
     Optional<Repuesto> modificarRepuesto(Repuesto repuesto);
 
-    void borrarRepuesto(Repuesto repuesto);
+    void darDeBaja(Repuesto repuesto);
 
     // ____   ____ ____    ___   ____  ______  ____  __
     // || \\ ||    || \\  // \\  || \\ | || | ||    (( \

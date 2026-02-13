@@ -16,6 +16,7 @@ public class RepuestoRowViewModel {
     private final DoubleProperty cantidad;
     private final DoubleProperty cantidadMinima;
     private final StringProperty uniMedida;
+    private final StringProperty estado;
 
     public RepuestoRowViewModel(Repuesto r) {
         this.repuestoOriginal = r; // Muy útil para operaciones como 'modificar' o 'borrar'
@@ -27,6 +28,9 @@ public class RepuestoRowViewModel {
         this.cantidad = new SimpleDoubleProperty(r.getStock().getCantidadExistente());
         this.cantidadMinima = new SimpleDoubleProperty(r.getStock().getCantMinima());
         this.uniMedida = new SimpleStringProperty(r.getStock().getUnidadMedida());
+        this.estado = new SimpleStringProperty(
+                (r.getActivo()) ? "ACTIVO" : "BAJA"
+        );
     }
 
     // para acceder al modelo subyacente
@@ -43,6 +47,7 @@ public class RepuestoRowViewModel {
         this.repuestoOriginal.setMarcaRepuesto(repuestoActualizado.getMarcaRepuesto());
         this.repuestoOriginal.setDetalle(repuestoActualizado.getDetalle());
         this.repuestoOriginal.setPrecio(repuestoActualizado.getPrecio());
+        this.repuestoOriginal.setActivo(repuestoActualizado.getActivo());
         this.repuestoOriginal.setStock(repuestoActualizado.getStock());
         this.repuestoOriginal.getStock().setId(repuestoActualizado.getId());
         this.repuestoOriginal.getStock().setCantidadExistente(repuestoActualizado.getStock().getCantidadExistente());
@@ -60,6 +65,7 @@ public class RepuestoRowViewModel {
         this.cantidad.set(repuestoActualizado.getStock().getCantidadExistente());
         this.cantidadMinima.set(repuestoActualizado.getStock().getCantMinima());
         this.uniMedida.set(repuestoActualizado.getStock().getUnidadMedida());
+        this.estado.set(repuestoActualizado.getActivo() ? "ACTIVO" : "BAJA");
     }
 
     // Getters y métodos de propiedad (tu código original aquí está perfecto)
@@ -125,5 +131,13 @@ public class RepuestoRowViewModel {
 
     public StringProperty uniMedidaProperty() {
         return uniMedida;
+    }
+
+    public String getEstado() {
+        return estado.get();
+    }
+
+    public StringProperty estadoProperty() {
+        return estado;
     }
 }

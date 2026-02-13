@@ -54,19 +54,19 @@ public class RepuestoServImpl implements RepuestoServ {
     public ResultadoPaginado<Repuesto> buscarRepuestosPaginado(FiltroRepuestoDTO filtro,
                                                                int pagina, int itemsPorPagina) {
         int offset = pagina * itemsPorPagina;
-
         FiltroRepuestoDTO filtroPaginado = new FiltroRepuestoDTO(
                 filtro.codBarras(),
                 filtro.nombre(),
                 filtro.marca(),
                 filtro.stockNormal(),
                 filtro.stockBajo(),
+                filtro.activos(),
+                filtro.inactivos(),
                 filtro.colOrden(),
                 filtro.tipoOrden(),
                 offset,
                 itemsPorPagina
         );
-
         return daoRepuesto.buscarRepuestosPaginado(filtroPaginado);
     }
 
@@ -164,13 +164,9 @@ public class RepuestoServImpl implements RepuestoServ {
 
     @Transactional
     @Override
-    public void borrarRepuesto(Repuesto r) {
-        if (r == null || r.getStock() == null) {
-            throw new NullPointerException("El repuesto a borrar o su stock son nulo.");
-        }
+    public void darDeBaja(Repuesto r) {
         r.setActivo(Boolean.FALSE);
         r.getStock().setActivo(Boolean.FALSE);
-        r.setCodBarra(r.getCodBarra() + ".DEL" + r.getId());
         daoRepuesto.update(r);
     }
 }

@@ -28,13 +28,12 @@ public class DepositoController implements Initializable {
     @FXML
     private TableView<RepuestoRowViewModel> tablaRepuestos;
     @FXML
-    private TableColumn<RepuestoRowViewModel, String> colCodBarra, colDetalle, colMarca, colPrecio;
-    @FXML
-    private TableColumn<RepuestoRowViewModel, String> colCantidad, colCantidadMinima, colUniMedida;
+    private TableColumn<RepuestoRowViewModel, String> colCodBarra, colDetalle, colMarca, colPrecio,
+            colCantidad, colCantidadMinima, colUniMedida, colEstado;
     @FXML
     private ComboBox<String> comboOrdenarPor, comboTipoOrden, comboFormatos;
     @FXML
-    private CheckBox checkMostrarNormal, checkMostrarBajo;
+    private CheckBox checkMostrarNormal, checkMostrarBajo, chActivos, chInactivos;
     @FXML
     private TextField tfCodigo, tfNombre, tfMarca;
     @FXML
@@ -74,6 +73,8 @@ public class DepositoController implements Initializable {
         tfMarca.textProperty().bindBidirectional(viewModel.marcaFiltro);
         checkMostrarNormal.selectedProperty().bindBidirectional(viewModel.mostrarNormal);
         checkMostrarBajo.selectedProperty().bindBidirectional(viewModel.mostrarBajo);
+        chActivos.selectedProperty().bindBidirectional(viewModel.mostrarActivo);
+        chInactivos.selectedProperty().bindBidirectional(viewModel.mostrarInactivo);
 
         // Enlazar combos
         comboOrdenarPor.setItems(viewModel.ordenarPorOptions);
@@ -144,21 +145,19 @@ public class DepositoController implements Initializable {
     private void borrarRepuesto() {
         RepuestoRowViewModel vm = tablaRepuestos.getSelectionModel().getSelectedItem();
         if (vm == null) {
-            NotificationHelper.mostrarAdvertencia("Borrar", "Seleccione un repuesto para borrarlo.");
+            NotificationHelper.mostrarAdvertencia("Dar de baja",
+                    "Seleccione un repuesto para darlo de baja.");
             return;
         }
-        if (!SimpleDialogs.confirmacion("Borrar repuesto",
-                "Esta acción es irreversible.\n¿Desea continuar con el borrado?"))
-            return;
-        if (!SimpleDialogs.confirmacion("Borrar repuesto",
-                "¿Confirmar borrado de:\n" + vm.getNombre() + " ?"))
+        if (!SimpleDialogs.confirmacion("Dar de baja",
+                "¿Confirmar baja de:\n" + vm.getNombre() + " ?"))
             return;
 
         try {
             viewModel.borrarRepuesto(vm);
-            NotificationHelper.mostrarExito("Borrar repuesto", "Se ha borrado el repuesto con éxito.");
+            NotificationHelper.mostrarExito("Dar de baja", "Se ha dado de baja el repuesto con éxito.");
         } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Borrar repuesto", "Ha ocurrido un error al borrar.");
+            NotificationHelper.mostrarError("Dar de baja", "Ha ocurrido un error al dar de baja.");
             e.printStackTrace();
         }
     }
@@ -208,6 +207,27 @@ public class DepositoController implements Initializable {
         colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
         colCantidadMinima.setCellValueFactory(new PropertyValueFactory<>("cantidadMinima"));
         colUniMedida.setCellValueFactory(new PropertyValueFactory<>("uniMedida"));
+        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+
+        if (colEstado != null) {
+            colEstado.setCellFactory(col -> new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(null);
+                    setStyle("");
+                    if (empty || item == null) return;
+
+                    setText(item);
+                    RepuestoRowViewModel rvm = getTableView().getItems().get(getIndex());
+                    if (rvm.getRepuestoOriginal().getActivo()) {
+                        setStyle("-fx-text-fill: #026e21; -fx-font-weight: bold; -fx-alignment: CENTER");
+                    } else {
+                        setStyle("-fx-text-fill: #952122; -fx-font-weight: bold; -fx-alignment: CENTER");
+                    }
+                }
+            });
+        }
     }
 
     private void seteaEstiloTabla() {
