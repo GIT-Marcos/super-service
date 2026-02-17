@@ -118,6 +118,12 @@
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#darDeBaja" styleClass="btn-danger" text="🗑 Dar de baja" />
 
                 <Separator prefWidth="200.0" />
+            <Label layoutX="21.0" layoutY="20.0" styleClass="section-label" text="REPORTES">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Button fx:id="btnReporte" layoutX="21.0" layoutY="136.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#masIngresos" styleClass="btn-report" text="🏆 Top más ingresos" />
 
             </children>
             <padding>

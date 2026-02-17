@@ -45,6 +45,7 @@ public enum Views {
     CARGAR_NOTA("/views/CargarNotaRetiro.fxml", CargarNotaController.class),
     MODIFICAR_USUARIO("/views/ModificarUsuario.fxml", ModificarUsuarioController.class),
     OPERACIONES_CLIENTE("/views/OperacionesCliente.fxml", OperacionesClienteController.class),
+    STATS_CLIENTE("/views/EstadisticasCliente.fxml", EstadisticasClienteController.class),
 
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),
@@ -54,7 +55,8 @@ public enum Views {
     CHART_USO_REPUESTOS("/views/ChartUsoDeRepuestos.fxml", ChartUsoDeRepuestosController.class),
     CHART_COMPARACION_INGRESOS("/views/ChartComparacionIngresos.fxml", ChartComparacionIngresosController.class),
     CHART_MAS_RETIRADOS("/views/ChartRepuestosMasRetirados.fxml", ChartMasRetiradosController.class),
-    CHART_VEHICULOS("/views/ChartVehiculos.fxml", ChartVehiculosController.class);
+    CHART_VEHICULOS("/views/ChartVehiculos.fxml", ChartVehiculosController.class),
+    CHART_INGRESOS_CLIENTES("/views/ChartClientesMasIngresos.fxml", ChartClientesMasIngresosController.class);
 
     private final String fxmlPath;
     private final Class<?> controllerClass;

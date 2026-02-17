@@ -1,11 +1,13 @@
 package SPRService.SPRService.controllers;
 
 import SPRService.SPRService.entities.Cliente;
+import SPRService.SPRService.enums.RolUsuario;
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.navigation.Navigator;
 import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ClienteServ;
 import SPRService.SPRService.util.ResultadoPaginado;
+import SPRService.SPRService.util.SessionManager;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.tablas.ClienteViewModelTabla;
@@ -35,6 +37,8 @@ public class ClienteController implements Initializable {
     @FXML
     private CheckBox cbActivos, cbInactivos;
     @FXML
+    private Button btnReporte;
+    @FXML
     private TableView<ClienteViewModelTabla> tablaClientes;
     @FXML
     private TableColumn<ClienteViewModelTabla, String> colDNI, colApellido, colNombre, colEstado;
@@ -55,6 +59,14 @@ public class ClienteController implements Initializable {
 
         // Cargar primera página
         cargarPagina(0);
+        configPermisos();
+    }
+
+    private void configPermisos() {
+        RolUsuario rol = SessionManager.getRolUsuario();
+        if (rol == RolUsuario.OPERATIVO_RECEPCION) {
+            btnReporte.setDisable(true);
+        }
     }
 
     // ==================== PAGINACIÓN ====================
@@ -202,6 +214,11 @@ public class ClienteController implements Initializable {
             NotificationHelper.mostrarError("Dar de baja cliente", "Ha ocurrido un error inesperado.");
             throw new RuntimeException(e);
         }
+    }
+
+    @FXML
+    private void masIngresos() {
+        navigator.openModal(Views.CHART_INGRESOS_CLIENTES, "Reporte de ingresos por cliente", null);
     }
 
     // ==================== CONFIGURACIÓN ====================
