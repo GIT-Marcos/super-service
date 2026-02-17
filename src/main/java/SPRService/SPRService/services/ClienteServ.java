@@ -33,6 +33,8 @@ public interface ClienteServ {
     //  |  _ <| |___|  __/| |_| |  _ < | | | |___ ___) |
     //  |_| \_\_____|_|    \___/|_| \_\|_| |_____|____/
 
+    Optional<ClientesMasIngresosDTO> obtenerEstadisticasCliente(Long idCliente);
+
     List<ClientesMasIngresosDTO> generarReporteClientesMasIngresos(
             Integer cantidad, LocalDate fechaMin, LocalDate fechaMax);
 }

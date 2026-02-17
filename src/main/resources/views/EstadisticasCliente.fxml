@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="rootPane" prefWidth="450.0" spacing="15.0" styleClass="root" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.EstadisticasClienteController">
+
+    <children>
+        <!-- Información del cliente - Panel Superior -->
+        <VBox spacing="5.0" styleClass="top-panel">
+            <padding>
+                <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+            </padding>
+            <children>
+                <Label fx:id="lblNombreCliente" text="👤 Cliente: [Nombre]" />
+                <Label fx:id="lblDocumento" text="🪪 Documento: [DNI]" />
+            </children>
+        </VBox>
+
+        <Separator />
+
+        <!-- Título de sección -->
+        <Label styleClass="section-label" text="💰 INGRESOS GENERADOS (SOLO PAGADOS)">
+         <VBox.margin>
+            <Insets left="5.0" right="5.0" />
+         </VBox.margin></Label>
+
+        <!-- Grid de detalles -->
+        <GridPane fx:id="gridDetalles" hgap="25.0" vgap="12.0">
+            <padding>
+                <Insets bottom="10.0" top="10.0" />
+            </padding>
+
+            <!-- Encabezados -->
+            <Label text="Tipo de Operación" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Label text="Cantidad" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Label text="Total Generado" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+
+            <!-- Separador -->
+            <Separator prefWidth="400.0" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+
+            <!-- Fila Services -->
+            <Label text="📋 Services" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <Label fx:id="lblCantidadServices" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <font>
+               <Font size="16.0" />
+            </font></Label>
+            <Label fx:id="lblTotalServices" style="-fx-text-fill: #2980b9;" GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <font>
+               <Font size="16.0" />
+            </font></Label>
+
+            <!-- Fila Ventas -->
+            <Label text="🛒 Ventas de Repuestos" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <Label fx:id="lblCantidadVentas" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <font>
+               <Font size="16.0" />
+            </font></Label>
+            <Label fx:id="lblTotalVentas" style="-fx-text-fill: #27ae60;" GridPane.columnIndex="2" GridPane.rowIndex="3">
+            <font>
+               <Font size="16.0" />
+            </font></Label>
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints hgrow="ALWAYS" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+         <VBox.margin>
+            <Insets left="5.0" right="5.0" />
+         </VBox.margin>
+        </GridPane>
+
+        <Separator />
+
+        <!-- Totales -->
+        <HBox fx:id="totalesBox" alignment="CENTER" spacing="40.0" styleClass="sidebar">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <children>
+                <VBox alignment="CENTER" spacing="5.0">
+                    <children>
+                        <Label styleClass="section-label" text="Total Operaciones" />
+                        <Label fx:id="lblTotalOperaciones" style="-fx-font-size: 22px; -fx-font-weight: bold;" text="0" />
+                    </children>
+                </VBox>
+
+                <Separator orientation="VERTICAL" prefHeight="50.0" />
+
+                <VBox alignment="CENTER" spacing="5.0">
+                    <children>
+                        <Label styleClass="section-label" text="Total Ingresos" />
+                        <Label fx:id="lblTotalIngresos" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <!-- Porcentajes -->
+        <HBox fx:id="porcentajesBox" alignment="CENTER" spacing="30.0" styleClass="dato-contacto-cell">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+            <children>
+                <Label fx:id="lblPorcentajeServices" style="-fx-text-fill: #2980b9;" text="📋 Services: 0.0%">
+               <font>
+                  <Font size="16.0" />
+               </font></Label>
+                <Label fx:id="lblPorcentajeVentas" style="-fx-text-fill: #27ae60;" text="🛒 Ventas: 0.0%">
+               <font>
+                  <Font size="16.0" />
+               </font></Label>
+            </children>
+        </HBox>
+
+        <!-- Mensaje cuando no hay ingresos -->
+        <Label fx:id="lblSinIngresos" managed="false" styleClass="alert-label-compact" text="¡¡Este cliente no tiene operaciones pagadas registradas!!" visible="false" />
+    </children>
+</VBox>

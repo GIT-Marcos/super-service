@@ -1,6 +1,9 @@
 package SPRService.SPRService.controllers.charts;
 
 import SPRService.SPRService.DTOs.ClientesMasIngresosDTO;
+import SPRService.SPRService.navigation.AppCoordinator;
+import SPRService.SPRService.navigation.Navigator;
+import SPRService.SPRService.navigation.Views;
 import SPRService.SPRService.services.ClienteServ;
 import SPRService.SPRService.util.EMailSender;
 import SPRService.SPRService.util.ManejadorInputs;
@@ -11,25 +14,18 @@ import com.google.inject.Inject;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.util.Duration;
 import org.apache.commons.mail.EmailException;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -41,6 +37,7 @@ import java.util.ResourceBundle;
 
 public class ChartClientesMasIngresosController implements Initializable {
 
+    private final Navigator navigator;
     private final ClienteServ clienteServ;
     private final EMailSender eMailSender;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ROOT);
@@ -64,7 +61,8 @@ public class ChartClientesMasIngresosController implements Initializable {
     private Label lblTotalGeneral, lblTotalServices, lblTotalVentas, lblTotalTransacciones;
 
     @Inject
-    public ChartClientesMasIngresosController(ClienteServ clienteServ, EMailSender eMailSender) {
+    public ChartClientesMasIngresosController(AppCoordinator coordinator, ClienteServ clienteServ, EMailSender eMailSender) {
+        this.navigator = coordinator.getMainNavigator();
         this.clienteServ = clienteServ;
         this.eMailSender = eMailSender;
     }
@@ -187,127 +185,7 @@ public class ChartClientesMasIngresosController implements Initializable {
     }
 
     private void mostrarPopupDetalles(ClientesMasIngresosDTO dto) {
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Detalle de Ingresos");
-        dialog.setHeaderText("📊 " + dto.getNombreCompleto());
-        dialog.initModality(Modality.APPLICATION_MODAL);
-
-        // Contenido del popup
-        VBox contenido = new VBox(15);
-        contenido.setPadding(new Insets(20));
-        contenido.setAlignment(Pos.TOP_LEFT);
-        contenido.setStyle("-fx-background-color: white;");
-
-        // Información del cliente
-        Label lblCliente = new Label("👤 Cliente: " + dto.getNombreCompleto());
-        lblCliente.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-
-        Label lblDocumento = new Label("Documento: " + dto.documentoCliente());
-        lblDocumento.setStyle("-fx-font-size: 14px;");
-
-        Separator sep1 = new Separator();
-
-        // Grid para mostrar detalles
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        // Encabezados
-        Label headerTipo = new Label("Tipo");
-        headerTipo.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
-        Label headerCantidad = new Label("Cantidad");
-        headerCantidad.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
-        Label headerTotal = new Label("Total");
-        headerTotal.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
-
-        grid.add(headerTipo, 0, 0);
-        grid.add(headerCantidad, 1, 0);
-        grid.add(headerTotal, 2, 0);
-
-        // Fila Services
-        Label lblServices = new Label("📋 Services");
-        lblServices.setStyle("-fx-font-size: 13px;");
-        Label lblCantServices = new Label(String.valueOf(dto.cantidadServices()));
-        lblCantServices.setStyle("-fx-font-size: 16px; -fx-alignment: center;");
-        Label lblTotalServicesVal = new Label(currencyFormat.format(dto.totalServices()));
-        lblTotalServicesVal.setStyle("-fx-font-size: 16px; -fx-text-fill: #2980b9;");
-
-        grid.add(lblServices, 0, 1);
-        grid.add(lblCantServices, 1, 1);
-        grid.add(lblTotalServicesVal, 2, 1);
-
-        // Fila Ventas
-        Label lblVentas = new Label("🛒 Ventas Particulares");
-        lblVentas.setStyle("-fx-font-size: 13px;");
-        Label lblCantVentas = new Label(String.valueOf(dto.cantidadVentas()));
-        lblCantVentas.setStyle("-fx-font-size: 16px; -fx-alignment: center;");
-        Label lblTotalVentasVal = new Label(currencyFormat.format(dto.totalVentas()));
-        lblTotalVentasVal.setStyle("-fx-font-size: 16px; -fx-text-fill: #27ae60;");
-
-        grid.add(lblVentas, 0, 2);
-        grid.add(lblCantVentas, 1, 2);
-        grid.add(lblTotalVentasVal, 2, 2);
-
-        Separator sep2 = new Separator();
-
-        // Totales
-        HBox totalesBox = new HBox(30);
-        totalesBox.setAlignment(Pos.CENTER);
-        totalesBox.setPadding(new Insets(10));
-        totalesBox.setStyle("-fx-background-color: #f8f9fa; -fx-background-radius: 5;");
-
-        VBox totalTransBox = new VBox(5);
-        totalTransBox.setAlignment(Pos.CENTER);
-        Label lblTotalTransTitulo = new Label("Total Transacciones");
-        lblTotalTransTitulo.setStyle("-fx-font-size: 11px; -fx-text-fill: #636e72;");
-        Label lblTotalTransValor = new Label(String.valueOf(dto.totalTransacciones()));
-        lblTotalTransValor.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        totalTransBox.getChildren().addAll(lblTotalTransTitulo, lblTotalTransValor);
-
-        VBox totalIngBox = new VBox(5);
-        totalIngBox.setAlignment(Pos.CENTER);
-        Label lblTotalIngTitulo = new Label("Total Ingresos");
-        lblTotalIngTitulo.setStyle("-fx-font-size: 11px; -fx-text-fill: #636e72;");
-        Label lblTotalIngValor = new Label(currencyFormat.format(dto.totalIngresos()));
-        lblTotalIngValor.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
-        totalIngBox.getChildren().addAll(lblTotalIngTitulo, lblTotalIngValor);
-
-        totalesBox.getChildren().addAll(totalTransBox, new Separator(), totalIngBox);
-
-        // Porcentajes
-        HBox porcentajesBox = new HBox(20);
-        porcentajesBox.setAlignment(Pos.CENTER);
-        porcentajesBox.setPadding(new Insets(5));
-
-        BigDecimal porcentajeServices = dto.totalIngresos().compareTo(BigDecimal.ZERO) > 0
-                ? dto.totalServices().multiply(BigDecimal.valueOf(100)).divide(dto.totalIngresos(), 1, RoundingMode.HALF_UP)
-                : BigDecimal.ZERO;
-        BigDecimal porcentajeVentas = dto.totalIngresos().compareTo(BigDecimal.ZERO) > 0
-                ? dto.totalVentas().multiply(BigDecimal.valueOf(100)).divide(dto.totalIngresos(), 1, RoundingMode.HALF_UP)
-                : BigDecimal.ZERO;
-
-        Label lblPorcServices = new Label(String.format("📋 Services: %.1f%%", porcentajeServices));
-        lblPorcServices.setStyle("-fx-font-size: 16px; -fx-text-fill: #2980b9;");
-        Label lblPorcVentas = new Label(String.format("🛒 Ventas: %.1f%%", porcentajeVentas));
-        lblPorcVentas.setStyle("-fx-font-size: 16px; -fx-text-fill: #27ae60;");
-
-        porcentajesBox.getChildren().addAll(lblPorcServices, lblPorcVentas);
-
-        contenido.getChildren().addAll(
-                lblCliente, lblDocumento, sep1,
-                grid, sep2,
-                totalesBox, porcentajesBox
-        );
-
-        dialog.getDialogPane().setContent(contenido);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-        dialog.getDialogPane().setPrefWidth(400);
-
-        // Estilo del dialog
-        dialog.getDialogPane().setStyle("-fx-background-color: white;");
-
-        dialog.showAndWait();
+        navigator.openModal(Views.STATS_CLIENTE, "Estadísticas de cliente", dto);
     }
 
     private void actualizarResumen(List<ClientesMasIngresosDTO> datos) {

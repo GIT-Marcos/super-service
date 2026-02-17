@@ -7,28 +7,26 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<!-- Asegúrate de vincular tu hoja de estilos aquí si no lo haces desde el código Java
-     stylesheets="@tu_archivo.css" -->
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="550.0" prefWidth="550.0" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.OperacionesClienteController">
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="550.0" prefWidth="500.0" stylesheets="@../styles/clientes.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.OperacionesClienteController">
-
-   <!-- ENCABEZADO: Usa el estilo .top-panel del CSS -->
+   <!-- ENCABEZADO -->
    <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="630.0" spacing="10.0" styleClass="top-panel" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_LEFT" prefWidth="630.0" spacing="10.0" styleClass="top-panel" BorderPane.alignment="CENTER">
          <children>
             <Label fx:id="lblTituloCliente" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Operaciones del cliente: [Nombre Cliente]" />
          </children>
          <padding>
-            <Insets left="15.0" right="15.0" />
+            <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
          </padding>
       </HBox>
    </top>
 
    <!-- CENTRO: Contenido principal -->
    <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" BorderPane.alignment="CENTER">
          <padding>
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
          </padding>
@@ -51,7 +49,7 @@
                   </VBox>
                </children>
                <VBox.margin>
-                  <Insets bottom="5.0" />
+                  <Insets />
                </VBox.margin>
             </HBox>
 
@@ -60,7 +58,6 @@
             <!-- LISTA DE OPERACIONES -->
             <Label style="-fx-font-weight: bold; -fx-text-fill: #636e72;" text="Historial de Movimientos" />
 
-            <!-- VBox.vgrow="ALWAYS" permite que la lista ocupe todo el espacio disponible -->
             <ListView fx:id="listViewOperaciones" style="-fx-background-insets: 0; -fx-border-color: #b2bec3; -fx-border-radius: 3;" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
@@ -70,8 +67,13 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="651.0" spacing="10.0" style="-fx-background-color: #e9ecef; -fx-border-color: #dcdcdc; -fx-border-width: 1 0 0 0;" BorderPane.alignment="CENTER">
          <children>
-            <!-- Botón Cerrar con estilo Danger (Rojo suave) según tu CSS -->
+
+            <!-- Botón Cerrar -->
             <Button mnemonicParsing="false" onAction="#cerrar" prefWidth="100.0" styleClass="btn-danger" text="Cerrar" />
+
+            <Region HBox.hgrow="ALWAYS" />
+            <!-- Botón Ver Estadísticas -->
+            <Button mnemonicParsing="false" onAction="#verEstadisticas" prefWidth="150.0" styleClass="btn-report" text="📊 Ver Estadísticas" />
          </children>
          <padding>
             <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />

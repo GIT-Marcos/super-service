@@ -125,6 +125,12 @@ public class ClienteServImpl implements ClienteServ {
 
     @Transactional
     @Override
+    public Optional<ClientesMasIngresosDTO> obtenerEstadisticasCliente(Long idCliente) {
+        return dao.obtenerEstadisticasCliente(idCliente);
+    }
+
+    @Transactional
+    @Override
     public List<ClientesMasIngresosDTO> generarReporteClientesMasIngresos(
             Integer cantidad, LocalDate fechaMin, LocalDate fechaMax) {
         return dao.reporteClientesMasIngresos(

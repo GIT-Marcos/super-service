@@ -126,6 +126,55 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
     }
 
     @Override
+    public Optional<ClientesMasIngresosDTO> obtenerEstadisticasCliente(Long idCliente) {
+        EntityManager em = emProvider.get();
+        Query query = em.createNativeQuery(
+                        "SELECT " +
+                                "    c.pk_cliente, " +
+                                "    c.nombre, " +
+                                "    c.apellido, " +
+                                "    c.dni, " +
+                                "    COALESCE(s.cant_services, 0), " +
+                                "    COALESCE(v.cant_ventas, 0), " +
+                                "    (COALESCE(s.cant_services, 0) + COALESCE(v.cant_ventas, 0)), " +
+                                "    COALESCE(s.total_services, 0), " +
+                                "    COALESCE(v.total_ventas, 0), " +
+                                "    (COALESCE(s.total_services, 0) + COALESCE(v.total_ventas, 0)) " +
+                                "FROM clientes c " +
+                                "LEFT JOIN (" +
+                                "    SELECT fk_cliente, COUNT(*) as cant_services, SUM(monto_total) as total_services " +
+                                "    FROM services " +
+                                "    WHERE estado_service = 'PAGADO' " +
+                                "    GROUP BY fk_cliente" +
+                                ") s ON c.pk_cliente = s.fk_cliente " +
+                                "LEFT JOIN (" +
+                                "    SELECT fk_cliente, COUNT(*) as cant_ventas, SUM(monto_total) as total_ventas " +
+                                "    FROM ventas_repuestos " +
+                                "    WHERE activo = true AND estado_venta = 'PAGADO' " +
+                                "    GROUP BY fk_cliente" +
+                                ") v ON c.pk_cliente = v.fk_cliente " +
+                                "WHERE c.pk_cliente = :idCliente")
+                .setParameter("idCliente", idCliente);
+
+        Object[] row = (Object[]) query.getSingleResult();
+
+        if (row == null) return Optional.empty();
+
+        return Optional.of(new ClientesMasIngresosDTO(
+                ((Number) row[0]).longValue(),
+                (String) row[1],
+                (String) row[2],
+                (String) row[3],
+                ((Number) row[4]).intValue(),
+                ((Number) row[5]).intValue(),
+                ((Number) row[6]).intValue(),
+                row[7] != null ? new BigDecimal(row[7].toString()) : BigDecimal.ZERO,
+                row[8] != null ? new BigDecimal(row[8].toString()) : BigDecimal.ZERO,
+                row[9] != null ? new BigDecimal(row[9].toString()) : BigDecimal.ZERO
+        ));
+    }
+
+    @Override
     public List<ClientesMasIngresosDTO> reporteClientesMasIngresos(Integer cantidad, LocalDateTime fechaMin,
                                                                    LocalDateTime fechaMax) {
         EntityManager em = emProvider.get();

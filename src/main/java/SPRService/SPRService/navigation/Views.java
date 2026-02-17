@@ -45,6 +45,7 @@ public enum Views {
     CARGAR_NOTA("/views/CargarNotaRetiro.fxml", CargarNotaController.class),
     MODIFICAR_USUARIO("/views/ModificarUsuario.fxml", ModificarUsuarioController.class),
     OPERACIONES_CLIENTE("/views/OperacionesCliente.fxml", OperacionesClienteController.class),
+    STATS_CLIENTE("/views/EstadisticasCliente.fxml", EstadisticasClienteController.class),
 
     // Charts
     CHART_VENTAS_REPUESTOS_MES("/views/ChartTotalVentasMes.fxml", ChartTotalVentasMesController.class),

@@ -18,8 +18,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -34,12 +33,12 @@ public class OperacionesClienteController implements Initializable, DataReceiver
     private final ServiceServ serviceServ;
     private final Navigator navigator;
     private Cliente cliente;
-    private ObservableList<ItemOperacionViewModel> obsList = FXCollections.observableArrayList();
+    private final ObservableList<ItemOperacionViewModel> obsList = FXCollections.observableArrayList();
 
     @FXML
     private Label lblTituloCliente, lblCantVentas, lblCantServices;
     @FXML
-    ListView<ItemOperacionViewModel> listViewOperaciones;
+    private ListView<ItemOperacionViewModel> listViewOperaciones;
 
     @Inject
     public OperacionesClienteController(ClienteServ clienteServ, VentaRepuestoServ ventaServ, ServiceServ serviceServ, AppCoordinator coordinator) {
@@ -65,6 +64,12 @@ public class OperacionesClienteController implements Initializable, DataReceiver
 
             llenarCampos();
         }
+    }
+
+    @FXML
+    private void verEstadisticas() {
+        clienteServ.obtenerEstadisticasCliente(cliente.getId())
+                .ifPresent(dto -> navigator.openModal(Views.STATS_CLIENTE, "Estadísticas de cliente", dto));
     }
 
     @FXML
