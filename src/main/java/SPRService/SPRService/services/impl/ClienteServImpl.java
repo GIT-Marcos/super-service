@@ -1,6 +1,7 @@
 package SPRService.SPRService.services.impl;
 
 import SPRService.SPRService.DAOs.ClienteDAO;
+import SPRService.SPRService.DTOs.ClientesMasIngresosDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroClienteDTO;
 import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.entities.DatosContacto;
@@ -13,6 +14,8 @@ import com.google.inject.persist.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.Hibernate;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -118,6 +121,17 @@ public class ClienteServImpl implements ClienteServ {
     public void softDeleteClient(Cliente c) {
         Cliente managedClient = dao.getById(c.getId());
         managedClient.setActivo(Boolean.FALSE);
+    }
+
+    @Transactional
+    @Override
+    public List<ClientesMasIngresosDTO> generarReporteClientesMasIngresos(
+            Integer cantidad, LocalDate fechaMin, LocalDate fechaMax) {
+        return dao.reporteClientesMasIngresos(
+                cantidad,
+                fechaMin.atStartOfDay(),
+                fechaMax.atTime(LocalTime.MAX)
+        );
     }
 
     private void poneMayus(Cliente c) {

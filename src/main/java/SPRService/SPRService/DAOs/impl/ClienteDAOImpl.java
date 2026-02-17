@@ -1,6 +1,7 @@
 package SPRService.SPRService.DAOs.impl;
 
 import SPRService.SPRService.DAOs.ClienteDAO;
+import SPRService.SPRService.DTOs.ClientesMasIngresosDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroClienteDTO;
 import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.util.ResultadoPaginado;
@@ -8,13 +9,17 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements ClienteDAO {
@@ -118,6 +123,65 @@ public class ClienteDAOImpl extends GenericDAOImpl<Cliente, Long> implements Cli
         List<Cliente> resultados = query.getResultList();
 
         return new ResultadoPaginado<>(resultados, total);
+    }
+
+    @Override
+    public List<ClientesMasIngresosDTO> reporteClientesMasIngresos(Integer cantidad, LocalDateTime fechaMin,
+                                                                   LocalDateTime fechaMax) {
+        EntityManager em = emProvider.get();
+
+        // Usando query nativa porque JPQL no soporta UNION directamente
+        Query query = em.createNativeQuery(
+                        "SELECT " +
+                                "    c.pk_cliente, " +
+                                "    c.nombre, " +
+                                "    c.apellido, " +
+                                "    c.dni, " +
+                                "    COALESCE(s.cant_services, 0), " +
+                                "    COALESCE(v.cant_ventas, 0), " +
+                                "    (COALESCE(s.cant_services, 0) + COALESCE(v.cant_ventas, 0)), " +
+                                "    COALESCE(s.total_services, 0), " +
+                                "    COALESCE(v.total_ventas, 0), " +
+                                "    (COALESCE(s.total_services, 0) + COALESCE(v.total_ventas, 0)) " +
+                                "FROM clientes c " +
+                                "LEFT JOIN (" +
+                                "    SELECT fk_cliente, COUNT(*) as cant_services, SUM(monto_total) as total_services " +
+                                "    FROM services " +
+                                "    WHERE fechacarga BETWEEN :fechaMin AND :fechaMax " +
+                                "    AND estado_service = 'PAGADO' " +
+                                "    GROUP BY fk_cliente" +
+                                ") s ON c.pk_cliente = s.fk_cliente " +
+                                "LEFT JOIN (" +
+                                "    SELECT fk_cliente, COUNT(*) as cant_ventas, SUM(monto_total) as total_ventas " +
+                                "    FROM ventas_repuestos " +
+                                "    WHERE fecha BETWEEN :fechaMin AND :fechaMax " +
+                                "    AND activo = true " +
+                                "    AND estado_venta = 'PAGADO' " +
+                                "    GROUP BY fk_cliente" +
+                                ") v ON c.pk_cliente = v.fk_cliente " +
+                                "WHERE (s.fk_cliente IS NOT NULL OR v.fk_cliente IS NOT NULL) " +
+                                "ORDER BY (COALESCE(s.total_services, 0) + COALESCE(v.total_ventas, 0)) DESC")
+                .setParameter("fechaMin", fechaMin)
+                .setParameter("fechaMax", fechaMax)
+                .setMaxResults(cantidad);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = query.getResultList();
+
+        return results.stream()
+                .map(row -> new ClientesMasIngresosDTO(
+                        ((Number) row[0]).longValue(),
+                        (String) row[1],
+                        (String) row[2],
+                        (String) row[3],
+                        ((Number) row[4]).intValue(),
+                        ((Number) row[5]).intValue(),
+                        ((Number) row[6]).intValue(),
+                        row[7] != null ? new BigDecimal(row[7].toString()) : BigDecimal.ZERO,
+                        row[8] != null ? new BigDecimal(row[8].toString()) : BigDecimal.ZERO,
+                        row[9] != null ? new BigDecimal(row[9].toString()) : BigDecimal.ZERO
+                ))
+                .collect(Collectors.toList());
     }
 
     /**

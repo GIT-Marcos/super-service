@@ -1,9 +1,11 @@
 package SPRService.SPRService.DAOs;
 
+import SPRService.SPRService.DTOs.ClientesMasIngresosDTO;
 import SPRService.SPRService.DTOs.filtros.FiltroClienteDTO;
 import SPRService.SPRService.entities.Cliente;
 import SPRService.SPRService.util.ResultadoPaginado;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,4 +36,6 @@ public interface ClienteDAO extends GenericDAO<Cliente, Long> {
 
     ResultadoPaginado<Cliente> buscarPaginado(FiltroClienteDTO filtro);
 
+    List<ClientesMasIngresosDTO> reporteClientesMasIngresos(Integer cantidad, LocalDateTime fechaMin,
+                                                            LocalDateTime fechaMax);
 }
