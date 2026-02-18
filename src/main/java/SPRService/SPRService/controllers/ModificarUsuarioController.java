@@ -1,7 +1,7 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.enums.RolUsuario;
-import SPRService.SPRService.exceptions.DuplicateUserNameException;
 import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.UsuarioServ;
@@ -62,7 +62,7 @@ public class ModificarUsuarioController implements Initializable, ModalControlle
             tfNombre.setText(data.getNombre());
             tfCorreo.setText(data.getCorreo());
             comboRoles.getSelectionModel().select(data.getUsuario().getRol());
-            if (!data.getUsuario().getActivo()){
+            if (!data.getUsuario().getActivo()) {
                 lblInactivo.setVisible(true);
                 btnGuardar.setDisable(true);
             }
@@ -89,15 +89,15 @@ public class ModificarUsuarioController implements Initializable, ModalControlle
             viewModelUsuarioModificar.getUsuario().setPassword(contraseniaNueva);
             viewModelUsuarioModificar.getUsuario().setRol(rol);
 
-            usuarioServ.modificarUsuario(viewModelUsuarioModificar.getUsuario(), inputContraseniaOriginal)
-                    .ifPresent(u -> {
-                        viewModelUsuarioParaDevolver = new UsuarioViewModelTabla(u);
-                        NotificationHelper.mostrarExito("Guardar usuario", "Se ha guardado el usuario " + nombre + " con éxito.");
-                        Node n = ((Node) event.getSource());
-                        Stage s = (Stage) n.getScene().getWindow();
-                        s.close();
-                    });
-        } catch (IllegalArgumentException | DuplicateUserNameException e) {
+            Usuario guardado = usuarioServ.modificarUsuario(viewModelUsuarioModificar.getUsuario(), inputContraseniaOriginal);
+            viewModelUsuarioParaDevolver = new UsuarioViewModelTabla(guardado);
+
+            Node n = ((Node) event.getSource());
+            Stage s = (Stage) n.getScene().getWindow();
+            s.close();
+            NotificationHelper.mostrarExito("Guardar usuario",
+                    "Se ha guardado el usuario '" + nombre + "' con éxito.");
+        } catch (IllegalArgumentException e) {
             NotificationHelper.mostrarAdvertencia("Guardar usuario", e.getMessage());
         } catch (Exception e) {
             NotificationHelper.mostrarError("Guardar usuario", e.getMessage());

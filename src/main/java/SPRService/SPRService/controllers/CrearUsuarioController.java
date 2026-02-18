@@ -14,7 +14,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.enums.RolUsuario;
-import SPRService.SPRService.exceptions.DuplicateUserNameException;
 import SPRService.SPRService.util.ManejadorInputs;
 
 import java.net.URL;
@@ -62,11 +61,12 @@ public class CrearUsuarioController implements Initializable, ModalController<Us
                 return;
 
             Usuario usuario = new Usuario(null, nombre, correo, contrasenia, privilegio);
-            usuarioServ.cargarUsuario(usuario).ifPresent(u ->
-                    viewModelUsuarioCreado = new UsuarioViewModelTabla(u));
+            Usuario creado = usuarioServ.cargarUsuario(usuario);
+            viewModelUsuarioCreado = new UsuarioViewModelTabla(creado);
+
             limpiarCampos();
             NotificationHelper.mostrarExito("Crear usuario", "Se ha creado el usuario " + nombre + " con éxito.");
-        } catch (IllegalArgumentException | DuplicateUserNameException e) {
+        } catch (IllegalArgumentException e) {
             NotificationHelper.mostrarAdvertencia("Crear usuario", e.getMessage());
         } catch (Exception e) {
             NotificationHelper.mostrarError("Crear usuario", e.getMessage());
@@ -75,9 +75,9 @@ public class CrearUsuarioController implements Initializable, ModalController<Us
     }
 
     private void limpiarCampos() {
-        tfNombre.setText("");
-        tfCorreo.setText("");
-        tfContrasenia.setText("");
+        tfNombre.clear();
+        tfCorreo.clear();
+        tfContrasenia.clear();
         comboRoles.getSelectionModel().select(RolUsuario.GERENCIAL);
     }
 

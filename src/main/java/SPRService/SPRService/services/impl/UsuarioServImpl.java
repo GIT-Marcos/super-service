@@ -3,15 +3,12 @@ package SPRService.SPRService.services.impl;
 import SPRService.SPRService.DAOs.UsuarioDAO;
 import SPRService.SPRService.DTOs.filtros.FiltroUsuarioDTO;
 import SPRService.SPRService.entities.Usuario;
-import SPRService.SPRService.exceptions.DuplicateUserNameException;
 import SPRService.SPRService.services.UsuarioServ;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 import org.hibernate.HibernateException;
-import org.hibernate.exception.ConstraintViolationException;
 import org.mindrot.jbcrypt.BCrypt;
-import org.postgresql.util.PSQLException;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,48 +38,47 @@ public class UsuarioServImpl implements UsuarioServ {
     }
 
     @Transactional
-    @Override
-    public Optional<Usuario> cargarUsuario(Usuario usuario) throws DuplicateUserNameException {
-        if (usuario == null) {
-            throw new NullPointerException("usuario a cargar nulo.");
-        }
-        String hashed = BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt());
-        usuario.setPassword(hashed);
-        try {
-            daoUsuario.save(usuario);
-        } catch (RuntimeException e) {
-            if (e instanceof ConstraintViolationException &&
-                    e.getCause() instanceof PSQLException) {
-                throw new DuplicateUserNameException("El usuario con el nombre: " + usuario.getNombre() +
-                        " ya existe en el sistema.");
-            }
-            throw new RuntimeException("Error inesperado al cargar usuario", e);
-        }
-        return Optional.of(usuario);
+    private void verificarUnicidad(Usuario usu) {
+        daoUsuario.validarNombre(usu.getId(), usu.getNombre())
+                .ifPresent(u -> {
+                    throw new IllegalArgumentException("El usuario con el nombre '" + u.getNombre() +
+                            "' ya existe en el sistema.");
+                });
+
+        daoUsuario.validarMail(usu.getId(), usu.getCorreo())
+                .ifPresent(u -> {
+                    throw new IllegalArgumentException("El correo '" + u.getCorreo() +
+                            "' ya pertenece a otro usuario.");
+                });
     }
 
     @Transactional
     @Override
-    public Optional<Usuario> modificarUsuario(Usuario usuario, String inputPassOriginal) throws DuplicateUserNameException {
-        try {
-            Usuario usuarioOriginal = daoUsuario.getById(usuario.getId());
-            verificarPass(inputPassOriginal, usuarioOriginal);
-            String hashed = BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt());
-            usuario.setPassword(hashed);
+    public Usuario cargarUsuario(Usuario usuario) {
+        verificarUnicidad(usuario);
 
-            Usuario updated = daoUsuario.update(usuario);
-            daoUsuario.flush();
-            return Optional.ofNullable(updated);
-        } catch (RuntimeException e) {
-            if (e instanceof ConstraintViolationException &&
-                    e.getCause() instanceof PSQLException) {
-                throw new DuplicateUserNameException("El usuario con el nombre: " + usuario.getNombre() +
-                        " ya existe en el sistema.");
-            } else if (e instanceof IllegalArgumentException) {
-                throw e;
-            }
-            throw new RuntimeException("Error inesperado al cargar usuario", e);
-        }
+        String hashed = BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt());
+        usuario.setPassword(hashed);
+
+        daoUsuario.save(usuario);
+        return usuario;
+    }
+
+    @Transactional
+    @Override
+    public Usuario modificarUsuario(Usuario usuarioDTO, String inputPassOriginal) {
+        Usuario usuarioOriginal = daoUsuario.getById(usuarioDTO.getId());
+        verificarPass(inputPassOriginal, usuarioOriginal);
+
+        verificarUnicidad(usuarioDTO);
+
+        String hashed = BCrypt.hashpw(usuarioDTO.getPassword(), BCrypt.gensalt());
+        usuarioOriginal.setPassword(hashed);
+        usuarioOriginal.setRol(usuarioDTO.getRol());
+        usuarioOriginal.setCorreo(usuarioDTO.getCorreo());
+        usuarioOriginal.setNombre(usuarioDTO.getNombre());
+
+        return usuarioOriginal;
     }
 
     private void verificarPass(String inputPassOriginal, Usuario u) {
@@ -94,7 +90,7 @@ public class UsuarioServImpl implements UsuarioServ {
     @Transactional
     @Override
     public Usuario loguear(String nombre, String inputPass) {
-        Optional<Usuario> result = daoUsuario.buscarPorNombre(nombre);
+        Optional<Usuario> result = daoUsuario.buscarParaLogin(nombre);
         if (result.isEmpty()) {
             throw new HibernateException("No se encontró usuario con nombre " + nombre);
         }
@@ -110,7 +106,6 @@ public class UsuarioServImpl implements UsuarioServ {
         return usuarioEncontrado;
     }
 
-    //TODO: reemplazar en casos como estos usar Optional<>
     @Transactional
     @Override
     public Optional<Usuario> darDeBaja(Usuario usuario) {
