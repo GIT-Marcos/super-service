@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -58,7 +59,7 @@ public class UsuarioDAOImpl extends GenericDAOImpl<Usuario, Long> implements Usu
     }
 
     @Override
-    public Optional<Usuario> buscarPorNombre(String nombre) {
+    public Optional<Usuario> buscarParaLogin(String nombre) {
         EntityManager em = emProvider.get();
         return em.createQuery("SELECT DISTINCT u FROM Usuario u " +
                                 "WHERE u.nombre = :nombre",
@@ -66,5 +67,39 @@ public class UsuarioDAOImpl extends GenericDAOImpl<Usuario, Long> implements Usu
                 .setParameter("nombre", nombre)
                 .setMaxResults(1)
                 .getResultStream().findFirst();
+    }
+
+    @Override
+    public Optional<Usuario> validarNombre(Long id, String nombre) {
+        EntityManager em = emProvider.get();
+        String jpql = "select u from Usuario u where u.nombre = :nombre";
+        if (id != null) {
+            jpql += " and u.id != :id";
+        }
+        TypedQuery<Usuario> query = em.createQuery(jpql, Usuario.class)
+                .setParameter("nombre", nombre)
+                .setMaxResults(1);
+        if (id != null) {
+            query.setParameter("id", id);
+        }
+
+        return query.getResultStream().findFirst();
+    }
+
+    @Override
+    public Optional<Usuario> validarMail(Long id, String mail) {
+        EntityManager em = emProvider.get();
+        String jpql = "select u from Usuario u where u.correo = :mail";
+        if (id != null) {
+            jpql += " and u.id != :id";
+        }
+        TypedQuery<Usuario> query = em.createQuery(jpql, Usuario.class)
+                .setParameter("mail", mail)
+                .setMaxResults(1);
+        if (id != null) {
+            query.setParameter("id", id);
+        }
+
+        return query.getResultStream().findFirst();
     }
 }

@@ -29,21 +29,13 @@ public class UsuariosController implements Initializable {
     private ObservableList<UsuarioViewModelTabla> obsListUsuariosVM = FXCollections.observableArrayList();
 
     @FXML
-    private TextField tfUsuario;
-    @FXML
-    private TextField tfCorreo;
+    private TextField tfUsuario, tfCorreo;
     @FXML
     private CheckComboBox<RolUsuario> cbRoles;
     @FXML
     private TableView<UsuarioViewModelTabla> tabla;
     @FXML
-    private TableColumn<UsuarioViewModelTabla, String> colUsuario;
-    @FXML
-    private TableColumn<UsuarioViewModelTabla, String> colCorreo;
-    @FXML
-    private TableColumn<UsuarioViewModelTabla, String> colRol;
-    @FXML
-    private TableColumn<UsuarioViewModelTabla, String> colEstado;
+    private TableColumn<UsuarioViewModelTabla, String> colUsuario, colCorreo, colRol, colEstado;
     @FXML
     private CheckBox chkActivos, chkInactivos;
 
@@ -107,6 +99,36 @@ public class UsuariosController implements Initializable {
 
         Optional<UsuarioViewModelTabla> result = navigator.openModal(Views.MODIFICAR_USUARIO, "Detalles/Modificar usuario", seleccionado);
         result.ifPresent(vm -> obsListUsuariosVM.set(obsListUsuariosVM.indexOf(seleccionado), vm));
+    }
+
+    @FXML
+    private void reactivar() {
+        UsuarioViewModelTabla seleccionado = tabla.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            NotificationHelper.mostrarAdvertencia("Reactivar usuario",
+                    "Selecciona un usuario inactivo de la tabla para reactivarlo.");
+            return;
+        }
+        if (seleccionado.getUsuario().getActivo()) {
+            NotificationHelper.mostrarAdvertencia("Reactivar usuario",
+                    "El usuario seleccionado ya está activo.");
+            return;
+        }
+
+        if (!SimpleDialogs.confirmacion("Reactivar usuario", "¿Está seguro que desea reactivar este usuario?")) {
+            return;
+        }
+
+        try {
+            usuarioServ.reactivar(seleccionado.getUsuario().getId());
+            seleccionado.getUsuario().setActivo(true);
+            seleccionado.actualizarDatos(seleccionado.getUsuario());
+
+            NotificationHelper.mostrarExito("Reactivar usuario", "Se ha reactivado el usuario con éxito.");
+        } catch (RuntimeException e) {
+            NotificationHelper.mostrarError("Reactivar usuario", "Ha ocurrido un error inesperado.");
+            e.printStackTrace();
+        }
     }
 
     @FXML

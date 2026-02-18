@@ -1,7 +1,7 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.entities.Usuario;
 import SPRService.SPRService.enums.RolUsuario;
-import SPRService.SPRService.exceptions.DuplicateUserNameException;
 import SPRService.SPRService.navigation.DataReceiver;
 import SPRService.SPRService.navigation.ModalController;
 import SPRService.SPRService.services.UsuarioServ;
@@ -45,6 +45,8 @@ public class ModificarUsuarioController implements Initializable, ModalControlle
         this.usuarioServ = usuarioServ;
     }
 
+    // ================= INIT =================
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         comboRoles.getItems().setAll(RolUsuario.values());
@@ -62,46 +64,147 @@ public class ModificarUsuarioController implements Initializable, ModalControlle
             tfNombre.setText(data.getNombre());
             tfCorreo.setText(data.getCorreo());
             comboRoles.getSelectionModel().select(data.getUsuario().getRol());
-            if (!data.getUsuario().getActivo()){
+
+            if (!data.getUsuario().getActivo()) {
                 lblInactivo.setVisible(true);
                 btnGuardar.setDisable(true);
             }
         }
     }
 
+    // ================= ACCIÓN PRINCIPAL =================
+
     @FXML
     private void guardarUsuario(ActionEvent event) {
-        String nombre = tfNombre.getText().strip();
-        String contraseniaNueva = tfContrasenia.getText();
-        String inputContraseniaOriginal = tfContraseniaOriginal.getText();
-        String correo = tfCorreo.getText().strip();
-        RolUsuario rol = comboRoles.getSelectionModel().getSelectedItem();
+        Optional<UsuarioFormData> datosValidados = validarFormulario();
+        if (datosValidados.isEmpty()) return;
 
+        UsuarioFormData data = datosValidados.get();
+
+        if (!SimpleDialogs.confirmacion("Guardar usuario",
+                "¿Está seguro que desea guardar los cambios del usuario?")) {
+            return;
+        }
+
+        persistirUsuario(data, event);
+    }
+
+    // ================= VALIDACIÓN =================
+
+    private Optional<UsuarioFormData> validarFormulario() {
+        UsuarioFormData data = new UsuarioFormData();
+        StringBuilder errores = new StringBuilder("Por favor corrija los siguientes errores:\n");
+        boolean hayErrores = false;
+
+        // Validar nombre
         try {
-            ManejadorInputs.textoGenerico(nombre, true, "Nombre de usuario", 20);
-            ManejadorInputs.eMail(correo, true);
-            ManejadorInputs.contrasenia(contraseniaNueva);
-            ManejadorInputs.contrasenia(inputContraseniaOriginal);
-            if (!SimpleDialogs.confirmacion("Guardar usuario", "¿Está seguro que desea guardar el usuario?"))
-                return;
-            viewModelUsuarioModificar.getUsuario().setNombre(nombre);
-            viewModelUsuarioModificar.getUsuario().setCorreo(correo);
-            viewModelUsuarioModificar.getUsuario().setPassword(contraseniaNueva);
-            viewModelUsuarioModificar.getUsuario().setRol(rol);
+            data.nombre = ManejadorInputs.nombreUsuario(tfNombre.getText());
+            marcarCampoError(tfNombre, false);
+        } catch (IllegalArgumentException e) {
+            marcarCampoError(tfNombre, true);
+            errores.append("- Nombre: ").append(e.getMessage()).append("\n");
+            hayErrores = true;
+        }
 
-            usuarioServ.modificarUsuario(viewModelUsuarioModificar.getUsuario(), inputContraseniaOriginal)
-                    .ifPresent(u -> {
-                        viewModelUsuarioParaDevolver = new UsuarioViewModelTabla(u);
-                        NotificationHelper.mostrarExito("Guardar usuario", "Se ha guardado el usuario " + nombre + " con éxito.");
-                        Node n = ((Node) event.getSource());
-                        Stage s = (Stage) n.getScene().getWindow();
-                        s.close();
-                    });
-        } catch (IllegalArgumentException | DuplicateUserNameException e) {
-            NotificationHelper.mostrarAdvertencia("Guardar usuario", e.getMessage());
+        // Validar correo
+        try {
+            data.correo = ManejadorInputs.eMail(tfCorreo.getText().strip(), true);
+            marcarCampoError(tfCorreo, false);
+        } catch (IllegalArgumentException e) {
+            marcarCampoError(tfCorreo, true);
+            errores.append("- Correo: ").append(e.getMessage()).append("\n");
+            hayErrores = true;
+        }
+
+        // Validar contraseña nueva
+        try {
+            data.contraseniaNueva = ManejadorInputs.contrasenia(tfContrasenia.getText());
+            marcarCampoError(tfContrasenia, false);
+        } catch (IllegalArgumentException e) {
+            marcarCampoError(tfContrasenia, true);
+            errores.append("- Contraseña nueva: ").append(e.getMessage()).append("\n");
+            hayErrores = true;
+        }
+
+        // Validar contraseña original
+        try {
+            data.contraseniaOriginal = ManejadorInputs.contrasenia(tfContraseniaOriginal.getText());
+            marcarCampoError(tfContraseniaOriginal, false);
+        } catch (IllegalArgumentException e) {
+            marcarCampoError(tfContraseniaOriginal, true);
+            errores.append("- Contraseña original: ").append(e.getMessage()).append("\n");
+            hayErrores = true;
+        }
+
+        // Validar rol
+        RolUsuario rolSeleccionado = comboRoles.getSelectionModel().getSelectedItem();
+        if (rolSeleccionado == null) {
+            marcarCampoError(comboRoles, true);
+            errores.append("- Rol: Debe seleccionar un rol.\n");
+            hayErrores = true;
+        } else {
+            data.rol = rolSeleccionado;
+            marcarCampoError(comboRoles, false);
+        }
+
+        if (hayErrores) {
+            NotificationHelper.mostrarError("Error de Validación", errores.toString());
+            return Optional.empty();
+        }
+
+        return Optional.of(data);
+    }
+
+    // ================= PERSISTENCIA =================
+
+    private void persistirUsuario(UsuarioFormData data, ActionEvent event) {
+        try {
+            Usuario usuario = viewModelUsuarioModificar.getUsuario();
+            usuario.setNombre(data.nombre);
+            usuario.setCorreo(data.correo);
+            usuario.setPassword(data.contraseniaNueva);
+            usuario.setRol(data.rol);
+
+            Usuario guardado = usuarioServ.modificarUsuario(usuario, data.contraseniaOriginal);
+            viewModelUsuarioParaDevolver = new UsuarioViewModelTabla(guardado);
+
+            NotificationHelper.mostrarExito("Guardar usuario",
+                    "Se ha guardado el usuario '" + data.nombre + "' con éxito.");
+
+            cerrarVentana(event);
+
+        } catch (IllegalArgumentException e) {
+            NotificationHelper.mostrarAdvertencia("Error de Validación", e.getMessage());
         } catch (Exception e) {
-            NotificationHelper.mostrarError("Guardar usuario", e.getMessage());
+            NotificationHelper.mostrarError("Error de Persistencia", "Ha ocurrido un error inesperado.");
             e.printStackTrace();
         }
+    }
+
+    // ================= UI =================
+
+    private void marcarCampoError(Node node, boolean esError) {
+        if (esError) {
+            if (!node.getStyleClass().contains("error-border")) {
+                node.getStyleClass().add("error-border");
+            }
+        } else {
+            node.getStyleClass().remove("error-border");
+        }
+    }
+
+    private void cerrarVentana(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close();
+    }
+
+    // ================= DTO INTERNO =================
+
+    private static class UsuarioFormData {
+        String nombre;
+        String correo;
+        String contraseniaNueva;
+        String contraseniaOriginal;
+        RolUsuario rol;
     }
 }
