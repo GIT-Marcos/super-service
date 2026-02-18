@@ -11,6 +11,7 @@ public class ManejadorInputs {
     private static final Pattern PATRON_CONTRASENA = Pattern.compile(
             "^[a-zA-Z0-9!@#$%^&*()_\\-+=`{}\\[\\]/?.,<>;:'\"~|]+$"
     );
+    private static final Pattern NOMBRE_USUARIO = Pattern.compile("^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9._-]{6,20}$");
     private static final Pattern PATRON_NUMERICO = Pattern.compile(
             "^\\d{1,3}(,\\d{3})*(\\.\\d{1,2})?$|^\\d+(\\.\\d{1,2})?$");
     private static final Pattern PATRON_NROS_DNI = Pattern.compile("^\\d+$");
@@ -151,6 +152,9 @@ public class ManejadorInputs {
         if (input == null || input.isEmpty()) {
             throw new IllegalArgumentException("La contraseña es obligatoria.");
         }
+        if (input.strip().contains(" ")) {
+            throw new IllegalArgumentException("La contraseña no puede tener espacios.");
+        }
         if (input.strip().length() != input.length()) {
             throw new IllegalArgumentException("La contraseña no puede tener espacios al principio o al final.");
         }
@@ -161,6 +165,23 @@ public class ManejadorInputs {
             throw new IllegalArgumentException("La contraseña contiene caracteres no válidos.");
         }
         return input;
+    }
+
+    public static String nombreUsuario(String input) {
+        if (input == null || input.isEmpty()) {
+            throw new IllegalArgumentException("El nombre de usuario es obligatorio.");
+        }
+        String trimmed = input.strip();
+        if (trimmed.contains(" ")) {
+            throw new IllegalArgumentException("El nombre de usuario no puede tener espacios.");
+        }
+        if (trimmed.length() < 6 || trimmed.length() > 20) {
+            throw new IllegalArgumentException("El nombre de usuario debe tener entre 6 y 20 caracteres.");
+        }
+        if (!NOMBRE_USUARIO.matcher(trimmed).matches()) {
+            throw new IllegalArgumentException("El nombre de usuario tiene caracteres no válidos.");
+        }
+        return trimmed;
     }
 
     public static String eMail(String input, boolean esObligatorio) {
