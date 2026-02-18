@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/usuarios.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.UsuariosController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="root" stylesheets="@../styles/usuarios.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.UsuariosController">
 
     <!-- TOP: PANEL DE BÚSQUEDA MEJORADO -->
     <top>
@@ -93,6 +93,7 @@
                 <!-- Sección Edición -->
                 <Label styleClass="section-label" text="ACCIONES DE SELECCIÓN" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#modificar" text="📝 Detalles / Modificar" />
+            <Button layoutX="21.0" layoutY="116.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#reactivar" text="🔁 Reactivar" />
                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#darDeBaja" styleClass="btn-danger" text="🗑 Dar de Baja" />
             </children>
             <padding>

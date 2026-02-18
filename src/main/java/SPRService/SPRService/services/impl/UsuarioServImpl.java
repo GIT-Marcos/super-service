@@ -112,4 +112,11 @@ public class UsuarioServImpl implements UsuarioServ {
         usuario.setActivo(Boolean.FALSE);
         return Optional.ofNullable(daoUsuario.update(usuario));
     }
+
+    @Transactional
+    @Override
+    public void reactivar(Long id) {
+        Usuario managed = daoUsuario.getById(id);
+        managed.setActivo(true);
+    }
 }

@@ -19,4 +19,6 @@ public interface UsuarioServ {
     Usuario modificarUsuario(Usuario usuarioDTO, String inputPassOriginal);
 
     Optional<Usuario> darDeBaja(Usuario usuario);
+
+    void reactivar(Long id);
 }
