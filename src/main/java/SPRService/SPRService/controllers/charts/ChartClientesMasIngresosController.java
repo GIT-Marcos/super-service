@@ -40,7 +40,7 @@ public class ChartClientesMasIngresosController implements Initializable {
     private final Navigator navigator;
     private final ClienteServ clienteServ;
     private final EMailSender eMailSender;
-    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ROOT);
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"));
 
     // Mapa para almacenar los datos de cada cliente y acceder desde el popup
     private Map<String, ClientesMasIngresosDTO> datosClientesMap = new HashMap<>();
