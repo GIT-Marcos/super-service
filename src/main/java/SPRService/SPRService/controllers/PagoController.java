@@ -120,10 +120,10 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
         StringBuilder errores = new StringBuilder("Por favor corrija los siguientes errores:\n");
         boolean hayErrores = false;
 
-        boolean esTarjeta = esTarjeta(metodo);
+        boolean requiereDatosBancarios = requiereDatosBancarios(metodo);
 
         try {
-            data.dni = ManejadorInputs.dni(tfDniCliente.getText(), esTarjeta);
+            data.dni = ManejadorInputs.dni(tfDniCliente.getText(), requiereDatosBancarios);
             marcarCampoError(tfDniCliente, false);
         } catch (IllegalArgumentException e) {
             marcarCampoError(tfDniCliente, true);
@@ -155,12 +155,14 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
             hayErrores = true;
         }
 
-        if (esTarjeta) {
-            hayErrores |= validarDatosTarjeta(data, errores);
+        // Validar datos bancarios para tarjetas Y transferencias
+        if (requiereDatosBancarios) {
+            hayErrores |= validarDatosBancarios(data, errores, metodo);
         } else {
-            limpiarErroresTarjeta();
+            limpiarErroresDatosBancarios();
         }
 
+        // Validar comprobante solo para transferencia
         if (metodo == MetodosPago.TRANSFERENCIA) {
             if (rutaComprobante == null) {
                 btnAdjuntar.getStyleClass().add("error-border");
@@ -180,12 +182,14 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
         return Optional.of(data);
     }
 
-    private boolean validarDatosTarjeta(PagoFormData data, StringBuilder errores) {
+    private boolean validarDatosBancarios(PagoFormData data, StringBuilder errores, MetodosPago metodo) {
         boolean error = false;
+        boolean esTarjeta = esTarjeta(metodo);
 
+        // Marca de tarjeta: obligatoria solo para tarjetas
         try {
             data.marca = ManejadorInputs.marcaTarjetaYBanco(
-                    comboMarcaTarjeta.getValue(), true, null, 30);
+                    comboMarcaTarjeta.getValue(), esTarjeta, null, 30);
             marcarCampoError(comboMarcaTarjeta, false);
         } catch (IllegalArgumentException e) {
             marcarCampoError(comboMarcaTarjeta, true);
@@ -193,6 +197,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
             error = true;
         }
 
+        // Banco: obligatorio para tarjetas y transferencias
         try {
             data.banco = ManejadorInputs.marcaTarjetaYBanco(
                     comboBancoTarjeta.getValue(), true, null, 30);
@@ -203,8 +208,9 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
             error = true;
         }
 
+        // Últimos 4 dígitos: obligatorio solo para tarjetas
         try {
-            data.ultimos4 = ManejadorInputs.ultimos4(tfUltimos4.getText(), true);
+            data.ultimos4 = ManejadorInputs.ultimos4(tfUltimos4.getText(), esTarjeta);
             marcarCampoError(tfUltimos4, false);
         } catch (IllegalArgumentException e) {
             marcarCampoError(tfUltimos4, true);
@@ -212,6 +218,7 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
             error = true;
         }
 
+        // Referencia: obligatoria para tarjetas y transferencias
         try {
             data.referencia = ManejadorInputs.referenciaTarjeta(
                     tfNroReferencia.getText(), true);
@@ -230,7 +237,14 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
                 metodo == MetodosPago.TARJETA_DEBITO;
     }
 
-    private void limpiarErroresTarjeta() {
+    private boolean requiereDatosBancarios(MetodosPago metodo) {
+        return metodo == MetodosPago.TARJETA_CREDITO ||
+                metodo == MetodosPago.TARJETA_DEBITO ||
+                metodo == MetodosPago.TRANSFERENCIA;
+    }
+
+    private void limpiarErroresDatosBancarios() {
+        marcarCampoError(tfDniCliente, false);
         marcarCampoError(comboMarcaTarjeta, false);
         marcarCampoError(comboBancoTarjeta, false);
         marcarCampoError(tfUltimos4, false);
@@ -318,15 +332,29 @@ public class PagoController implements Initializable, DataReceiver<Transaccion>,
 
     private void listenerGrupoRadios() {
         radiosFormaPago.selectedToggleProperty().addListener((obs, oldV, newV) -> {
-            boolean esEfectivo = tomaMetodoPago() == MetodosPago.EFECTIVO;
+            MetodosPago metodo = tomaMetodoPago();
+            boolean esEfectivo = metodo == MetodosPago.EFECTIVO;
+            boolean esTransferencia = metodo == MetodosPago.TRANSFERENCIA;
 
+            // DNI: habilitado para todos menos efectivo
             tfDniCliente.setDisable(esEfectivo);
-            comboMarcaTarjeta.setDisable(esEfectivo);
+
+            // Marca tarjeta: solo para tarjetas (no transferencia)
+            comboMarcaTarjeta.setDisable(esEfectivo || esTransferencia);
+
+            // Banco: habilitado para tarjetas y transferencias
             comboBancoTarjeta.setDisable(esEfectivo);
-            tfUltimos4.setDisable(esEfectivo);
+
+            // Últimos 4: solo para tarjetas (no transferencia)
+            tfUltimos4.setDisable(esEfectivo || esTransferencia);
+
+            // Referencia: habilitado para tarjetas y transferencias
             tfNroReferencia.setDisable(esEfectivo);
 
-            if (esEfectivo) limpiarErroresTarjeta();
+            // Botón adjuntar: solo para transferencias
+            btnAdjuntar.setDisable(!esTransferencia);
+
+            if (esEfectivo) limpiarErroresDatosBancarios();
         });
     }
 

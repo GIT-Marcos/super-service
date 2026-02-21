@@ -167,20 +167,22 @@ public class VentasController implements Initializable {
                     "Esta venta ya está cancelada y no es posible imprimir su factura.");
             return;
         }
-        ventaParaImpresion = vrvm.getVentaRepuesto();
 
-        File file = SimpleDialogs.selectorRuta(event, "Seleccione donde guardar la factura", "factura.pdf",
-                new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
-        if (file == null) {
-            return;
-        }
-        try {
-            GeneradorFacturasPDF.generaPDFVenta(ventaParaImpresion, file);
-        } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Impresión de factura",
-                    "Ha ocurrido un error inesperado el imprimir la factura.");
-            e.printStackTrace();
-        }
+        ventaRepuestoServ.verDetalle(vrvm.getVentaRepuesto().getId())
+                .ifPresent(paraImprimir -> {
+                    File file = SimpleDialogs.selectorRuta(event, "Seleccione donde guardar la factura", "factura.pdf",
+                            new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
+                    if (file == null) {
+                        return;
+                    }
+                    try {
+                        GeneradorFacturasPDF.generaPDFVenta(paraImprimir, file);
+                    } catch (RuntimeException e) {
+                        NotificationHelper.mostrarError("Impresión de factura",
+                                "Ha ocurrido un error inesperado el imprimir la factura.");
+                        e.printStackTrace();
+                    }
+                });
     }
 
     @FXML
