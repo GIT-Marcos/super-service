@@ -36,8 +36,8 @@ public class CargarNotaController implements Initializable, ModalController<Nota
     private final Navigator navigator;
     private final NotaRetiroServ notaRetiroServ;
     private NotaRetiro paraDevolver;
-    private Set<DetalleRetiro> detalles = new HashSet<>();
-    private ObservableList<ItemDetalleViewModel> items = FXCollections.observableArrayList();
+    private final Set<DetalleRetiro> detalles = new HashSet<>();
+    private final ObservableList<ItemDetalleViewModel> items = FXCollections.observableArrayList();
 
     @FXML
     private ListView<ItemDetalleViewModel> lista;

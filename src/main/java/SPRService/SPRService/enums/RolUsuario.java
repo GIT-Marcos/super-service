@@ -1,7 +1,7 @@
 package SPRService.SPRService.enums;
 
 public enum RolUsuario {
-    GERENCIAL("Gerencial"),
+    ADMINISTRADOR("Administrador"),
     JEFE_TALLER("Jefe Taller"),
     JEFE_VENTAS("Jefe Ventas"),
     JEFE_RECEPCION("Jefe Recepción"),

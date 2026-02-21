@@ -156,7 +156,7 @@ public class CrearUsuarioController implements Initializable, ModalController<Us
         tfNombre.clear();
         tfCorreo.clear();
         tfContrasenia.clear();
-        comboRoles.getSelectionModel().select(RolUsuario.GERENCIAL);
+        comboRoles.getSelectionModel().select(RolUsuario.ADMINISTRADOR);
 
         // Limpiar estilos de error
         marcarCampoError(tfNombre, false);
@@ -168,7 +168,7 @@ public class CrearUsuarioController implements Initializable, ModalController<Us
     private void llenarComboRoles() {
         ObservableList<RolUsuario> datosLista = FXCollections.observableArrayList(RolUsuario.values());
         comboRoles.setItems(datosLista);
-        comboRoles.getSelectionModel().select(RolUsuario.GERENCIAL);
+        comboRoles.getSelectionModel().select(RolUsuario.ADMINISTRADOR);
     }
 
     // ================= DTO INTERNO =================

@@ -44,11 +44,7 @@ public class NotasRetiroController implements Initializable {
     @FXML
     private TableColumn<NotaRetiroViewModel, Long> colNotaId;
     @FXML
-    private TableColumn<NotaRetiroViewModel, String> colNotaTipo;
-    @FXML
-    private TableColumn<NotaRetiroViewModel, String> colNotaFecha;
-    @FXML
-    private TableColumn<NotaRetiroViewModel, String> colNotaEstado;
+    private TableColumn<NotaRetiroViewModel, String> colNotaTipo, colNotaFecha, colNotaEstado;
     @FXML
     private Pagination paginacion;
     @FXML
