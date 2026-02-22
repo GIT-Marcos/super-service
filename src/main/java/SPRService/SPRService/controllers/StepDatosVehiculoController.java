@@ -1,10 +1,10 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.VehiculoVM;
 import SPRService.SPRService.navigation.WizardStateProvider;
 import SPRService.SPRService.navigation.WizardStepController;
 import SPRService.SPRService.util.ManejadorInputs;
-import SPRService.SPRService.util.alertas.Alertas;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -68,7 +68,7 @@ public class StepDatosVehiculoController implements Initializable, WizardStepCon
             lblAviso.setText(""); // Limpiar mensajes de error previos
         } catch (IllegalArgumentException e) {
             // La validación falló, mostramos el error
-            Alertas.aviso("Datos del vehículo incorrectos", e.getMessage());
+            NotificationHelper.mostrarAdvertencia("Datos del vehículo incorrectos", e.getMessage());
             lblAviso.setText(e.getMessage()); // También podemos mostrarlo en la UI
         }
     }

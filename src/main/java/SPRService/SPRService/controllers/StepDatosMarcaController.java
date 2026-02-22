@@ -1,11 +1,11 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.VehiculoVM;
 import SPRService.SPRService.components.CeldaMarcaVehiculo;
 import SPRService.SPRService.entities.MarcaVehiculo;
 import SPRService.SPRService.navigation.WizardStateProvider;
 import SPRService.SPRService.navigation.WizardStepController;
-import SPRService.SPRService.util.alertas.Alertas;
 import com.google.inject.Inject;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -70,7 +70,8 @@ public class StepDatosMarcaController implements Initializable, WizardStepContro
 
     @Override
     public void mostrarErrores() {
-        Alertas.aviso("Selección de marca", "Debe seleccionar una marca para el vehículo.");
+        NotificationHelper.mostrarAdvertencia("Selección de marca",
+                "Debe seleccionar una marca para continuar.");
     }
 
     private void textFieldListener() {

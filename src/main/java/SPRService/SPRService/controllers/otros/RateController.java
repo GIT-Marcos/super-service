@@ -1,7 +1,7 @@
 package SPRService.SPRService.controllers.otros;
 
-import SPRService.SPRService.util.alertas.Alertas;
 import SPRService.SPRService.util.EMailSender;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import com.google.inject.Inject;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -54,8 +54,8 @@ public class RateController implements Initializable {
                     .position(Pos.CENTER)
                     .showInformation();
         } catch (EmailException e) {
-            Alertas.error("Error Mail", "Fallo al enviar el correo. Verifique su " +
-                    "conexión o configuración: " + e.getMessage());
+            NotificationHelper.mostrarError("Error al enviar mail",
+                    "Fallo al enviar el correo, verifique su conexión o configuración.");
             e.printStackTrace();
         }
     }

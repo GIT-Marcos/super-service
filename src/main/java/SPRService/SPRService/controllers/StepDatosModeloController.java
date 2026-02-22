@@ -1,11 +1,11 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.VehiculoVM;
 import SPRService.SPRService.components.CeldaModeloVehiculo;
 import SPRService.SPRService.entities.ModeloVehiculo;
 import SPRService.SPRService.navigation.WizardStateProvider;
 import SPRService.SPRService.navigation.WizardStepController;
-import SPRService.SPRService.util.alertas.Alertas;
 import com.google.inject.Inject;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -64,7 +64,8 @@ public class StepDatosModeloController implements Initializable, WizardStepContr
 
     @Override
     public void mostrarErrores() {
-        Alertas.aviso("Selección de modelo", "Debe seleccionar un modelo para el vehículo.");
+        NotificationHelper.mostrarAdvertencia("Selección de modelo",
+                "Debe seleccionar un modelo para el vehículo.");
     }
 
     private void textFieldListener() {
