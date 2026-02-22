@@ -47,7 +47,7 @@ public class MainController implements Initializable {
             RolUsuario rol = SessionManager.getRolUsuario();
             // Permisos según departamentos
             switch (rol) {
-                case GERENCIAL -> {
+                case ADMINISTRADOR -> {
                     navigator.navigateTo(Views.DEPOSITO);
                     btnDeposito.setSelected(true);
                 }

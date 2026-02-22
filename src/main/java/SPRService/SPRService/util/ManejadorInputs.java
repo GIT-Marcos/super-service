@@ -1,5 +1,7 @@
 package SPRService.SPRService.util;
 
+import SPRService.SPRService.entities.Repuesto;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Locale;
@@ -17,7 +19,8 @@ public class ManejadorInputs {
     private static final Pattern PATRON_NROS_DNI = Pattern.compile("^\\d+$");
     private static final Pattern PATRON_PATENTE = Pattern.compile("^[a-zA-Z0-9]*$");
     private static final Pattern PATRON_KILOMETRAJE = Pattern.compile("^\\d{1,7}$");
-    private static final Pattern NRO_TELEFONO = Pattern.compile("^\\+?(?:[1-9][\\s-]?){8,15}[0-9]$");
+    private static final Pattern NRO_TELEFONO =
+            Pattern.compile("^\\+?[1-9]\\d{0,14}(-\\d+)*$");
     private static final Pattern PATRON_EMAIL = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$\n");
 
     // Para evitar que la clase sea instanciada
@@ -125,10 +128,14 @@ public class ManejadorInputs {
             if (valor > 9999999) {
                 throw new IllegalArgumentException("La cantidad de stock no puede ser mayor a 9,999,999");
             }
-            return valor;
+            return redondearStock(valor);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Formato de cantidad inválido: " + input);
         }
+    }
+
+    private static double redondearStock(double d) {
+        return Math.round(d * 100.0) / 100.0;
     }
 
     public static String codBarras(String input, boolean esObligatorio) {
@@ -316,33 +323,51 @@ public class ManejadorInputs {
 
     public static String nroTel(String input, boolean esObligatorio) {
         String trimmedInput = (input == null) ? "" : input.strip();
+
         if (trimmedInput.isBlank()) {
             if (esObligatorio) {
                 throw new IllegalArgumentException("El número de teléfono es obligatorio.");
             }
             return "";
         }
-        if (trimmedInput.contains(" "))
-            throw new IllegalArgumentException("El número de teléfono no puede contener espacios en blanco.");
-        if (trimmedInput.startsWith("0"))
-            throw new IllegalArgumentException("El número de teléfono no puede comenzar con '0'.");
-        if (trimmedInput.length() < 6 || trimmedInput.length() > 15)
-            throw new IllegalArgumentException("El número de teléfono debe tener entre 6 y 15 caracteres.");
-        if (!NRO_TELEFONO.matcher(trimmedInput).matches())
-            throw new IllegalArgumentException("El número de teléfono está en formato incorrecto.\n" +
-                    "Solo se permiten números, '-' y '+'.");
-        return limpiarTelefono(trimmedInput);
+
+        if (trimmedInput.contains(" ")) {
+            throw new IllegalArgumentException("El número de teléfono no puede contener espacios.");
+        }
+
+        if (trimmedInput.chars().filter(ch -> ch == '+').count() > 1) {
+            throw new IllegalArgumentException("El número de teléfono solo puede contener un '+' al inicio.");
+        }
+
+        if (trimmedInput.contains("+") && !trimmedInput.startsWith("+")) {
+            throw new IllegalArgumentException("El símbolo '+' solo puede estar al inicio del número.");
+        }
+
+        if (trimmedInput.startsWith("-") || trimmedInput.endsWith("-")) {
+            throw new IllegalArgumentException("El número de teléfono no puede comenzar ni terminar con '-'.");
+        }
+
+        if (!NRO_TELEFONO.matcher(trimmedInput).matches()) {
+            throw new IllegalArgumentException(
+                    "Formato inválido. Use formato internacional válido (ej: +5491123456789 o 54911-2345-6789)."
+            );
+        }
+
+        // Validación real de cantidad de dígitos (sin contar + ni -)
+        String soloNumeros = trimmedInput.replaceAll("[^0-9]", "");
+
+        if (soloNumeros.length() < 8 || soloNumeros.length() > 15) {
+            throw new IllegalArgumentException(
+                    "El número de teléfono debe contener entre 8 y 15 dígitos."
+            );
+        }
+
+        return trimmedInput;
     }
 
     // ==============================
     // Métodos Privados Auxiliares
     // ==============================
-
-    private static String limpiarTelefono(String telefono) {
-        if (telefono == null) return null;
-        // Quita lo que no sea dígito
-        return telefono.replaceAll("\\D", "");
-    }
 
     private static String capitalize(String str) {
         if (str == null || str.isEmpty()) {

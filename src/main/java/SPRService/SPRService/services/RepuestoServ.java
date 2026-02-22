@@ -18,6 +18,8 @@ public interface RepuestoServ {
 
     ResultadoPaginado<Repuesto> buscarRepuestosPaginado(FiltroRepuestoDTO filtro, int pagina, int itemsPorPagina);
 
+    ResultadoPaginado<Repuesto> buscarParaExportar(FiltroRepuestoDTO filtro);
+
     List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro);
 
     Optional<Repuesto> cargarRepuesto(Repuesto repuesto);

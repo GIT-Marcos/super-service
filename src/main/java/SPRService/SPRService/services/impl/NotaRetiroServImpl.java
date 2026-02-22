@@ -5,6 +5,7 @@ import SPRService.SPRService.DTOs.filtros.FiltroNotaRetiro;
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.NotaRetiro;
 import SPRService.SPRService.services.NotaRetiroServ;
+import SPRService.SPRService.services.StockServ;
 import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,10 +17,12 @@ import java.util.Optional;
 public class NotaRetiroServImpl implements NotaRetiroServ {
 
     private final NotaRetiroDAO daoNota;
+    private final StockServ daoStock;
 
     @Inject
-    public NotaRetiroServImpl(NotaRetiroDAO daoNota) {
+    public NotaRetiroServImpl(NotaRetiroDAO daoNota, StockServ daoStock) {
         this.daoNota = daoNota;
+        this.daoStock = daoStock;
     }
 
     @Transactional
@@ -43,9 +46,9 @@ public class NotaRetiroServImpl implements NotaRetiroServ {
     @Transactional
     @Override
     public NotaRetiro guardarNota(NotaRetiro notaRetiro) {
-        for (DetalleRetiro d : notaRetiro.getDetallesRetiro()) {
-            d.getRepuesto().getStock().salidaDeStock(d.getCantidadRetirada());
-        }
+        notaRetiro.getDetallesRetiro().forEach(detalleRetiro -> {
+            daoStock.quitarExistente(detalleRetiro.getRepuesto().getStock(), detalleRetiro.getCantidadRetirada());
+        });
         daoNota.save(notaRetiro);
         return notaRetiro;
     }

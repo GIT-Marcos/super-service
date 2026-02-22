@@ -30,7 +30,7 @@ public class SessionManager {
 
     public static RolUsuario getRolUsuario() {
         if (usuarioSesion == null)
-            return RolUsuario.GERENCIAL;
+            return RolUsuario.ADMINISTRADOR;
 
         return usuarioSesion.getRol();
     }

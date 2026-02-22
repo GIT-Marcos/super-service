@@ -6,7 +6,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import SPRService.SPRService.util.alertas.Alertas;
 
 import java.io.File;
 import java.util.Optional;
@@ -72,7 +71,7 @@ public class SimpleDialogs {
             return ManejadorInputs.textoGenerico(opt.get(), true, "Nombre de marca",
                     100);
         } catch (NullPointerException | IllegalArgumentException e) {
-            Alertas.aviso("Crear nueva marca de repuestos", e.getMessage());
+            NotificationHelper.mostrarAdvertencia("Crear marca de repuestos", e.getMessage());
             return null;
         }
     }
@@ -125,31 +124,7 @@ public class SimpleDialogs {
         try {
             return ManejadorInputs.cantidadStock(input, true);
         } catch (RuntimeException e) {
-            Alertas.error("Error de formato", e.getMessage());
-            return null;
-        }
-    }
-
-    public static Integer inputEntero() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Generar reporte");
-        dialog.setHeaderText("Indique la cantidad de elementos a contemplar en el reporte.");
-        dialog.setContentText("Cantidad: ");
-
-        Optional<String> opt = dialog.showAndWait();
-        //si se cierra la ventana
-        if (opt.isEmpty()) {
-            return null;
-        }
-        String input = opt.get().strip();
-        try {
-            if (input.isBlank()) {
-                Alertas.aviso("Genera reporte", "Para continuar debe ingresar una cantidad.");
-                return null;
-            }
-            return Integer.valueOf(input);
-        } catch (NumberFormatException e) {
-            Alertas.error("Generar reporte", "Cantidad ingresada en mal formato");
+            NotificationHelper.mostrarAdvertencia("Ingresar stock", e.getMessage());
             return null;
         }
     }
@@ -169,7 +144,7 @@ public class SimpleDialogs {
             return ManejadorInputs.textoGenerico(opt.get(), true, "Motivo",
                     50);
         } catch (NullPointerException | IllegalArgumentException e) {
-            Alertas.aviso("Cancelación de venta", e.getMessage());
+            NotificationHelper.mostrarAdvertencia("Motivo de cancelación", e.getMessage());
             return null;
         }
     }

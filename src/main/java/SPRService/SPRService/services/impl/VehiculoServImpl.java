@@ -84,6 +84,18 @@ public class VehiculoServImpl implements VehiculoServ {
 
     @Transactional
     @Override
+    public ResultadoPaginado<Vehiculo> buscarParaExportar(String patente, String modelo, String marca, boolean activos, boolean baja) {
+        if (patente == null) patente = "";
+        if (modelo == null) modelo = "";
+        if (marca == null) marca = "";
+        FiltroVehiculoDTO filtroParaExportar = new FiltroVehiculoDTO(
+                patente, modelo, marca, activos, baja, null, null
+        );
+        return daoVehiculo.buscarPaginado(filtroParaExportar);
+    }
+
+    @Transactional
+    @Override
     public List<ModelosMasRegistradosDTO> generarReporteModelosMasRegistrados(Integer cantidad, LocalDate fechaMin,
                                                                               LocalDate fechaMax) {
         if (fechaMin == null) fechaMin = LocalDate.now().minusYears(20L);

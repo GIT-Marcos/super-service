@@ -2,6 +2,7 @@ package SPRService.SPRService.util.generadores;
 
 import SPRService.SPRService.DTOs.FacturaServiceDTO;
 import SPRService.SPRService.entities.Trabajo;
+import SPRService.SPRService.util.alertas.NotificationHelper;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
@@ -11,7 +12,6 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import SPRService.SPRService.entities.DetalleRetiro;
 import SPRService.SPRService.entities.VentaRepuesto;
-import SPRService.SPRService.util.alertas.Alertas;
 
 import java.awt.*;
 import java.io.File;
@@ -217,9 +217,10 @@ public class GeneradorFacturasPDF {
             document.add(footerTable);
 
             document.close();
-            Alertas.exito("Factura", "Factura creada con éxito en :\n" +
-                    file);
+            NotificationHelper.mostrarExito("Generación de factura",
+                    "Factura generada con éxito en: "+ file);
         } catch (Exception e) {
+            NotificationHelper.mostrarError("Generación de factura", "Ha ocurrido un error inesperado.");
             e.printStackTrace();
         }
     }
@@ -468,9 +469,10 @@ public class GeneradorFacturasPDF {
             document.add(footerTable);
 
             document.close();
-            Alertas.exito("Factura Service", "Factura generada con éxito en :\n" + file);
-
+            NotificationHelper.mostrarExito("Generación de factura",
+                    "Factura generada con éxito en: " + file);
         } catch (Exception e) {
+            NotificationHelper.mostrarError("Generación de factura", "Ha ocurrido un error inesperado.");
             e.printStackTrace();
         }
     }

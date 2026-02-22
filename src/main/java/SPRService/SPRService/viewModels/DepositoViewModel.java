@@ -20,6 +20,8 @@ import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -211,10 +213,16 @@ public class DepositoViewModel {
         File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta", defaultFileName, filter);
         if (file == null) return;
 
+        FiltroRepuestoDTO filtroParaExportar = construirFiltro();
+
+        List<RepuestoRowViewModel> listaParaExportar = new ArrayList<>();
+        repuestoServ.buscarParaExportar(filtroParaExportar).getLista().stream().map(RepuestoRowViewModel::new)
+                .forEach(listaParaExportar::add);
+
         if (selectedFormatoExportacion.get().equals("CSV")) {
-            ExportadorTabla.exportarRepuestosCSV(repuestosViewModels, file);
+            ExportadorTabla.exportarRepuestosCSV(listaParaExportar, file);
         } else {
-            ExportadorTabla.exportarRepuestosXLSX(repuestosViewModels, file);
+            ExportadorTabla.exportarRepuestosXLSX(listaParaExportar, file);
         }
     }
 
