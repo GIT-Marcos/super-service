@@ -26,6 +26,8 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -289,10 +291,22 @@ public class VehiculosController implements Initializable {
         File file = SimpleDialogs.selectorRuta(event, "Seleccione la ruta", defaultFileName, filter);
         if (file == null) return;
 
+        String patente = tfPatente.getText() != null ? tfPatente.getText().strip() : "";
+        String modelo = tfModelo.getText() != null ? tfModelo.getText().strip() : "";
+        String marca = tfMarca.getText() != null ? tfMarca.getText().strip() : "";
+        boolean verActivos = chkActivos.isSelected();
+        boolean verBaja = chkInactivos.isSelected();
+
+        List<VehiculoRowViewModel> listaParaExportar = new ArrayList<>();
+
+        vehiculoServ.buscarParaExportar(patente, modelo, marca, verActivos, verBaja)
+                .getLista().stream().map(VehiculoRowViewModel::new)
+                .forEach(listaParaExportar::add);
+
         if (comboFormato.getValue().equals("CSV")) {
-            ExportadorTabla.exportarVehiculosCSV(obsListViewModel, file);
+            ExportadorTabla.exportarVehiculosCSV(listaParaExportar, file);
         } else {
-            ExportadorTabla.exportarVehiculosXLSX(obsListViewModel, file);
+            ExportadorTabla.exportarVehiculosXLSX(listaParaExportar, file);
         }
     }
 

@@ -72,6 +72,16 @@ public class RepuestoServImpl implements RepuestoServ {
 
     @Transactional
     @Override
+    public ResultadoPaginado<Repuesto> buscarParaExportar(FiltroRepuestoDTO filtro) {
+        FiltroRepuestoDTO filtroParaExportar = new FiltroRepuestoDTO(
+                filtro.codBarras(), filtro.nombre(), filtro.marca(), filtro.stockNormal(), filtro.stockBajo(),
+                filtro.activos(), filtro.inactivos(), filtro.colOrden(), filtro.tipoOrden(), null, null
+        );
+        return daoRepuesto.buscarRepuestosPaginado(filtroParaExportar);
+    }
+
+    @Transactional
+    @Override
     public List<Repuesto> buscarRepuestos(FiltroRepuestoDTO filtro) {
         return daoRepuesto.buscarRepuestos(filtro);
     }

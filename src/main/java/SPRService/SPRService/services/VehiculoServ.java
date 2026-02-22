@@ -15,6 +15,8 @@ public interface VehiculoServ {
     List<Vehiculo> buscarPor(String patente, String modelo, String marca, boolean activos, boolean baja);
     ResultadoPaginado<Vehiculo> buscarPaginado(String patente, String modelo, String marca,
                                                boolean activos, boolean baja, int pagina, int itemsPorPagina);
+    ResultadoPaginado<Vehiculo> buscarParaExportar(String patente, String modelo, String marca,
+                                      boolean activos, boolean baja);
     List<ModelosMasRegistradosDTO> generarReporteModelosMasRegistrados(Integer cantidad, LocalDate fechaMin,
                                                                        LocalDate fechaMax);
 
