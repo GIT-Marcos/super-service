@@ -1,5 +1,7 @@
 package SPRService.SPRService.util;
 
+import SPRService.SPRService.entities.Repuesto;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Locale;
@@ -126,10 +128,14 @@ public class ManejadorInputs {
             if (valor > 9999999) {
                 throw new IllegalArgumentException("La cantidad de stock no puede ser mayor a 9,999,999");
             }
-            return valor;
+            return redondearStock(valor);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Formato de cantidad inválido: " + input);
         }
+    }
+
+    private static double redondearStock(double d) {
+        return Math.round(d * 100.0) / 100.0;
     }
 
     public static String codBarras(String input, boolean esObligatorio) {

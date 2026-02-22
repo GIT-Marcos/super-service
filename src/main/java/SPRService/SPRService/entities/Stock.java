@@ -169,6 +169,9 @@ public class Stock implements Serializable {
         if (cantidadEntrada.isInfinite() || cantidadEntrada.isNaN() || cantidadEntrada < 0)
             throw new IllegalArgumentException("Cantidad de stock a agregar en mal formato");
 
-        this.setCantidadExistente(this.getCantidadExistente() + cantidadEntrada);
+        Double nuevaCantidad = this.cantidadExistente + cantidadEntrada;
+        nuevaCantidad = ManejadorInputs.cantidadStock(String.valueOf(nuevaCantidad), true);
+
+        this.setCantidadExistente(nuevaCantidad);
     }
 }

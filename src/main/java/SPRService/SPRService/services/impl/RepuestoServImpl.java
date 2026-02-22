@@ -129,6 +129,7 @@ public class RepuestoServImpl implements RepuestoServ {
             Ubicacion ubicacionAttached = daoUbicacion.update(repuesto.getStock().getUbicacion());
             repuesto.getStock().asociarUbicacion(ubicacionAttached);
 
+            redondearStock(repuesto);
             daoRepuesto.save(repuesto);
         } catch (DuplicateProductException e) {
             throw e;
@@ -136,6 +137,11 @@ public class RepuestoServImpl implements RepuestoServ {
             throw new RuntimeException(e);
         }
         return Optional.of(repuesto);
+    }
+
+    private void redondearStock(Repuesto r) {
+        r.getStock().setCantidadExistente(Math.round(r.getStock().getCantidadExistente() * 100.0) / 100.0);
+        r.getStock().setCantMinima(Math.round(r.getStock().getCantMinima() * 100.0) / 100.0);
     }
 
     @Transactional
@@ -154,6 +160,7 @@ public class RepuestoServImpl implements RepuestoServ {
     public Optional<Repuesto> modificarRepuesto(Repuesto repuesto) {
         try {
             verificarUnicidadCodBarras(repuesto);
+            redondearStock(repuesto);
             return Optional.ofNullable(daoRepuesto.update(repuesto));
         } catch (DuplicateProductException e) {
             throw e;
