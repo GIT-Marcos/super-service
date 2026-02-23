@@ -2,6 +2,7 @@ package SPRService.SPRService;
 
 import SPRService.SPRService.navigation.AppCoordinator;
 import SPRService.SPRService.util.AppModule;
+import SPRService.SPRService.util.ServicioNavegador;
 import SPRService.SPRService.util.persistence.PersistenceModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -13,6 +14,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+        ServicioNavegador.inicializar(getHostServices());
+
         Injector injector = Guice.createInjector(new AppModule(), new PersistenceModule());
 
         AppCoordinator coordinator = injector.getInstance(AppCoordinator.class);
