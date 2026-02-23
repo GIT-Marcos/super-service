@@ -195,6 +195,18 @@
     -fx-background-radius: 3;
 }
 
+.btn-copiar-cell {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 2 6;
+    -fx-font-size: 12px;
+}
+
+.btn-copiar-cell:hover {
+    -fx-background-color: rgba(0, 120, 215, 0.1);
+    -fx-background-radius: 4;
+}
+
 /* ListView sin bordes en celdas vacías */
 .list-view .list-cell:empty {
     -fx-background-color: transparent;
