@@ -200,6 +200,14 @@ public class ServiceDAOImpl extends GenericDAOImpl<Service, Long> implements Ser
             predicates.add(root.get("estadoService").in(filtros.estados()));
         }
 
+        if (filtros.montoMinimo() != null && filtros.montoMaximo() != null) {
+            predicates.add(cb.between(root.get("montoTotal"), filtros.montoMinimo(), filtros.montoMaximo()));
+        } else if (filtros.montoMinimo() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("montoTotal"), filtros.montoMinimo()));
+        } else if (filtros.montoMaximo() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("montoTotal"), filtros.montoMaximo()));
+        }
+
         return predicates;
     }
 
