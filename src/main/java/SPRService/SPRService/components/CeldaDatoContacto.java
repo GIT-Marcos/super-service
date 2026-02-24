@@ -30,8 +30,15 @@ public class CeldaDatoContacto extends ListCell<ItemDatoContactoViewModel> {
     private final Button btnEliminar;
     private final Region spacer;
 
+    private boolean mostrarBotonEliminar;
+
     public CeldaDatoContacto() {
+        this(true);
+    }
+
+    public CeldaDatoContacto(boolean mostrarBotonEliminar) {
         super();
+        this.mostrarBotonEliminar = mostrarBotonEliminar;
 
         // === Etiquetas ===
         lblIcono = new Label();
@@ -92,6 +99,16 @@ public class CeldaDatoContacto extends ListCell<ItemDatoContactoViewModel> {
         botonesBox.setVisible(false);
         container.setOnMouseEntered(e -> botonesBox.setVisible(true));
         container.setOnMouseExited(e -> botonesBox.setVisible(false));
+    }
+
+    // ==================== GETTER / SETTER ====================
+
+    public boolean isMostrarBotonEliminar() {
+        return mostrarBotonEliminar;
+    }
+
+    public void setMostrarBotonEliminar(boolean mostrarBotonEliminar) {
+        this.mostrarBotonEliminar = mostrarBotonEliminar;
     }
 
     // ==================== ACCIONES ====================
@@ -156,11 +173,15 @@ public class CeldaDatoContacto extends ListCell<ItemDatoContactoViewModel> {
         if (item.getTipo() == TipoContacto.EMAIL) {
             btnAbrir.setText("✉");
             btnAbrir.setTooltip(new Tooltip("Enviar correo a " + item.getValor()));
-            botonesBox.getChildren().addAll(btnAbrir, btnCopiar, btnEliminar);
+            botonesBox.getChildren().addAll(btnAbrir, btnCopiar);
         } else {
             btnAbrir.setText("📞");
             btnAbrir.setTooltip(new Tooltip("Llamar a " + item.getValor()));
-            botonesBox.getChildren().addAll(btnAbrir, btnWhatsApp, btnCopiar, btnEliminar);
+            botonesBox.getChildren().addAll(btnAbrir, btnWhatsApp, btnCopiar);
+        }
+
+        if (mostrarBotonEliminar) {
+            botonesBox.getChildren().add(btnEliminar);
         }
 
         // Estilo según tipo

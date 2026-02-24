@@ -1,8 +1,10 @@
 package SPRService.SPRService.controllers;
 
+import SPRService.SPRService.components.CeldaDatoContacto;
 import SPRService.SPRService.components.CeldaPago;
 import SPRService.SPRService.components.ItemCellFactory;
 import SPRService.SPRService.navigation.*;
+import SPRService.SPRService.viewModels.celdas.ItemDatoContactoViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleRetiroViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemDetalleViewModel;
 import SPRService.SPRService.viewModels.celdas.ItemPagoViewModel;
@@ -28,7 +30,7 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     private VentaRepuesto ventaParaDevolver;
     private ObservableList<ItemDetalleViewModel> itemsDetalles = FXCollections.observableArrayList();
     private ObservableList<ItemPagoViewModel> itemsPagos = FXCollections.observableArrayList();
-    private ObservableList<String> itemsContacto = FXCollections.observableArrayList();
+    private ObservableList<ItemDatoContactoViewModel> itemsContacto = FXCollections.observableArrayList();
     private final Navigator navigator;
 
     @Inject
@@ -41,7 +43,7 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     @FXML
     private ListView<ItemPagoViewModel> listaPagos;
     @FXML
-    private ListView<String> listaContactosCliente;
+    private ListView<ItemDatoContactoViewModel> listaContactosCliente;
     @FXML
     private Label labelCodVenta, labelFechaVenta, labelMontoTotal, labelEstadoVenta, labelMontoFaltante,
             labelClienteDni, labelClienteNombre;
@@ -85,6 +87,7 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
         listaPagos.setItems(itemsPagos);
         listaDetalles.setItems(itemsDetalles);
         listaContactosCliente.setItems(itemsContacto);
+        listaContactosCliente.setCellFactory(cell -> new CeldaDatoContacto(false));
 
         listaPagos.setCellFactory(c -> new CeldaPago());
         listaDetalles.setCellFactory(new ItemCellFactory().setMostrarBotonEliminar(false));
@@ -93,6 +96,8 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
         listaDetalles.getStylesheets().add(css);
         String css2 = getClass().getResource("/styles/celdaPago.css").toExternalForm();
         listaPagos.getStylesheets().add(css2);
+        String css3 = getClass().getResource("/styles/clientes.css").toExternalForm();
+        listaContactosCliente.getStylesheets().add(css3);
     }
 
     private void cargarProductosLista() {
@@ -120,8 +125,7 @@ public class DetalleVentaController implements Initializable, DataReceiver<Venta
     private void cargarDatosCliente() {
         itemsContacto.clear();
         if (this.ventaRepuesto.getCliente() != null) {
-            itemsContacto.addAll(this.ventaRepuesto.getCliente().getContactosCliente().getEmailSet());
-            itemsContacto.addAll(this.ventaRepuesto.getCliente().getContactosCliente().getNroTelefonoSet());
+            itemsContacto.setAll(ItemDatoContactoViewModel.fromEntity(this.ventaRepuesto.getCliente().getContactosCliente()));
             labelClienteDni.setText(this.ventaRepuesto.getCliente().getDni());
             labelClienteNombre.setText(this.ventaRepuesto.getCliente().getNombre() + " " + this.ventaRepuesto.getCliente().getApellido());
         }
