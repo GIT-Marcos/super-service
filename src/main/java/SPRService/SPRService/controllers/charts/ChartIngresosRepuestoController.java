@@ -34,7 +34,6 @@ public class ChartIngresosRepuestoController implements Initializable {
 
     @FXML
     private BorderPane rootPane;
-
     @FXML
     private BarChart<Number, String> chart;
     @FXML

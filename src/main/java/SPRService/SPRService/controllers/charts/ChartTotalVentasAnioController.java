@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.time.Year;
 import java.util.*;
 import java.util.List;
@@ -37,6 +38,7 @@ public class ChartTotalVentasAnioController implements Initializable {
             "Ene", "Feb", "Mar", "Abr", "May", "Jun",
             "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
     };
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"));
 
     @FXML
     private BorderPane rootPane;
@@ -116,8 +118,8 @@ public class ChartTotalVentasAnioController implements Initializable {
         int anio = spinnerAnio.getValue();
         lblTitulo.setText("Año: " + anio);
         lblCantidadDeVentasAnio.setText(ventaRepuestoServ.cantidadDeVentasEnAnio(anio) + " ventas");
-        lblIngresosTotales.setText("$ " + ventaRepuestoServ.ingresosDeVentasEnAnio(anio));
-        lblPromedioIngresosPorVenta.setText("$ " + ventaRepuestoServ.ingresosPromedioPorVentaEnAnio(anio));
+        lblIngresosTotales.setText(currencyFormat.format(ventaRepuestoServ.ingresosDeVentasEnAnio(anio)));
+        lblPromedioIngresosPorVenta.setText(currencyFormat.format(ventaRepuestoServ.ingresosPromedioPorVentaEnAnio(anio)));
     }
 
     private void poblarChartCantidad(List<ReporteCantidadEnAnioDTO> ventasDTO) {

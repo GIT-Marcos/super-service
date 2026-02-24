@@ -30,11 +30,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.time.Year;
 import java.util.*;
 import java.util.List;
 
-//TODO: CONTROLADOR IDÉNTICO AL DE VENTA
 public class ChartReportesAnualesServiceController implements Initializable {
 
     private final ServiceServ serviceServ;
@@ -44,6 +44,7 @@ public class ChartReportesAnualesServiceController implements Initializable {
             "Ene", "Feb", "Mar", "Abr", "May", "Jun",
             "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
     };
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"));
 
     @FXML
     private AnchorPane rootPane;
@@ -131,13 +132,11 @@ public class ChartReportesAnualesServiceController implements Initializable {
     private void poblarLabels() {
         int ano = spinnerAnio.getValue();
         DatosReporteServiceDTO dto = serviceServ.generarDatosAnuales(ano);
-        lblIngresosTotales.setText("$ " + dto.ingTotales());
-        lblPromedioIngresosPorService.setText(
-                "$ " + String.format("%.2f", dto.ingPromedioPorService())
-        );
+        lblIngresosTotales.setText(currencyFormat.format(dto.ingTotales()));
+        lblPromedioIngresosPorService.setText(currencyFormat.format(dto.ingPromedioPorService()));
         lblCantidadDeServicesAnio.setText(dto.cantidadDeService().toString());
-        lblIngresosPorTrabajos.setText("$ " + dto.ingPorTrabajos());
-        lblIngresosPorRepuestos.setText("$ " + dto.ingPorRepuestos());
+        lblIngresosPorTrabajos.setText(currencyFormat.format(dto.ingPorTrabajos()));
+        lblIngresosPorRepuestos.setText(currencyFormat.format(dto.ingPorRepuestos()));
 
         BigDecimal ingTotal = dto.ingPorTrabajos().add(dto.ingPorRepuestos());
         BigDecimal cien = new BigDecimal("100");
