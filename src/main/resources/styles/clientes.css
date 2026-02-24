@@ -180,21 +180,6 @@
     -fx-text-fill: #212529;
 }
 
-/*!* Botón eliminar *!*/
-/*.btn-eliminar-cell {*/
-/*    -fx-background-color: transparent;*/
-/*    -fx-text-fill: #dc3545;*/
-/*    -fx-font-size: 12px;*/
-/*    -fx-padding: 2 6;*/
-/*    -fx-cursor: hand;*/
-/*}*/
-
-/*.btn-eliminar-cell:hover {*/
-/*    -fx-background-color: #dc3545;*/
-/*    -fx-text-fill: white;*/
-/*    -fx-background-radius: 3;*/
-/*}*/
-
 .btn-copiar-cell {
     -fx-background-color: transparent;
     -fx-cursor: hand;
