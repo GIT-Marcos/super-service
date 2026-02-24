@@ -3,6 +3,7 @@ package SPRService.SPRService.DTOs.filtros;
 import SPRService.SPRService.enums.EstadoService;
 import SPRService.SPRService.enums.PrioridadService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -21,17 +22,19 @@ public record FiltroServiceDTO(
         LocalDateTime fchMaxRetiro,
         List<EstadoService> estados,
         List<PrioridadService> prioridadServices,
+        BigDecimal montoMinimo,
+        BigDecimal montoMaximo,
         Integer offset,
         Integer limit
 ) {
 
     /**
-     * Constructor principal que recibe los valores de los controles de la UI.
-     * Se encarga de la conversión segura de LocalDate a LocalDateTime y maneja los valores nulos.
+     * Constructor principal que recibe los valores de los controles de la UI (sin paginación).
      */
     public FiltroServiceDTO(Long codigo, String dniCliente, LocalDate fchMinCarga, LocalDate fchMaxCarga,
                             LocalDate fchMinRetiro, LocalDate fchMaxRetiro,
-                            List<EstadoService> estados, List<PrioridadService> prioridadServices) {
+                            List<EstadoService> estados, List<PrioridadService> prioridadServices,
+                            BigDecimal montoMinimo, BigDecimal montoMaximo) {
         this(
                 codigo,
                 dniCliente,
@@ -41,17 +44,20 @@ public record FiltroServiceDTO(
                 (fchMaxRetiro != null) ? fchMaxRetiro.atTime(LocalTime.MAX) : null,
                 estados,
                 prioridadServices,
+                montoMinimo,
+                montoMaximo,
                 null,
                 null
         );
     }
 
     /**
-     * Constructor con paginación (recibe LocalDate)
+     * Constructor con paginación (recibe LocalDate).
      */
     public FiltroServiceDTO(Long codigo, String dniCliente, LocalDate fchMinCarga, LocalDate fchMaxCarga,
                             LocalDate fchMinRetiro, LocalDate fchMaxRetiro,
                             List<EstadoService> estados, List<PrioridadService> prioridadServices,
+                            BigDecimal montoMinimo, BigDecimal montoMaximo,
                             Integer offset, Integer limit) {
         this(
                 codigo,
@@ -62,8 +68,46 @@ public record FiltroServiceDTO(
                 (fchMaxRetiro != null) ? fchMaxRetiro.atTime(LocalTime.MAX) : null,
                 estados,
                 prioridadServices,
+                montoMinimo,
+                montoMaximo,
                 offset,
                 limit
+        );
+    }
+
+    /**
+     * Constructor sin montos (retrocompatibilidad, sin paginación).
+     */
+    public FiltroServiceDTO(Long codigo, String dniCliente, LocalDate fchMinCarga, LocalDate fchMaxCarga,
+                            LocalDate fchMinRetiro, LocalDate fchMaxRetiro,
+                            List<EstadoService> estados, List<PrioridadService> prioridadServices) {
+        this(
+                codigo,
+                dniCliente,
+                fchMinCarga, fchMaxCarga,
+                fchMinRetiro, fchMaxRetiro,
+                estados,
+                prioridadServices,
+                (BigDecimal) null, null
+        );
+    }
+
+    /**
+     * Constructor sin montos con paginación (retrocompatibilidad).
+     */
+    public FiltroServiceDTO(Long codigo, String dniCliente, LocalDate fchMinCarga, LocalDate fchMaxCarga,
+                            LocalDate fchMinRetiro, LocalDate fchMaxRetiro,
+                            List<EstadoService> estados, List<PrioridadService> prioridadServices,
+                            Integer offset, Integer limit) {
+        this(
+                codigo,
+                dniCliente,
+                fchMinCarga, fchMaxCarga,
+                fchMinRetiro, fchMaxRetiro,
+                estados,
+                prioridadServices,
+                null, null,
+                offset, limit
         );
     }
 
@@ -71,6 +115,7 @@ public record FiltroServiceDTO(
      * Constructor para un estado de "ver todos" o sin filtros aplicados.
      */
     public FiltroServiceDTO() {
-        this(null, null, (LocalDateTime) null, null, null, null, null, null, null, null);
+        this(null, null, (LocalDateTime) null, null, null, null,
+                null, null, null, null, null, null);
     }
 }

@@ -39,7 +39,6 @@
 
                         <Separator orientation="VERTICAL" />
 
-                        <!-- ========== NUEVO CAMPO DE BÚSQUEDA POR DNI ========== -->
                         <VBox spacing="2.0">
                             <children>
                                 <Label text="DNI Cliente" />
@@ -48,7 +47,6 @@
                         </VBox>
 
                         <Separator orientation="VERTICAL" />
-                        <!-- ====================================================== -->
 
                         <VBox alignment="CENTER_LEFT" spacing="2.0">
                             <children>
@@ -96,6 +94,22 @@
                         <CheckComboBox fx:id="ccbPrioridades" minWidth="150.0" showCheckedCount="true" styleClass="text-field" title="Prioridad..." />
 
                         <CheckComboBox fx:id="ccbEstados" minWidth="150.0" showCheckedCount="true" styleClass="text-field" title="Estados..." />
+
+                        <Separator orientation="VERTICAL" />
+
+                        <!-- ========== NUEVOS CAMPOS DE BÚSQUEDA POR MONTO ========== -->
+                        <VBox alignment="CENTER_LEFT" spacing="2.0">
+                            <children>
+                                <Label text="Monto Total:" />
+                                <HBox spacing="5.0">
+                                    <children>
+                                        <TextField fx:id="tfMontoMinimo" prefWidth="110.0" promptText="Mín. $" styleClass="text-field" />
+                                        <TextField fx:id="tfMontoMaximo" prefWidth="110.0" promptText="Máx. $" styleClass="text-field" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                        <!-- ========================================================== -->
 
                         <Region HBox.hgrow="ALWAYS" />
 

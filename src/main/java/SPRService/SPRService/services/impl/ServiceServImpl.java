@@ -62,6 +62,8 @@ public class ServiceServImpl implements ServiceServ {
                 filtros.fchMaxRetiro(),
                 filtros.estados(),
                 filtros.prioridadServices(),
+                filtros.montoMinimo(),
+                filtros.montoMaximo(),
                 offset,
                 itemsPorPagina
         );

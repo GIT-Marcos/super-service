@@ -34,6 +34,7 @@ import javafx.stage.FileChooser;
 import org.controlsfx.control.CheckComboBox;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -50,6 +51,8 @@ public class ServicesController implements Initializable {
 
     @FXML
     private TextField tfCodigo, tfDniCliente;
+    @FXML
+    private TextField tfMontoMinimo, tfMontoMaximo;
     @FXML
     private CheckComboBox<PrioridadService> ccbPrioridades;
     @FXML
@@ -80,7 +83,6 @@ public class ServicesController implements Initializable {
         configurarPaginacion();
         tablaServices.setItems(obsListServiceVM);
 
-        // Cargar primera página
         cargarPagina(0);
 
         configPermisos();
@@ -106,7 +108,6 @@ public class ServicesController implements Initializable {
         paginacion.setCurrentPageIndex(0);
         paginacion.setMaxPageIndicatorCount(10);
 
-        // Listener para cambios de página
         paginacion.currentPageIndexProperty().addListener((obs, oldPage, newPage) -> {
             if (newPage != null && !newPage.equals(oldPage)) {
                 cargarPagina(newPage.intValue());
@@ -114,11 +115,7 @@ public class ServicesController implements Initializable {
         });
     }
 
-    /**
-     * Carga una página específica de resultados
-     */
     private void cargarPagina(int numeroPagina) {
-        // Validar que haya al menos un estado y una prioridad seleccionados
         if (ccbPrioridades.getCheckModel().getCheckedItems().isEmpty() ||
                 ccbEstados.getCheckModel().getCheckedItems().isEmpty()) {
             obsListServiceVM.clear();
@@ -131,24 +128,18 @@ public class ServicesController implements Initializable {
         ResultadoPaginado<Service> resultado = serviceServ.buscarPaginado(
                 filtros, numeroPagina, ITEMS_POR_PAGINA);
 
-        // Actualizar datos de paginación
         int paginas = (int) Math.ceil((double) resultado.getCantidadResultados() / ITEMS_POR_PAGINA);
         totalPaginas = Math.max(1, paginas);
         paginaActual = numeroPagina;
 
-        // Actualizar el control de paginación
         paginacion.setPageCount(totalPaginas);
 
-        // Actualizar la tabla
         obsListServiceVM.clear();
         for (Service s : resultado.getLista()) {
             obsListServiceVM.add(new ServiceRowViewModel(s));
         }
     }
 
-    /**
-     * Construye el DTO de filtro basándose en los valores actuales de la UI
-     */
     private FiltroServiceDTO construirFiltro() {
         return new FiltroServiceDTO(
                 ManejadorInputs.codigoVenta(tfCodigo.getText().strip(), false),
@@ -158,13 +149,27 @@ public class ServicesController implements Initializable {
                 dpMinimaRetiro.getValue(),
                 dpMaximaRetiro.getValue(),
                 ccbEstados.getCheckModel().getCheckedItems(),
-                ccbPrioridades.getCheckModel().getCheckedItems()
+                ccbPrioridades.getCheckModel().getCheckedItems(),
+                parsearMonto(tfMontoMinimo.getText()),
+                parsearMonto(tfMontoMaximo.getText())
         );
     }
 
     /**
-     * Recarga la página actual
+     * Convierte el texto de un campo de monto a BigDecimal.
+     * Devuelve null si el campo está vacío o no es un número válido.
      */
+    private BigDecimal parsearMonto(String texto) {
+        if (texto == null || texto.isBlank()) return null;
+        try {
+            String limpio = texto.replace(",", ".").strip();
+            BigDecimal valor = new BigDecimal(limpio);
+            return valor.compareTo(BigDecimal.ZERO) >= 0 ? valor : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private void recargarPaginaActual() {
         cargarPagina(paginaActual);
     }
@@ -175,6 +180,8 @@ public class ServicesController implements Initializable {
     private void verTodos() {
         tfCodigo.clear();
         tfDniCliente.clear();
+        tfMontoMinimo.clear();
+        tfMontoMaximo.clear();
         dpMinimaCarga.setValue(null);
         dpMaximaCarga.setValue(null);
         dpMinimaRetiro.setValue(null);
@@ -194,6 +201,30 @@ public class ServicesController implements Initializable {
                     "Debe seleccionar al menos un estado y una prioridad.");
             return;
         }
+
+        // ========== VALIDACIÓN DE MONTOS ==========
+        BigDecimal montoMin = parsearMonto(tfMontoMinimo.getText());
+        BigDecimal montoMax = parsearMonto(tfMontoMaximo.getText());
+
+        if (!tfMontoMinimo.getText().isBlank() && montoMin == null) {
+            NotificationHelper.mostrarAdvertencia("Buscar",
+                    "El monto mínimo ingresado no es un número válido.");
+            tfMontoMinimo.requestFocus();
+            return;
+        }
+        if (!tfMontoMaximo.getText().isBlank() && montoMax == null) {
+            NotificationHelper.mostrarAdvertencia("Buscar",
+                    "El monto máximo ingresado no es un número válido.");
+            tfMontoMaximo.requestFocus();
+            return;
+        }
+        if (montoMin != null && montoMax != null && montoMin.compareTo(montoMax) > 0) {
+            NotificationHelper.mostrarAdvertencia("Buscar",
+                    "El monto mínimo no puede ser mayor al monto máximo.");
+            tfMontoMinimo.requestFocus();
+            return;
+        }
+        // ==================================================
 
         paginacion.setCurrentPageIndex(0);
         cargarPagina(0);
@@ -390,6 +421,11 @@ public class ServicesController implements Initializable {
         ccbPrioridades.getItems().setAll(PrioridadService.values());
         ccbPrioridades.getCheckModel().checkAll();
 
+        // ========== RESTRICCIÓN: solo números y punto/coma ==========
+        restringirAMoneda(tfMontoMinimo);
+        restringirAMoneda(tfMontoMaximo);
+        // =============================================================
+
         colFechaEntrega.setCellFactory(column -> new TableCell<ServiceRowViewModel, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -454,7 +490,17 @@ public class ServicesController implements Initializable {
                 }
             }
         });
+    }
 
+    /**
+     * Restringe un TextField para que solo acepte dígitos, punto y coma (moneda).
+     */
+    private void restringirAMoneda(TextField tf) {
+        tf.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.matches("[0-9.,]*")) {
+                tf.setText(oldVal);
+            }
+        });
     }
 
     private void configColumnas() {
