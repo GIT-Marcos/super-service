@@ -35,11 +35,8 @@ public class ChartMasRetiradosController implements Initializable {
 
     @FXML
     private BorderPane rootPane;
-
-    // CAMBIO: Invertido a <Number, String> para grafico horizontal
     @FXML
     private BarChart<Number, String> chart;
-
     @FXML
     private DatePicker dpFechaMin, dpFechaMax;
     @FXML

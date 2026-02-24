@@ -24,7 +24,9 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class ChartComparacionIngresosController implements Initializable {
@@ -32,6 +34,7 @@ public class ChartComparacionIngresosController implements Initializable {
     private final ServiceServ serviceServ;
     private final EMailSender eMailSender;
     private ObservableList<PieChart.Data> obsPie = FXCollections.observableArrayList();
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"));
 
     @FXML
     private AnchorPane rootPane;
@@ -125,9 +128,9 @@ public class ChartComparacionIngresosController implements Initializable {
         lblCantService.setText(dto.cantService().toString());
         lblCantVentas.setText(dto.cantVenta().toString());
         lblCantOperaciones.setText(dto.totalOperaciones().toString());
-        lblIngresosTotales.setText("$ " + dto.totalIngresos());
-        lblIngVentas.setText("$ " + dto.ingVenta());
-        lblIngService.setText("$ " + dto.ingService());
+        lblIngresosTotales.setText(currencyFormat.format(dto.totalIngresos()));
+        lblIngVentas.setText(currencyFormat.format(dto.ingVenta()));
+        lblIngService.setText(currencyFormat.format(dto.ingService()));
     }
 
     private void limpiarVista() {
