@@ -1,6 +1,8 @@
 package SPRService.SPRService.viewModels;
 
 import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
+import SPRService.SPRService.entities.Ubicacion;
+import SPRService.SPRService.services.UbicacionServ;
 import SPRService.SPRService.util.ResultadoPaginado;
 import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
@@ -29,6 +31,7 @@ public class DepositoViewModel {
 
     // --- Dependencias ---
     private final RepuestoServ repuestoServ;
+    private final UbicacionServ ubicacionServ;
     private final StockServ stockServ;
     private final Navigator navigator;
 
@@ -48,6 +51,8 @@ public class DepositoViewModel {
     public final BooleanProperty mostrarBajo = new SimpleBooleanProperty(true);
     public final BooleanProperty mostrarActivo = new SimpleBooleanProperty(true);
     public final BooleanProperty mostrarInactivo = new SimpleBooleanProperty(true);
+    public final ObservableList<String> ubicacionesDisponibles = FXCollections.observableArrayList();
+    public final ObservableList<String> ubicacionesSeleccionadas = FXCollections.observableArrayList();
 
     // Ordenamiento
     public final ObservableList<String> ordenarPorOptions =
@@ -63,6 +68,7 @@ public class DepositoViewModel {
 
     // Otros estados
     private final BooleanProperty avisoStockBajoVisible = new SimpleBooleanProperty(false);
+    private final StringProperty avisoStockBajoTexto = new SimpleStringProperty("");
 
     // ====== NUEVAS PROPIEDADES DE PAGINACIÓN ======
     private final IntegerProperty paginaActual = new SimpleIntegerProperty(0);
@@ -70,14 +76,21 @@ public class DepositoViewModel {
     private final LongProperty totalResultados = new SimpleLongProperty(0);
 
     @Inject
-    public DepositoViewModel(RepuestoServ repuestoServ, StockServ stockServ, AppCoordinator appCoordinator) {
+    public DepositoViewModel(RepuestoServ repuestoServ, UbicacionServ ubicacionServ, StockServ stockServ, AppCoordinator appCoordinator) {
         this.repuestoServ = repuestoServ;
+        this.ubicacionServ = ubicacionServ;
         this.stockServ = stockServ;
         this.navigator = appCoordinator.getMainNavigator();
     }
 
     public void initialize() {
+        cargarUbicaciones();
         cargarTodosRepuestos();
+    }
+
+    private void cargarUbicaciones() {
+        List<String> nombres = ubicacionServ.verTodas().stream().map(Ubicacion::getUbicacion).toList();
+        ubicacionesDisponibles.setAll(nombres);
     }
 
     public void cargarTodosRepuestos() {
@@ -142,6 +155,9 @@ public class DepositoViewModel {
         };
         int tipoOrden = tipoOrdenOptions.indexOf(selectedTipoOrden.get());
 
+        // Copiar la lista de ubicaciones seleccionadas
+        List<String> ubicaciones = new ArrayList<>(ubicacionesSeleccionadas);
+
         return new FiltroRepuestoDTO(
                 codigoFiltro.get(),
                 nombreFiltro.get(),
@@ -151,8 +167,13 @@ public class DepositoViewModel {
                 mostrarActivo.get(),
                 mostrarInactivo.get(),
                 colOrden,
-                tipoOrden
+                tipoOrden,
+                ubicaciones
         );
+    }
+
+    public void refrescarUbicaciones() {
+        cargarUbicaciones();
     }
 
     /**
@@ -165,19 +186,22 @@ public class DepositoViewModel {
     public void crearNuevoRepuesto() {
         Optional<Repuesto> result = navigator.openModal(Views.GUARDAR_REPUESTO, "Nuevo repuesto", null);
         result.ifPresent(nuevoRepuesto -> {
-            // Recargar la primera página para mostrar el nuevo repuesto
+            refrescarUbicaciones();   // ✅ por si se creó una nueva ubicación
             paginaActual.set(0);
             cargarPagina(0);
         });
+        refrescarUbicaciones();
     }
 
     public void modificarRepuesto(RepuestoRowViewModel vm) {
         Optional<Repuesto> result = navigator.openModal(
                 Views.GUARDAR_REPUESTO, "Modificar repuesto", vm.getRepuestoOriginal());
         result.ifPresent(r -> {
+            refrescarUbicaciones();   // ✅ por si cambió la ubicación
             cargarPagina(paginaActual.get());
             verificarBajoStock();
         });
+        refrescarUbicaciones();
     }
 
     public void borrarRepuesto(RepuestoRowViewModel vm) {
@@ -232,7 +256,14 @@ public class DepositoViewModel {
 
     // --- Lógica Privada ---
     private void verificarBajoStock() {
-        avisoStockBajoVisible.set(repuestoServ.contarStockBajo() > 0);
+        long cantidad = repuestoServ.contarStockBajo();
+        avisoStockBajoVisible.set(cantidad > 0);
+
+        if (cantidad > 0) {
+            avisoStockBajoTexto.set("⚠ " + cantidad + " repuesto(s) activo(s) con Stock Crítico");
+        } else {
+            avisoStockBajoTexto.set("");
+        }
     }
 
     // --- Getters para las Propiedades ---
@@ -246,6 +277,10 @@ public class DepositoViewModel {
 
     public BooleanProperty avisoStockBajoVisibleProperty() {
         return avisoStockBajoVisible;
+    }
+
+    public StringProperty avisoStockBajoTextoProperty() {
+        return avisoStockBajoTexto;
     }
 
     // ====== GETTERS DE PAGINACIÓN ======

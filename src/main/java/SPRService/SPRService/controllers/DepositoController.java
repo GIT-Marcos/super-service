@@ -6,11 +6,14 @@ import SPRService.SPRService.util.SimpleDialogs;
 import SPRService.SPRService.util.alertas.NotificationHelper;
 import SPRService.SPRService.viewModels.DepositoViewModel;
 import com.google.inject.Inject;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import org.controlsfx.control.CheckComboBox;
 import SPRService.SPRService.viewModels.tablas.RepuestoRowViewModel;
 
 import java.net.URL;
@@ -37,11 +40,15 @@ public class DepositoController implements Initializable {
     @FXML
     private TextField tfCodigo, tfNombre, tfMarca;
     @FXML
+    private HBox hboxAvisoStock;
+    @FXML
     private Label labelAvisoStock;
     @FXML
     private Pagination paginacion;
     @FXML
     private Button btnBaja, btnRepMasRetirados, btnRepUsos;
+    @FXML
+    private CheckComboBox<String> checkComboUbicaciones;
 
     private void configPermisos() {
         RolUsuario rol = SessionManager.getRolUsuario();
@@ -65,12 +72,15 @@ public class DepositoController implements Initializable {
     private void bindViewModel() {
         // Enlazar la tabla
         tablaRepuestos.itemsProperty().bind(viewModel.repuestosViewModelsProperty());
-        viewModel.selectedRepuestoProperty().bind(tablaRepuestos.getSelectionModel().selectedItemProperty());
+        viewModel.selectedRepuestoProperty().bind(
+                tablaRepuestos.getSelectionModel().selectedItemProperty());
 
-        // Enlazar filtros
+        // Enlazar filtros de texto
         tfCodigo.textProperty().bindBidirectional(viewModel.codigoFiltro);
         tfNombre.textProperty().bindBidirectional(viewModel.nombreFiltro);
         tfMarca.textProperty().bindBidirectional(viewModel.marcaFiltro);
+
+        // Enlazar checkboxes
         checkMostrarNormal.selectedProperty().bindBidirectional(viewModel.mostrarNormal);
         checkMostrarBajo.selectedProperty().bindBidirectional(viewModel.mostrarBajo);
         chActivos.selectedProperty().bindBidirectional(viewModel.mostrarActivo);
@@ -84,8 +94,26 @@ public class DepositoController implements Initializable {
         comboFormatos.setItems(viewModel.formatosExportacion);
         comboFormatos.valueProperty().bindBidirectional(viewModel.selectedFormatoExportacion);
 
-        // Enlazar otros elementos
-        labelAvisoStock.visibleProperty().bind(viewModel.avisoStockBajoVisibleProperty());
+        checkComboUbicaciones.getItems().setAll(viewModel.ubicacionesDisponibles);
+
+        // Cuando cambian las ubicaciones disponibles (ej: tras crear repuesto),
+        // refrescar items del CheckComboBox
+        viewModel.ubicacionesDisponibles.addListener((ListChangeListener<String>) change -> {
+            checkComboUbicaciones.getItems().setAll(viewModel.ubicacionesDisponibles);
+        });
+
+        // Sincronizar selección del CheckComboBox → ViewModel
+        checkComboUbicaciones.getCheckModel().getCheckedItems()
+                .addListener((ListChangeListener<String>) change -> {
+                    viewModel.ubicacionesSeleccionadas.setAll(
+                            checkComboUbicaciones.getCheckModel().getCheckedItems()
+                    );
+                });
+
+        // Enlazar fila de aviso de stock (visible + managed + texto)
+        hboxAvisoStock.visibleProperty().bind(viewModel.avisoStockBajoVisibleProperty());
+        hboxAvisoStock.managedProperty().bind(viewModel.avisoStockBajoVisibleProperty());
+        labelAvisoStock.textProperty().bind(viewModel.avisoStockBajoTextoProperty());
 
         // Enlazar paginación
         paginacion.pageCountProperty().bind(viewModel.totalPaginasProperty());
@@ -99,34 +127,31 @@ public class DepositoController implements Initializable {
     private void configurarPaginacion() {
         paginacion.setPageCount(1);
         paginacion.setCurrentPageIndex(0);
-        paginacion.setMaxPageIndicatorCount(10); // Número de botones de página visibles
-
-        // PageFactory para crear el contenido de cada página
-        // Retornamos un nodo vacío, ya que la tabla se actualiza vía binding
-        paginacion.setPageFactory(pageIndex -> {
-            // No necesitamos hacer nada aquí porque el listener
-            // de currentPageIndex ya llama a cargarPagina()
-            return new Label(""); // Nodo invisible
-        });
+        paginacion.setMaxPageIndicatorCount(10);
+        paginacion.setPageFactory(pageIndex -> new Label(""));
     }
 
     // --- Métodos de acción ---
+
     @FXML
     private void buscarConFiltros() {
-        paginacion.setCurrentPageIndex(0); // Resetear a primera página
+        // Las ubicaciones ya están sincronizadas vía el listener
+        paginacion.setCurrentPageIndex(0);
         viewModel.buscarConFiltros();
     }
 
     @FXML
     private void todosRepuestos() {
-        paginacion.setCurrentPageIndex(0); // Resetear a primera página
+        checkComboUbicaciones.getCheckModel().clearChecks();
+        paginacion.setCurrentPageIndex(0);
         viewModel.cargarTodosRepuestos();
     }
 
     @FXML
     private void nuevoRepuesto() {
         viewModel.crearNuevoRepuesto();
-        // Después de crear, ir a la primera página
+        // Refrescar items del CheckComboBox por si se creó nueva ubicación
+        checkComboUbicaciones.getItems().setAll(viewModel.ubicacionesDisponibles);
         paginacion.setCurrentPageIndex(0);
     }
 
@@ -162,9 +187,11 @@ public class DepositoController implements Initializable {
 
         try {
             viewModel.borrarRepuesto(vm);
-            NotificationHelper.mostrarExito("Dar de baja", "Se ha dado de baja el repuesto con éxito.");
+            NotificationHelper.mostrarExito("Dar de baja",
+                    "Se ha dado de baja el repuesto con éxito.");
         } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Dar de baja", "Ha ocurrido un error al dar de baja.");
+            NotificationHelper.mostrarError("Dar de baja",
+                    "Ha ocurrido un error al dar de baja.");
             e.printStackTrace();
         }
     }
@@ -178,15 +205,23 @@ public class DepositoController implements Initializable {
             return;
         }
 
+        if (!vm.getRepuestoOriginal().getActivo()) {
+            NotificationHelper.mostrarAdvertencia("Ingresar stock",
+                    "Solo puede ingresar stock en repuestos activos.");
+            return;
+        }
+
         Double cantidad = SimpleDialogs.inputStock();
         if (cantidad == null) return;
         try {
             viewModel.ingresarStock(vm, cantidad);
-            NotificationHelper.mostrarExito("Ingreso de stock", "Se ha ingresado el stock con éxito.");
+            NotificationHelper.mostrarExito("Ingreso de stock",
+                    "Se ha ingresado el stock con éxito.");
         } catch (IllegalArgumentException e) {
             NotificationHelper.mostrarAdvertencia("Ingreso de stock", e.getMessage());
         } catch (RuntimeException e) {
-            NotificationHelper.mostrarError("Ingreso de stock", "Ha ocurrido un error inesperado.");
+            NotificationHelper.mostrarError("Ingreso de stock",
+                    "Ha ocurrido un error inesperado.");
             e.printStackTrace();
         }
     }
@@ -245,7 +280,7 @@ public class DepositoController implements Initializable {
                 RepuestoRowViewModel item = row.getItem();
                 if (item != null) {
                     if (item.getCantidad() <= item.getCantidadMinima()) {
-                        row.setStyle("-fx-background-color: lightcoral;");
+                        row.setStyle("-fx-background-color: #fd7777;");
                     } else {
                         row.setStyle("");
                     }

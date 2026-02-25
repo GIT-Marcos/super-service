@@ -16,10 +16,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.CheckComboBox?>
 
 <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../styles/deposito.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.DepositoController">
 
-    <!-- PARTE SUPERIOR COMPACTA (~85px de alto) -->
+    <!-- PARTE SUPERIOR -->
     <top>
         <VBox spacing="8.0" styleClass="top-panel" BorderPane.alignment="CENTER">
             <padding>
@@ -54,18 +55,27 @@
                         <CheckBox fx:id="chActivos" selected="true" text="Activos" />
                         <CheckBox fx:id="chInactivos" text="Inactivos" />
 
-                        <!-- Aviso de Stock (Se muestra aquí para ahorrar espacio vertical) -->
-                        <Label fx:id="labelAvisoStock" styleClass="alert-label-compact" text="⚠ Repuestos con Stock Crítico" visible="false">
-                            <HBox.margin>
-                                <Insets left="10.0" />
-                            </HBox.margin>
+                        <Separator orientation="VERTICAL" />
+
+                        <Label text="📍" textFill="#b2bec3">
+                            <font><Font size="14.0" /></font>
                         </Label>
+                        <CheckComboBox fx:id="checkComboUbicaciones" prefWidth="180.0" title="Ubicaciones">
+                            <tooltip><Tooltip text="Filtrar por ubicación" /></tooltip>
+                        </CheckComboBox>
 
                         <Region HBox.hgrow="ALWAYS" />
 
                         <Label text="Ordenar:" textFill="#b2bec3" />
                         <ComboBox fx:id="comboOrdenarPor" prefWidth="140.0" promptText="Campo" />
                         <ComboBox fx:id="comboTipoOrden" prefWidth="140.0" promptText="Orden" />
+                    </children>
+                </HBox>
+
+                <!-- FILA 3: Aviso de Stock Crítico (solo visible cuando hay alertas) -->
+                <HBox fx:id="hboxAvisoStock" alignment="CENTER_LEFT" managed="false" spacing="5.0" styleClass="alert-bar" visible="false">
+                    <children>
+                        <Label fx:id="labelAvisoStock" styleClass="alert-label-compact" text="⚠ Repuestos activos con Stock Crítico" />
                     </children>
                 </HBox>
             </children>

@@ -6,6 +6,7 @@ import SPRService.SPRService.DTOs.filtros.FiltroRepuestoDTO;
 import SPRService.SPRService.entities.MarcaRepuesto;
 import SPRService.SPRService.entities.Repuesto;
 import SPRService.SPRService.entities.Stock;
+import SPRService.SPRService.entities.Ubicacion;
 import SPRService.SPRService.util.ResultadoPaginado;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -170,6 +171,12 @@ public class RepuestoDAOImpl extends GenericDAOImpl<Repuesto, Long> implements R
             filtros.add(cb.lessThanOrEqualTo(joinStock.get("cantidadExistente"),
                     joinStock.get("cantMinima")));
         }
+
+        if (filtro.ubicaciones() != null && !filtro.ubicaciones().isEmpty()) {
+            Join<Stock, Ubicacion> joinUbicacion = joinStock.join("ubicacion", JoinType.LEFT);
+            filtros.add(joinUbicacion.get("ubicacion").in(filtro.ubicaciones()));
+        }
+
         return filtros;
     }
 

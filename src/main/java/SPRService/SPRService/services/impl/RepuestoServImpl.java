@@ -64,6 +64,7 @@ public class RepuestoServImpl implements RepuestoServ {
                 filtro.inactivos(),
                 filtro.colOrden(),
                 filtro.tipoOrden(),
+                filtro.ubicaciones(),
                 offset,
                 itemsPorPagina
         );
@@ -74,8 +75,12 @@ public class RepuestoServImpl implements RepuestoServ {
     @Override
     public ResultadoPaginado<Repuesto> buscarParaExportar(FiltroRepuestoDTO filtro) {
         FiltroRepuestoDTO filtroParaExportar = new FiltroRepuestoDTO(
-                filtro.codBarras(), filtro.nombre(), filtro.marca(), filtro.stockNormal(), filtro.stockBajo(),
-                filtro.activos(), filtro.inactivos(), filtro.colOrden(), filtro.tipoOrden(), null, null
+                filtro.codBarras(), filtro.nombre(), filtro.marca(),
+                filtro.stockNormal(), filtro.stockBajo(),
+                filtro.activos(), filtro.inactivos(),
+                filtro.colOrden(), filtro.tipoOrden(),
+                filtro.ubicaciones(),   // ← pasar ubicaciones
+                null, null
         );
         return daoRepuesto.buscarRepuestosPaginado(filtroParaExportar);
     }
