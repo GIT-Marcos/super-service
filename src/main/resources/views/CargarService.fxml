@@ -21,7 +21,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="650.0" minWidth="1000.0" prefHeight="680.0" prefWidth="1000.0" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarServiceController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="650.0" minWidth="1100.0" prefHeight="680.0" prefWidth="1100.0" styleClass="root" stylesheets="@../styles/service.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="SPRService.SPRService.controllers.CargarServiceController">
 
     <!-- HEADER: IDENTIFICACIÓN -->
     <top>
