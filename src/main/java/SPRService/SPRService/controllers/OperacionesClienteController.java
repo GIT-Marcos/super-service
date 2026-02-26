@@ -14,6 +14,7 @@ import SPRService.SPRService.viewModels.celdas.ItemVentaViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,6 +23,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -34,6 +36,7 @@ public class OperacionesClienteController implements Initializable, DataReceiver
     private final Navigator navigator;
     private Cliente cliente;
     private final ObservableList<ItemOperacionViewModel> obsList = FXCollections.observableArrayList();
+    private final SortedList<ItemOperacionViewModel> sortedList = new SortedList<>(obsList);
 
     @FXML
     private Label lblTituloCliente, lblCantVentas, lblCantServices;
@@ -50,7 +53,9 @@ public class OperacionesClienteController implements Initializable, DataReceiver
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        listViewOperaciones.setItems(obsList);
+        sortedList.setComparator(Comparator.comparing(ItemOperacionViewModel::getFecha).reversed());
+        listViewOperaciones.setItems(sortedList);
+
         listViewOperaciones.setCellFactory(c -> new CeldaOperacionUniversal(this::detallesOperacion));
         String css = getClass().getResource("/styles/celda-operacion.css").toExternalForm();
         listViewOperaciones.getStylesheets().add(css);
