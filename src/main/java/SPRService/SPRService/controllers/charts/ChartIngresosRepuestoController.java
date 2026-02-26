@@ -23,14 +23,17 @@ import org.apache.commons.mail.EmailException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class ChartIngresosRepuestoController implements Initializable {
 
     private final VentaRepuestoServ ventaRepuestoServ;
     private final EMailSender eMailSender;
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"));
 
     @FXML
     private BorderPane rootPane;
@@ -99,11 +102,11 @@ public class ChartIngresosRepuestoController implements Initializable {
                 data.nodeProperty().addListener((observable, oldNode, newNode) -> {
                     if (newNode != null) {
                         String textoTooltip = String.format(
-                                "Repuesto: %s\nMarca: %s\nUnidades vendidas: %d\nIngresos Totales: $%.2f",
+                                "Repuesto: %s\nMarca: %s\nUnidades vendidas: %d\nIngresos Totales: %s",
                                 dto.detalle(),
                                 dto.marca(),
                                 dto.cantidadVendida().intValue(),
-                                dto.IngresosGenerados()
+                                currencyFormat.format(dto.IngresosGenerados())
                         );
 
                         Tooltip tooltip = new Tooltip(textoTooltip);
