@@ -60,7 +60,7 @@ public class VehiculosTest {
         //System.out.println("Clientes disponibles: " + clientes.size());
 
         Random random = new Random();
-        int totalObjetivo = 70;
+        int totalObjetivo = 100;
         int totalCreados = 0;
 
         // Set para asegurar unicidad de patentes en esta ejecución

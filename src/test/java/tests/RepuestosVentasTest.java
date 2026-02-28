@@ -68,15 +68,28 @@ class RepuestosVentasTest {
 
         Random random = new Random();
 
-        // 1. PREPARAR CACHE DE MARCAS Y UBICACIÓN
-        // Usamos un mapa para no crear duplicados de Marcas si sale la misma dos veces
+        // 1. PREPARAR CACHE DE MARCAS Y UBICACIONES
         Map<String, MarcaRepuesto> marcasCache = new HashMap<>();
 
-        // Creamos una única ubicación para este lote
-        Ubicacion ubicacionActual = new Ubicacion(null, "DEPOSITO CENTRAL " + UUID.randomUUID().toString().substring(0, 4), new ArrayList<>());
+        // Creamos 5 ubicaciones para distribuir los repuestos
+        String[] nombresUbicaciones = {
+                "DEPOSITO CENTRAL",
+                "DEPOSITO NORTE",
+                "DEPOSITO SUR",
+                "SUCURSAL OESTE",
+                "SUCURSAL ESTE"
+        };
+
+        List<Ubicacion> ubicaciones = new ArrayList<>();
+        for (String nombre : nombresUbicaciones) {
+            ubicaciones.add(new Ubicacion(null, nombre + " " + UUID.randomUUID().toString().substring(0, 4), new ArrayList<>()));
+        }
 
         int cantidadRepuestos = 70;
         int creados = 0;
+
+        // Set para rastrear qué ubicaciones ya fueron persistidas (tienen ID)
+        Set<Integer> ubicacionesPersistidas = new HashSet<>();
 
         // 2. CREAR LOS REPUESTOS
         for (int i = 0; i < cantidadRepuestos; i++) {
@@ -91,33 +104,41 @@ class RepuestosVentasTest {
                 // Recuperar marca del cache o crear nueva instancia si no existe
                 MarcaRepuesto marcaEntity = marcasCache.getOrDefault(nombreMarca, new MarcaRepuesto(null, nombreMarca, new HashSet<>()));
 
+                // Seleccionar una ubicación aleatoria de las 5
+                int idxUbicacion = random.nextInt(ubicaciones.size());
+                Ubicacion ubicacionSeleccionada = ubicaciones.get(idxUbicacion);
+
                 // Llamada al auxiliar pasando el nombre específico
-                Repuesto repuestoGuardado = crearRepuestoParametrizado(i, nombreCompleto, marcaEntity, ubicacionActual);
+                Repuesto repuestoGuardado = crearRepuestoParametrizado(i, nombreCompleto, marcaEntity, ubicacionSeleccionada);
 
                 // GESTIÓN DE REFERENCIAS POST-GUARDADO
 
                 // A. Actualizar Cache de Marcas:
-                // Si la marca era nueva, ahora tiene ID gracias al Cascade del Repuesto. La guardamos en el mapa.
                 if (!marcasCache.containsKey(nombreMarca)) {
                     marcasCache.put(nombreMarca, repuestoGuardado.getMarcaRepuesto());
                 }
 
-                // B. Actualizar Ubicación:
-                // Solo en la primera iteración necesitamos recuperar la Ubicación con ID asignado
-                if (i == 0) {
-                    ubicacionActual = repuestoGuardado.getStock().getUbicacion();
-                    assertNotNull(ubicacionActual.getId(), "La ubicación debería tener ID tras el primer guardado");
+                // B. Actualizar Ubicación con ID asignado tras el primer uso de cada una
+                if (!ubicacionesPersistidas.contains(idxUbicacion)) {
+                    ubicaciones.set(idxUbicacion, repuestoGuardado.getStock().getUbicacion());
+                    assertNotNull(ubicaciones.get(idxUbicacion).getId(),
+                            "La ubicación '" + nombresUbicaciones[idxUbicacion] + "' debería tener ID tras el primer guardado");
+                    ubicacionesPersistidas.add(idxUbicacion);
                 }
 
                 creados++;
-                System.out.println("Repuesto creado [" + creados + "/" + cantidadRepuestos + "]: " + repuestoGuardado.getDetalle() + " (" + repuestoGuardado.getPrecio() + ")");
+                System.out.println("Repuesto creado [" + creados + "/" + cantidadRepuestos + "]: "
+                        + repuestoGuardado.getDetalle() + " (" + repuestoGuardado.getPrecio() + ")"
+                        + " -> Ubicación: " + ubicaciones.get(idxUbicacion).getId());
 
             } catch (Exception e) {
                 System.err.println("Error al crear repuesto índice " + i + ": " + e.getMessage());
                 e.printStackTrace();
             }
         }
+
         System.out.println("--- Fin población Repuestos. Total creados: " + creados + " ---");
+        System.out.println("--- Ubicaciones utilizadas: " + ubicacionesPersistidas.size() + " de " + ubicaciones.size() + " ---");
     }
 
     @Test
