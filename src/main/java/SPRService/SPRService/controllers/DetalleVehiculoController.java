@@ -17,6 +17,7 @@ import SPRService.SPRService.viewModels.celdas.ItemServiceViewModel;
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -31,6 +32,7 @@ import javafx.stage.Stage;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -40,7 +42,8 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
     private final ServiceServ serviceServ;
     private final Navigator navigator;
     private Vehiculo vehiculo;
-    private ObservableList<ItemOperacionViewModel> items = FXCollections.observableArrayList();
+    private final ObservableList<ItemOperacionViewModel> items = FXCollections.observableArrayList();
+    private final SortedList<ItemOperacionViewModel> wrapper = new SortedList<>(items);
 
     @FXML
     private Label lblPatente, lblColor, lblNroChasis, lblNroMotor, lblMarca, lblModelo, lblAnio, lblCilindrada,
@@ -101,7 +104,9 @@ public class DetalleVehiculoController implements Initializable, DataReceiver<Ve
     }
 
     private void configurarLista() {
-        lvServices.setItems(items);
+        wrapper.setComparator(Comparator.comparing(ItemOperacionViewModel::getFecha).reversed());
+        lvServices.setItems(wrapper);
+
         lvServices.setCellFactory(f -> new CeldaOperacionUniversal(this::detallesOperacion));
         String css = getClass().getResource("/styles/celda-operacion.css").toExternalForm();
         lvServices.getStylesheets().add(css);
