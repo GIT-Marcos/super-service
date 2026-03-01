@@ -23,7 +23,6 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -34,13 +33,14 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
     private final ClienteServ clienteServ;
     private boolean flagModifyMode = false;
     private ObservableList<ItemDatoContactoViewModel> items = FXCollections.observableArrayList();
+    private ToggleGroup tgTipoContacto;
 
     @FXML
     private TextField tfDNI, tfNombre, tfApellido, tfDatoContacto;
     @FXML
     private Button btnGuardar, btnReActivar;
     @FXML
-    private ComboBox<ItemDatoContactoViewModel.TipoContacto> cbTipoContacto;
+    private RadioButton rbTelefono, rbEmail;
     @FXML
     private ListView<ItemDatoContactoViewModel> lvDatosContacto;
 
@@ -54,21 +54,43 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
         lvDatosContacto.setItems(items);
         lvDatosContacto.setCellFactory(cell -> new CeldaDatoContacto());
 
-        cbTipoContacto.getItems().addAll(ItemDatoContactoViewModel.TipoContacto.values());
-        cbTipoContacto.getSelectionModel().selectFirst();
+        // Crear y configurar el ToggleGroup programáticamente
+        tgTipoContacto = new ToggleGroup();
+        rbTelefono.setToggleGroup(tgTipoContacto);
+        rbEmail.setToggleGroup(tgTipoContacto);
 
-        cbTipoContacto.setOnAction(e -> actualizarPlaceholder());
+        // Listener para cambio de selección en RadioButtons
+        tgTipoContacto.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                actualizarPlaceholder();
+            }
+        });
+
+        // Placeholder inicial (Teléfono seleccionado por defecto)
         actualizarPlaceholder();
     }
 
     private void actualizarPlaceholder() {
-        ItemDatoContactoViewModel.TipoContacto tipo = cbTipoContacto.getValue();
+        ItemDatoContactoViewModel.TipoContacto tipo = getTipoContactoSeleccionado();
+        if (tipo == null) return;
+
         switch (tipo) {
             case EMAIL -> tfDatoContacto.setPromptText("email@ejemplo.com");
             case TELEFONO -> tfDatoContacto.setPromptText("+5491123456789");
         }
     }
 
+    /**
+     * Obtiene el tipo de contacto seleccionado basándose en el RadioButton activo
+     */
+    private ItemDatoContactoViewModel.TipoContacto getTipoContactoSeleccionado() {
+        if (rbTelefono.isSelected()) {
+            return ItemDatoContactoViewModel.TipoContacto.TELEFONO;
+        } else if (rbEmail.isSelected()) {
+            return ItemDatoContactoViewModel.TipoContacto.EMAIL;
+        }
+        return null;
+    }
 
     @Override
     public void receiveData(Cliente data) {
@@ -95,7 +117,7 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
 
     @FXML
     private void addDatoContacto() {
-        ItemDatoContactoViewModel.TipoContacto tipo = cbTipoContacto.getSelectionModel().getSelectedItem();
+        ItemDatoContactoViewModel.TipoContacto tipo = getTipoContactoSeleccionado();
         if (tipo == null) {
             return;
         }
@@ -145,7 +167,6 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
 
     @FXML
     private void guardar(ActionEvent event) {
-        // 1. Validar campos de texto
         String dni, nombre, apellido;
         try {
             dni = ManejadorInputs.dni(tfDNI.getText(), true);
@@ -156,32 +177,22 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
             return;
         }
 
-        // 2. Validar contactos
         if (items.isEmpty()) {
             NotificationHelper.mostrarAdvertencia("Datos de contacto", "Debe haber al menos un dato de contacto.");
             return;
         }
 
-        // 3. Confirmación de guardado
         if (!SimpleDialogs.confirmacion("Guardar cliente", "¿Confirmar guardado de cliente?")) return;
 
-        // 4. Construir DatosContacto
         DatosContacto contactos = new DatosContacto();
         if (flagModifyMode && cliente.getContactosCliente() != null) {
-            contactos.setId(cliente.getContactosCliente().getId()); // ⚠ Reusar ID existente
+            contactos.setId(cliente.getContactosCliente().getId());
         }
         ItemDatoContactoViewModel.updateEntity(contactos, items);
 
-        // 5. Construir Cliente
-        Cliente clienteParaCargar = new Cliente(
-                dni,
-                nombre,
-                apellido,
-                contactos
-        );
+        Cliente clienteParaCargar = new Cliente(dni, nombre, apellido, contactos);
         clienteParaCargar.setId(flagModifyMode ? cliente.getId() : null);
 
-        // 6. Guardar o editar
         try {
             if (!flagModifyMode) {
                 this.clienteParaDevolver = clienteServ.saveClient(clienteParaCargar);
@@ -201,18 +212,11 @@ public class CargarClienteController implements Initializable, DataReceiver<Clie
                 NotificationHelper.mostrarError("Guardar cliente", e.getMessage());
                 e.printStackTrace();
             }
-
         } catch (RuntimeException e) {
             NotificationHelper.mostrarError("Guardar cliente", e.getMessage());
             e.printStackTrace();
         }
     }
-
-    private void crearNuevo() {
-
-    }
-
-
 
     @FXML
     private void cancelar(ActionEvent event) {
