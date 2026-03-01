@@ -178,7 +178,7 @@ class RepuestosVentasTest {
                 int diasEnMes = YearMonth.of(anio, mes).lengthOfMonth();
 
                 System.out.println("Generando " + numVentasEsteMes + " ventas para " +
-                        Month.of(mes).name() + " 2024...");
+                        Month.of(mes).name() + " 2025...");
 
                 for (int i = 0; i < numVentasEsteMes; i++) {
                     try {
@@ -203,10 +203,12 @@ class RepuestosVentasTest {
                         notaRetiro.agregarDetalle(detalle);
 
                         // 60% de probabilidad de tener cliente registrado, 40% consumidor final
-                        Cliente cliente = null;
-                        if (!listaClientes.isEmpty() && random.nextDouble() < 0.6) {
-                            cliente = listaClientes.get(random.nextInt(listaClientes.size()));
-                        }
+//                        Cliente cliente = null;
+//                        if (!listaClientes.isEmpty() && random.nextDouble() < 0.6) {
+//                            cliente = listaClientes.get(random.nextInt(listaClientes.size()));
+//                        }
+
+                        Cliente cliente = listaClientes.get(random.nextInt(listaClientes.size()));
 
                         VentaRepuesto venta = new VentaRepuesto(notaRetiro);
                         venta.asociarCliente(cliente);
@@ -227,9 +229,11 @@ class RepuestosVentasTest {
 
                         String banco = null, marcaTarjeta = null, ultimos4 = null, referencia = null;
 
-                        String identificadorCliente = (cliente != null)
-                                ? cliente.getDni()
-                                : "CONSUMIDOR_FINAL";
+//                        String identificadorCliente = (cliente != null)
+//                                ? cliente.getDni()
+//                                : "CONSUMIDOR_FINAL";
+
+                        String identificadorCliente = cliente.getDni();
 
                         switch (metodoSeleccionado) {
                             case TARJETA_CREDITO:
@@ -274,13 +278,13 @@ class RepuestosVentasTest {
                     }
                 }
 
-                System.out.println("✓ Mes " + String.format("%02d", mes) + "/2024 completado. " +
+                System.out.println("✓ Mes " + String.format("%02d", mes) + "/2025 completado. " +
                         "Ventas acumuladas: " + totalVentasGeneradas);
             }
 
             System.out.println("\n===========================================");
             System.out.println("RESUMEN FINAL:");
-            System.out.println("- Año procesado: 2024 (completo)");
+            System.out.println("- Año procesado: 2025 (completo)");
             System.out.println("- Total de ventas generadas: " + totalVentasGeneradas);
             System.out.println("- Promedio por mes: " + (totalVentasGeneradas / 12));
             System.out.println("===========================================\n");
